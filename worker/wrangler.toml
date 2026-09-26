@@ -1,0 +1,26 @@
+name = "occultviision-api"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# --- D1 database (already provisioned live on the account, Session 5) ---
+[[d1_databases]]
+binding = "DB"
+database_name = "occultviision-db"
+database_id = "481b2745-1558-4018-925b-4f8dbc62d4d5"
+
+# --- KV namespace for sessions / rate-limit counters / trial-tracking ---
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "c384e9b815c3407e9501807b11b5094a"
+
+# --- Secrets (set via `wrangler secret put <NAME>`, never committed) ---
+# OTP_PROVIDER_API_KEY      -> SMS gateway (e.g. MSG91) for OTP send/verify
+# WHATSAPP_API_KEY          -> Interakt (default per ARCHITECTURE.md, unconfirmed)
+# RAZORPAY_KEY_ID
+# RAZORPAY_KEY_SECRET
+# JWT_SIGNING_SECRET        -> session token signing
+
+[vars]
+# Non-secret config only. Environment-specific values, not credentials.
+ENVIRONMENT = "development"
