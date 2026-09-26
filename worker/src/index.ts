@@ -18,6 +18,7 @@ import {
   handleGetSummary,
   type Env as AdminRouteEnv,
 } from "./routes/admin";
+import { handleGetKpChart, type Env as KpRouteEnv } from "./routes/kp";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { errorJson, corsPreflight } from "./lib/response";
@@ -30,6 +31,7 @@ export interface Env
     OrdersRouteEnv,
     ReferralRouteEnv,
     AdminRouteEnv,
+    KpRouteEnv,
     RateLimitEnv,
     SessionEnv {}
 
@@ -137,6 +139,11 @@ export default {
     const adminDeactivateMatch = /^\/admin\/users\/(\d+)\/deactivate$/.exec(pathname);
     if (request.method === "POST" && adminDeactivateMatch) {
       return handleDeactivateUser(request, env, Number(adminDeactivateMatch[1]));
+    }
+
+    const kpChartMatch = /^\/kp\/chart\/(\d+)$/.exec(pathname);
+    if (request.method === "GET" && kpChartMatch) {
+      return handleGetKpChart(request, env, Number(kpChartMatch[1]));
     }
 
     if (pathname === "/health") {
