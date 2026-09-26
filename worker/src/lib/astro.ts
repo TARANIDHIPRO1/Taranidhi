@@ -29,7 +29,11 @@ export function julianDayFromUtc(date: Date): number {
   return date.getTime() / 86400000 + 2440587.5;
 }
 
-/** Lahiri Ayanamsa -- see file header: verified vs Swiss Ephemeris in the prototype. */
+/** Lahiri Ayanamsa (app-wide default per ARCHITECTURE.md Section 4).
+ *  Polynomial from the Floot prototype, claimed verified vs Swiss Ephemeris
+ *  to 0.001°. This is the general-purpose ayanamsa for Muhurta, natal chart
+ *  displays, Hora scoring, etc. The KP module uses krishnamurtiAyanamsa()
+ *  instead -- see that function's comment for the calibration story. */
 export function lahiriAyanamsa(jd: number): number {
   const T = (jd - 2451545) / 36525;
   return (
@@ -39,6 +43,39 @@ export function lahiriAyanamsa(jd: number): number {
       0.00007964 * T * T * T) /
     3600
   );
+}
+
+// KRISHNAMURTI AYANAMSA -- scoped to KP module ONLY (ARCHITECTURE.md Section
+// 4: "Krishnamurti ayanamsa is scoped ONLY to the KP/Query-Window module --
+// it must never leak into or override the app-wide default.")
+//
+// CALIBRATION (this session, with Naveen): Naveen provided his own KP chart
+// from onlinejyotish.com (08/04/1973 11:45 IST, Bhopal) -- a tool he
+// confirmed is trustworthy. Our Lahiri formula's Ascendant, MC, and 4
+// independent Placidus cusps ALL differed from that KP reference by the SAME
+// constant: +0.0965° (5'47"), with only ~1.8 arcsec scatter across 6 checks.
+// That uniform offset confirms:
+//   (a) The Placidus geometry is correct (independent cusps all agree).
+//   (b) The difference is purely ayanamsa-constant, not formula error.
+//
+// The KP reference tool presumably uses Krishnamurti ayanamsa (standard for
+// KP charts), and the ~5'47" offset is close to the historically-documented
+// Lahiri-vs-old-Krishnamurti difference. So: Krishnamurti = Lahiri - 0.0965°
+// at this epoch.
+//
+// CAVEAT: calibrated from a SINGLE reference chart at a SINGLE epoch (1973).
+// A constant additive correction fixes a constant-term discrepancy but would
+// NOT catch a rate (drift-speed) mismatch -- that would only appear as a
+// growing offset at a very different epoch. Not yet tested against a second
+// chart at a different date. If a future verification shows a materially
+// different offset, this constant needs revisiting.
+const KP_AYANAMSA_OFFSET_DEG = -0.0965;
+
+/** Krishnamurti Ayanamsa -- for KP module use ONLY.
+ *  See the calibration note above. Do NOT use this in Muhurta, natal charts,
+ *  or any non-KP context. */
+export function krishnamurtiAyanamsa(jd: number): number {
+  return lahiriAyanamsa(jd) + KP_AYANAMSA_OFFSET_DEG;
 }
 
 const BODY_MAP: Record<string, Astronomy.Body> = {

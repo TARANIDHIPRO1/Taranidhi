@@ -21,32 +21,27 @@
 //    constant offset across every cusp means the iterative semi-arc solve
 //    itself is right; the only discrepancy is the ayanamsa constant used.
 //
-// UNRESOLVED: which ayanamsa convention is authoritative. lib/astro.ts's
-// lahiriAyanamsa() carries its own comment claiming verification against
-// Swiss Ephemeris to 0.001 degrees (from an earlier session), which is a
-// stronger provenance than a free online tool of unconfirmed calculation
-// quality -- so this is flagged as "likely the reference tool's ayanamsa
-// differs slightly," not "our formula is wrong," but this is NOT
-// independently reverified here and should not be treated as settled.
-// Confirm with Naveen which software/ayanamsa his practice treats as
-// authoritative before this feeds a paid, correctness-critical KP verdict.
-// Until then, this file reuses the same lahiriAyanamsa() as the rest of the
-// app for consistency (ARCHITECTURE.md Section 4: pass ayanamsa as an
-// explicit parameter, never hard-code one) -- NOT yet a true Krishnamurti
-// ayanamsa, which remains a separate, still-unresolved gap (see this file's
-// export of DEFAULT_AYANAMSA_CAVEAT below for what a caller should surface).
+// RESOLVED (this session): the ~0.0965° offset was identified as the
+// Lahiri-vs-Krishnamurti ayanamsa difference. This file now imports
+// krishnamurtiAyanamsa() from astro.ts (= Lahiri - 0.0965°, calibrated
+// against Naveen's own reference KP chart from onlinejyotish.com).
+// ARCHITECTURE.md Section 4 requires exactly this: Krishnamurti scoped to
+// KP only, never leaking into the app-wide Lahiri default.
+//
+// REMAINING CAVEAT: the correction constant was derived from a single
+// reference chart at a single epoch (1973). See astro.ts's
+// krishnamurtiAyanamsa() comment for the full caveat on epoch-sensitivity.
 
-import { julianDayFromUtc, lahiriAyanamsa, NAKSHATRA_NAMES } from "./astro";
+import { julianDayFromUtc, krishnamurtiAyanamsa, NAKSHATRA_NAMES } from "./astro";
 
 const DEG = Math.PI / 180;
 const norm360 = (x: number): number => ((x % 360) + 360) % 360;
 const NAK_WIDTH = 360 / 27;
 
 export const DEFAULT_AYANAMSA_CAVEAT =
-  "Using the app's Lahiri ayanamsa (not a separately-verified Krishnamurti ayanamsa). " +
-  "A real reference chart shows a small constant offset (~6 arcmin) against one online KP tool; " +
-  "the source of that offset is not yet confirmed. Do not treat cuspal degrees to sub-arcminute " +
-  "precision as final until this is resolved with the domain owner.";
+  "Using Krishnamurti ayanamsa (Lahiri - 0.0965°), calibrated against a verified reference " +
+  "KP chart (onlinejyotish.com). Calibration is from a single epoch (1973); a second reference " +
+  "chart at a different date has not yet been tested.";
 
 // ── Placidus house cusps ──
 
@@ -115,9 +110,9 @@ export interface PlacidusCusps {
 }
 
 /**
- * All 12 Placidus house cusps, sidereal (Lahiri). See file header for the
- * verification status of this formula (structurally confirmed against a
- * real reference chart; ayanamsa constant not yet independently settled).
+ * All 12 Placidus house cusps, sidereal (Krishnamurti ayanamsa).
+ * Structurally verified against Naveen's reference KP chart; now uses
+ * krishnamurtiAyanamsa() per ARCHITECTURE.md Section 4.
  */
 export function solvePlacidusCusps(birthUtc: Date, latitudeDeg: number, longitudeDeg: number): PlacidusCusps {
   const jd = julianDayFromUtc(birthUtc);
@@ -129,7 +124,8 @@ export function solvePlacidusCusps(birthUtc: Date, latitudeDeg: number, longitud
   const obliquityDeg = 23.439291111 - 0.013004167 * T - 0.0000001639 * T * T;
   const obliquityRad = obliquityDeg * DEG;
   const latRad = latitudeDeg * DEG;
-  const ayanamsa = lahiriAyanamsa(jd);
+  // ARCHITECTURE.md Section 4: KP module uses Krishnamurti, not Lahiri.
+  const ayanamsa = krishnamurtiAyanamsa(jd);
 
   // Ascendant -- same verified closed-form as lib/astro.ts / lib/lagna.ts.
   const ramc = ramcDeg * DEG;
