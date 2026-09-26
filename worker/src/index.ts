@@ -9,9 +9,10 @@ import { handleCreateKundali, handleListKundalis, type Env as KundaliEnv } from 
 import { handleMuhurtaNow, type Env as MuhurtaEnv } from "./routes/muhurta";
 import { handleGetBalance, type Env as WalletRouteEnv } from "./routes/wallet";
 import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway, type Env as OrdersRouteEnv } from "./routes/orders";
+import { handleGetReferralCode, handleAttributeReferral, type Env as ReferralRouteEnv } from "./routes/referral";
 import { errorJson, corsPreflight } from "./lib/response";
 
-export interface Env extends AuthEnv, KundaliEnv, MuhurtaEnv, WalletRouteEnv, OrdersRouteEnv {}
+export interface Env extends AuthEnv, KundaliEnv, MuhurtaEnv, WalletRouteEnv, OrdersRouteEnv, ReferralRouteEnv {}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -48,6 +49,13 @@ export default {
 
     if (request.method === "POST" && pathname === "/orders") {
       return handleCreateOrder(request, env);
+    }
+
+    if (request.method === "GET" && pathname === "/referral/code") {
+      return handleGetReferralCode(request, env);
+    }
+    if (request.method === "POST" && pathname === "/referral/attribute") {
+      return handleAttributeReferral(request, env);
     }
     const fundMatch = /^\/orders\/(\d+)\/fund\/(wallet|gateway)$/.exec(pathname);
     if (request.method === "POST" && fundMatch) {

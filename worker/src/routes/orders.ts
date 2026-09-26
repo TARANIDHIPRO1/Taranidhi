@@ -4,9 +4,10 @@
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
 import { createOrder, maybeFinalizeOrder, type OrderPurpose, type Env as OrdersEnv } from "../lib/orders";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
+import { maybeGrantReferralCommission, type Env as ReferralEnv } from "../lib/referral";
 import { json, errorJson } from "../lib/response";
 
-export interface Env extends AuthEnv, OrdersEnv, WalletEnv {
+export interface Env extends AuthEnv, OrdersEnv, WalletEnv, ReferralEnv {
   DB: D1Database;
 }
 
@@ -114,7 +115,21 @@ export async function handleFundOrderFromWallet(request: Request, env: Env, orde
 
   const fullyPaid = await maybeFinalizeOrder(env, orderId);
 
-  return json({ order_id: orderId, funded_paise: body.amount_paise, points_debited: pointsNeeded, fully_paid: fullyPaid });
+  let referralCommission: string | null = null;
+  if (fullyPaid) {
+    // ARCHITECTURE.md Section 7: commission triggers on the referred user's
+    // actual paid purchase, never mere signup -- checked here, right after
+    // the order that just made this true.
+    referralCommission = await maybeGrantReferralCommission(env, auth.userId, orderId);
+  }
+
+  return json({
+    order_id: orderId,
+    funded_paise: body.amount_paise,
+    points_debited: pointsNeeded,
+    fully_paid: fullyPaid,
+    referral_commission: referralCommission,
+  });
 }
 
 /**
