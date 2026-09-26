@@ -19,6 +19,7 @@ import {
   type Env as AdminRouteEnv,
 } from "./routes/admin";
 import { handleGetKpChart, type Env as KpRouteEnv } from "./routes/kp";
+import { handleKpQuery, handleListActivities, type Env as KpQueryRouteEnv } from "./routes/kpQuery";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { errorJson, corsPreflight } from "./lib/response";
@@ -32,6 +33,7 @@ export interface Env
     ReferralRouteEnv,
     AdminRouteEnv,
     KpRouteEnv,
+    KpQueryRouteEnv,
     RateLimitEnv,
     SessionEnv {}
 
@@ -144,6 +146,12 @@ export default {
     const kpChartMatch = /^\/kp\/chart\/(\d+)$/.exec(pathname);
     if (request.method === "GET" && kpChartMatch) {
       return handleGetKpChart(request, env, Number(kpChartMatch[1]));
+    }
+    if (request.method === "POST" && pathname === "/kp/query") {
+      return handleKpQuery(request, env);
+    }
+    if (request.method === "GET" && pathname === "/kp/activities") {
+      return handleListActivities(request, env);
     }
 
     if (pathname === "/health") {
