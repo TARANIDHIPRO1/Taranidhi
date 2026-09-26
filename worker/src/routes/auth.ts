@@ -18,7 +18,7 @@
 // `fingerprint_hash` is required on verify-otp, not optional -- see the note
 // in lib/device.ts about where that value is expected to come from.
 
-import { issueOtp, verifyOtp, type Env as OtpEnv } from "../lib/otp";
+import { issueOtp, verifyOtp, DEV_BYPASS_OTP_CODE, type Env as OtpEnv } from "../lib/otp";
 import { checkAndRegisterDevice, markTrialUsed, type Env as DeviceEnv } from "../lib/device";
 import { grantFreeTrial, type Env as WalletEnv } from "../lib/wallet";
 import { createSession, type Env as SessionEnv } from "../lib/session";
@@ -59,10 +59,10 @@ export async function handleRequestOtp(request: Request, env: Env): Promise<Resp
   try {
     await issueOtp(env, phoneNumber);
   } catch (err) {
-    // This will currently always throw -- see lib/otp.ts, the SMS gateway
-    // integration is an intentional stub pending ARCHITECTURE.md open
-    // decision #4 (provider choice). Surface that clearly rather than
-    // pretending the OTP was sent.
+    // This will currently always throw when DEV_OTP_BYPASS is off -- see
+    // lib/otp.ts, the SMS gateway integration is an intentional stub pending
+    // ARCHITECTURE.md open decision #4 (provider choice). Surface that
+    // clearly rather than pretending the OTP was sent.
     return errorJson(
       err instanceof Error ? err.message : "OTP could not be sent.",
       503,
@@ -70,7 +70,19 @@ export async function handleRequestOtp(request: Request, env: Env): Promise<Resp
     );
   }
 
-  return json({ status: "otp_sent", phone_number: phoneNumber });
+  // dev_bypass_active is informational only, and deliberately NOT a secret --
+  // it just tells a test client whether to expect a real SMS or to use the
+  // fixed test code. It reflects the exact same env check as issueOtp; if
+  // DEV_OTP_BYPASS is off/unset or ENVIRONMENT=production this is always false.
+  const devBypassActive = env.ENVIRONMENT !== "production" && env.DEV_OTP_BYPASS === "true";
+
+  return json({
+    status: "otp_sent",
+    phone_number: phoneNumber,
+    ...(devBypassActive
+      ? { dev_bypass_active: true, dev_bypass_code: DEV_BYPASS_OTP_CODE }
+      : {}),
+  });
 }
 
 export async function handleVerifyOtp(request: Request, env: Env): Promise<Response> {

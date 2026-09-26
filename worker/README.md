@@ -86,6 +86,30 @@ curl -X POST http://localhost:8787/auth/request-otp \
 # will currently return 503 OTP_GATEWAY_NOT_CONFIGURED -- expected, see above
 ```
 
+### Testing the full flow before a real SMS provider is wired up
+
+`DEV_OTP_BYPASS` in `wrangler.toml` is **off by default** (`"false"`). Flip it
+to `"true"` (in a local/dev environment only -- never in a production deploy)
+to unblock end-to-end testing of auth -> kundali without a real SMS gateway:
+
+```
+curl -X POST http://localhost:8787/auth/request-otp \
+  -H "content-type: application/json" \
+  -d '{"phone_number": "9876543210"}'
+# -> { "status": "otp_sent", "dev_bypass_active": true, "dev_bypass_code": "000000" }
+
+curl -X POST http://localhost:8787/auth/verify-otp \
+  -H "content-type: application/json" \
+  -d '{"phone_number": "9876543210", "code": "000000", "fingerprint_hash": "test-fingerprint-00000000"}'
+# -> { "status": "authenticated", "session_token": "...", ... }
+```
+
+It is double-gated (see `src/lib/otp.ts`, `isDevOtpBypassActive`): it only
+activates when `DEV_OTP_BYPASS="true"` **and** `ENVIRONMENT` is not
+`"production"`. **Set `DEV_OTP_BYPASS` back to `"false"` before the real
+launch deploy** -- don't rely on the `ENVIRONMENT` gate alone to keep this off
+in production.
+
 ## Deploying
 
 ```

@@ -22,6 +22,7 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthResul
   if (!match) return null;
 
   const token = match[1];
+  if (!token) return null;
   const userId = await getUserIdFromSession(env, token);
   if (userId === null) return null;
 
