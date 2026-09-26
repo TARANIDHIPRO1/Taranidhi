@@ -6,9 +6,10 @@
 
 import { handleRequestOtp, handleVerifyOtp, type Env as AuthEnv } from "./routes/auth";
 import { handleCreateKundali, handleListKundalis, type Env as KundaliEnv } from "./routes/kundali";
+import { handleMuhurtaNow, type Env as MuhurtaEnv } from "./routes/muhurta";
 import { errorJson, corsPreflight } from "./lib/response";
 
-export interface Env extends AuthEnv, KundaliEnv {}
+export interface Env extends AuthEnv, KundaliEnv, MuhurtaEnv {}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -33,6 +34,10 @@ export default {
     }
     if (request.method === "GET" && pathname === "/kundali") {
       return handleListKundalis(request, env);
+    }
+
+    if (request.method === "GET" && pathname === "/muhurta/now") {
+      return handleMuhurtaNow(request, env);
     }
 
     if (pathname === "/health") {

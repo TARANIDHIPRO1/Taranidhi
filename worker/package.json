@@ -9,8 +9,11 @@
     "db:migrate:remote": "wrangler d1 execute occultviision-db --remote --file=../db/schema.sql"
   },
   "devDependencies": {
-    "wrangler": "^3.90.0",
+    "@cloudflare/workers-types": "^4.20250101.0",
     "typescript": "^5.6.0",
-    "@cloudflare/workers-types": "^4.20250101.0"
+    "wrangler": "^3.90.0"
+  },
+  "dependencies": {
+    "astronomy-engine": "^2.1.19"
   }
 }

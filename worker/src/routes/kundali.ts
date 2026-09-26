@@ -10,6 +10,7 @@
 
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
 import { getLagnaRashiIndex } from "../lib/lagna";
+import { buildRealChart } from "../lib/astro";
 import { json, errorJson } from "../lib/response";
 
 export interface Env extends AuthEnv {
@@ -36,13 +37,12 @@ interface CreateKundaliBody {
   birth_place_lat?: number;
   birth_place_lon?: number;
   birth_place_name?: string;
-  // Required client-supplied value for now. Computing this server-side
-  // needs the Moon's sidereal longitude at birth, which needs a real
-  // ephemeris library (astronomy-engine) -- a dependency ARCHITECTURE.md
-  // Section 4 flags as "not yet added." Lagna, by contrast, IS computed
-  // server-side below because it has a genuine closed-form solution that
-  // doesn't need ephemeris data. Do not silently guess this value if it's
-  // missing -- reject the request instead (see validation below).
+  // No longer required from the caller. lib/astro.ts now computes this
+  // server-side via astronomy-engine (real Moon sidereal longitude at
+  // birth), ported from the verified TaraNidhi Floot prototype. If a caller
+  // still sends this field it is IGNORED, not trusted -- the server-computed
+  // value is always authoritative, since a client-supplied value could be
+  // wrong or (worse) spoofed to manipulate Tarabala-gated scoring downstream.
   janma_nakshatra_idx?: number;
 }
 
@@ -57,7 +57,7 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     return errorJson("Request body must be JSON.");
   }
 
-  const { birth_datetime_utc, birth_place_lat, birth_place_lon, janma_nakshatra_idx } = body;
+  const { birth_datetime_utc, birth_place_lat, birth_place_lon } = body;
 
   if (!birth_datetime_utc || Number.isNaN(Date.parse(birth_datetime_utc))) {
     return errorJson(
@@ -71,19 +71,6 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
   }
   if (typeof birth_place_lon !== "number" || birth_place_lon < -180 || birth_place_lon > 180) {
     return errorJson("birth_place_lon must be a number between -180 and 180.", 400, "INVALID_LON");
-  }
-  if (
-    typeof janma_nakshatra_idx !== "number" ||
-    !Number.isInteger(janma_nakshatra_idx) ||
-    janma_nakshatra_idx < 0 ||
-    janma_nakshatra_idx > 26
-  ) {
-    return errorJson(
-      "janma_nakshatra_idx is required (0-26) -- this endpoint does not compute it server-side yet. " +
-        "See the comment in routes/kundali.ts for why.",
-      400,
-      "MISSING_NAKSHATRA"
-    );
   }
 
   // Tier-limit check.
@@ -109,6 +96,13 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
   const birthDate = new Date(birth_datetime_utc);
   const lagnaRashiIdx = getLagnaRashiIndex(birthDate, birth_place_lat, birth_place_lon);
 
+  // janma_nakshatra_idx: now computed server-side from the Moon's real
+  // sidereal longitude at birth via astronomy-engine (lib/astro.ts), ported
+  // from the verified TaraNidhi Floot prototype. Any client-supplied value
+  // for this field (see the CreateKundaliBody comment above) is ignored.
+  const realChart = buildRealChart(birthDate, birth_place_lat, birth_place_lon);
+  const janmaNakshatraIdx = realChart.janmaNakIdx;
+
   const isoDate = birthDate.toISOString();
   const created = await env.DB.prepare(
     `INSERT INTO kundalis
@@ -125,7 +119,7 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
       birth_place_lat,
       birth_place_lon,
       body.birth_place_name ?? null,
-      janma_nakshatra_idx,
+      janmaNakshatraIdx,
       lagnaRashiIdx
     )
     .first<{ id: number }>();
@@ -134,7 +128,7 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     {
       id: created!.id,
       lagna_rashi_idx: lagnaRashiIdx,
-      janma_nakshatra_idx,
+      janma_nakshatra_idx: janmaNakshatraIdx,
     },
     201
   );
