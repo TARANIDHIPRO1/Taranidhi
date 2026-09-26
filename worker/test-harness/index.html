@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OCCULTVIISION API — Test Harness</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 640px; margin: 0 auto; padding: 16px; line-height: 1.5; }
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 1.05rem; margin-top: 2rem; border-top: 1px solid #8884; padding-top: 1rem; }
+  label { display: block; margin-top: 0.6rem; font-size: 0.85rem; opacity: 0.8; }
+  input { width: 100%; box-sizing: border-box; padding: 0.5rem; font-size: 1rem; margin-top: 0.2rem; }
+  button { margin-top: 0.8rem; padding: 0.6rem 1rem; font-size: 1rem; cursor: pointer; width: 100%; }
+  pre { background: #8882; padding: 0.7rem; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; }
+  .ok { color: #2a2; } .err { color: #d33; }
+  .step { border: 1px solid #8884; border-radius: 8px; padding: 12px; margin-top: 12px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; background: #8882; }
+</style>
+</head>
+<body>
+  <h1>OCCULTVIISION — API Test Harness</h1>
+  <p>Sirf testing/demo ke liye. Base URL apni machine ki LAN IP se badlo agar mobile se test kar rahe ho.</p>
+
+  <label>API Base URL</label>
+  <input id="baseUrl" value="http://localhost:8787" />
+
+  <div class="step">
+    <h2>0. Health check</h2>
+    <button onclick="healthCheck()">Ping /health</button>
+    <pre id="out-health"></pre>
+  </div>
+
+  <div class="step">
+    <h2>1. Request OTP</h2>
+    <label>Phone number (10-digit, e.g. 9876543210)</label>
+    <input id="phone" value="9876543210" />
+    <button onclick="requestOtp()">Send OTP request</button>
+    <pre id="out-otp-request"></pre>
+  </div>
+
+  <div class="step">
+    <h2>2. Verify OTP &amp; log in</h2>
+    <label>OTP code (dev bypass fixed code shows above once requested — usually 000000)</label>
+    <input id="code" value="000000" />
+    <label>Device fingerprint (any string ≥8 chars for testing)</label>
+    <input id="fingerprint" value="test-device-fingerprint-001" />
+    <button onclick="verifyOtp()">Verify &amp; get session token</button>
+    <pre id="out-otp-verify"></pre>
+    <p><span class="badge" id="session-badge">no session yet</span></p>
+  </div>
+
+  <div class="step">
+    <h2>3. Save a kundali</h2>
+    <label>Label</label>
+    <input id="k-label" value="Test Chart 1" />
+    <label>Birth datetime (UTC ISO, e.g. 1973-04-08T06:15:00Z)</label>
+    <input id="k-dt" value="1973-04-08T06:15:00Z" />
+    <label>Latitude</label>
+    <input id="k-lat" value="23.2599" />
+    <label>Longitude</label>
+    <input id="k-lon" value="77.4126" />
+    <label>Place name</label>
+    <input id="k-place" value="Bhopal" />
+    <label>Janma Nakshatra index (0-26, server doesn't compute this yet — use any valid test value)</label>
+    <input id="k-nak" value="3" />
+    <button onclick="createKundali()">POST /kundali</button>
+    <pre id="out-kundali-create"></pre>
+  </div>
+
+  <div class="step">
+    <h2>4. List my kundalis</h2>
+    <button onclick="listKundalis()">GET /kundali</button>
+    <pre id="out-kundali-list"></pre>
+  </div>
+
+<script>
+let sessionToken = null;
+
+function base() { return document.getElementById('baseUrl').value.replace(/\/$/, ''); }
+function show(id, data, isError) {
+  const el = document.getElementById(id);
+  el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  el.className = isError ? 'err' : 'ok';
+}
+
+async function call(path, opts) {
+  try {
+    const res = await fetch(base() + path, opts);
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data };
+  } catch (e) {
+    return { ok: false, status: 0, data: { error: String(e) } };
+  }
+}
+
+async function healthCheck() {
+  const r = await call('/health', {});
+  show('out-health', r.ok ? 'OK (' + r.status + ')' : r, !r.ok);
+}
+
+async function requestOtp() {
+  const phone = document.getElementById('phone').value;
+  const r = await call('/auth/request-otp', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ phone_number: phone }),
+  });
+  show('out-otp-request', r.data, !r.ok);
+  if (r.ok && r.data.dev_bypass_code) {
+    document.getElementById('code').value = r.data.dev_bypass_code;
+  }
+}
+
+async function verifyOtp() {
+  const phone = document.getElementById('phone').value;
+  const code = document.getElementById('code').value;
+  const fingerprint_hash = document.getElementById('fingerprint').value;
+  const r = await call('/auth/verify-otp', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ phone_number: phone, code, fingerprint_hash }),
+  });
+  show('out-otp-verify', r.data, !r.ok);
+  if (r.ok && r.data.session_token) {
+    sessionToken = r.data.session_token;
+    document.getElementById('session-badge').textContent = 'session active (user #' + r.data.user.id + ', tier: ' + r.data.user.tier + ')';
+  } else {
+    document.getElementById('session-badge').textContent = 'no session yet';
+  }
+}
+
+async function createKundali() {
+  if (!sessionToken) { show('out-kundali-create', 'Verify OTP first to get a session token.', true); return; }
+  const body = {
+    label: document.getElementById('k-label').value,
+    birth_datetime_utc: document.getElementById('k-dt').value,
+    birth_place_lat: parseFloat(document.getElementById('k-lat').value),
+    birth_place_lon: parseFloat(document.getElementById('k-lon').value),
+    birth_place_name: document.getElementById('k-place').value,
+    janma_nakshatra_idx: parseInt(document.getElementById('k-nak').value, 10),
+  };
+  const r = await call('/kundali', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'authorization': 'Bearer ' + sessionToken },
+    body: JSON.stringify(body),
+  });
+  show('out-kundali-create', r.data, !r.ok);
+}
+
+async function listKundalis() {
+  if (!sessionToken) { show('out-kundali-list', 'Verify OTP first to get a session token.', true); return; }
+  const r = await call('/kundali', {
+    method: 'GET',
+    headers: { 'authorization': 'Bearer ' + sessionToken },
+  });
+  show('out-kundali-list', r.data, !r.ok);
+}
+</script>
+</body>
+</html>

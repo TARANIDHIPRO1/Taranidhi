@@ -35,4 +35,4 @@ ENVIRONMENT = "development"
 # MUST be "false" (or removed) before any production deploy. It is also
 # hard-blocked from working if ENVIRONMENT="production", as a second gate --
 # but don't rely on that alone. Flip this back to "false" before launch.
-DEV_OTP_BYPASS = "false"
+DEV_OTP_BYPASS = "true"
