@@ -63,3 +63,94 @@ export async function getSpendableBalance(env: Env, userId: number): Promise<num
 
   return row?.balance ?? 0;
 }
+
+export class InsufficientBalanceError extends Error {
+  constructor(public readonly available: number, public readonly requested: number) {
+    super(`Insufficient balance: requested ${requested}, available ${available}.`);
+    this.name = "InsufficientBalanceError";
+  }
+}
+
+/**
+ * Atomically debits `amount` points from a user's spendable balance, FIFO
+ * across active batches (oldest expires_at first -- so trial points, which
+ * expire soonest, get consumed before longer-lived subscription/top-up
+ * batches, minimizing wasted expiry). This is THE function referenced by
+ * ARCHITECTURE.md Section 8's "Wallet double-spend (race condition)" row --
+ * do not reimplement a separate "read balance, then write deduction" path
+ * anywhere else in the codebase. Every debit goes through this function.
+ *
+ * Concurrency: Cloudflare D1 does not (as of this writing) expose
+ * client-driven multi-statement SERIALIZABLE transactions the way a
+ * traditional Postgres/MySQL connection would -- `env.DB.batch([...])` runs
+ * multiple statements atomically as a batch, but a batch is a fixed list of
+ * prepared statements decided BEFORE execution, not a read-then-branch
+ * transaction. Given that constraint, this function does the FIFO batch
+ * selection as a single read, then issues the resulting UPDATEs as one
+ * `env.DB.batch()` call -- atomic as a set, but with a real (if narrow) TOCTOU
+ * gap between the read and the batch under high concurrent write volume on
+ * the SAME user_id. This is a deliberate, documented interim choice given
+ * D1's current transaction primitives, not the "check then deduct as two
+ * separate uncoordinated steps" antipattern Section 8 warns against -- but it
+ * is not a full row-lock/serializable guarantee either. Flagged here rather
+ * than silently presented as fully solved: revisit if/when D1 ships a true
+ * interactive transaction API, or move this specific hot path to Durable
+ * Objects (one DO instance per user_id gives natural per-user serialization)
+ * if concurrent-debit abuse is ever observed in production logs.
+ */
+export async function debitWallet(
+  env: Env,
+  userId: number,
+  amount: number,
+  reason: string,
+  orderId?: number
+): Promise<void> {
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error(`debitWallet: amount must be a positive integer, got ${amount}.`);
+  }
+
+  const now = new Date().toISOString();
+  const { results: batches } = await env.DB.prepare(
+    `SELECT id, amount_remaining
+     FROM wallet_ledger
+     WHERE user_id = ?
+       AND status = 'active'
+       AND expires_at > ?
+       AND (holding_until IS NULL OR holding_until <= ?)
+     ORDER BY expires_at ASC`
+  )
+    .bind(userId, now, now)
+    .all<{ id: number; amount_remaining: number }>();
+
+  const available = batches.reduce((sum, b) => sum + b.amount_remaining, 0);
+  if (available < amount) {
+    throw new InsufficientBalanceError(available, amount);
+  }
+
+  let remainingToDebit = amount;
+  const statements: D1PreparedStatement[] = [];
+  for (const batch of batches) {
+    if (remainingToDebit <= 0) break;
+    const takeFromThisBatch = Math.min(batch.amount_remaining, remainingToDebit);
+    const newRemaining = batch.amount_remaining - takeFromThisBatch;
+
+    statements.push(
+      env.DB.prepare(
+        `UPDATE wallet_ledger
+         SET amount_remaining = ?,
+             status = CASE WHEN ? = 0 THEN 'depleted' ELSE status END
+         WHERE id = ?`
+      ).bind(newRemaining, newRemaining, batch.id)
+    );
+    statements.push(
+      env.DB.prepare(
+        `INSERT INTO wallet_transactions (wallet_ledger_id, amount, reason, order_id)
+         VALUES (?, ?, ?, ?)`
+      ).bind(batch.id, -takeFromThisBatch, reason, orderId ?? null)
+    );
+
+    remainingToDebit -= takeFromThisBatch;
+  }
+
+  await env.DB.batch(statements);
+}

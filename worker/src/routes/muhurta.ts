@@ -9,20 +9,28 @@
 // (Chandrabala-Gate, Lagna-Gate, Dasha-Gate) before this can be called the
 // complete Hora Matrix.
 //
-// NOT yet wired: query_logs insertion / wallet point debit for this lookup
-// (ARCHITECTURE.md Section 5: general lookups cost 1 point on Basic tier).
-// This endpoint is free to call for now -- ARCHITECTURE.md Task backlog
-// tracks wiring the wallet debit once the wallet debit function exists.
+// Billing (ARCHITECTURE.md Section 5, "General lookups" row): Basic tier is
+// pay-per-use at 1 point/query; Premium/Ultra are unlimited. This is a
+// "general_lookup" query_type in query_logs terms (Section 2, step 8), NOT
+// a "kp_query_window" -- this endpoint is the Muhurta/Hora side, not the KP
+// Horary side (that's a separate not-yet-built module, also pay-per-use for
+// everyone per Section 5's KP row). Basic-tier debit failure (insufficient
+// balance) returns 402, matching how a real payment-required flow should
+// read on the wire.
 
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
 import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, NAKSHATRA_NAMES } from "../lib/astro";
 import { buildHoraWindows, getActiveHora, buildUphoras, getActiveUphora, getRahuKaal, isWithinRahuKaal, computeTara } from "../lib/muhurta";
 import { scoreHora, type LagnaOnlyChart } from "../lib/horaScoring";
+import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
 
-export interface Env extends AuthEnv {
+export interface Env extends AuthEnv, WalletEnv {
   DB: D1Database;
 }
+
+const GENERAL_LOOKUP_COST = 1;
+const UNLIMITED_TIERS = new Set(["premium", "ultra"]);
 
 export async function handleMuhurtaNow(request: Request, env: Env): Promise<Response> {
   const auth = await requireAuth(request, env);
@@ -45,9 +53,10 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
 
   let lagnaOnlyChart: LagnaOnlyChart | null = null;
   let janmaNakIdx: number | null = null;
+  let kundaliId: number | null = null;
 
   if (kundaliIdParam !== null) {
-    const kundaliId = Number(kundaliIdParam);
+    kundaliId = Number(kundaliIdParam);
     if (!Number.isInteger(kundaliId)) {
       return errorJson("kundali_id must be an integer.", 400, "INVALID_KUNDALI_ID");
     }
@@ -63,6 +72,30 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     }
     if (row.lagna_rashi_idx !== null) lagnaOnlyChart = { lagnaRashi: row.lagna_rashi_idx };
     janmaNakIdx = row.janma_nakshatra_idx;
+  }
+
+  // Tier + billing check, AFTER all input validation -- a request that would
+  // fail validation anyway (bad lat/lon, a kundali_id that isn't the
+  // caller's) must never charge a point first.
+  const user = await env.DB.prepare(`SELECT tier FROM users WHERE id = ?`)
+    .bind(auth.userId)
+    .first<{ tier: string }>();
+  if (!user) return errorJson("User not found.", 404, "USER_NOT_FOUND");
+
+  const isUnlimitedTier = UNLIMITED_TIERS.has(user.tier);
+  if (!isUnlimitedTier) {
+    try {
+      await debitWallet(env, auth.userId, GENERAL_LOOKUP_COST, "query");
+    } catch (err) {
+      if (err instanceof InsufficientBalanceError) {
+        return errorJson(
+          `Insufficient points balance (have ${err.available}, need ${err.requested}). Top up or upgrade your tier.`,
+          402,
+          "INSUFFICIENT_BALANCE"
+        );
+      }
+      throw err;
+    }
   }
 
   const now = new Date();
@@ -88,6 +121,20 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   if (activeHora) {
     score = scoreHora(activeHora.lord, purpose, lagnaOnlyChart, janmaNakIdx, currentNakIdx, currentNakDeg);
   }
+
+  // Query log -- per ARCHITECTURE.md Section 2 step 8 ("Query + result are
+  // logged to D1") and Section 8 (this table is also the substrate for
+  // future API-scraping rate-limit checks). Fire-and-forget-safe: logging
+  // failure should not fail an otherwise-successful, already-billed request,
+  // but is still awaited here so a D1 outage surfaces as a real error rather
+  // than a silently-lost log line -- revisit if this ever needs to be
+  // decoupled from the request's latency budget.
+  await env.DB.prepare(
+    `INSERT INTO query_logs (user_id, kundali_id, query_type, muhurta_pct, points_charged)
+     VALUES (?, ?, 'general_lookup', ?, ?)`
+  )
+    .bind(auth.userId, kundaliId, score?.score ?? null, isUnlimitedTier ? 0 : GENERAL_LOOKUP_COST)
+    .run();
 
   return json({
     as_of: now.toISOString(),
