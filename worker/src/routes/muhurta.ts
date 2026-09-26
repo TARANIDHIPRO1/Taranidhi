@@ -4,10 +4,12 @@
 // This is the first real consumer of lib/muhurta.ts + lib/horaScoring.ts
 // (ported from the verified TaraNidhi Floot prototype) inside the Worker,
 // per ARCHITECTURE.md Section 8: scoring must run server-side, never on the
-// client. It is intentionally a "3-layer" score (Purpose, Functional-Nature,
-// Tarabala) -- see lib/horaScoring.ts header for what's still missing
-// (Chandrabala-Gate, Lagna-Gate, Dasha-Gate) before this can be called the
-// complete Hora Matrix.
+// client. It now supplies all 5 of horaScoring.ts's implemented layers
+// (Purpose, Functional-Nature, Dasha-Gate, Tarabala, Chandrabala) when a
+// kundali_id is given, rebuilding the natal chart on-demand via
+// buildRealChart() to get the natal Moon rashi + Vimshottari Dasha -- see
+// lib/horaScoring.ts header for why "Lagna-Gate" (the 6th, undefined layer)
+// is deliberately NOT included.
 //
 // Billing (ARCHITECTURE.md Section 5, "General lookups" row): Basic tier is
 // pay-per-use at 1 point/query; Premium/Ultra are unlimited. This is a
@@ -19,9 +21,9 @@
 // read on the wire.
 
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
-import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, NAKSHATRA_NAMES } from "../lib/astro";
+import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, buildRealChart, getCurrentDasha, NAKSHATRA_NAMES } from "../lib/astro";
 import { buildHoraWindows, getActiveHora, buildUphoras, getActiveUphora, getRahuKaal, isWithinRahuKaal, computeTara } from "../lib/muhurta";
-import { scoreHora, type LagnaOnlyChart } from "../lib/horaScoring";
+import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
 
@@ -35,6 +37,8 @@ const UNLIMITED_TIERS = new Set(["premium", "ultra"]);
 export async function handleMuhurtaNow(request: Request, env: Env): Promise<Response> {
   const auth = await requireAuth(request, env);
   if (!auth) return unauthorized();
+
+  const now = new Date();
 
   const url = new URL(request.url);
   const latParam = url.searchParams.get("lat");
@@ -54,6 +58,8 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   let lagnaOnlyChart: LagnaOnlyChart | null = null;
   let janmaNakIdx: number | null = null;
   let kundaliId: number | null = null;
+  let dashaContext: DashaContext | null = null;
+  let chandrabalaContext: ChandrabalaContext | null = null;
 
   if (kundaliIdParam !== null) {
     kundaliId = Number(kundaliIdParam);
@@ -63,15 +69,42 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     // Scoped to the caller's own kundali -- never let one user personalize a
     // score using another user's saved birth data.
     const row = await env.DB.prepare(
-      `SELECT lagna_rashi_idx, janma_nakshatra_idx FROM kundalis WHERE id = ? AND user_id = ?`
+      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, birth_time, birth_place_lat, birth_place_lon
+       FROM kundalis WHERE id = ? AND user_id = ?`
     )
       .bind(kundaliId, auth.userId)
-      .first<{ lagna_rashi_idx: number | null; janma_nakshatra_idx: number | null }>();
+      .first<{
+        lagna_rashi_idx: number | null;
+        janma_nakshatra_idx: number | null;
+        birth_date: string;
+        birth_time: string;
+        birth_place_lat: number;
+        birth_place_lon: number;
+      }>();
     if (!row) {
       return errorJson("Kundali not found for this account.", 404, "KUNDALI_NOT_FOUND");
     }
     if (row.lagna_rashi_idx !== null) lagnaOnlyChart = { lagnaRashi: row.lagna_rashi_idx };
     janmaNakIdx = row.janma_nakshatra_idx;
+
+    // Rebuild the natal chart on-demand from stored birth data to get the
+    // natal Moon rashi (Chandrabala-Gate) and Vimshottari Dasha (Dasha-Gate).
+    // Neither is stored as its own column -- see lib/horaScoring.ts /
+    // lib/astro.ts headers for why recomputing here (instead of adding new
+    // schema columns) was the chosen approach: it reuses the same
+    // already-verified buildRealChart() as kundali creation, so there's only
+    // one place natal-chart math can go wrong, not two.
+    const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+    if (!Number.isNaN(birthUtc.getTime())) {
+      const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+      const natalMoon = natalChart.planets.find((p) => p.planet === "Moon");
+      if (natalMoon) {
+        // currentMoonRashi filled in below once moonLon is computed.
+        chandrabalaContext = { natalMoonRashi: natalMoon.rashi, currentMoonRashi: -1 };
+      }
+      const dasha = getCurrentDasha(natalChart, now);
+      dashaContext = { mahaLord: dasha?.maha.lord ?? null, antarLord: dasha?.antar.lord ?? null };
+    }
   }
 
   // Tier + billing check, AFTER all input validation -- a request that would
@@ -98,7 +131,6 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     }
   }
 
-  const now = new Date();
   const { sunrise, sunset, nextSunrise } = realSunriseSunset(now, lat, lon);
   const horaWindows = buildHoraWindows(sunrise, sunset, nextSunrise, now);
   const activeHora = getActiveHora(horaWindows, now);
@@ -112,6 +144,10 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const currentNakIdx = Math.floor(moonLon / (360 / 27));
   const currentNakDeg = moonLon % (360 / 27);
 
+  if (chandrabalaContext) {
+    chandrabalaContext = { ...chandrabalaContext, currentMoonRashi: Math.floor(moonLon / 30) };
+  }
+
   let tara: { number: number; name: string; isBenefic: boolean } | null = null;
   if (janmaNakIdx !== null) {
     tara = computeTara(janmaNakIdx, currentNakIdx);
@@ -119,7 +155,16 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
 
   let score: ReturnType<typeof scoreHora> | null = null;
   if (activeHora) {
-    score = scoreHora(activeHora.lord, purpose, lagnaOnlyChart, janmaNakIdx, currentNakIdx, currentNakDeg);
+    score = scoreHora(
+      activeHora.lord,
+      purpose,
+      lagnaOnlyChart,
+      janmaNakIdx,
+      currentNakIdx,
+      currentNakDeg,
+      dashaContext,
+      chandrabalaContext
+    );
   }
 
   // Query log -- per ARCHITECTURE.md Section 2 step 8 ("Query + result are
