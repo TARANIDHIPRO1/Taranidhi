@@ -20,6 +20,7 @@ import {
 } from "./routes/admin";
 import { handleGetKpChart, type Env as KpRouteEnv } from "./routes/kp";
 import { handleKpQuery, handleListActivities, type Env as KpQueryRouteEnv } from "./routes/kpQuery";
+import { handleMuhurtaScan, type Env as MuhurtaScanEnv } from "./routes/muhurtaScanner";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { errorJson, corsPreflight } from "./lib/response";
@@ -34,6 +35,7 @@ export interface Env
     AdminRouteEnv,
     KpRouteEnv,
     KpQueryRouteEnv,
+    MuhurtaScanEnv,
     RateLimitEnv,
     SessionEnv {}
 
@@ -100,6 +102,9 @@ export default {
 
     if (request.method === "GET" && pathname === "/muhurta/now") {
       return handleMuhurtaNow(request, env);
+    }
+    if (request.method === "GET" && pathname === "/muhurta/scan") {
+      return handleMuhurtaScan(request, env);
     }
 
     if (request.method === "GET" && pathname === "/wallet/balance") {
