@@ -21,8 +21,19 @@
 // read on the wire.
 
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
-import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, buildRealChart, getCurrentDasha, NAKSHATRA_NAMES } from "../lib/astro";
-import { buildHoraWindows, getActiveHora, buildUphoras, getActiveUphora, getRahuKaal, isWithinRahuKaal, computeTara } from "../lib/muhurta";
+import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, buildRealChart, getCurrentDasha, getCombustion, NAKSHATRA_NAMES } from "../lib/astro";
+import {
+  buildHoraWindows,
+  getActiveHora,
+  buildUphoras,
+  getActiveUphora,
+  getRahuKaal,
+  isWithinRahuKaal,
+  computeTara,
+  getPanchakaDosha,
+  getGandaMoola,
+  getDishashool,
+} from "../lib/muhurta";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
@@ -153,6 +164,22 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     tara = computeTara(janmaNakIdx, currentNakIdx);
   }
 
+  // Panchaka Dosha / Ganda Moola / Dishashool -- ARCHITECTURE.md Section 4.
+  // All three are general (not personalized to a kundali) checks based on
+  // the current moment's nakshatra/weekday, so they run unconditionally.
+  // See lib/muhurta.ts for the sourcing caveats on the weekday-name tables.
+  const panchaka = getPanchakaDosha(currentNakIdx, currentNakDeg, now.getUTCDay());
+  const gandaMoola = getGandaMoola(currentNakIdx);
+  const dishashool = getDishashool(now.getUTCDay());
+
+  // Combustion -- ARCHITECTURE.md Section 4: checked for Venus and Jupiter
+  // specifically, since those are the two planets it names as governing
+  // sanskaras (marriage, upanayan, etc.) that combustion classically
+  // prohibits. Other planets' combustion states aren't part of that
+  // documented rule, so they're not computed here.
+  const venusCombustion = getCombustion("Venus", jd);
+  const jupiterCombustion = getCombustion("Jupiter", jd);
+
   let score: ReturnType<typeof scoreHora> | null = null;
   if (activeHora) {
     score = scoreHora(
@@ -195,6 +222,10 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     rahu_kaal: { start: rahuKaal.start.toISOString(), end: rahuKaal.end.toISOString(), active_now: inRahuKaal },
     current_nakshatra: { idx: currentNakIdx, name: NAKSHATRA_NAMES[currentNakIdx] },
     tara,
+    panchaka_dosha: panchaka,
+    ganda_moola: gandaMoola,
+    dishashool,
+    combustion: { venus: venusCombustion, jupiter: jupiterCombustion },
     score,
     personalized: lagnaOnlyChart !== null || janmaNakIdx !== null,
   });

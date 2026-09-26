@@ -298,6 +298,62 @@ export function realSunriseSunset(
   };
 }
 
+// ── Combustion (Ast) ──
+// ARCHITECTURE.md Section 4: "Requires real planetary longitudes relative to
+// the Sun (same ephemeris dependency as sub-lords). Orbs vary by planet and
+// by direct/retrograde state (e.g. Venus 10 deg direct / 8 deg retrograde).
+// Classically prohibits Venus/Jupiter-ruled sanskaras (marriage, upanayan,
+// etc.) when either planet is combust." That ephemeris dependency is now
+// satisfied by this file's trueSiderealLongitude(), so this is no longer
+// technically blocked -- but ARCHITECTURE.md's own research only confirms
+// ONE planet's orb (Venus, 10 deg/8 deg). The other planets' orbs below are
+// the commonly-published classical values (Muhurta Chintamani / standard
+// Panchang references: Moon 12 deg, Mars 17 deg, Mercury 14 deg retro / 12
+// deg direct, Jupiter 11 deg, Saturn 15 deg) -- NOT independently confirmed
+// by ARCHITECTURE.md's research pass the way Venus's was. Flagging this
+// explicitly: verify against a primary source before this feeds paid
+// scoring, same caveat pattern as the Panchaka/Dishashool weekday tables in
+// lib/muhurta.ts. The Sun itself and the two nodes (Rahu/Ketu, which are
+// never combust) are excluded.
+const COMBUSTION_ORB_DEG: Record<string, { direct: number; retrograde: number }> = {
+  Moon: { direct: 12, retrograde: 12 },
+  Mars: { direct: 17, retrograde: 17 },
+  Mercury: { direct: 12, retrograde: 14 },
+  Jupiter: { direct: 11, retrograde: 11 },
+  Venus: { direct: 10, retrograde: 8 }, // the one orb ARCHITECTURE.md itself confirms
+  Saturn: { direct: 15, retrograde: 15 },
+};
+
+export interface CombustionResult {
+  planet: string;
+  combust: boolean;
+  angularDistanceDeg: number;
+  orbDeg: number;
+  retrograde: boolean;
+}
+
+/**
+ * Checks whether `planet` is combust (too close to the Sun) at Julian Day
+ * `jd`. Retrograde is detected the same way getCurrentTransit() does: a
+ * short forward finite-difference in longitude.
+ */
+export function getCombustion(planet: string, jd: number): CombustionResult {
+  if (!(planet in COMBUSTION_ORB_DEG)) {
+    throw new Error(`getCombustion: no orb data for planet "${planet}" (Sun/Rahu/Ketu are never combust).`);
+  }
+  const sunLon = trueSiderealLongitude("Sun", jd);
+  const planetLon = trueSiderealLongitude(planet, jd);
+  const rawDiff = Math.abs(planetLon - sunLon) % 360;
+  const angularDistanceDeg = rawDiff > 180 ? 360 - rawDiff : rawDiff;
+
+  const lon2 = trueSiderealLongitude(planet, jd + 0.25);
+  const diff = ((lon2 - planetLon + 540) % 360) - 180;
+  const retrograde = diff < 0;
+
+  const orbDeg = retrograde ? COMBUSTION_ORB_DEG[planet]!.retrograde : COMBUSTION_ORB_DEG[planet]!.direct;
+  return { planet, combust: angularDistanceDeg <= orbDeg, angularDistanceDeg, orbDeg, retrograde };
+}
+
 export const RASHI_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",

@@ -142,3 +142,92 @@ export function isWithinRahuKaal(now: Date, rahuKaal: { start: Date; end: Date }
   const t = now.getTime();
   return t >= rahuKaal.start.getTime() && t < rahuKaal.end.getTime();
 }
+
+// ── Panchaka Dosha ──
+// ARCHITECTURE.md Section 4: "Nakshatra-window check (last 2 padas of
+// Dhanishtha through Revati). Note the Monday exception: Raj Panchak is
+// actually auspicious for government/property work -- do not treat all 5
+// weekday variants as uniformly inauspicious."
+//
+// The window itself (last 2 padas of Dhanishtha idx 22 through the end of
+// Revati idx 26) is directly from ARCHITECTURE.md. The specific
+// weekday-name-to-effect table below (Rog/Raj/Agni/Chor/Mrityu Panchak) is
+// NOT separately confirmed in ARCHITECTURE.md beyond the Monday=Raj Panchak
+// example -- it's the commonly-published Panchang convention (5 of 7
+// weekdays carry a named effect; Wednesday/Thursday classically carry none).
+// Flagging this rather than presenting it as independently verified: confirm
+// against a primary source before this feeds paid scoring.
+const PANCHAKA_NAK_START = 22; // Dhanishtha
+const PANCHAKA_NAK_LAST = 26; // Revati
+const PANCHAKA_WEEKDAY_NAME: Record<number, { name: string; auspicious: boolean; note: string }> = {
+  0: { name: "Rog Panchak", auspicious: false, note: "Commonly associated with illness -- avoid health-sensitive starts." },
+  1: { name: "Raj Panchak", auspicious: true, note: "Exception: auspicious, particularly for government/property/authority-related work." },
+  2: { name: "Agni Panchak", auspicious: false, note: "Commonly associated with fire/accident risk -- avoid construction, kitchen work." },
+  3: { name: "", auspicious: true, note: "No named Panchak effect classically assigned to Wednesday." },
+  4: { name: "", auspicious: true, note: "No named Panchak effect classically assigned to Thursday." },
+  5: { name: "Chor Panchak", auspicious: false, note: "Commonly associated with theft/loss risk." },
+  6: { name: "Mrityu Panchak", auspicious: false, note: "Commonly considered the most severe variant -- avoid important starts." },
+};
+
+export interface PanchakaResult {
+  active: boolean;
+  name: string;
+  auspicious: boolean;
+  note: string;
+}
+
+export function getPanchakaDosha(currentNakIdx: number, currentNakDeg: number, dow: number): PanchakaResult {
+  const nakWidth = 360 / 27;
+  const inWindow =
+    (currentNakIdx === PANCHAKA_NAK_START && currentNakDeg >= nakWidth / 2) || // last 2 of 4 padas
+    (currentNakIdx > PANCHAKA_NAK_START && currentNakIdx <= PANCHAKA_NAK_LAST);
+  if (!inWindow) {
+    return { active: false, name: "", auspicious: true, note: "Not in the Panchaka nakshatra window." };
+  }
+  const variant = PANCHAKA_WEEKDAY_NAME[dow]!;
+  return { active: true, name: variant.name, auspicious: variant.auspicious, note: variant.note };
+}
+
+// ── Ganda Moola ──
+// ARCHITECTURE.md Section 4: "Nakshatra-based check: Ashwini, Ashlesha,
+// Magha, Jyeshtha, Mula, Revati. Distinct from Panchaka (different 6
+// nakshatras, different rule)." Directly from ARCHITECTURE.md -- no
+// additional weekday or degree conditions documented, so none are applied
+// here.
+const GANDA_MOOLA_NAKS = new Set([0, 8, 9, 17, 18, 26]); // Ashwini, Ashlesha, Magha, Jyeshtha, Mula, Revati
+
+export function getGandaMoola(currentNakIdx: number): { active: boolean; note: string } {
+  const active = GANDA_MOOLA_NAKS.has(currentNakIdx);
+  return {
+    active,
+    note: active
+      ? `${NAKSHATRA_NAMES[currentNakIdx]} is a Ganda Moola nakshatra -- classically considered inauspicious for new beginnings.`
+      : "Not a Ganda Moola nakshatra.",
+  };
+}
+
+// ── Dishashool ──
+// ARCHITECTURE.md Section 4: "Weekday-based travel-direction table. Low
+// effort, no ephemeris dependency, not yet on the build schedule but cheap
+// to add." ARCHITECTURE.md does not itself give the day->direction mapping,
+// so the table below is the commonly-published Panchang convention (Drik
+// Panchang and most Hindu almanacs agree on it), not something confirmed by
+// ARCHITECTURE.md's own research pass -- flag as unverified-against-a-
+// primary-source, same caveat as the Panchaka weekday-name table above.
+const DISHASHOOL_BY_WEEKDAY: Record<number, string> = {
+  0: "West", // Sunday
+  1: "East", // Monday
+  2: "North", // Tuesday
+  3: "North", // Wednesday
+  4: "South", // Thursday
+  5: "West", // Friday
+  6: "East", // Saturday
+};
+
+export function getDishashool(dow: number): { direction: string; note: string } {
+  const direction = DISHASHOOL_BY_WEEKDAY[dow]!;
+  return {
+    direction,
+    note: `Travel toward ${direction} is classically inauspicious today -- if travel that direction is unavoidable, a remedy (e.g. a specific food item before departure) is traditionally prescribed, not modeled here.`,
+  };
+}
