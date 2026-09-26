@@ -17,7 +17,14 @@ CREATE TABLE users (
                         CHECK (tier IN ('basic', 'premium', 'ultra')),
     created_at      TEXT NOT NULL DEFAULT (datetime('now')),
     is_active       INTEGER NOT NULL DEFAULT 1,   -- 0 = deactivated (soft delete)
-    deactivated_at  TEXT
+    deactivated_at  TEXT,
+    -- Admin-panel access (ARCHITECTURE.md Section 9: "least privilege" --
+    -- this flags a support/ops account for the read-mostly Admin API in
+    -- routes/admin.ts, it is NOT the same thing as a Cloudflare/GitHub/
+    -- Razorpay credential, which Section 9 already covers separately.
+    -- Nobody is granted this by default; set it directly in D1 for the
+    -- account owner (Naveen) and any collaborator who genuinely needs it.
+    is_admin        INTEGER NOT NULL DEFAULT 0
 );
 
 -- Device fingerprints are tracked separately from users so a fingerprint can be
