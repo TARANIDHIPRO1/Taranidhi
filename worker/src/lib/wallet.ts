@@ -71,14 +71,32 @@ export class InsufficientBalanceError extends Error {
   }
 }
 
+export type UseCase = "personal_use" | "new_id_activation";
+
 /**
- * Atomically debits `amount` points from a user's spendable balance, FIFO
+ * Atomically debits enough points to cover `valueNeeded` units of spending
+ * VALUE (not necessarily raw points -- see usage_multipliers below), FIFO
  * across active batches (oldest expires_at first -- so trial points, which
  * expire soonest, get consumed before longer-lived subscription/top-up
  * batches, minimizing wasted expiry). This is THE function referenced by
  * ARCHITECTURE.md Section 8's "Wallet double-spend (race condition)" row --
  * do not reimplement a separate "read balance, then write deduction" path
  * anywhere else in the codebase. Every debit goes through this function.
+ *
+ * usage_multipliers (db/schema.sql): a batch's source determines its
+ * effective value for a given use_case -- e.g. referral_commission points
+ * are worth 100% for personal_use but only 50% for new_id_activation
+ * (ARCHITECTURE.md Section 7's explicit anti-abuse rule). This function
+ * looks up each batch's multiplier and consumes MORE raw points from a
+ * discounted-source batch to deliver the same value. Getting this wrong
+ * (treating all points as 100% face value regardless of source) would let
+ * commission points be used for activation at double their intended value
+ * -- exactly the kind of quiet business-rule violation ARCHITECTURE.md
+ * Section 7 exists to prevent. Callers debiting for ordinary query/report
+ * consumption should pass useCase='personal_use' (all sources are 100%
+ * there, so behavior is a plain 1:1 point debit); order-funding callers
+ * (routes/orders.ts) MUST pass 'new_id_activation' when that's what the
+ * order is for.
  *
  * Concurrency: Cloudflare D1 does not (as of this writing) expose
  * client-driven multi-statement SERIALIZABLE transactions the way a
@@ -101,17 +119,18 @@ export class InsufficientBalanceError extends Error {
 export async function debitWallet(
   env: Env,
   userId: number,
-  amount: number,
+  valueNeeded: number,
   reason: string,
+  useCase: UseCase = "personal_use",
   orderId?: number
 ): Promise<void> {
-  if (!Number.isInteger(amount) || amount <= 0) {
-    throw new Error(`debitWallet: amount must be a positive integer, got ${amount}.`);
+  if (!Number.isInteger(valueNeeded) || valueNeeded <= 0) {
+    throw new Error(`debitWallet: valueNeeded must be a positive integer, got ${valueNeeded}.`);
   }
 
   const now = new Date().toISOString();
   const { results: batches } = await env.DB.prepare(
-    `SELECT id, amount_remaining
+    `SELECT id, amount_remaining, source
      FROM wallet_ledger
      WHERE user_id = ?
        AND status = 'active'
@@ -120,19 +139,36 @@ export async function debitWallet(
      ORDER BY expires_at ASC`
   )
     .bind(userId, now, now)
-    .all<{ id: number; amount_remaining: number }>();
+    .all<{ id: number; amount_remaining: number; source: string }>();
 
-  const available = batches.reduce((sum, b) => sum + b.amount_remaining, 0);
-  if (available < amount) {
-    throw new InsufficientBalanceError(available, amount);
+  const { results: multiplierRows } = await env.DB.prepare(
+    `SELECT source, multiplier_pct FROM usage_multipliers WHERE use_case = ?`
+  )
+    .bind(useCase)
+    .all<{ source: string; multiplier_pct: number }>();
+  const multiplierBySource = new Map(multiplierRows.map((r) => [r.source, r.multiplier_pct / 100]));
+
+  const availableValue = batches.reduce((sum, b) => {
+    const mult = multiplierBySource.get(b.source) ?? 1;
+    return sum + b.amount_remaining * mult;
+  }, 0);
+  if (availableValue < valueNeeded) {
+    throw new InsufficientBalanceError(Math.floor(availableValue), valueNeeded);
   }
 
-  let remainingToDebit = amount;
+  let remainingValueToDebit = valueNeeded;
   const statements: D1PreparedStatement[] = [];
   for (const batch of batches) {
-    if (remainingToDebit <= 0) break;
-    const takeFromThisBatch = Math.min(batch.amount_remaining, remainingToDebit);
-    const newRemaining = batch.amount_remaining - takeFromThisBatch;
+    if (remainingValueToDebit <= 0) break;
+    const mult = multiplierBySource.get(batch.source) ?? 1;
+    if (mult <= 0) continue; // a 0%-value source for this use_case contributes nothing; skip it
+
+    // Raw points to take from THIS batch to deliver up to remainingValueToDebit
+    // worth of value, capped at what the batch actually holds.
+    const rawNeededForRemainder = Math.ceil(remainingValueToDebit / mult);
+    const rawTaken = Math.min(batch.amount_remaining, rawNeededForRemainder);
+    const valueProvided = rawTaken * mult;
+    const newRemaining = batch.amount_remaining - rawTaken;
 
     statements.push(
       env.DB.prepare(
@@ -146,10 +182,10 @@ export async function debitWallet(
       env.DB.prepare(
         `INSERT INTO wallet_transactions (wallet_ledger_id, amount, reason, order_id)
          VALUES (?, ?, ?, ?)`
-      ).bind(batch.id, -takeFromThisBatch, reason, orderId ?? null)
+      ).bind(batch.id, -rawTaken, reason, orderId ?? null)
     );
 
-    remainingToDebit -= takeFromThisBatch;
+    remainingValueToDebit -= valueProvided;
   }
 
   await env.DB.batch(statements);

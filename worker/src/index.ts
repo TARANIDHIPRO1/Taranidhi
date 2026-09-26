@@ -8,9 +8,10 @@ import { handleRequestOtp, handleVerifyOtp, type Env as AuthEnv } from "./routes
 import { handleCreateKundali, handleListKundalis, type Env as KundaliEnv } from "./routes/kundali";
 import { handleMuhurtaNow, type Env as MuhurtaEnv } from "./routes/muhurta";
 import { handleGetBalance, type Env as WalletRouteEnv } from "./routes/wallet";
+import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway, type Env as OrdersRouteEnv } from "./routes/orders";
 import { errorJson, corsPreflight } from "./lib/response";
 
-export interface Env extends AuthEnv, KundaliEnv, MuhurtaEnv, WalletRouteEnv {}
+export interface Env extends AuthEnv, KundaliEnv, MuhurtaEnv, WalletRouteEnv, OrdersRouteEnv {}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -43,6 +44,18 @@ export default {
 
     if (request.method === "GET" && pathname === "/wallet/balance") {
       return handleGetBalance(request, env);
+    }
+
+    if (request.method === "POST" && pathname === "/orders") {
+      return handleCreateOrder(request, env);
+    }
+    const fundMatch = /^\/orders\/(\d+)\/fund\/(wallet|gateway)$/.exec(pathname);
+    if (request.method === "POST" && fundMatch) {
+      const orderId = Number(fundMatch[1]);
+      const rail = fundMatch[2];
+      return rail === "wallet"
+        ? handleFundOrderFromWallet(request, env, orderId)
+        : handleFundOrderFromGateway(request, env, orderId);
     }
 
     if (pathname === "/health") {

@@ -20,6 +20,15 @@ id = "c384e9b815c3407e9501807b11b5094a"
 # RAZORPAY_KEY_ID
 # RAZORPAY_KEY_SECRET
 # JWT_SIGNING_SECRET        -> session token signing
+# POINTS_TO_PAISE_RATE      -> how many paise 1 wallet point is worth, when
+#                              funding a paise-denominated order from the
+#                              wallet (routes/orders.ts). NOT a secret really,
+#                              but kept here rather than [vars] since it's a
+#                              pricing decision, not dev config. Deliberately
+#                              UNSET until Naveen finalizes Premium/Ultra
+#                              pricing (ARCHITECTURE.md Section 12, item 1) --
+#                              /orders/:id/fund/wallet returns a clear 503
+#                              until this is set. Do not guess a number here.
 
 [vars]
 # Non-secret config only. Environment-specific values, not credentials.
