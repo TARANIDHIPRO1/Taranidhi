@@ -3,7 +3,7 @@
 // CORS_TODO: In production, API_BASE must match the real Worker URL.
 // For dev, the Vite proxy or a localhost Worker serves the API.
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+const API_BASE = (import.meta as any).env?.VITE_API_BASE ?? "";
 
 let sessionToken: string | null = localStorage.getItem("ov_session");
 

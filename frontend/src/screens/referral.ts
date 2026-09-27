@@ -5,7 +5,7 @@
 
 import { $app, clear, showToast } from "../dom";
 import { navigate } from "../router";
-import { getReferralCode } from "../api";
+import { referralCode } from "../api";
 
 export async function renderReferral(): Promise<void> {
   const app = $app();
@@ -92,7 +92,7 @@ export async function renderReferral(): Promise<void> {
   const btnCopy = document.getElementById("btn-copy")!;
   const btnShare = document.getElementById("btn-share")!;
   const btnCopyMessage = document.getElementById("btn-copy-message")!;
-  const referralCode = document.getElementById("referral-code")!;
+  const referralCodeElem = document.getElementById("referral-code")!;
   const totalEarned = document.getElementById("total-earned")!;
   const referralCount = document.getElementById("referral-count")!;
   const referredUsers = document.getElementById("referred-users")!;
@@ -105,7 +105,7 @@ export async function renderReferral(): Promise<void> {
     errorBox.style.display = "none";
 
     try {
-      const res = await getReferralCode();
+      const res = await referralCode();
 
       if (res.ok) {
         const data = res.data;
@@ -114,7 +114,7 @@ export async function renderReferral(): Promise<void> {
         const users = Array.isArray(data.referred_users) ? data.referred_users : [];
 
         // Display code
-        referralCode.textContent = currentCode || "LOADING...";
+        referralCodeElem.textContent = currentCode || "LOADING...";
 
         // Display stats
         totalEarned.textContent = `₹${stats.total_earned ?? 0}`;

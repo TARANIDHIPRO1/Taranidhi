@@ -6,7 +6,7 @@
 
 import { $app, clear, showToast } from "../dom";
 import { navigate } from "../router";
-import { getBalance } from "../api";
+import { walletBalance } from "../api";
 
 export async function renderWallet(): Promise<void> {
   const app = $app();
@@ -77,11 +77,11 @@ export async function renderWallet(): Promise<void> {
   async function loadBalance(): Promise<void> {
     errorBox.style.display = "none";
     balanceAmount.textContent = "Loading...";
-    btnRefresh.disabled = true;
-    btnTopup.disabled = true;
+    (btnRefresh as HTMLButtonElement).disabled = true;
+    (btnTopup as HTMLButtonElement).disabled = true;
 
     try {
-      const res = await getBalance();
+      const res = await walletBalance();
 
       if (res.ok) {
         const data = res.data;
@@ -169,8 +169,8 @@ export async function renderWallet(): Promise<void> {
       errorBox.style.display = "block";
       balanceAmount.textContent = "Error";
     } finally {
-      btnRefresh.disabled = false;
-      btnTopup.disabled = false;
+      (btnRefresh as HTMLButtonElement).disabled = false;
+      (btnTopup as HTMLButtonElement).disabled = false;
     }
   }
 

@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+# --- Static site (PWA frontend) ---
+[site]
+bucket = "../frontend/dist"
+
 # --- D1 database (already provisioned live on the account, Session 5) ---
 [[d1_databases]]
 binding = "DB"
