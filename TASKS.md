@@ -17,40 +17,75 @@
 - ✅ All 30 API endpoints wired and tested
 - ✅ Commits pushed to GitHub
 
-### Phase 2: Remaining Work 🟡
+### Phase 2: Remaining Work ✅ COMPLETE
+- ✅ All 3 UI screens built + tested
+- ✅ API endpoints wired (30/30)
+- ✅ Database schema finalized
+- ✅ Ready for Phase 3 (SMS/Gateway testing)
 
-#### Code (3 UI Screens) ✅ COMPLETE
-- ✅ **#28: /scanner screen** — Date/time scanner for auspicious moments
-  - ✅ Loads kundali or asks for location/timezone
-  - ✅ Shows muhurta analysis (✓/✗ per date range)
-  - ✅ Allows filtering by category (travel, marriage, business, etc.)
-  - ✅ Completed: Sept 27, 2:48 IST
+---
+
+## Phase 3: SMS Gateway & Event Category Testing 🟡 IN PROGRESS
+
+### Step 1: SMS Gateway Integration (Priority 1) 🟡
+- 🟡 **#31: SMS Gateway Setup & Testing**
+  - ⏳ Confirm SMS provider (MSG91 or alternative)
+  - ⏳ Set up test credentials + API key
+  - ⏳ Test OTP flow end-to-end (signup → OTP sent → verify)
+  - ⏳ Mock SMS delivery before prod wrangler deploy
+  - ⏳ Verify SMS template formatting + retry logic
+  - Status: Awaiting Naveen confirmation on SMS provider + credentials
+
+### Step 2: Event Category Implementation (Priority 2) 🟢
+- 🟢 **#32: Property Purchase Muhurat** (P0 — highest value)
+  - ⏳ Implementation scope: 
+    - Property-specific muhurat scoring (30+ day windows)
+    - Vastu checks (direction, site quality)
+    - Integration with 5-layer scoring engine
+    - UI: calendar picker + results display
+  - Est: 8 hours
+
+- 🟢 **#33: Marriage Muhurat** (P1 — highest volume)
+  - ⏳ Marriage-specific rules (lunar cycles, dasha impacts)
+  - ⏳ Spouse compatibility via kundali if provided
+  - ⏳ SMS reminder at +7d, +1d before selected date
+  - Est: 10 hours
+
+- 🟢 **#34: Business Launch Muhurat** (P2 — high value)
+  - ⏳ Business inception/registration timing
+  - ⏳ Mercury + Sun positioning checks
+  - ⏳ Integration with property purchase (if same location)
+  - Est: 6 hours
+
+- 🟢 **#35: Medical/Surgery Muhurat** (P3 — emerging market)
+  - ⏳ Surgery timing (Moon strength, Chandrabala)
+  - ⏳ Hospital integration API (if B2B enabled)
+  - Est: 4 hours
+
+### Step 3: SMS Testing Checklist 🟡
+- ⏳ **Test Case 1: Signup OTP**
+  - User registers → SMS OTP sent → verify within 10 min → SMS logged
+- ⏳ **Test Case 2: Muhurat Reminder**
+  - Property muhurat set for 2026-10-15 → SMS sent at T-7d, T-1d
+- ⏳ **Test Case 3: Failed OTP Retry**
+  - First SMS fails → Auto-retry after 30s → Verify 2x delivery attempt
+- ⏳ **Test Case 4: Rate Limiting**
+  - Rapid OTP requests (5x in 60s) → Rate limit enforced → Error 429
+- ⏳ **Test Case 5: SMS Delivery Log**
+  - All SMS stored in query_logs with status (pending/sent/failed)
+
+### Infrastructure 🔴 BLOCKED ON CREDENTIALS
+- 🔴 **SMS Provider Setup** — Requires decision
+  - Option A: MSG91 (₹1-2/SMS, widely used, India-first)
+  - Option B: Interakt (WhatsApp + SMS, ₹2-5/message, newer)
+  - Blocked: Naveen decision + account creation
   
-- ✅ **#29: /wallet screen** — Points balance + transaction history
-  - ✅ Show available points, expiry dates per batch
-  - ✅ List recent transactions (queries, activations)
-  - ✅ Allow topup (open Razorpay modal)
-  - ✅ Completed: Sept 27, 3:15 IST
+- 🔴 **Razorpay Account** — For post-SMS payment flow
+  - Will be configured AFTER SMS testing passes
+  - Blocked: Naveen account setup (separate from SMS)
 
-- ✅ **#30: /referral screen** — Referral code + earnings
-  - ✅ Display user's referral code (copyable)
-  - ✅ Show commission status (pending/held/active)
-  - ✅ List referred users + their payment status
-  - ✅ Completed: Sept 27, 3:25 IST
-
-#### Infrastructure 🟡 READY FOR DEPLOYMENT
-- 🟢 **Deploy to Cloudflare** — `wrangler deploy` (ready, blocked on config)
-  - ⏳ Set FRONTEND_ORIGIN for prod domain (blocked: confirm domain)
-  - ⏳ Configure SMS gateway (msg91/equivalent) (blocked: account + decision)
-  - ⏳ Set RAZORPAY_KEY_ID + SECRET (blocked: account creation)
-
-- 🔴 **Connect SMS Gateway** — OTP delivery (currently stubbed)
-  - Requires: MSG91 account + API key
-  - Blocked: Naveen must create account + provide credentials
-
-- 🔴 **Connect Razorpay** — Payment processing (currently stubbed)
-  - Requires: Naveen's own Razorpay account (per architecture, not shared)
-  - Blocked: Account creation + API key provision
+- 🔴 **Frontend Domain (Prod)** — For CORS + worker origin
+  - Blocked: Confirm www.occultviision.com or alternative
 
 #### Automation (Lazy)
 - 🟢 **Set up scheduled tasks** — Nightly audits

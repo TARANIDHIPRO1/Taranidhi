@@ -34,7 +34,7 @@ Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
 
 | Name | What | Status |
 |------|------|--------|
-| **OCCULTVIISION Kaalchakra Pro** | Single-file PWA for KP horoscope queries + numerology + licensing | Phase 2 (3 screens left, then deploy) |
+| **OCCULTVIISION Kaalchakra Pro** | Single-file PWA for KP horoscope queries + numerology + licensing | Phase 3 (SMS testing → event categories) |
 | **TaraNidhi** | Alias for Kaalchakra Pro (internal codename) | Same as above |
 | **HoraPath** / **HoraSetu** | Earlier codenames for same project | Deprecated |
 
@@ -69,10 +69,12 @@ Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
 
 ## Recent Decisions
 
-1. ✅ **Chose Option B + A:** Fixed all 14 blocking issues in one session
-2. ✅ **Architecture validated:** Lahiri ayanamsa default, KP module uses Krishnamurti - 0.0965°
-3. ✅ **Database scaling:** 15 indexes added for 1M-user capacity
-4. ⏳ **Pending:** Frontend domain (prod), SMS provider, Razorpay account
+1. ✅ **Phase 1 Complete:** All 14 blocking issues fixed (compilation 0 errors)
+2. ✅ **Phase 2 Complete:** 3 UI screens built (scanner, wallet, referral)
+3. ✅ **Janma Tara Classification:** Changed from malefic → neutral (Karma Vipak Samhita sourced)
+4. ✅ **Market Research Complete:** TAM ₹1B by 2030, 5% capture = ₹40-55Cr revenue potential
+5. 🟡 **Phase 3 Starting:** SMS gateway testing BEFORE full Cloudflare deployment
+6. 📊 **Event Category Priority:** Property (P0) → Marriage (P1) → Business (P2) → Medical (P3)
 
 ---
 
@@ -98,18 +100,25 @@ Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
 
 ## Next Steps
 
-**Immediate (Next Session):**
-1. Confirm frontend domain (prod)
-2. Decide on SMS provider
-3. Check if Razorpay account exists
-4. Build 3 remaining UI screens
-5. Deploy to Cloudflare
+**Phase 3 (SMS Gateway Testing) — Immediate:**
+1. ⏳ Naveen confirms SMS provider (MSG91 or Interakt)
+2. ⏳ Set up SMS test credentials + mock delivery
+3. ⏳ Test OTP flow (signup → OTP → verify)
+4. ⏳ Verify SMS retry logic + rate limiting
+5. ⏳ Run 5-point SMS test checklist (signup, reminder, retry, rate-limit, logging)
 
-**Then:**
-- SMS gateway integration
-- Razorpay payment flow
+**Phase 3 (Event Categories) — Parallel:**
+1. 🟢 Build Property Purchase muhurat (P0, 8h)
+2. 🟢 Build Marriage muhurat (P1, 10h)
+3. 🟢 Build Business Launch muhurat (P2, 6h)
+4. 🟢 Build Medical/Surgery muhurat (P3, 4h)
+
+**Phase 4 (Post-SMS):**
+- Razorpay payment integration
+- Frontend domain configuration
+- Full Cloudflare worker deployment
 - Automation/monitoring setup
-- Launch
+- Public launch
 
 ---
 
