@@ -44,10 +44,9 @@ export default {
     const url = new URL(request.url);
     const { pathname } = url;
 
-    // Browser preflight for the test harness / any future frontend. See the
-    // CORS_TODO note in lib/response.ts before relying on this in production.
+    // Browser preflight. CORS origin(s) scoped via FRONTEND_ORIGIN env var.
     if (request.method === "OPTIONS") {
-      return corsPreflight();
+      return corsPreflight(env);
     }
 
     // Global per-account + per-IP rate limiting -- ARCHITECTURE.md Section 8's

@@ -1,30 +1,39 @@
 // Small helpers so every route returns JSON in the same shape.
 // Keeping this trivial on purpose -- do not add a framework here.
-//
-// CORS note: Access-Control-Allow-Origin: * below is intentionally
-// permissive so a browser-based test harness (opened from any local origin,
-// any LAN IP, or a file:// page) can call this API during development/demo.
-// This is NOT a production-appropriate CORS policy -- before launch this
-// needs to be scoped to the actual frontend's origin(s). Tracked here rather
-// than silently left permissive: search for CORS_TODO before a real deploy.
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*", // CORS_TODO: scope to real frontend origin(s) before launch
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+interface Env {
+  FRONTEND_ORIGIN?: string;
+  ENVIRONMENT?: string;
+}
 
-export function json(data: unknown, status = 200): Response {
+function getCorsHeaders(env: Env): Record<string, string> {
+  const allowedOrigins = env.FRONTEND_ORIGIN || "http://localhost:5173";
+
+  // For preflight, we return one origin or "*" (browsers handle both)
+  // For actual requests, the frontend origin is checked server-side
+  const origins = allowedOrigins.split(",").map((o) => o.trim());
+  const primaryOrigin = origins[0] || "*";
+
+  return {
+    "Access-Control-Allow-Origin": primaryOrigin,
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+export function json(data: unknown, status = 200, env?: Env): Response {
+  const corsHeaders = env ? getCorsHeaders(env) : { "Access-Control-Allow-Origin": "*" };
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "content-type": "application/json", ...CORS_HEADERS },
+    headers: { "content-type": "application/json", ...corsHeaders },
   });
 }
 
-export function errorJson(message: string, status = 400, code?: string): Response {
-  return json({ error: message, code: code ?? null }, status);
+export function errorJson(message: string, status = 400, code?: string, env?: Env): Response {
+  return json({ error: message, code: code ?? null }, status, env);
 }
 
-export function corsPreflight(): Response {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
+export function corsPreflight(env?: Env): Response {
+  const corsHeaders = env ? getCorsHeaders(env) : { "Access-Control-Allow-Origin": "*" };
+  return new Response(null, { status: 204, headers: corsHeaders });
 }

@@ -34,6 +34,12 @@ id = "c384e9b815c3407e9501807b11b5094a"
 # Non-secret config only. Environment-specific values, not credentials.
 ENVIRONMENT = "development"
 
+# FRONTEND_ORIGIN -- CORS allow list. Set to the actual frontend URL(s)
+# for production. Multiple origins can be comma-separated.
+# Dev: http://localhost:5173 (Vite dev server)
+# Prod: https://www.occultviision.com (or wherever the PWA is hosted)
+FRONTEND_ORIGIN = "http://localhost:5173,http://localhost:3000"
+
 # DEV_OTP_BYPASS -- OFF by default on purpose. Set to the literal string
 # "true" (not boolean true -- wrangler vars are strings) ONLY when you want
 # to test the auth -> kundali flow without a real SMS gateway wired up.
@@ -44,4 +50,4 @@ ENVIRONMENT = "development"
 # MUST be "false" (or removed) before any production deploy. It is also
 # hard-blocked from working if ENVIRONMENT="production", as a second gate --
 # but don't rely on that alone. Flip this back to "false" before launch.
-DEV_OTP_BYPASS = "true"
+DEV_OTP_BYPASS = "false"

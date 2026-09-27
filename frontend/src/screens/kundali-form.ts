@@ -183,14 +183,56 @@ export async function renderKundaliForm(): Promise<void> {
     submitBtn.textContent = "Creating...";
 
     try {
-      // Combine date + time into ISO string
+      // Combine date + time into local ISO string
       const [year, month, day] = date.split("-");
       const [hours, minutes] = time.split(":");
-      const birthDateTime = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+      const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+
+      // Convert local time to UTC using the timezone
+      // We create a date string, pass it through Intl to understand the timezone offset
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+
+      // Create a UTC date from the local time parts
+      const localDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+
+      // Get the offset between UTC and the specified timezone
+      // by comparing what the formatter thinks the UTC time is vs actual local time
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).formatToParts(new Date());
+
+      const tzDate = new Date(
+        parseInt(parts.find((p) => p.type === "year")?.value || "2000"),
+        parseInt(parts.find((p) => p.type === "month")?.value || "1") - 1,
+        parseInt(parts.find((p) => p.type === "day")?.value || "1"),
+        parseInt(parts.find((p) => p.type === "hour")?.value || "0"),
+        parseInt(parts.find((p) => p.type === "minute")?.value || "0"),
+        parseInt(parts.find((p) => p.type === "second")?.value || "0")
+      );
+
+      const offsetMs = localDate.getTime() - tzDate.getTime();
+      const utcTime = new Date(localDate.getTime() - offsetMs);
+      const birthDateUTC = utcTime.toISOString().split(".")[0]; // Remove milliseconds
 
       const res = await createKundali({
         label: name,
-        birth_date: birthDateTime,
+        birth_date: birthDateUTC,
         latitude: lat,
         longitude: lon,
         timezone: tz,
