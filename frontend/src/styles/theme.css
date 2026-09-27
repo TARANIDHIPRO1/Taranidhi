@@ -1,0 +1,104 @@
+/**
+ * OccultViision Theme Aggregator
+ * Imports all stylesheets and provides theme utilities
+ */
+
+/* Import all stylesheets in order */
+@import "./base.css";
+@import "./components.css";
+@import "./screens.css";
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Theme-Specific Overrides & Utilities */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Light theme explicit override */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Dark theme explicit override */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Print Styles */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .btn,
+  .modal-overlay,
+  .toast-container,
+  .screen-header,
+  .spinner {
+    display: none;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* High Contrast Mode (accessibility) */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: #000;
+    --color-text-secondary: #000;
+  }
+
+  input,
+  textarea,
+  select {
+    border-width: 2px;
+  }
+
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Reduced Motion Mode (accessibility) */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Landscape Mobile Optimizations */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .screen-header {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .screen-header h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .form-group {
+    margin-bottom: var(--space-3);
+  }
+
+  .card {
+    padding: var(--space-3);
+  }
+}
