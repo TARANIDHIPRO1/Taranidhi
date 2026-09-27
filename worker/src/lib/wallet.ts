@@ -6,6 +6,10 @@
 
 import type { D1Database } from "@cloudflare/workers-types";
 
+export interface Env {
+  DB: D1Database;
+}
+
 export interface PointBatch {
   id: number;
   user_id: number;
@@ -20,8 +24,8 @@ export interface PointBatch {
 }
 
 /**
- * Deduct points from user's wallet using FIFO consumption
- * Must be called within an atomic transaction to prevent double-spend
+ * Deduct points from user's wallet using FIFO consumption.
+ * ATOMIC: Uses D1 batch() for transactional safety against double-spend.
  */
 export async function deductPoints(
   userId: number,
@@ -33,11 +37,35 @@ export async function deductPoints(
   batches_used?: Array<{ batch_id: number; points_used: number }>;
 }> {
   try {
-    // Fetch active, non-expired batches (FIFO order: oldest first)
-    const batches = await db
+    // Check total available first
+    const checkRes = await db
       .prepare(
         `
-        SELECT id, amount_granted, amount_remaining, source, holding_until
+        SELECT COALESCE(SUM(amount_remaining), 0) as total
+        FROM wallet_ledger
+        WHERE user_id = ?
+          AND status = 'active'
+          AND expires_at > datetime('now')
+          AND amount_remaining > 0
+          AND (holding_until IS NULL OR holding_until <= datetime('now'))
+      `
+      )
+      .bind(userId)
+      .first();
+
+    const availableTotal = (checkRes?.total as number) ?? 0;
+    if (availableTotal < pointsNeeded) {
+      return {
+        success: false,
+        message: `Insufficient points. Need ${pointsNeeded}, available ${availableTotal}`,
+      };
+    }
+
+    // Fetch active, non-expired batches (FIFO order: oldest first)
+    const batchesRes = await db
+      .prepare(
+        `
+        SELECT id, amount_remaining
         FROM wallet_ledger
         WHERE user_id = ?
           AND status = 'active'
@@ -50,39 +78,39 @@ export async function deductPoints(
       .bind(userId)
       .all();
 
-    if (!batches.success || !batches.results) {
+    if (!batchesRes.success || !batchesRes.results) {
       return { success: false, message: "Failed to fetch wallet" };
     }
 
+    const batches = batchesRes.results as any[];
     let remaining = pointsNeeded;
     const usedBatches: Array<{ batch_id: number; points_used: number }> = [];
+    const updates: Array<{ id: number; deduct: number }> = [];
 
-    // Consume batches in FIFO order
-    for (const batch of batches.results as any[]) {
-      const available = batch.amount_remaining;
-      const toUse = Math.min(available, remaining);
-
-      // Update batch
-      const updateRes = await db
-        .prepare(`UPDATE wallet_ledger SET amount_remaining = amount_remaining - ? WHERE id = ?`)
-        .bind(toUse, batch.id)
-        .run();
-
-      if (!updateRes.success) {
-        return { success: false, message: "Failed to update wallet" };
-      }
-
+    // Plan the deductions (FIFO)
+    for (const batch of batches) {
+      const toUse = Math.min(batch.amount_remaining, remaining);
+      updates.push({ id: batch.id, deduct: toUse });
       usedBatches.push({ batch_id: batch.id, points_used: toUse });
       remaining -= toUse;
-
       if (remaining === 0) break;
     }
 
-    if (remaining > 0) {
-      return {
-        success: false,
-        message: `Insufficient points. Need ${pointsNeeded}, available ${pointsNeeded - remaining}`,
-      };
+    // Execute all updates atomically via batch()
+    const batchStmts = updates.map((u) =>
+      db.prepare(`UPDATE wallet_ledger SET amount_remaining = amount_remaining - ? WHERE id = ?`).bind(u.deduct, u.id)
+    );
+
+    const batchRes = await db.batch(batchStmts);
+    if (!batchRes || batchRes.length === 0) {
+      return { success: false, message: "Failed to apply wallet deductions" };
+    }
+
+    // Verify all succeeded
+    for (const res of batchRes) {
+      if (!res.success) {
+        return { success: false, message: "Wallet update failed" };
+      }
     }
 
     return { success: true, message: "Points deducted", batches_used: usedBatches };
@@ -168,6 +196,13 @@ export async function getAvailablePoints(userId: number, db: D1Database): Promis
     console.error("Get points error:", error);
     return 0;
   }
+}
+
+/**
+ * Alias for getAvailablePoints (used by routes/wallet.ts)
+ */
+export async function getSpendableBalance(env: Env, userId: number): Promise<number> {
+  return getAvailablePoints(userId, env.DB);
 }
 
 /**

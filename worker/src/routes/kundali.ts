@@ -25,25 +25,11 @@ const TIER_KUNDALI_LIMITS: Record<string, number> = {
 
 interface CreateKundaliBody {
   label?: string;
-  // Birth moment MUST be sent as a UTC ISO-8601 string (e.g.
-  // "1973-04-08T06:15:00Z"). This endpoint deliberately does NOT accept a
-  // local time + timezone-name pair and convert it server-side -- that
-  // needs an IANA timezone database and DST-history handling
-  // (ARCHITECTURE.md's own research flagged this as the #1 real-world bug
-  // source in these calculations). Doing the local->UTC conversion is the
-  // frontend's job for now; revisit if that turns out to be the wrong
-  // place for it once the actual birth-data form exists.
-  birth_datetime_utc?: string;
-  birth_place_lat?: number;
-  birth_place_lon?: number;
-  birth_place_name?: string;
-  // No longer required from the caller. lib/astro.ts now computes this
-  // server-side via astronomy-engine (real Moon sidereal longitude at
-  // birth), ported from the verified TaraNidhi Floot prototype. If a caller
-  // still sends this field it is IGNORED, not trusted -- the server-computed
-  // value is always authoritative, since a client-supplied value could be
-  // wrong or (worse) spoofed to manipulate Tarabala-gated scoring downstream.
-  janma_nakshatra_idx?: number;
+  birth_date: string;        // ISO datetime string (YYYY-MM-DDTHH:MM:SS)
+  latitude: number;
+  longitude: number;
+  timezone: string;          // IANA timezone (e.g. "Asia/Kolkata")
+  janma_nakshatra_idx?: number; // Ignored; computed server-side
 }
 
 export async function handleCreateKundali(request: Request, env: Env): Promise<Response> {
@@ -57,20 +43,23 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     return errorJson("Request body must be JSON.");
   }
 
-  const { birth_datetime_utc, birth_place_lat, birth_place_lon } = body;
+  const { birth_date, latitude, longitude, timezone } = body;
 
-  if (!birth_datetime_utc || Number.isNaN(Date.parse(birth_datetime_utc))) {
+  if (!birth_date || Number.isNaN(Date.parse(birth_date))) {
     return errorJson(
-      "birth_datetime_utc is required and must be a valid ISO-8601 UTC timestamp.",
+      "birth_date is required and must be a valid ISO-8601 timestamp.",
       400,
-      "INVALID_BIRTH_DATETIME"
+      "INVALID_BIRTH_DATE"
     );
   }
-  if (typeof birth_place_lat !== "number" || birth_place_lat < -90 || birth_place_lat > 90) {
-    return errorJson("birth_place_lat must be a number between -90 and 90.", 400, "INVALID_LAT");
+  if (typeof latitude !== "number" || latitude < -90 || latitude > 90) {
+    return errorJson("latitude must be a number between -90 and 90.", 400, "INVALID_LAT");
   }
-  if (typeof birth_place_lon !== "number" || birth_place_lon < -180 || birth_place_lon > 180) {
-    return errorJson("birth_place_lon must be a number between -180 and 180.", 400, "INVALID_LON");
+  if (typeof longitude !== "number" || longitude < -180 || longitude > 180) {
+    return errorJson("longitude must be a number between -180 and 180.", 400, "INVALID_LON");
+  }
+  if (!timezone || typeof timezone !== "string") {
+    return errorJson("timezone is required and must be a string.", 400, "INVALID_TIMEZONE");
   }
 
   // Tier-limit check.
@@ -93,32 +82,26 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     );
   }
 
-  const birthDate = new Date(birth_datetime_utc);
-  const lagnaRashiIdx = getLagnaRashiIndex(birthDate, birth_place_lat, birth_place_lon);
+  const birthDate = new Date(birth_date);
+  const lagnaRashiIdx = getLagnaRashiIndex(birthDate, latitude, longitude);
 
-  // janma_nakshatra_idx: now computed server-side from the Moon's real
-  // sidereal longitude at birth via astronomy-engine (lib/astro.ts), ported
-  // from the verified TaraNidhi Floot prototype. Any client-supplied value
-  // for this field (see the CreateKundaliBody comment above) is ignored.
-  const realChart = buildRealChart(birthDate, birth_place_lat, birth_place_lon);
+  // janma_nakshatra_idx: computed server-side via astronomy-engine
+  const realChart = buildRealChart(birthDate, latitude, longitude);
   const janmaNakshatraIdx = realChart.janmaNakIdx;
 
-  const isoDate = birthDate.toISOString();
   const created = await env.DB.prepare(
     `INSERT INTO kundalis
-       (user_id, label, birth_date, birth_time, birth_place_lat, birth_place_lon, birth_place_name,
-        janma_nakshatra_idx, lagna_rashi_idx)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       (user_id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
      RETURNING id`
   )
     .bind(
       auth.userId,
       body.label ?? null,
-      isoDate.slice(0, 10),
-      isoDate.slice(11, 19),
-      birth_place_lat,
-      birth_place_lon,
-      body.birth_place_name ?? null,
+      birth_date,
+      latitude,
+      longitude,
+      timezone,
       janmaNakshatraIdx,
       lagnaRashiIdx
     )
@@ -139,12 +122,56 @@ export async function handleListKundalis(request: Request, env: Env): Promise<Re
   if (!auth) return unauthorized();
 
   const { results } = await env.DB.prepare(
-    `SELECT id, label, birth_date, birth_time, birth_place_lat, birth_place_lon,
-            birth_place_name, janma_nakshatra_idx, lagna_rashi_idx, created_at
+    `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
      FROM kundalis WHERE user_id = ? ORDER BY created_at ASC`
   )
     .bind(auth.userId)
     .all();
 
   return json({ kundalis: results });
+}
+
+export async function handleGetKundali(request: Request, env: Env): Promise<Response> {
+  const auth = await requireAuth(request, env);
+  if (!auth) return unauthorized();
+
+  const url = new URL(request.url);
+  const idStr = url.pathname.split("/").pop();
+  const id = parseInt(idStr || "", 10);
+
+  if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
+
+  const kundali = await env.DB.prepare(
+    `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
+     FROM kundalis WHERE id = ? AND user_id = ?`
+  )
+    .bind(id, auth.userId)
+    .first();
+
+  if (!kundali) return errorJson("Kundali not found.", 404);
+
+  return json(kundali);
+}
+
+export async function handleDeleteKundali(request: Request, env: Env): Promise<Response> {
+  const auth = await requireAuth(request, env);
+  if (!auth) return unauthorized();
+
+  const url = new URL(request.url);
+  const idStr = url.pathname.split("/").pop();
+  const id = parseInt(idStr || "", 10);
+
+  if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
+
+  const result = await env.DB.prepare(
+    `DELETE FROM kundalis WHERE id = ? AND user_id = ?`
+  )
+    .bind(id, auth.userId)
+    .run();
+
+  if (!result.success || result.meta.changes === 0) {
+    return errorJson("Kundali not found.", 404);
+  }
+
+  return json({ deleted: true }, 200);
 }

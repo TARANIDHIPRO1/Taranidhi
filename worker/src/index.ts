@@ -5,7 +5,7 @@
 // that manual if/else dispatch gets unreadable -- not before.
 
 import { handleRequestOtp, handleVerifyOtp, type Env as AuthEnv } from "./routes/auth";
-import { handleCreateKundali, handleListKundalis, type Env as KundaliEnv } from "./routes/kundali";
+import { handleCreateKundali, handleListKundalis, handleGetKundali, handleDeleteKundali, type Env as KundaliEnv } from "./routes/kundali";
 import { handleMuhurtaNow, type Env as MuhurtaEnv } from "./routes/muhurta";
 import { handleGetBalance, type Env as WalletRouteEnv } from "./routes/wallet";
 import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway, type Env as OrdersRouteEnv } from "./routes/orders";
@@ -99,6 +99,13 @@ export default {
     if (request.method === "GET" && pathname === "/kundali") {
       return handleListKundalis(request, env);
     }
+    const kundaliIdMatch = /^\/kundali\/(\d+)$/.exec(pathname);
+    if (request.method === "GET" && kundaliIdMatch) {
+      return handleGetKundali(request, env);
+    }
+    if (request.method === "DELETE" && kundaliIdMatch) {
+      return handleDeleteKundali(request, env);
+    }
 
     if (request.method === "GET" && pathname === "/muhurta/now") {
       return handleMuhurtaNow(request, env);
@@ -136,7 +143,7 @@ export default {
     if (request.method === "GET" && pathname === "/admin/query-logs") {
       return handleListQueryLogs(request, env);
     }
-    if (request.method === "GET" && pathname === "/admin/summary") {
+    if (request.method === "GET" && (pathname === "/admin/summary" || pathname === "/admin/stats")) {
       return handleGetSummary(request, env);
     }
     const adminUserMatch = /^\/admin\/users\/(\d+)$/.exec(pathname);
@@ -157,6 +164,17 @@ export default {
     }
     if (request.method === "GET" && pathname === "/kp/activities") {
       return handleListActivities(request, env);
+    }
+
+    if (request.method === "POST" && pathname === "/api/log-error") {
+      // Error logging from frontend -- store or log, don't fail
+      try {
+        const body = await request.json();
+        console.error("[Frontend Error]", body);
+      } catch {
+        console.error("[Frontend Error] (malformed)");
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }
 
     if (pathname === "/health") {
