@@ -173,9 +173,22 @@ export async function grantPoints(
 
 /**
  * Get user's total available points
+ * Triggers lazy cleanup of expired batches and released holds
  */
 export async function getAvailablePoints(userId: number, db: D1Database): Promise<number> {
   try {
+    // Lazy cleanup: mark expired batches and release held commissions
+    await db.batch([
+      db.prepare(
+        `UPDATE wallet_ledger SET status = 'expired'
+         WHERE user_id = ? AND status = 'active' AND expires_at <= datetime('now')`
+      ).bind(userId),
+      db.prepare(
+        `UPDATE wallet_ledger SET status = 'active'
+         WHERE user_id = ? AND status = 'held' AND holding_until IS NOT NULL AND holding_until <= datetime('now')`
+      ).bind(userId),
+    ]);
+
     const result = await db
       .prepare(
         `
