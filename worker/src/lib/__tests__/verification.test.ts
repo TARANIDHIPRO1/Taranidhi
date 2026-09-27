@@ -464,60 +464,65 @@ describe("Module 12: Hora Windows", () => {
 // MODULE 13: Navtara / Tarabala
 // ═════════════════════════════════════════════════════════════════════════
 describe("Module 13: Navtara / Tarabala", () => {
-  it("same nakshatra = Janma (tara 1), malefic", () => {
+  it("same nakshatra = Janma (tara 1), neutral (per Karma Vipak Samhita: karmic marker, not inherent defect)", () => {
     const t = computeTara(0, 0);
     expect(t.number).toBe(1);
     expect(t.name).toBe("Janma");
-    expect(t.isBenefic).toBe(false);
+    expect(t.beneficence).toBe("neutral");
   });
 
   it("Ashwini -> Bharani = Sampat (tara 2), benefic", () => {
     const t = computeTara(0, 1);
     expect(t.number).toBe(2);
     expect(t.name).toBe("Sampat");
-    expect(t.isBenefic).toBe(true);
+    expect(t.beneficence).toBe("benefic");
   });
 
   it("Ashwini -> Ashlesha = Atimitra (tara 9), benefic", () => {
     const t = computeTara(0, 8);
     expect(t.number).toBe(9);
     expect(t.name).toBe("Atimitra");
-    expect(t.isBenefic).toBe(true);
+    expect(t.beneficence).toBe("benefic");
   });
 
   it("cycle repeats: Ashwini -> Magha = Janma again (2nd cycle)", () => {
     const t = computeTara(0, 9);
     expect(t.number).toBe(1);
     expect(t.name).toBe("Janma");
-    expect(t.isBenefic).toBe(false);
+    expect(t.beneficence).toBe("neutral");
   });
 
   it("Pushya(7) -> Pushya(7) = Janma", () => {
     const t = computeTara(7, 7);
     expect(t.number).toBe(1);
-    expect(t.isBenefic).toBe(false);
+    expect(t.beneficence).toBe("neutral");
   });
 
   it("Pushya(7) -> Ashlesha(8) = Sampat", () => {
     const t = computeTara(7, 8);
     expect(t.number).toBe(2);
-    expect(t.isBenefic).toBe(true);
+    expect(t.beneficence).toBe("benefic");
   });
 
   it("Pushya(7) -> Punarvasu(6) = Atimitra (wraps around)", () => {
     const t = computeTara(7, 6);
     expect(t.number).toBe(9);
     expect(t.name).toBe("Atimitra");
-    expect(t.isBenefic).toBe(true);
+    expect(t.beneficence).toBe("benefic");
   });
 
   it("benefic set is {2,4,6,8,9}", () => {
+    // Benefic Taras (Sampat, Kshema, Sadhak, Mitra, Atimitra)
     expect(TARA_BENEFIC.has(2)).toBe(true);
     expect(TARA_BENEFIC.has(4)).toBe(true);
     expect(TARA_BENEFIC.has(6)).toBe(true);
     expect(TARA_BENEFIC.has(8)).toBe(true);
     expect(TARA_BENEFIC.has(9)).toBe(true);
+
+    // Janma (1) is neutral, not malefic (per Karma Vipak Samhita: karmic marker, not inherent defect)
     expect(TARA_BENEFIC.has(1)).toBe(false);
+
+    // Malefic Taras (Vipat, Pratyari, Vadha)
     expect(TARA_BENEFIC.has(3)).toBe(false);
     expect(TARA_BENEFIC.has(5)).toBe(false);
     expect(TARA_BENEFIC.has(7)).toBe(false);

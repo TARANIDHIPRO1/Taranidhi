@@ -24,7 +24,13 @@ export const NAKSHATRA_NAMES = [
 ];
 
 export const TARA_NAMES = ["", "Janma", "Sampat", "Vipat", "Kshema", "Pratyari", "Sadhak", "Vadha", "Mitra", "Atimitra"];
+// Tara beneficence classification:
+// - TARA_BENEFIC: Classically auspicious (Sampat, Kshema, Sadhak, Mitra, Atimitra)
+// - TARA_NEUTRAL: Neutral or context-dependent (Janma: karma marker, not inherent defect per Karma Vipak Samhita)
+// - Implicitly malefic: Vipat, Pratyari, Vadha (not listed above)
+// Source: B.V. Raman (context-dependent), Karma Vipak Samhita (Janma Nakshatra as karmic marker with remedies)
 export const TARA_BENEFIC = new Set([2, 4, 6, 8, 9]);
+export const TARA_NEUTRAL = new Set([1]); // Janma — no inherent malefic quality
 
 /** Classical Chaldean order -- same sequence the Hora-lord rotation and
  *  Uphora sub-division both use. Confirmed from the prior TaraNidhi build. */
@@ -105,14 +111,31 @@ export function getActiveUphora(uphoras: Uphora[], now: Date): Uphora | null {
 /**
  * Compute Tara from Janma-Nakshatra and current Nakshatra. Personalized per
  * user -- each user's Tara is unique to their own birth star.
+ *
+ * Returns three-state beneficence: "benefic" (2,4,6,8,9), "neutral" (1 Janma),
+ * or "malefic" (3,5,7 Vipat, Pratyari, Vadha).
+ *
+ * Janma (1) is classified as neutral, not malefic, per Karma Vipak Samhita
+ * (Janma Nakshatra as karmic marker, not inherent defect) and B.V. Raman's
+ * context-dependent model (favorable for certain purposes, unfavorable for others).
  */
 export function computeTara(
   janmaNakIdx: number,
   currentNakIdx: number
-): { number: number; name: string; isBenefic: boolean } {
+): { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" } {
   const count = ((currentNakIdx - janmaNakIdx + 27) % 27) + 1;
   const taraNum = ((count - 1) % 9) + 1;
-  return { number: taraNum, name: TARA_NAMES[taraNum]!, isBenefic: TARA_BENEFIC.has(taraNum) };
+
+  let beneficence: "benefic" | "neutral" | "malefic";
+  if (TARA_BENEFIC.has(taraNum)) {
+    beneficence = "benefic";
+  } else if (TARA_NEUTRAL.has(taraNum)) {
+    beneficence = "neutral";
+  } else {
+    beneficence = "malefic";
+  }
+
+  return { number: taraNum, name: TARA_NAMES[taraNum]!, beneficence };
 }
 
 /**

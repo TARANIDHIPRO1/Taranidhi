@@ -141,7 +141,7 @@ function renderMuhurtaResult(d: any): string {
         <span>Hora: <strong>${d.hora_lord ?? "?"}</strong></span>
         <span>Nakshatra: <strong>${d.nakshatra ?? "?"}</strong></span>
       </div>
-      ${d.tara ? `<div class="tara">Tara: ${d.tara.name} (#${d.tara.number}) — ${d.tara.isBenefic ? "✅ Benefic" : "❌ Malefic"}</div>` : ""}
+      ${d.tara ? `<div class="tara">Tara: ${d.tara.name} (#${d.tara.number}) — ${d.tara.beneficence === "benefic" ? "✅ Benefic" : d.tara.beneficence === "neutral" ? "⚖️ Neutral (context-dependent)" : "❌ Malefic"}</div>` : ""}
       ${d.dishashool ? `<div class="dishashool">Dishashool: ${d.dishashool.direction}</div>` : ""}
       <div class="layers">${layers}</div>
       ${warnings.length ? `<div class="warnings">${warnings.join("<br/>")}</div>` : ""}

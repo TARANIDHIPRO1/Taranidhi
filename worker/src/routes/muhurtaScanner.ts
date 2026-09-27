@@ -65,7 +65,7 @@ interface ScanResult {
   hora_lord: string;
   purpose_label: string;
   nakshatra: string;
-  tara: { number: number; name: string; isBenefic: boolean } | null;
+  tara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" } | null;
   panchaka_active: boolean;
   ganda_moola: boolean;
   dishashool_direction: string | null;

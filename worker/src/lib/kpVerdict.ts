@@ -194,8 +194,10 @@ export interface HouseVerdict {
   subLordSignifiesFavorable: boolean;
   /** Does the sub-lord signify unfavorable houses (6/8/12 from queried house)? */
   subLordSignifiesUnfavorable: boolean;
-  /** Navtara of the sub-lord planet relative to natal Moon's nakshatra. */
-  navtara: { number: number; name: string; isBenefic: boolean };
+  /** Navtara of the sub-lord planet relative to natal Moon's nakshatra.
+   *  Beneficence: "benefic" (2,4,6,8,9), "neutral" (1 Janma), or "malefic" (3,5,7).
+   *  Janma is neutral per Karma Vipak Samhita: karmic marker, not inherent defect. */
+  navtara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" };
   /** Raw verdict: "promised" or "denied". */
   verdict: "promised" | "denied";
   /** Breakdown of favorable vs unfavorable house counts for transparency. */
@@ -244,18 +246,26 @@ export function evaluateHouse(
   // Verdict logic:
   // - If sub-lord signifies more favorable houses than unfavorable → Promised
   // - If sub-lord signifies more unfavorable than favorable → Denied
-  // - Tie-break: Navtara benefic → Promised, malefic → Denied
+  // - Tie-break: Navtara benefic → Promised, malefic → Denied, neutral → defer to
+  //   context (no bias applied; this reflects that Janma Tara is context-dependent per
+  //   B.V. Raman and Karma Vipak Samhita — favorable for nuptials/sacrifices/coronations,
+  //   unfavorable for business/war; remedies mitigate per KVS)
   // - If sub-lord directly signifies the queried house itself, that's a
   //   strong positive signal (adds to favorable count conceptually)
   let effectiveFavorable = favorableCount + (subLordSignifiesQueriedHouse ? 1 : 0);
+
+  // Determine tie-break behavior based on Navtara beneficence.
+  // Neutral (Janma) imposes no tie-break bias — context must be evaluated separately.
+  const navtaraTiebreak = navtara.beneficence === "benefic" ? "promised" : navtara.beneficence === "malefic" ? "denied" : null;
+
   const verdict: "promised" | "denied" =
     effectiveFavorable > unfavorableCount
       ? "promised"
       : effectiveFavorable < unfavorableCount
         ? "denied"
-        : navtara.isBenefic
-          ? "promised"
-          : "denied";
+        : navtaraTiebreak !== null
+          ? navtaraTiebreak
+          : "denied"; // Default to "denied" if tie remains unbroken (cautious default)
 
   return {
     house,

@@ -159,7 +159,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     chandrabalaContext = { ...chandrabalaContext, currentMoonRashi: Math.floor(moonLon / 30) };
   }
 
-  let tara: { number: number; name: string; isBenefic: boolean } | null = null;
+  let tara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" } | null = null;
   if (janmaNakIdx !== null) {
     tara = computeTara(janmaNakIdx, currentNakIdx);
   }
