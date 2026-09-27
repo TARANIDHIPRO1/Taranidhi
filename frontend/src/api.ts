@@ -109,3 +109,6 @@ export const walletBalance = () => apiFetch("/wallet/balance");
 
 // ── Referral ──
 export const referralCode = () => apiFetch("/referral/code");
+
+// ── Admin ──
+export const adminStats = () => apiFetch("/admin/stats");

@@ -10,6 +10,7 @@ import { renderMuhurta } from "./screens/muhurta";
 import { renderKundaliList } from "./screens/kundali-list";
 import { renderKundaliForm } from "./screens/kundali-form";
 import { renderKpQuery } from "./screens/kp-query";
+import { renderAdminPanel } from "./screens/admin-panel";
 // TODO: import { renderScanner }, renderKp, renderWallet, renderReferral
 
 type RouteHandler = () => Promise<void> | void;
@@ -25,6 +26,7 @@ export class Router {
     this.routes.set("/kundali", renderKundaliList);
     this.routes.set("/kundali-form", renderKundaliForm);
     this.routes.set("/kp-query", renderKpQuery);
+    this.routes.set("/admin", renderAdminPanel);
     // TODO: Add /scanner, /kp, /wallet, /referral
   }
 
