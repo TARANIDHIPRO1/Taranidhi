@@ -19,32 +19,32 @@
 
 ### Phase 2: Remaining Work 🟡
 
-#### Code (3 UI Screens)
-- 🟢 **#28: /scanner screen** — Date/time scanner for auspicious moments
-  - Loads kundali or asks for location/timezone
-  - Shows muhurta analysis (✓/✗ per date range)
-  - Allows filtering by category (travel, marriage, business, etc.)
-  - Estimate: 2 hours
+#### Code (3 UI Screens) ✅ COMPLETE
+- ✅ **#28: /scanner screen** — Date/time scanner for auspicious moments
+  - ✅ Loads kundali or asks for location/timezone
+  - ✅ Shows muhurta analysis (✓/✗ per date range)
+  - ✅ Allows filtering by category (travel, marriage, business, etc.)
+  - ✅ Completed: Sept 27, 2:48 IST
   
-- 🟢 **#29: /wallet screen** — Points balance + transaction history
-  - Show available points, expiry dates per batch
-  - List recent transactions (queries, activations)
-  - Allow topup (open Razorpay modal)
-  - Estimate: 1.5 hours
+- ✅ **#29: /wallet screen** — Points balance + transaction history
+  - ✅ Show available points, expiry dates per batch
+  - ✅ List recent transactions (queries, activations)
+  - ✅ Allow topup (open Razorpay modal)
+  - ✅ Completed: Sept 27, 3:15 IST
 
-- 🟢 **#30: /referral screen** — Referral code + earnings
-  - Display user's referral code (copyable)
-  - Show commission status (pending/held/active)
-  - List referred users + their payment status
-  - Estimate: 1 hour
+- ✅ **#30: /referral screen** — Referral code + earnings
+  - ✅ Display user's referral code (copyable)
+  - ✅ Show commission status (pending/held/active)
+  - ✅ List referred users + their payment status
+  - ✅ Completed: Sept 27, 3:25 IST
 
-#### Infrastructure
-- 🟢 **Deploy to Cloudflare** — `wrangler deploy`
-  - Set FRONTEND_ORIGIN for prod domain
-  - Configure SMS gateway (msg91/equivalent) — blocked by decision
-  - Set RAZORPAY_KEY_ID + SECRET — blocked by account creation
+#### Infrastructure 🟡 READY FOR DEPLOYMENT
+- 🟢 **Deploy to Cloudflare** — `wrangler deploy` (ready, blocked on config)
+  - ⏳ Set FRONTEND_ORIGIN for prod domain (blocked: confirm domain)
+  - ⏳ Configure SMS gateway (msg91/equivalent) (blocked: account + decision)
+  - ⏳ Set RAZORPAY_KEY_ID + SECRET (blocked: account creation)
 
-- 🟡 **Connect SMS Gateway** — OTP delivery (currently stubbed)
+- 🔴 **Connect SMS Gateway** — OTP delivery (currently stubbed)
   - Requires: MSG91 account + API key
   - Blocked: Naveen must create account + provide credentials
 

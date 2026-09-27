@@ -4,40 +4,41 @@
 // route count is small. Revisit that choice once there are enough routes
 // that manual if/else dispatch gets unreadable -- not before.
 
-import { handleRequestOtp, handleVerifyOtp, type Env as AuthEnv } from "./routes/auth";
-import { handleCreateKundali, handleListKundalis, handleGetKundali, handleDeleteKundali, type Env as KundaliEnv } from "./routes/kundali";
-import { handleMuhurtaNow, type Env as MuhurtaEnv } from "./routes/muhurta";
-import { handleGetBalance, type Env as WalletRouteEnv } from "./routes/wallet";
-import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway, type Env as OrdersRouteEnv } from "./routes/orders";
-import { handleGetReferralCode, handleAttributeReferral, type Env as ReferralRouteEnv } from "./routes/referral";
+/// <reference types="@cloudflare/workers-types" />
+
+import { handleRequestOtp, handleVerifyOtp } from "./routes/auth";
+import { handleCreateKundali, handleListKundalis, handleGetKundali, handleDeleteKundali } from "./routes/kundali";
+import { handleMuhurtaNow } from "./routes/muhurta";
+import { handleGetBalance } from "./routes/wallet";
+import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway } from "./routes/orders";
+import { handleGetReferralCode, handleAttributeReferral } from "./routes/referral";
 import {
   handleListUsers,
   handleGetUserDetail,
   handleDeactivateUser,
   handleListQueryLogs,
   handleGetSummary,
-  type Env as AdminRouteEnv,
 } from "./routes/admin";
-import { handleGetKpChart, type Env as KpRouteEnv } from "./routes/kp";
-import { handleKpQuery, handleListActivities, type Env as KpQueryRouteEnv } from "./routes/kpQuery";
-import { handleMuhurtaScan, type Env as MuhurtaScanEnv } from "./routes/muhurtaScanner";
+import { handleGetKpChart } from "./routes/kp";
+import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
+import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
+import { type Env as AuthEnv } from "./lib/auth-middleware";
+import { type Env as WalletEnv } from "./lib/wallet";
+import { type Env as OrdersEnv } from "./lib/orders";
+import { type Env as ReferralEnv } from "./lib/referral";
 import { errorJson, corsPreflight } from "./lib/response";
 
 export interface Env
   extends AuthEnv,
-    KundaliEnv,
-    MuhurtaEnv,
-    WalletRouteEnv,
-    OrdersRouteEnv,
-    ReferralRouteEnv,
-    AdminRouteEnv,
-    KpRouteEnv,
-    KpQueryRouteEnv,
-    MuhurtaScanEnv,
+    WalletEnv,
+    OrdersEnv,
+    ReferralEnv,
     RateLimitEnv,
-    SessionEnv {}
+    SessionEnv {
+  DB: D1Database;
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
