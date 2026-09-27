@@ -9,7 +9,8 @@ import { renderDashboard } from "./screens/dashboard";
 import { renderMuhurta } from "./screens/muhurta";
 import { renderKundaliList } from "./screens/kundali-list";
 import { renderKundaliForm } from "./screens/kundali-form";
-// TODO: import { renderScanner }, renderKp, renderKpQuery, renderWallet, renderReferral
+import { renderKpQuery } from "./screens/kp-query";
+// TODO: import { renderScanner }, renderKp, renderWallet, renderReferral
 
 type RouteHandler = () => Promise<void> | void;
 
@@ -23,7 +24,8 @@ export class Router {
     this.routes.set("/muhurta", renderMuhurta);
     this.routes.set("/kundali", renderKundaliList);
     this.routes.set("/kundali-form", renderKundaliForm);
-    // TODO: Add /scanner, /kp, /kp-query, /wallet, /referral
+    this.routes.set("/kp-query", renderKpQuery);
+    // TODO: Add /scanner, /kp, /wallet, /referral
   }
 
   currentRoute(): string {

@@ -55,11 +55,10 @@ CREATE TABLE kundalis (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id             INTEGER NOT NULL REFERENCES users(id),
     label               TEXT,                       -- e.g. "Self", "Spouse" -- for multi-kundali tiers
-    birth_date          TEXT NOT NULL,               -- ISO date
-    birth_time          TEXT NOT NULL,               -- HH:MM:SS local
-    birth_place_lat     REAL NOT NULL,
-    birth_place_lon     REAL NOT NULL,
-    birth_place_name    TEXT,
+    birth_date          TEXT NOT NULL,               -- ISO datetime (YYYY-MM-DDTHH:MM:SS)
+    latitude            REAL NOT NULL,
+    longitude           REAL NOT NULL,
+    timezone            TEXT NOT NULL,              -- IANA timezone e.g. "Asia/Kolkata"
     janma_nakshatra_idx INTEGER,                     -- 0-26, required for Tarabala/Dasha -- must be populated on save
     lagna_rashi_idx     INTEGER,                      -- 0-11, from the existing closed-form Lagna formula (Lahiri)
     created_at          TEXT NOT NULL DEFAULT (datetime('now'))
@@ -213,11 +212,73 @@ CREATE TABLE query_logs (
 );
 
 -- ============================================================
--- INDEXES
+-- KP QUERY LOGS (distinct from general query_logs, for analytics)
 -- ============================================================
 
+CREATE TABLE kp_queries (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id),
+    kundali_id      INTEGER NOT NULL REFERENCES kundalis(id),
+    activity_code   TEXT NOT NULL,                   -- from HOUSE_ACTIVITY_MAPPING
+    verdict         TEXT NOT NULL
+                        CHECK (verdict IN ('promised', 'denied')),
+    confidence_pct  INTEGER NOT NULL,
+    queried_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    points_charged  INTEGER NOT NULL DEFAULT 1
+);
+
+-- ============================================================
+-- RATE LIMITING (ephemeral, can also live in KV, but D1 provides durability)
+-- ============================================================
+
+CREATE TABLE rate_limits (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    resource_key    TEXT NOT NULL UNIQUE,         -- "user:123:kp_query" or "ip:203.0.113.1:api"
+    request_count   INTEGER NOT NULL DEFAULT 1,
+    window_start    TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at      TEXT NOT NULL
+);
+
+-- ============================================================
+-- INDEXES (scaled for 1M users/year)
+-- ============================================================
+
+-- User lookups
+CREATE INDEX idx_users_phone ON users(phone_number);
+
+-- Kundali queries
+CREATE INDEX idx_kundalis_user_id ON kundalis(user_id, created_at DESC);
+CREATE INDEX idx_kundalis_lagna ON kundalis(lagna_rashi_idx) WHERE lagna_rashi_idx IS NOT NULL;
+
+-- Wallet & points
 CREATE INDEX idx_wallet_ledger_user_status ON wallet_ledger(user_id, status);
 CREATE INDEX idx_wallet_ledger_expiry ON wallet_ledger(expires_at) WHERE status = 'active';
+CREATE INDEX idx_wallet_ledger_user_active ON wallet_ledger(user_id) WHERE status = 'active';
+CREATE INDEX idx_wallet_transactions_ledger ON wallet_transactions(wallet_ledger_id);
+CREATE INDEX idx_wallet_transactions_reason ON wallet_transactions(reason);
+
+-- Orders & payments
 CREATE INDEX idx_orders_user_status ON orders(user_id, status);
-CREATE INDEX idx_query_logs_user_time ON query_logs(user_id, queried_at);
+CREATE INDEX idx_orders_created ON orders(created_at DESC);
+CREATE INDEX idx_payments_order ON payments(order_id);
+CREATE INDEX idx_payments_razorpay ON payments(razorpay_payment_id) WHERE razorpay_payment_id IS NOT NULL;
+
+-- Query logs (analytics + rate limiting)
+CREATE INDEX idx_query_logs_user_time ON query_logs(user_id, queried_at DESC);
+CREATE INDEX idx_query_logs_kundali ON query_logs(kundali_id);
+CREATE INDEX idx_query_logs_type ON query_logs(query_type, queried_at DESC);
+CREATE INDEX idx_kp_queries_user_time ON kp_queries(user_id, queried_at DESC);
+CREATE INDEX idx_kp_queries_kundali ON kp_queries(kundali_id);
+CREATE INDEX idx_kp_queries_verdict ON kp_queries(verdict, queried_at DESC);
+
+-- Referrals
 CREATE INDEX idx_referrals_referrer ON referrals(referrer_user_id);
+CREATE INDEX idx_referrals_referred ON referrals(referred_user_id);
+CREATE INDEX idx_referrals_status ON referrals(commission_status);
+
+-- Device & security
+CREATE INDEX idx_device_fingerprints_trial ON device_fingerprints(trial_used, blacklisted);
+CREATE INDEX idx_user_devices_fingerprint ON user_devices(fingerprint_id);
+
+-- Rate limiting
+CREATE INDEX idx_rate_limits_expiry ON rate_limits(expires_at);
