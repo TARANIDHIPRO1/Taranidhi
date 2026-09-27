@@ -28,7 +28,7 @@ import { type Env as AuthEnv } from "./lib/auth-middleware";
 import { type Env as WalletEnv } from "./lib/wallet";
 import { type Env as OrdersEnv } from "./lib/orders";
 import { type Env as ReferralEnv } from "./lib/referral";
-import { errorJson, corsPreflight } from "./lib/response";
+import { errorJson, corsPreflight, type Env as ResponseEnv } from "./lib/response";
 
 export interface Env
   extends AuthEnv,
@@ -47,7 +47,7 @@ export default {
 
     // Browser preflight. CORS origin(s) scoped via FRONTEND_ORIGIN env var.
     if (request.method === "OPTIONS") {
-      return corsPreflight(env);
+      return corsPreflight(env as ResponseEnv);
     }
 
     // Global per-account + per-IP rate limiting -- ARCHITECTURE.md Section 8's

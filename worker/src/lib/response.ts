@@ -1,7 +1,7 @@
 // Small helpers so every route returns JSON in the same shape.
 // Keeping this trivial on purpose -- do not add a framework here.
 
-interface Env {
+export interface Env {
   FRONTEND_ORIGIN?: string;
   ENVIRONMENT?: string;
 }
