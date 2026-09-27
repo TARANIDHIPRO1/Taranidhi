@@ -206,6 +206,37 @@ export async function getSpendableBalance(env: Env, userId: number): Promise<num
 }
 
 /**
+ * Grant free trial points (3 days validity)
+ */
+export async function grantFreeTrial(env: Env, userId: number): Promise<{ success: boolean; message: string }> {
+  const result = await grantPoints(userId, 10, "free_trial", 3, env.DB);
+  return { success: result.success, message: result.message };
+}
+
+/**
+ * Deduct wallet (accepts variable args for compatibility with routes)
+ * Signature: debitWallet(env, userId, points, ...extra_args)
+ */
+export async function debitWallet(env: Env, userId: number, points: number, ..._args: any[]): Promise<{ success: boolean; message: string }> {
+  return deductPoints(userId, points, env.DB);
+}
+
+/**
+ * Insufficient balance error class
+ */
+export class InsufficientBalanceError extends Error {
+  available?: number;
+  requested?: number;
+
+  constructor(message: string, available?: number, requested?: number) {
+    super(message);
+    this.name = "InsufficientBalanceError";
+    this.available = available;
+    this.requested = requested;
+  }
+}
+
+/**
  * Clawback commission on refund
  */
 export async function clawbackCommission(batchId: number, db: D1Database): Promise<boolean> {

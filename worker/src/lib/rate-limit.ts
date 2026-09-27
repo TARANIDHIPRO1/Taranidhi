@@ -34,7 +34,8 @@ export async function checkRateLimit(
   category: string,
   kv: KVNamespace
 ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
-  const config = RATE_LIMIT_CONFIGS[category] || RATE_LIMIT_CONFIGS["api:default"];
+  const config = RATE_LIMIT_CONFIGS[category] ?? RATE_LIMIT_CONFIGS["api:default"];
+  if (!config) throw new Error("No default rate limit config");
   const now = Date.now();
 
   try {
