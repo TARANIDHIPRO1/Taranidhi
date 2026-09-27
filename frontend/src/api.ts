@@ -55,14 +55,19 @@ export const verifyOtp = (phone: string, code: string, fingerprint: string) =>
 
 // ── Kundali ──
 export const listKundalis = () => apiFetch("/kundali");
+
 export const createKundali = (body: {
   label: string;
   birth_date: string;
-  birth_time: string;
-  birth_place_lat: number;
-  birth_place_lon: number;
-  birth_place_name: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
 }) => apiFetch("/kundali", { method: "POST", body: JSON.stringify(body) });
+
+export const deleteKundali = (id: number) =>
+  apiFetch(`/kundali/${id}`, { method: "DELETE" });
+
+export const getKundali = (id: number) => apiFetch(`/kundali/${id}`);
 
 // ── Muhurta ──
 export const muhurtaNow = (lat: number, lon: number, purpose?: string, kundaliId?: number) => {

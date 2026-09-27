@@ -1,33 +1,53 @@
-// Minimal hash-based SPA router.
-// Routes: #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
-//         #/kundali, #/wallet, #/referral
+/**
+ * Hash-based SPA Router
+ * Routes: #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
+ *         #/kundali, #/kundali-form, #/wallet, #/referral
+ */
 
-type RouteHandler = () => void;
-const routes = new Map<string, RouteHandler>();
+import { renderLogin } from "./screens/login";
+import { renderDashboard } from "./screens/dashboard";
+import { renderMuhurta } from "./screens/muhurta";
+import { renderKundaliList } from "./screens/kundali-list";
+import { renderKundaliForm } from "./screens/kundali-form";
+// TODO: import { renderScanner }, renderKp, renderKpQuery, renderWallet, renderReferral
 
-export function route(path: string, handler: RouteHandler) {
-  routes.set(path, handler);
-}
+type RouteHandler = () => Promise<void> | void;
 
-export function navigate(path: string) {
-  window.location.hash = path;
-}
+export class Router {
+  private routes = new Map<string, RouteHandler>();
 
-export function currentRoute(): string {
-  return window.location.hash.slice(1) || "/login";
-}
+  constructor() {
+    // Register routes
+    this.routes.set("/login", renderLogin);
+    this.routes.set("/dashboard", renderDashboard);
+    this.routes.set("/muhurta", renderMuhurta);
+    this.routes.set("/kundali", renderKundaliList);
+    this.routes.set("/kundali-form", renderKundaliForm);
+    // TODO: Add /scanner, /kp, /kp-query, /wallet, /referral
+  }
 
-export function startRouter() {
-  const dispatch = () => {
-    const path = currentRoute();
-    const handler = routes.get(path);
-    if (handler) handler();
-    else {
-      // Fallback: try to match parameterized routes or go to login
-      const fallback = routes.get("/login");
-      if (fallback) fallback();
+  currentRoute(): string {
+    return window.location.hash.slice(1) || "/login";
+  }
+
+  async route(): Promise<void> {
+    const path = this.currentRoute();
+    const handler = this.routes.get(path);
+
+    if (handler) {
+      try {
+        await handler();
+      } catch (error) {
+        console.error(`Route handler error for ${path}:`, error);
+      }
+    } else {
+      // Fallback to login
+      const fallback = this.routes.get("/login");
+      if (fallback) await fallback();
     }
-  };
-  window.addEventListener("hashchange", dispatch);
-  dispatch();
+  }
+}
+
+export function navigate(path: string): void {
+  window.location.hash = path;
 }
