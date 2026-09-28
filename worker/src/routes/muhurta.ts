@@ -34,6 +34,7 @@ import {
   getGandaMoola,
   getDishashool,
 } from "../lib/muhurta";
+import { getPakshiAtTime, scorePakshiFavorability } from "../lib/panchaPakshi";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
@@ -180,6 +181,11 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const venusCombustion = getCombustion("Venus", jd);
   const jupiterCombustion = getCombustion("Jupiter", jd);
 
+  // Pancha Pakshi (5-bird cycles) -- ultra-precise muhurta windows
+  // Provides 10-30-60 minute precision depending on event type
+  const pakshi = getPakshiAtTime(now, "STANDARD");
+  const pakshiScore = scorePakshiFavorability(now, "STANDARD");
+
   let score: ReturnType<typeof scoreHora> | null = null;
   if (activeHora) {
     score = scoreHora(
@@ -219,6 +225,14 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     active_uphora: activeUphora
       ? { sub: activeUphora.sub, start: activeUphora.start.toISOString(), end: activeUphora.end.toISOString() }
       : null,
+    pancha_pakshi: {
+      bird: pakshi.bird,
+      confidence: pakshi.confidence,
+      cycle_start: pakshi.startTime.toISOString(),
+      cycle_end: pakshi.endTime.toISOString(),
+      precision_minutes: pakshi.precisionMinutes,
+      favorability_score: pakshiScore,
+    },
     rahu_kaal: { start: rahuKaal.start.toISOString(), end: rahuKaal.end.toISOString(), active_now: inRahuKaal },
     current_nakshatra: { idx: currentNakIdx, name: NAKSHATRA_NAMES[currentNakIdx] },
     tara,
