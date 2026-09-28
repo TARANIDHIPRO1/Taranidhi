@@ -23,17 +23,6 @@ const MINUTE_MS = 60 * 1000;
 // 1. NAKSHATRA MAPPINGS
 // ============================================================================
 
-const SHUKLA_MAPPING: Record<number, Bird> = {
-  1:2:3:4:5: 'Vulture', 6:7:8:9:10:11: 'Owl', 12:13:14:15:16: 'Crow',
-  17:18:19:20:21: 'Cock', 22:23:24:25:26:27: 'Peacock'
-};
-
-const KRISHNA_MAPPING: Record<number, Bird> = {
-  1:2:3:4:5: 'Peacock', 6:7:8:9:10:11: 'Cock', 12:13:14:15:16: 'Crow',
-  17:18:19:20:21: 'Owl', 22:23:24:25:26:27: 'Vulture'
-};
-
-// Fix syntax - create proper objects
 const createMapping = (ranges: {[k: string]: Bird}): Record<number, Bird> => {
   const map: Record<number, Bird> = {};
   for (const [key, bird] of Object.entries(ranges)) {
