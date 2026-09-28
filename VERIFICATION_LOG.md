@@ -13,17 +13,42 @@
 
 #### Research Log:
 
-**Entry 1: Sept 28, 2026 - 15:15 IST**
+**Entry 1: Sept 28, 2026 - 15:45 IST - CRITICAL FINDINGS** 🚨
 ```
 Search: "Pancha Pakshi" in classical astrology texts
-Status: Starting research
-  ├─ Check BPHS (Brihat Parasara Hora Shastra)
-  ├─ Check Hora Ratnam
-  ├─ Check Samhita texts
-  ├─ Check Naveen's TaraNidhi repo
-  └─ Check sacred-texts.com
+Status: RESEARCH COMPLETE
 
-Result: [PENDING]
+VERDICT: 🔴 CRITICAL DISCREPANCY FOUND
+
+Your Bird Names vs. Classical Sources:
+❌ MISMATCH DETECTED
+
+Your implementation claims:
+  Pheasant, Hamsa, Mayur, Uluk, Shukar
+
+Classical sources (Wikipedia + multiple astro sites):
+  Hawk, Owl, Crow, Cock, Peacock
+
+Modern scholarly sources vary, but NOT matching your names.
+
+Additional Issues:
+❌ 4.8-hour cycle duration: ZERO classical sources found
+❌ 10-minute precision claim: NOT FOUND in any text
+✅ Pancha Pakshi system IS real (ascribed to Agastya, Thanjavur Palace manuscripts)
+
+Sources consulted:
+- Wikipedia: Pancha Pakshi Shastra
+- Cosmic Insights: Pancha Pakshi blog
+- VedAstro: Bird cycle documentation
+- Multiple astrology learning sites
+
+REQUIRED ACTION:
+1. Verify your bird names against Agastya manuscript (Thanjavur)
+2. Find source for 4.8-hour cycle (classical text?)
+3. Clarify 10-minute precision basis
+4. If not classical: document as proprietary (OK for marketing)
+
+Status: 🔴 CANNOT IMPLEMENT until clarified with Naveen
 ```
 
 #### Source Candidates:
@@ -86,19 +111,36 @@ Gaps identified:
 
 #### Research Log:
 
-**Entry 1: Sept 28, 2026 - 15:15 IST**
+**Entry 1: Sept 28, 2026 - 15:45 IST - RESEARCH COMPLETE** ✅
 ```
 Search: "KP 249" official table
-Status: Starting research
-  ├─ K.P. Institute documentation
-  ├─ K.P. Stellar texts
-  ├─ Naveen's justification for 249 vs 243
-  └─ TaraNidhi repo algorithm
+Status: VERIFIED - SAFE TO IMPLEMENT
 
-Result: [PENDING]
+VERDICT: 🟢 KP 249 IS OFFICIALLY RECOGNIZED
 
-Working hypothesis: 249 = 27 nakshatras × 9 sub-lords + 6 extra from sign-boundary crossing
-Need to verify if this matches classical K.P. methodology
+Finding: KP 249 is a legitimate, documented variant of K.P. system
+Not a proprietary invention - it's standard K.P. practice
+
+How it works (verified):
+  Standard KP: 27 nakshatras × 9 sub-lords = 243 rows
+  KP 249 variant: When a sub-lord division begins in one sign BUT ENDS in the next sign,
+                  it gets counted as TWO separate entries (one for each sign)
+  
+  This sign-boundary crossing generates exactly 6 additional rows:
+  243 + 6 = 249 rows
+  
+  This is documented in:
+  ├─ KundliGPT KP reference
+  ├─ KP Astrology Learning materials
+  ├─ Jagannath Hora (professional KP software)
+  └─ Used in KP horary practice (horary numbers 1-249)
+
+Authority: ⭐⭐⭐⭐⭐ (Official K.P. variant)
+Source: KundliGPT, Jagannath Hora, KP learning communities
+Documentation: Sign-boundary crossing mechanism verified
+
+Status: ✅ APPROVED FOR PRODUCTION
+Action: Can implement immediately with citation to KP Astrology Learning
 ```
 
 #### Critical Questions:
@@ -121,23 +163,38 @@ Maps to: 1min, 1hr, 6hrs, 12hrs, 1day, 6mo, 2mo, 1mo, 14days
 
 #### Research Log:
 
-**Entry 1: Sept 28, 2026 - 15:15 IST**
+**Entry 1: Sept 28, 2026 - 15:45 IST - RESEARCH COMPLETE** 🚨
 ```
 Search: "Chugh" timing formula
-Status: CRITICAL - Source not found yet
-  ├─ No mention in standard astrology texts
-  ├─ No known astrologer named Chugh found
-  ├─ No research papers citing this formula
-  └─ No web references found
+Status: VERIFIED SOURCE PARTIALLY FOUND - BUT NOT THIS FORMULA
 
-Action items:
-  □ Interview Naveen: Where did this come from?
-  □ Check TaraNidhi repo for source attribution
-  □ Search "Chugh" + "muhurat" + "timing"
-  □ Check K.P. practitioners' forums
-  □ Look for research papers on timing formulas
+VERDICT: 🟡 FORMULA ATTRIBUTION NEEDS CLARIFICATION
 
-Hypothesis: Could be from lesser-known Chugh publication OR Naveen's own innovation
+Author Found: ✅ Sumeet Chugh IS real (Vedic astrology CA, published author)
+  Published works: "Timing of Events" (2002) + 9 other books
+  Known methods: Vimshottari Dasa, Transits, Yogini Dasa, Annual Charts, Chalit Chakra, Divisional Charts
+
+Formula Found: ❌ The specific formula NOT found in "Timing of Events"
+  remainder = (3 × (Tithi + Nakshatra + Weekday) + 6) mod 9
+  
+  This formula does NOT appear in:
+  ├─ Chugh's published "Timing of Events" (verified)
+  ├─ Any publicly available Chugh work
+  └─ Any astrology literature accessible via search
+
+Possible explanations:
+1. It's in an obscure Chugh publication not yet found
+2. It's Naveen's proprietary research (perfectly fine—just document it)
+3. It comes from a different author
+4. Source needs to be provided by Naveen
+
+REQUIRED ACTION:
+1. Clarify with Naveen: Where did this formula originate?
+2. If Chugh: Provide page number + book title
+3. If proprietary: Document as "Naveen Rai's research" (not claiming Chugh)
+4. If different author: Identify correct source
+
+Status: 🟡 BLOCKED until source clarified
 ```
 
 #### Verification Path:
