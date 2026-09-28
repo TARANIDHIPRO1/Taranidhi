@@ -1,9 +1,9 @@
 # OCCULTVIISION v6 Complete Research Synthesis
 ## Master Document: 6 Research Files → Implementation Roadmap
 
-**Created:** 2026-09-29 03:55 IST  
-**Total Research Lines:** 2,641 lines across 6 files (172 KB)  
-**Scope:** v6 MVP + v7 Vision
+**Created:** 2026-09-29 03:55 IST | **Updated:** 2026-09-29 04:03 IST  
+**Total Research Lines:** 3,099 lines across 9 files (232 KB)  
+**Scope:** v6 MVP + v7 Vision + Ethical Framework
 
 ---
 
@@ -18,6 +18,8 @@
 | **5** | bfef9820 | 198 | 16K | 1k/10k/100k Scaling via NLP + Knowledge Graph | v7 Vision | Reference only |
 | **6** | 9d442520 | 480 | 36K | 1,000k Matrix (1M events) via Bitmasking | v7+ Vision | Reference only |
 | **7** | 6b0f4d9e-7 | 442 | 24K | Data Seeding + NLP Semantic Parser | v7 Production | Reference only |
+| **8** | a9f426eb-9 | 330 | 20K | **Real-World Property Deed Case Study (Oct 16, 2026)** | **v6 TEST CASE** | **Production validation** |
+| **9** | 997097ca-10 | 229 | 20K | **24-Hour Life Micro-Events + Gambling Ethics Framework** | **v7 Personalization** | **Ethical guardrails** |
 
 ---
 
