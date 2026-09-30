@@ -23,6 +23,7 @@ import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
+import { handleGetKundaliChart } from "./routes/kundaliChart";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { type Env as AuthEnv } from "./lib/auth-middleware";
@@ -102,6 +103,11 @@ export default {
     }
     if (request.method === "GET" && pathname === "/kundali") {
       return handleListKundalis(request, env);
+    }
+    // /kundali/:id/chart  -- full computed birth chart (must be checked before /kundali/:id)
+    const kundaliChartMatch = /^\/kundali\/(\d+)\/chart$/.exec(pathname);
+    if (request.method === "GET" && kundaliChartMatch) {
+      return handleGetKundaliChart(request, env);
     }
     const kundaliIdMatch = /^\/kundali\/(\d+)$/.exec(pathname);
     if (request.method === "GET" && kundaliIdMatch) {
