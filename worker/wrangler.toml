@@ -4,8 +4,11 @@ compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 # --- Static site (PWA frontend) ---
-[site]
-bucket = "../frontend/dist"
+# Using [assets] (Workers Static Assets, wrangler v3+) which binds as env.ASSETS
+# NOT [site] (old Workers Sites) which bound as __STATIC_CONTENT — that was the
+# root cause of the "TaraNidhi Loading..." bug: env.ASSETS was undefined under [site].
+[assets]
+directory = "../frontend/dist"
 
 # --- D1 database (already provisioned live on the account, Session 5) ---
 [[d1_databases]]
