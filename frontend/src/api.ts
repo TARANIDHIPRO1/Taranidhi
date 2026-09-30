@@ -127,3 +127,11 @@ export const referralCode = () => apiFetch("/referral/code");
 
 // ── Admin ──
 export const adminStats = () => apiFetch("/admin/stats");
+
+// ── Knowledge Search ──
+export const knowledgeQuery = (query: string, context?: Record<string, unknown>) =>
+  apiFetch("/knowledge/query", {
+    method: "POST",
+    body: JSON.stringify({ query, context }),
+  });
+export const knowledgeSources = () => apiFetch("/knowledge/sources");

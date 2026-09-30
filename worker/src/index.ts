@@ -24,6 +24,13 @@ import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
 import { handleGetKundaliChart } from "./routes/kundaliChart";
+import {
+  handleKnowledgeQuery,
+  handleKnowledgeSources,
+  handleKnowledgeCache,
+  handleDeleteKnowledgeCacheEntry,
+  type Env as KnowledgeEnv,
+} from "./routes/knowledge";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { type Env as AuthEnv } from "./lib/auth-middleware";
@@ -38,7 +45,8 @@ export interface Env
     OrdersEnv,
     ReferralEnv,
     RateLimitEnv,
-    SessionEnv {
+    SessionEnv,
+    KnowledgeEnv {
   DB: D1Database;
   ASSETS: {
     fetch(request: Request | string): Promise<Response>;
@@ -177,6 +185,21 @@ export default {
     }
     if (request.method === "GET" && pathname === "/kp/activities") {
       return handleListActivities(request, env);
+    }
+
+    // ── Knowledge Search routes ──────────────────────────────────────────────
+    if (request.method === "POST" && pathname === "/knowledge/query") {
+      return handleKnowledgeQuery(request, env);
+    }
+    if (request.method === "GET" && pathname === "/knowledge/sources") {
+      return handleKnowledgeSources(request, env);
+    }
+    if (request.method === "GET" && pathname === "/knowledge/cache") {
+      return handleKnowledgeCache(request, env);
+    }
+    const knowledgeCacheDeleteMatch = /^\/knowledge\/cache\/([0-9a-f]{64})$/.exec(pathname);
+    if (request.method === "DELETE" && knowledgeCacheDeleteMatch?.[1]) {
+      return handleDeleteKnowledgeCacheEntry(request, env, knowledgeCacheDeleteMatch[1]);
     }
 
     if (request.method === "POST" && pathname === "/api/log-error") {
