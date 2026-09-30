@@ -45,12 +45,12 @@ async function apiFetch(
 
 // ── Auth ──
 export const requestOtp = (phone: string) =>
-  apiFetch("/auth/request-otp", { method: "POST", body: JSON.stringify({ phone }) });
+  apiFetch("/auth/request-otp", { method: "POST", body: JSON.stringify({ phone_number: phone }) });
 
 export const verifyOtp = (phone: string, code: string, fingerprint: string) =>
   apiFetch("/auth/verify-otp", {
     method: "POST",
-    body: JSON.stringify({ phone, code, device_fingerprint: fingerprint }),
+    body: JSON.stringify({ phone_number: phone, code, fingerprint_hash: fingerprint }),
   });
 
 // ── Kundali ──
