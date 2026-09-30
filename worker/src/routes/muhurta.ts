@@ -86,7 +86,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     // Scoped to the caller's own kundali -- never let one user personalize a
     // score using another user's saved birth data.
     const row = await env.DB.prepare(
-      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, birth_time, birth_place_lat, birth_place_lon
+      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, latitude, longitude
        FROM kundalis WHERE id = ? AND user_id = ?`
     )
       .bind(kundaliId, auth.userId)
@@ -94,9 +94,8 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
         lagna_rashi_idx: number | null;
         janma_nakshatra_idx: number | null;
         birth_date: string;
-        birth_time: string;
-        birth_place_lat: number;
-        birth_place_lon: number;
+        latitude: number;
+        longitude: number;
       }>();
     if (!row) {
       return errorJson("Kundali not found for this account.", 404, "KUNDALI_NOT_FOUND");
@@ -111,9 +110,9 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     // schema columns) was the chosen approach: it reuses the same
     // already-verified buildRealChart() as kundali creation, so there's only
     // one place natal-chart math can go wrong, not two.
-    const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+    const birthUtc = new Date(row.birth_date);
     if (!Number.isNaN(birthUtc.getTime())) {
-      const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+      const natalChart = buildRealChart(birthUtc, row.latitude, row.longitude);
       const natalMoon = natalChart.planets.find((p) => p.planet === "Moon");
       if (natalMoon) {
         // currentMoonRashi filled in below once moonLon is computed.

@@ -201,7 +201,7 @@ CREATE TABLE query_logs (
     user_id         INTEGER NOT NULL REFERENCES users(id),
     kundali_id      INTEGER REFERENCES kundalis(id),
     query_type      TEXT NOT NULL
-                        CHECK (query_type IN ('general_lookup', 'kp_query_window', 'date_scanner')),
+                        CHECK (query_type IN ('general_lookup', 'kp_query_window', 'date_scanner', 'professional_muhurta', 'muhurta_scan')),
     activity_category TEXT,               -- foreign-key-in-spirit to HOUSE_ACTIVITY_MAPPING.md row, stored as text since that table is not yet in DB form
     resolved_houses TEXT,                 -- JSON array, e.g. "[6]" or "[5,7]"
     verdict         TEXT,                 -- for kp_query_window: 'promised' / 'denied'

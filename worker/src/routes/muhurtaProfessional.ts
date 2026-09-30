@@ -183,7 +183,7 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     }
     // Scoped to caller's own kundali -- never allow cross-user scoring.
     const row = await env.DB.prepare(
-      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, birth_time, birth_place_lat, birth_place_lon
+      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, latitude, longitude
        FROM kundalis WHERE id = ? AND user_id = ?`
     )
       .bind(kundaliId, auth.userId)
@@ -191,9 +191,8 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
         lagna_rashi_idx: number | null;
         janma_nakshatra_idx: number | null;
         birth_date: string;
-        birth_time: string;
-        birth_place_lat: number;
-        birth_place_lon: number;
+        latitude: number;
+        longitude: number;
       }>();
 
     if (!row) {
@@ -204,9 +203,9 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     // Rebuild natal chart on-demand (same approach as /muhurta/now).
     // We need natal Moon rashi for Chandrabala + Dasha for Dasha-Gate +
     // natal Moon degree for Navamsha + full chart for Chandrashtakavarga.
-    const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+    const birthUtc = new Date(row.birth_date);
     if (!Number.isNaN(birthUtc.getTime())) {
-      const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+      const natalChart = buildRealChart(birthUtc, row.latitude, row.longitude);
       natalChartRef = natalChart;
       const natalMoon = natalChart.planets.find((p) => p.planet === "Moon");
       if (natalMoon) {

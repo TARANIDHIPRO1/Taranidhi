@@ -132,7 +132,7 @@ export async function handleMuhurtaScan(request: Request, env: Env): Promise<Res
       return errorJson("kundali_id must be an integer.", 400, "INVALID_KUNDALI_ID");
     }
     const row = await env.DB.prepare(
-      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, birth_time, birth_place_lat, birth_place_lon
+      `SELECT lagna_rashi_idx, janma_nakshatra_idx, birth_date, latitude, longitude
        FROM kundalis WHERE id = ? AND user_id = ?`
     )
       .bind(kundaliId, auth.userId)
@@ -140,18 +140,17 @@ export async function handleMuhurtaScan(request: Request, env: Env): Promise<Res
         lagna_rashi_idx: number | null;
         janma_nakshatra_idx: number | null;
         birth_date: string;
-        birth_time: string;
-        birth_place_lat: number;
-        birth_place_lon: number;
+        latitude: number;
+        longitude: number;
       }>();
     if (!row) return errorJson("Kundali not found for this account.", 404, "KUNDALI_NOT_FOUND");
 
     if (row.lagna_rashi_idx !== null) lagnaOnlyChart = { lagnaRashi: row.lagna_rashi_idx };
     janmaNakIdx = row.janma_nakshatra_idx;
 
-    const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+    const birthUtc = new Date(row.birth_date);
     if (!Number.isNaN(birthUtc.getTime())) {
-      const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+      const natalChart = buildRealChart(birthUtc, row.latitude, row.longitude);
       const natalMoon = natalChart.planets.find((p) => p.planet === "Moon");
       if (natalMoon) natalMoonRashi = natalMoon.rashi;
 

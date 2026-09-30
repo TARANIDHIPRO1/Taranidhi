@@ -31,18 +31,18 @@ export async function handleGetKpChart(request: Request, env: Env, kundaliId: nu
   if (!auth) return unauthorized();
 
   const row = await env.DB.prepare(
-    `SELECT birth_date, birth_time, birth_place_lat, birth_place_lon FROM kundalis WHERE id = ? AND user_id = ?`
+    `SELECT birth_date, latitude, longitude FROM kundalis WHERE id = ? AND user_id = ?`
   )
     .bind(kundaliId, auth.userId)
-    .first<{ birth_date: string; birth_time: string; birth_place_lat: number; birth_place_lon: number }>();
+    .first<{ birth_date: string; latitude: number; longitude: number }>();
   if (!row) return errorJson("Kundali not found for this account.", 404, "KUNDALI_NOT_FOUND");
 
-  const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+  const birthUtc = new Date(row.birth_date);
   if (Number.isNaN(birthUtc.getTime())) {
     return errorJson("Stored birth date/time could not be parsed.", 500, "INVALID_BIRTH_DATA");
   }
 
-  const { cusps } = solvePlacidusCusps(birthUtc, row.birth_place_lat, row.birth_place_lon);
+  const { cusps } = solvePlacidusCusps(birthUtc, row.latitude, row.longitude);
   const jd = julianDayFromUtc(birthUtc);
 
   const houseCusps = cusps.map((deg, i) => {
