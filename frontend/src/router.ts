@@ -2,7 +2,7 @@
  * Hash-based SPA Router
  * Routes: #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
  *         #/kundali, #/kundali-form, #/wallet, #/referral, #/birth-chart,
- *         #/muhurta-dashboard
+ *         #/muhurta-dashboard, #/dasha-timeline
  *
  * Query-string support: #/birth-chart?id=5 → route "/birth-chart", params "id=5"
  * The handler receives no args; screens parse window.location.hash themselves.
@@ -20,6 +20,7 @@ import { renderWallet } from "./screens/wallet";
 import { renderReferral } from "./screens/referral";
 import { renderBirthChart } from "./screens/birth-chart";
 import { renderMuhurtaDashboard } from "./screens/muhurta-dashboard";
+import { renderDashaTimeline } from "./screens/dasha-timeline";
 
 type RouteHandler = () => Promise<void> | void;
 
@@ -40,6 +41,7 @@ export class Router {
     this.routes.set("/admin", renderAdminPanel);
     this.routes.set("/birth-chart", renderBirthChart);
     this.routes.set("/muhurta-dashboard", renderMuhurtaDashboard);
+    this.routes.set("/dasha-timeline", renderDashaTimeline);
   }
 
   currentRoute(): string {
