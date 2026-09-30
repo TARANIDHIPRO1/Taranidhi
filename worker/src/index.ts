@@ -22,6 +22,7 @@ import {
 import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
+import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
 import { checkRateLimit, getClientIp, type Env as RateLimitEnv } from "./lib/rateLimit";
 import { getUserIdFromSession, type Env as SessionEnv } from "./lib/session";
 import { type Env as AuthEnv } from "./lib/auth-middleware";
@@ -115,6 +116,9 @@ export default {
     }
     if (request.method === "GET" && pathname === "/muhurta/scan") {
       return handleMuhurtaScan(request, env);
+    }
+    if (request.method === "GET" && pathname === "/muhurta/professional") {
+      return handleMuhurtaProfessional(request, env);
     }
 
     if (request.method === "GET" && pathname === "/wallet/balance") {

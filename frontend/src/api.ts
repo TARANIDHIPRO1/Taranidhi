@@ -95,6 +95,18 @@ export const muhurtaScan = (params: {
   return apiFetch(`/muhurta/scan?${qs}`);
 };
 
+// ── Professional Muhurta ──
+export const muhurtaProfessional = (params: {
+  lat: number;
+  lon: number;
+  category: string;
+  kundali_id?: number;
+}) => {
+  const qs = new URLSearchParams({ lat: String(params.lat), lon: String(params.lon), category: params.category });
+  if (params.kundali_id !== undefined) qs.set("kundali_id", String(params.kundali_id));
+  return apiFetch(`/muhurta/professional?${qs}`);
+};
+
 // ── KP ──
 export const kpChart = (kundaliId: number) => apiFetch(`/kp/chart/${kundaliId}`);
 export const kpQuery = (kundaliId: number, activitySlug: string) =>
