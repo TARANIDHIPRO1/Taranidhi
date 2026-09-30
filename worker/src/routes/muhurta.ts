@@ -33,6 +33,11 @@ import {
   getPanchakaDosha,
   getGandaMoola,
   getDishashool,
+  getTithi,
+  isVishtiKarana,
+  getYamghanda,
+  getGulikaKaal,
+  isDurmuhurta,
 } from "../lib/muhurta";
 import { getPakshiAtTime, scorePakshiFavorability } from "../lib/panchaPakshi";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
@@ -181,9 +186,22 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const venusCombustion = getCombustion("Venus", jd);
   const jupiterCombustion = getCombustion("Jupiter", jd);
 
-  // Pancha Pakshi (5-bird cycles) -- ultra-precise muhurta windows
-  // Provides 10-30-60 minute precision depending on event type
-  const pakshi = getPakshiAtTime(now, "STANDARD");
+  // ── Tithi / Karana / Muhurta dosha ──
+  // Computed here (not just in /muhurta/professional) so /muhurta/now exposes
+  // the full daily muhurta picture. All five are implemented in lib/muhurta.ts.
+  const sunLon = trueSiderealLongitude("Sun", jd);
+  const currentTithi = getTithi(moonLon, sunLon);
+  const inVishtiKarana = isVishtiKarana(moonLon, sunLon);
+  const yamghanda = getYamghanda(sunrise, sunset, now.getUTCDay());
+  const inYamghanda = now.getTime() >= yamghanda.start.getTime() && now.getTime() < yamghanda.end.getTime();
+  const gulikaKaal = getGulikaKaal(sunrise, sunset, now.getUTCDay());
+  const inGulikaKaal = now.getTime() >= gulikaKaal.start.getTime() && now.getTime() < gulikaKaal.end.getTime();
+  const inDurmuhurta = isDurmuhurta(sunrise, sunset, now.getUTCDay(), now);
+
+  // Pancha Pakshi (5-bird cycles) -- real yama timing wired to sunrise/sunset.
+  // Bird is personalized only when kundali nakshatra is known; timing is accurate
+  // for all users now that sunrise/sunset are passed in.
+  const pakshi = getPakshiAtTime(now, "STANDARD", { sunriseTime: sunrise, sunsetTime: sunset });
   const pakshiScore = scorePakshiFavorability(now, "STANDARD");
 
   let score: ReturnType<typeof scoreHora> | null = null;
@@ -227,11 +245,14 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       : null,
     pancha_pakshi: {
       bird: pakshi.bird,
+      yama_number: pakshi.yamaNumber,
+      is_daytime: pakshi.isDayTime,
       confidence: pakshi.confidence,
       cycle_start: pakshi.startTime.toISOString(),
       cycle_end: pakshi.endTime.toISOString(),
       precision_minutes: pakshi.precisionMinutes,
       favorability_score: pakshiScore,
+      note: pakshi.note,
     },
     rahu_kaal: { start: rahuKaal.start.toISOString(), end: rahuKaal.end.toISOString(), active_now: inRahuKaal },
     current_nakshatra: { idx: currentNakIdx, name: NAKSHATRA_NAMES[currentNakIdx] },
@@ -240,6 +261,15 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     ganda_moola: gandaMoola,
     dishashool,
     combustion: { venus: venusCombustion, jupiter: jupiterCombustion },
+
+    // Extended muhurta dosha panel -- all implemented in lib/muhurta.ts,
+    // now exposed here so callers get the full picture in one request.
+    tithi: currentTithi,
+    vishti_karana: { active: inVishtiKarana, note: inVishtiKarana ? "Vishti (Bhadra) Karana active -- avoid auspicious work" : "No Vishti Karana" },
+    yamghanda_kaal: { start: yamghanda.start.toISOString(), end: yamghanda.end.toISOString(), active_now: inYamghanda },
+    gulika_kaal: { start: gulikaKaal.start.toISOString(), end: gulikaKaal.end.toISOString(), active_now: inGulikaKaal },
+    durmuhurta: { active: inDurmuhurta, note: inDurmuhurta ? "Durmuhurta active -- avoid starting new work" : "No Durmuhurta" },
+
     score,
     personalized: lagnaOnlyChart !== null || janmaNakIdx !== null,
   });

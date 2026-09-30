@@ -243,13 +243,21 @@ export function scorePakshiFavorability(time: Date, _precisionType: string = 'ST
 }
 
 /**
- * getPakshiAtTime — convenience wrapper expected by muhurta.ts.
- * Returns a minimal object describing the current Pancha Pakshi state.
- * Full precision implementation deferred until astro sunrise data is wired.
+ * getPakshiAtTime — convenience wrapper used by /muhurta/now.
+ *
+ * When sunriseTime + sunsetTime are supplied, the yama window is computed
+ * with real sunrise/sunset data (accurate to the minute). Without them,
+ * it falls back to a fixed 144-minute placeholder window.
+ *
+ * The bird field is always 'Unknown_Personalized' unless nakshatra + paksha
+ * are provided (personalized via analyzePanchaPakshi from the caller).
+ * This is intentional: Pancha Pakshi birth-bird is personal to the person's
+ * natal nakshatra — there is no "universal" bird for a moment in time.
  */
 export function getPakshiAtTime(
   time: Date,
-  _precisionType: string = 'STANDARD'
+  _precisionType: string = 'STANDARD',
+  opts?: { sunriseTime?: Date; sunsetTime?: Date }
 ): {
   score: number;
   bird: Bird;
@@ -257,16 +265,57 @@ export function getPakshiAtTime(
   startTime: Date;
   endTime: Date;
   precisionMinutes: number;
+  yamaNumber: number;
+  isDayTime: boolean;
+  note: string;
 } {
+  if (opts?.sunriseTime && opts?.sunsetTime) {
+    const { yama, yamaLength, isDayTime } = calculateYama(time, opts.sunriseTime, opts.sunsetTime);
+    // Align start to the yama boundary
+    const sunriseMs = opts.sunriseTime.getTime();
+    const sunsetMs = opts.sunsetTime.getTime();
+    const dayLen = sunsetMs - sunriseMs;
+    const dayYamaLen = dayLen / 5;
+    const nightYamaLen = ((sunriseMs + 86400000) - sunsetMs) / 5;
+
+    let yamaStart: Date;
+    let yamaEnd: Date;
+    if (isDayTime) {
+      const dayYama = yama - 1; // 0-indexed
+      yamaStart = new Date(sunriseMs + dayYama * dayYamaLen);
+      yamaEnd   = new Date(sunriseMs + (dayYama + 1) * dayYamaLen);
+    } else {
+      const nightYama = yama - 6; // 0-indexed night yama (yama 6 = index 0)
+      yamaStart = new Date(sunsetMs + nightYama * nightYamaLen);
+      yamaEnd   = new Date(sunsetMs + (nightYama + 1) * nightYamaLen);
+    }
+    const durationMinutes = Math.round(yamaLength / MINUTE_MS);
+    return {
+      score: 50,                   // requires birth nakshatra for real score
+      bird: 'Vulture',             // placeholder: add kundali_id for personalized bird
+      confidence: 0.5,             // 0.5 = timing accurate, bird unverified
+      startTime: yamaStart,
+      endTime: yamaEnd,
+      precisionMinutes: durationMinutes,
+      yamaNumber: yama,
+      isDayTime,
+      note: 'Yama timing accurate (sunrise wired). Add kundali_id for personalized birth-bird.',
+    };
+  }
+
+  // Fallback: no sunrise data — fixed 144-min window
   const start = new Date(time.getTime());
   const end   = new Date(time.getTime() + YAMA_MINUTES * MINUTE_MS);
   return {
     score: 50,
-    bird: 'Vulture',       // placeholder until sunrise wired
-    confidence: 0.5,
+    bird: 'Vulture',
+    confidence: 0.3,
     startTime: start,
     endTime: end,
     precisionMinutes: YAMA_MINUTES,
+    yamaNumber: 0,
+    isDayTime: true,
+    note: 'Sunrise data not supplied — window is a fixed 144-min placeholder. Pass lat/lon for accurate timing.',
   };
 }
 
