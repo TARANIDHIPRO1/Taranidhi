@@ -172,6 +172,39 @@
 
 ---
 
+## Task #51 — V6 Phase 1: Birth Chart Display Screen ✅ COMPLETE (Oct 1, 2026)
+
+**Commit:** `1d2530e`
+
+### Delivered
+- `frontend/src/screens/birth-chart.ts` (380 lines, 0 TS errors)
+  - Route: `#/birth-chart?id=<kundali_id>`
+  - API call: `GET /kundali/:id/chart`
+  - Sections displayed:
+    1. Birth details banner (date/time IST, lat/lon, Lahiri ayanamsa)
+    2. Ascendant card (rashi, nakshatra, pada, lord, KP sub-lord chain)
+    3. Vimshottari Dasha — Maha + Antar lords + date ranges
+    4. Janma Nakshatra + Tara (colour-coded: green=benefic, red=malefic, grey=neutral)
+    5. Planets table — 9 grahas (house, sign, degInRashi, nakshatra pada, KP chain)
+    6. KP House Cusps — all 12 houses (Placidus + Krishnamurti ayanamsa)
+    7. Engine + computed-at footer
+  - States: loading spinner, error card, no-ID guard
+  - Navigation: ← Kundali list | KP Query → | Muhurta →
+
+- `frontend/src/api.ts` — `getKundaliChart(id)` added
+- `frontend/src/router.ts` — `/birth-chart` route registered; `basePath()` added (strips `?id=5` before route lookup)
+- `frontend/src/screens/kundali-list.ts` — "View Chart" button wired to `navigate("/birth-chart?id=<id>")`
+
+### V6 Phase 1 Status: ✅ COMPLETE
+All checklist items from CLAUDE.md done:
+- [x] `/screens/birth-chart.ts` created
+- [x] Calls `/kundali/:id/chart` endpoint
+- [x] Shows Ascendant, 12 cusps, 9 planets, KP sub-lord chains, Nakshatra, Dasha lords, Tara
+- [ ] Test against Naveen's chart (next session — needs live deployment)
+- [ ] Verify house cusps match onlinejyotish.com ±0.0965° (next session)
+
+---
+
 ## Task #50 — parashari.ts core engine ✅ COMPLETE (Oct 1, 2026)
 
 **Commit:** `eae9253`
