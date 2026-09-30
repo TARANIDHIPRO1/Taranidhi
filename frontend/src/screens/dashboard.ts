@@ -8,12 +8,20 @@ export function renderDashboard() {
 
   app.innerHTML = `
     <div class="screen dashboard-screen">
+
       <header class="app-header">
-        <h1>OccultViision</h1>
+        <div>
+          <h1>✦ OccultViision ✦</h1>
+          <div style="color:#C8960C;font-size:0.6rem;letter-spacing:2px;opacity:0.75;margin-top:2px;">
+            KP · PANCHANG · NUMEROLOGY
+          </div>
+        </div>
         <div id="balance-badge" class="badge">...</div>
       </header>
 
       <div class="card-grid">
+
+        <!-- Core Tools -->
         <button class="card" data-route="/muhurta">
           <span class="card-icon">☉</span>
           <span class="card-label">Muhurta Now</span>
@@ -33,13 +41,13 @@ export function renderDashboard() {
         </button>
 
         <button class="card" data-route="/kp-query">
-          <span class="card-icon">❓</span>
+          <span class="card-icon">☿</span>
           <span class="card-label">KP Query</span>
           <span class="card-desc">Promise / Denied verdict</span>
         </button>
 
         <button class="card" data-route="/kundali">
-          <span class="card-icon">👤</span>
+          <span class="card-icon">♈</span>
           <span class="card-label">My Kundalis</span>
           <span class="card-desc">Manage birth charts</span>
         </button>
@@ -56,6 +64,7 @@ export function renderDashboard() {
           <span class="card-desc">Share your referral code</span>
         </button>
 
+        <!-- V6 Advanced (coming soon) -->
         <button class="card card--v6" data-route="/kundali" data-v6-dest="/dasha-timeline">
           <span class="card-icon">🪐</span>
           <span class="card-label">Dasha Timeline</span>
@@ -74,6 +83,7 @@ export function renderDashboard() {
           <span class="card-desc">Personalised Tara &amp; Hora</span>
         </button>
 
+        <!-- Event Muhurta -->
         <button class="card card--event" data-route="/event-muhurta?purpose=property">
           <span class="card-icon">🏠</span>
           <span class="card-label">Property Muhurta</span>
@@ -97,11 +107,13 @@ export function renderDashboard() {
           <span class="card-label">Medical / Surgery</span>
           <span class="card-desc">Surgical timing by KP</span>
         </button>
+
       </div>
 
       <footer class="app-footer">
         <button id="btn-logout" class="btn-link">Logout</button>
       </footer>
+
     </div>
   `;
 

@@ -31,129 +31,346 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/* Login Screen */
+/* Login Screen — TaraNidhi styled                                             */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
-.login-container {
+/* Full-screen centred wrapper */
+.login-screen {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  flex: 1;
+  justify-content: center;
+  min-height: 100vh;
   padding: var(--space-6);
-  gap: var(--space-6);
-}
-
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  background-color: var(--color-bg-secondary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
-  border: 1px solid var(--color-border);
-}
-
-.login-card h1 {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-6);
-  text-align: center;
-}
-
-.login-logo {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto var(--space-6);
-  font-size: 3rem;
-  text-align: center;
-}
-
-.otp-input-group {
-  display: flex;
-  gap: var(--space-2);
-  justify-content: space-between;
-  margin: var(--space-4) 0;
-}
-
-.otp-input {
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg);
-}
-
-.otp-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────── */
-/* Dashboard Screen */
-/* ─────────────────────────────────────────────────────────────────────────── */
-
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.dashboard-header {
-  padding: var(--space-6);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: white;
-}
-
-.dashboard-header h1 {
-  margin-bottom: var(--space-2);
-}
-
-.dashboard-content {
-  padding: var(--space-6);
-  flex: 1;
-}
-
-.grid-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--space-4);
+  background: var(--color-bg);
+  /* Subtle mandala-like background texture via gradient */
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(200,150,12,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(204,0,0,0.05) 0%, transparent 60%);
 }
 
-.action-card {
-  background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg));
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
+/* Sun / Om logo */
+.login-screen .logo {
+  font-size: 3.5rem;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(200,150,12,0.4);
+  animation: pulse-gold 3s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+  0%, 100% { text-shadow: 0 2px 8px rgba(200,150,12,0.4); }
+  50%       { text-shadow: 0 4px 20px rgba(200,150,12,0.7); }
+}
+
+/* App title on login screen */
+.login-screen h1 {
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  color: #3a1a00;
   text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-base);
+  margin-bottom: 0;
+  text-transform: uppercase;
 }
 
-.action-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
-  border-color: var(--color-primary);
-}
-
-.action-icon {
-  font-size: 3rem;
+/* Tagline */
+.login-screen .subtitle {
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  color: #C8960C;
+  text-align: center;
+  text-transform: uppercase;
   margin-bottom: var(--space-4);
 }
 
-.action-card h3 {
-  margin-bottom: var(--space-2);
+/* Form card */
+.login-screen #step-phone,
+.login-screen #step-otp {
+  width: 100%;
+  max-width: 360px;
+  background: #FFFAF4;
+  border: 1px solid #E8C89A;
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: 0 4px 20px rgba(204,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
-.action-card p {
-  font-size: var(--font-size-sm);
+.login-screen label {
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--color-text-secondary);
-  margin: 0;
+  font-weight: 600;
 }
+
+/* Phone input row: +91 prefix + input */
+.input-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.input-row .prefix {
+  background: #F5DEB3;
+  color: #7a4800;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: var(--space-2) var(--space-3);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.input-row input {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+}
+
+.input-row input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Focus ring on the wrapper */
+.input-row:focus-within {
+  border-color: #CC0000;
+  box-shadow: 0 0 0 3px rgba(200,150,12,0.18);
+}
+
+/* OTP single input */
+.login-screen #otp-code {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background: #FFFAF4;
+}
+
+.login-screen #otp-code:focus {
+  border-color: #CC0000;
+  box-shadow: 0 0 0 3px rgba(200,150,12,0.18);
+}
+
+/* Primary button */
+.btn-primary {
+  width: 100%;
+  background: #CC0000;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-6);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(204,0,0,0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #990000;
+  box-shadow: 0 4px 14px rgba(204,0,0,0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Back / link buttons */
+.login-screen .btn-link {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: underline;
+  padding: var(--space-1);
+}
+
+.login-screen .btn-link:hover { color: #CC0000; }
+
+/* Legacy login containers — kept for backward compat */
+.login-container { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; padding: var(--space-6); gap: var(--space-6); }
+.login-card { width: 100%; max-width: 400px; background-color: var(--color-bg-secondary); border-radius: var(--radius-lg); padding: var(--space-8); border: 1px solid var(--color-border); }
+.login-logo { width: 60px; height: 60px; margin: 0 auto var(--space-6); font-size: 3rem; text-align: center; }
+.otp-input { width: 50px; height: 50px; text-align: center; font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.otp-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* App Header — TaraNidhi dark maroon gradient                                */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-header {
+  background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00);
+  border-bottom: 3px solid #C8960C;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(204,0,0,0.2);
+}
+
+.app-header h1 {
+  color: #C8960C;
+  font-family: 'Georgia', serif;
+  font-size: 1.15rem;
+  letter-spacing: 3px;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.app-header .badge {
+  background: rgba(200, 150, 12, 0.18);
+  color: #C8960C;
+  border: 1px solid rgba(200,150,12,0.5);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Dashboard Screen — Card Grid                                                */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.dashboard-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-6);
+  flex: 1;
+}
+
+/* Dashboard tile cards */
+.card-grid .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  padding: var(--space-5) var(--space-4);
+  background: #FFFAF4;
+  border: 1px solid #E8C89A;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  min-height: 110px;
+  box-shadow: 0 1px 4px rgba(204,0,0,0.06);
+  /* Reset button defaults */
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--color-text);
+  outline: none;
+}
+
+.card-grid .card:hover {
+  border-color: #CC0000;
+  background: #FFF0DC;
+  box-shadow: 0 4px 14px rgba(204,0,0,0.16);
+  transform: translateY(-3px);
+}
+
+.card-grid .card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(204,0,0,0.1);
+}
+
+.card-icon {
+  font-size: 1.85rem;
+  display: block;
+  line-height: 1;
+}
+
+.card-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #3a1a00;
+  display: block;
+  line-height: 1.2;
+}
+
+.card-desc {
+  font-size: 0.7rem;
+  color: #7a4800;
+  display: block;
+  line-height: 1.3;
+}
+
+/* App footer */
+.app-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--space-2) var(--space-4);
+  font-family: inherit;
+  text-decoration: underline;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast);
+}
+
+.btn-link:hover {
+  color: var(--color-primary);
+}
+
+/* Dashboard legacy aliases (kept for any older references) */
+.dashboard-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+.dashboard-header { padding: var(--space-6); background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00); color: #C8960C; border-bottom: 3px solid #C8960C; }
+.dashboard-header h1 { margin-bottom: var(--space-2); color: #C8960C; letter-spacing: 3px; }
+.dashboard-content { padding: var(--space-6); flex: 1; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); }
+.action-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; cursor: pointer; transition: all var(--transition-base); }
+.action-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--color-primary); }
+.action-icon { font-size: 3rem; margin-bottom: var(--space-4); }
+.action-card h3 { margin-bottom: var(--space-2); }
+.action-card p { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0; }
 
 @media (max-width: 599px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
   .grid-cards {
     grid-template-columns: 1fr;
   }

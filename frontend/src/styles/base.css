@@ -8,31 +8,33 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Light theme (default) */
-  --color-primary: #5b21b6;
-  --color-primary-hover: #7c3aed;
-  --color-primary-active: #6d28d9;
-  --color-primary-light: #f3e8ff;
+  /* TaraNidhi Brand Palette — Cream + Red + Gold */
+  --color-primary: #CC0000;                    /* Crimson red — primary action */
+  --color-primary-hover: #990000;              /* Dark red — hover */
+  --color-primary-active: #AA0000;             /* Mid red — active */
+  --color-primary-light: rgba(200,150,12,0.13);/* Gold tint — focus rings */
 
-  --color-secondary: #0891b2;
-  --color-secondary-hover: #06b6d4;
-  --color-secondary-active: #0e7490;
+  --color-secondary: #C8960C;                  /* Antique gold — accent */
+  --color-secondary-hover: #D4A520;            /* Bright gold — hover */
+  --color-secondary-active: #A07808;           /* Deep gold — active */
+  --color-accent: #C8960C;                     /* Alias for gold */
 
-  --color-success: #059669;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --color-info: #2563eb;
+  --color-success: #1A7A1A;                    /* Forest green */
+  --color-warning: #D45800;                    /* Saffron-orange */
+  --color-danger: #CC0000;                     /* Same as primary */
+  --color-info: #1565C0;                       /* Indigo-blue */
 
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-text: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
-  --color-border-light: #f3f4f6;
+  /* Warm cream background — TaraNidhi signature */
+  --color-bg: #FFF8EF;                         /* Parchment cream */
+  --color-bg-secondary: #FFF0DC;              /* Slightly deeper cream */
+  --color-text: #3a1a00;                       /* Dark warm brown */
+  --color-text-secondary: #7a4800;             /* Medium warm brown */
+  --color-border: #E8C89A;                     /* Antique gold border */
+  --color-border-light: #F5DEB3;               /* Wheat — subtle dividers */
 
-  --color-shadow-light: rgba(0, 0, 0, 0.05);
-  --color-shadow-medium: rgba(0, 0, 0, 0.1);
-  --color-shadow-dark: rgba(0, 0, 0, 0.2);
+  --color-shadow-light: rgba(204,0,0,0.05);
+  --color-shadow-medium: rgba(204,0,0,0.12);
+  --color-shadow-dark: rgba(58,8,0,0.25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -107,8 +109,8 @@
   --space-12: 3rem; /* 48px */
   --space-16: 4rem; /* 64px */
 
-  /* Typography */
-  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Typography — Georgia serif (TaraNidhi signature) */
+  --font-family-sans: 'Georgia', 'Times New Roman', serif;
   --font-family-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
 
   --font-size-xs: 0.75rem; /* 12px */
