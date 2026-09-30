@@ -60,20 +60,24 @@ export async function handleKpQuery(request: Request, env: Env): Promise<Respons
   }
 
   // Load the kundali
+  // IMPORTANT: The schema stores birth_date as an ISO datetime string (UTC),
+  // latitude as a decimal, longitude as a decimal. There are NO separate
+  // birth_time, birth_place_lat, or birth_place_lon columns.
   const row = await env.DB.prepare(
-    `SELECT birth_date, birth_time, birth_place_lat, birth_place_lon FROM kundalis WHERE id = ? AND user_id = ?`
+    `SELECT birth_date, latitude, longitude FROM kundalis WHERE id = ? AND user_id = ?`
   )
     .bind(kundali_id, auth.userId)
-    .first<{ birth_date: string; birth_time: string; birth_place_lat: number; birth_place_lon: number }>();
+    .first<{ birth_date: string; latitude: number; longitude: number }>();
   if (!row) return errorJson("Kundali not found for this account.", 404, "KUNDALI_NOT_FOUND");
 
-  const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
+  // birth_date is already a UTC ISO datetime string (e.g. "1973-04-08T06:15:00.000Z")
+  const birthUtc = new Date(row.birth_date);
   if (Number.isNaN(birthUtc.getTime())) {
     return errorJson("Stored birth date/time could not be parsed.", 500, "INVALID_BIRTH_DATA");
   }
 
   // Compute KP cusps (using Krishnamurti ayanamsa, scoped to KP only)
-  const { cusps } = solvePlacidusCusps(birthUtc, row.birth_place_lat, row.birth_place_lon);
+  const { cusps } = solvePlacidusCusps(birthUtc, row.latitude, row.longitude);
   const jd = julianDayFromUtc(birthUtc);
 
   // Compute planet longitudes using Krishnamurti ayanamsa for KP context
@@ -106,7 +110,7 @@ export async function handleKpQuery(request: Request, env: Env): Promise<Respons
   // period itself -- only which nakshatra the Moon was in at birth, which
   // determines the starting lord). For KP consistency, we use the KP Moon
   // position to determine the starting lord.
-  const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+  const natalChart = buildRealChart(birthUtc, row.latitude, row.longitude);
   // Override janmaNakIdx with KP-consistent value
   const kpNatalChart = { ...natalChart, janmaNakIdx };
   const now = new Date();
