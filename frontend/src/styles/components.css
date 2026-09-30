@@ -511,3 +511,117 @@
 .opacity-50 {
   opacity: 0.5;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Bottom Navigation Bar                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.bottom-nav {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  position: sticky;
+  bottom: 0;
+}
+
+/* Wrap variant: allows buttons to wrap to 2 rows on narrow screens */
+.bottom-nav--wrap {
+  flex-wrap: wrap;
+}
+
+.bottom-nav .btn {
+  flex: 1 1 auto;
+  min-width: 7rem;
+  font-size: 0.8125rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Dashboard card variants                                                      */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* V6 feature cards — subtle badge to show "new" */
+.card--v6 {
+  border-left: 3px solid var(--color-primary);
+  position: relative;
+}
+
+.card--v6::after {
+  content: "V6";
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  opacity: 0.6;
+}
+
+/* Event category cards — highlighted accent */
+.card--event {
+  border-left: 3px solid var(--color-accent, #d97706);
+}
+
+.card--event .card-icon {
+  font-size: 1.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Score bar (used in muhurta / event result cards)                             */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.score-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.score-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.score-bar-fill--high   { background: #16a34a; }
+.score-bar-fill--medium { background: #ca8a04; }
+.score-bar-fill--low    { background: #dc2626; }
+
+.score-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 2.5rem;
+  text-align: right;
+  color: var(--color-text);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Warning badges (Panchaka / Ganda Moola / Dishashool)                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.warn-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.warn-badge--danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}

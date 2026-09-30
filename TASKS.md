@@ -36,31 +36,27 @@
   - ⏳ Verify SMS template formatting + retry logic
   - Status: Awaiting Naveen confirmation on SMS provider + credentials
 
-### Step 2: Event Category Implementation (Priority 2) 🟢
-- 🟢 **#32: Property Purchase Muhurat** (P0 — highest value)
-  - ⏳ Implementation scope: 
-    - Property-specific muhurat scoring (30+ day windows)
-    - Vastu checks (direction, site quality)
-    - Integration with 5-layer scoring engine
-    - UI: calendar picker + results display
-  - Est: 8 hours
+### Step 2: Event Category Implementation (Priority 2) ✅ COMPLETE
+- ✅ **#32: Property Purchase Muhurta** (P0) — `/event-muhurta?purpose=property`
+  - Single parametrised screen handles all 4 categories
+  - 30-day default window, KP scoring per category
+  - Commit: d9debb2
 
-- 🟢 **#33: Marriage Muhurat** (P1 — highest volume)
-  - ⏳ Marriage-specific rules (lunar cycles, dasha impacts)
-  - ⏳ Spouse compatibility via kundali if provided
-  - ⏳ SMS reminder at +7d, +1d before selected date
-  - Est: 10 hours
+- ✅ **#33: Marriage Muhurta** (P1) — `/event-muhurta?purpose=marriage`
+  - 60-day default window
+  - Commit: d9debb2
 
-- 🟢 **#34: Business Launch Muhurat** (P2 — high value)
-  - ⏳ Business inception/registration timing
-  - ⏳ Mercury + Sun positioning checks
-  - ⏳ Integration with property purchase (if same location)
-  - Est: 6 hours
+- ✅ **#34: Business Launch Muhurta** (P2) — `/event-muhurta?purpose=business`
+  - 30-day default window
+  - Commit: d9debb2
 
-- 🟢 **#35: Medical/Surgery Muhurat** (P3 — emerging market)
-  - ⏳ Surgery timing (Moon strength, Chandrabala)
-  - ⏳ Hospital integration API (if B2B enabled)
-  - Est: 4 hours
+- ✅ **#35: Medical/Surgery Muhurta** (P3) — `/event-muhurta?purpose=medical`
+  - 14-day default window, Chandrabala/Moon strength notes
+  - Commit: d9debb2
+
+  **Note:** All 4 categories call existing muhurtaScan() endpoint.
+  No backend changes needed. Score display includes: Panchaka,
+  Ganda Moola, Dishashool warnings + KP scoring guidelines per category.
 
 ### Step 3: SMS Testing Checklist 🟡
 - ⏳ **Test Case 1: Signup OTP**
