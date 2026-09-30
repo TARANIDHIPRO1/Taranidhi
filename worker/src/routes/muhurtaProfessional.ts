@@ -17,6 +17,7 @@ import {
   julianDayFromUtc,
   buildRealChart,
   getCurrentDasha,
+  getNavamshaLord,
   NAKSHATRA_NAMES,
 } from "../lib/astro";
 import {
@@ -30,7 +31,13 @@ import {
   getPanchakaDosha,
   getGandaMoola,
   getDishashool,
+  getTithi,
+  isVishtiKarana,
+  getYamghanda,
+  getGulikaKaal,
+  isDurmuhurta,
 } from "../lib/muhurta";
+import { computeChandrashtakavarga } from "../lib/ashtakwarga";
 import {
   type ProfessionalCategory,
   type UniversalParams,
@@ -165,6 +172,9 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
   let natalMoonRashi: number | null = null;
   let mahadashLord: string | null = null;
   let antardashLord: string | null = null;
+  let navamshaHouseLord: string | null = null;
+  // natalChartRef held here so ashtakwarga can use it after astronomical calculations below
+  let natalChartRef: ReturnType<typeof buildRealChart> | null = null;
 
   if (kundaliIdParam !== null) {
     kundaliId = Number(kundaliIdParam);
@@ -192,13 +202,18 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     janmaNakIdx = row.janma_nakshatra_idx;
 
     // Rebuild natal chart on-demand (same approach as /muhurta/now).
-    // We need natal Moon rashi for Chandrabala + Dasha for Dasha-Gate.
+    // We need natal Moon rashi for Chandrabala + Dasha for Dasha-Gate +
+    // natal Moon degree for Navamsha + full chart for Chandrashtakavarga.
     const birthUtc = new Date(`${row.birth_date}T${row.birth_time}Z`);
     if (!Number.isNaN(birthUtc.getTime())) {
       const natalChart = buildRealChart(birthUtc, row.birth_place_lat, row.birth_place_lon);
+      natalChartRef = natalChart;
       const natalMoon = natalChart.planets.find((p) => p.planet === "Moon");
       if (natalMoon) {
         natalMoonRashi = natalMoon.rashi;
+        // Navamsha lord of natal Moon -- used in personal layer scoring.
+        // deg is the full sidereal ecliptic longitude (not just degInSign).
+        navamshaHouseLord = getNavamshaLord(natalMoon.deg);
       }
       const dasha = getCurrentDasha(natalChart, now);
       mahadashLord = dasha?.maha.lord ?? null;
@@ -239,14 +254,16 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
 
   const jd = julianDayFromUtc(now);
   const moonLon = trueSiderealLongitude("Moon", jd);
+  const sunLon = trueSiderealLongitude("Sun", jd);
   const currentNakIdx = Math.floor(moonLon / (360 / 27));
   const currentNakDeg = moonLon % (360 / 27);
   const currentMoonRashi = Math.floor(moonLon / 30);
+  const dow = now.getUTCDay();
 
   // Panchaka / Ganda Moola / Dishashool
-  const panchaka = getPanchakaDosha(currentNakIdx, currentNakDeg, now.getUTCDay());
+  const panchaka = getPanchakaDosha(currentNakIdx, currentNakDeg, dow);
   const gandaMoola = getGandaMoola(currentNakIdx);
-  const dishashool = getDishashool(now.getUTCDay());
+  const dishashool = getDishashool(dow);
 
   // Tara (personal, requires kundali)
   let tara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" } | null = null;
@@ -254,16 +271,31 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     tara = computeTara(janmaNakIdx, currentNakIdx);
   }
 
+  // ── Tithi / Karana / Muhurta dosha calculations ──
+  const currentTithi = getTithi(moonLon, sunLon);
+  const inVishtiKarana = isVishtiKarana(moonLon, sunLon);
+  const yamghanda = getYamghanda(sunrise, sunset, dow);
+  const inYamghanda = now.getTime() >= yamghanda.start.getTime() && now.getTime() < yamghanda.end.getTime();
+  const gulikaKaal = getGulikaKaal(sunrise, sunset, dow);
+  const inGulikaKaal = now.getTime() >= gulikaKaal.start.getTime() && now.getTime() < gulikaKaal.end.getTime();
+  const inDurmuhurta = isDurmuhurta(sunrise, sunset, dow, now);
+
+  // ── Ashtakwarga (requires full natal chart) ──
+  let ashtakwargaBindu: number | null = null;
+  if (natalChartRef !== null) {
+    ashtakwargaBindu = computeChandrashtakavarga(natalChartRef, currentMoonRashi);
+  }
+
   // ── Universal Params (Layer 1) ──
   const universalParams: UniversalParams = {
     activeHora: activeHora?.lord ?? null,
     currentNakIndex: currentNakIdx,
-    currentTithi: null, // TODO: implement Tithi calculation in astro.ts
+    currentTithi,
     inRahuKaal,
-    inYamghanda: false, // TODO: implement Yamghanda (same pattern as Rahu Kaal)
-    inGulikaKaal: false, // TODO: implement Gulika Kaal
-    inDurmuhurta: false, // TODO: implement Durmuhurta
-    inVishtiKarana: false, // TODO: implement Vishti Karana detection
+    inYamghanda,
+    inGulikaKaal,
+    inDurmuhurta,
+    inVishtiKarana,
     panchakaActive: panchaka.active && !panchaka.auspicious,
   };
 
@@ -277,8 +309,8 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     antardashLord,
     natalMoonRashi,
     currentMoonRashi,
-    ashtakwargaBindu: null, // TODO: implement Ashtakwarga Bindu calculation
-    navamshaHouseLord: null, // TODO: implement Navamsha divisional chart
+    ashtakwargaBindu,
+    navamshaHouseLord,
   };
 
   // ── Professional Scoring ──

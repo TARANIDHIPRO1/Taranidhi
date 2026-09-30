@@ -403,3 +403,38 @@ export const NAKSHATRA_NAMES = [
   "Uttara Ashadha", "Shravana", "Dhanishtha", "Shatabhisha", "Purva Bhadrapada",
   "Uttara Bhadrapada", "Revati",
 ];
+
+// ── Navamsha (D9) Lord ──
+// Source: Brihat Parashara Hora Shastra, Shodasavarga chapter.
+// Each sign split into 9 navamshas of 3°20' (3.333°) = 30°/9 each.
+// Start rashi depends on sign element (triplicity):
+//   Fire (Aries=0, Leo=4, Sagittarius=8)     → navamsha starts from Aries (0)
+//   Earth (Taurus=1, Virgo=5, Capricorn=9)   → navamsha starts from Capricorn (9)
+//   Air (Gemini=2, Libra=6, Aquarius=10)     → navamsha starts from Libra (6)
+//   Water (Cancer=3, Scorpio=7, Pisces=11)   → navamsha starts from Cancer (3)
+// Lord of resulting navamsha rashi = sign lord per classical scheme.
+const NAVAMSHA_START_RASHI: Record<number, number> = {
+  0: 0, 4: 0, 8: 0,   // Fire  → Aries
+  1: 9, 5: 9, 9: 9,   // Earth → Capricorn
+  2: 6, 6: 6, 10: 6,  // Air   → Libra
+  3: 3, 7: 3, 11: 3,  // Water → Cancer
+};
+
+const SIGN_LORDS = [
+  "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury",
+  "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter",
+];
+
+/**
+ * Returns the lord of the Navamsha (D9) for a given ecliptic longitude (sidereal degrees).
+ * Used to assess quality of personal planetary period in muhurta scoring.
+ */
+export function getNavamshaLord(deg: number): string {
+  const normalised = norm360(deg);
+  const rashi = Math.floor(normalised / 30);       // 0-11
+  const degInSign = normalised % 30;                // 0-30
+  const pada = Math.floor(degInSign / (30 / 9));   // 0-8 (navamsha index within sign)
+  const startRashi = NAVAMSHA_START_RASHI[rashi]!;
+  const navamshaRashi = (startRashi + pada) % 12;
+  return SIGN_LORDS[navamshaRashi]!;
+}

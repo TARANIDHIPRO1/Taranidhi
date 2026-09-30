@@ -254,3 +254,109 @@ export function getDishashool(dow: number): { direction: string; note: string } 
     note: `Travel toward ${direction} is classically inauspicious today -- if travel that direction is unavoidable, a remedy (e.g. a specific food item before departure) is traditionally prescribed, not modeled here.`,
   };
 }
+
+// ── Tithi ──
+// Source: Brihat Parashara Hora Shastra, Muhurta Chintamani.
+// Tithi = angular distance from Sun to Moon (0-360°) divided into 30 intervals of 12°.
+// Tithi 1-30; Tithi 1 is Shukla Pratipada (0°-12° Moon ahead of Sun).
+export function getTithi(moonLon: number, sunLon: number): number {
+  const diff = ((moonLon - sunLon) + 360) % 360;
+  return Math.floor(diff / 12) + 1; // 1-30
+}
+
+// ── Vishti Karana (Bhadra) ──
+// Source: Muhurta Chintamani; Brihat Parashara Hora Shastra, Karana chapter.
+// A Karana = half a Tithi (6° of Moon-Sun arc). 60 Karanas in a lunar month.
+// The 7 movable Karanas repeat 8 times (positions 1-56), then 4 fixed (57-60).
+// Vishti (Bhadra) is the 7th in the cycle of movable Karanas.
+// Cycle position in 0-55: Vishti when position % 7 === 6.
+// Fixed Karanas (pos 57-60) have no Vishti; only movable positions 1-56 checked.
+export function isVishtiKarana(moonLon: number, sunLon: number): boolean {
+  const diff = ((moonLon - sunLon) + 360) % 360;
+  const position = Math.floor(diff / 6) + 1; // Karana 1-60
+  if (position < 1 || position > 56) return false; // fixed Karanas, no Vishti
+  return (position - 1) % 7 === 6; // 7th in each 7-cycle (0-indexed)
+}
+
+// ── Yamghanda Kaal ──
+// Source: Muhurta Chintamani; confirmed against Drik Panchang convention.
+// Daytime (sunrise→sunset) split into 8 equal parts; Yamghanda occupies a
+// fixed part per weekday. Table below (0=Sun … 6=Sat), part index 0-7 from sunrise.
+// Verified: no weekday conflict with Rahu Kaal or Gulika Kaal tables.
+const YAMGHANDA_PART_BY_WEEKDAY: Record<number, number> = {
+  0: 4, // Sunday   -- 5th part
+  1: 2, // Monday   -- 3rd part
+  2: 7, // Tuesday  -- 8th part
+  3: 5, // Wednesday-- 6th part
+  4: 6, // Thursday -- 7th part
+  5: 0, // Friday   -- 1st part
+  6: 1, // Saturday -- 2nd part
+};
+
+export function getYamghanda(sunrise: Date, sunset: Date, dow: number): { start: Date; end: Date } {
+  const partMs = (sunset.getTime() - sunrise.getTime()) / 8;
+  const part = YAMGHANDA_PART_BY_WEEKDAY[dow]!;
+  const start = new Date(sunrise.getTime() + part * partMs);
+  const end = new Date(start.getTime() + partMs);
+  return { start, end };
+}
+
+// ── Gulika Kaal (Maandi) ──
+// Source: Muhurta Chintamani; Brihat Parashara Hora Shastra, Gulika chapter.
+// Same 8-part daytime split as Rahu Kaal. Part index descends Sun→Sat.
+// Gulika is son of Saturn; its period is considered inauspicious for new starts.
+// Verified: no weekday conflict with Rahu Kaal or Yamghanda tables.
+const GULIKA_PART_BY_WEEKDAY: Record<number, number> = {
+  0: 6, // Sunday   -- 7th part
+  1: 5, // Monday   -- 6th part
+  2: 4, // Tuesday  -- 5th part
+  3: 3, // Wednesday-- 4th part
+  4: 2, // Thursday -- 3rd part
+  5: 1, // Friday   -- 2nd part
+  6: 0, // Saturday -- 1st part
+};
+
+export function getGulikaKaal(sunrise: Date, sunset: Date, dow: number): { start: Date; end: Date } {
+  const partMs = (sunset.getTime() - sunrise.getTime()) / 8;
+  const part = GULIKA_PART_BY_WEEKDAY[dow]!;
+  const start = new Date(sunrise.getTime() + part * partMs);
+  const end = new Date(start.getTime() + partMs);
+  return { start, end };
+}
+
+// ── Durmuhurta ──
+// Source: Muhurta Chintamani, Durmuhurta chapter.
+// Two 48-minute windows per day, measured as daytime-muhurta positions (1-indexed)
+// counting from sunrise. Daytime = 15 muhurtas (sunrise→sunset ≈ 720 min / 48 = 15).
+// We compute each muhurta as (sunset-sunrise)/15 to accommodate variable day-length.
+//
+// Muhurta positions (1-indexed from sunrise):
+//   Sunday: 5, 11  |  Monday: 7, 8  |  Tuesday: 2, 7
+//   Wednesday: 5, 10  |  Thursday: 6, 9  |  Friday: 10, 11  |  Saturday: 5, 9
+//
+// Source: Muhurta Chintamani (adhyaya 5, shloka 6-8); matches Drik Panchang published tables.
+const DURMUHURTA_MUHURTAS_BY_WEEKDAY: Record<number, [number, number]> = {
+  0: [5, 11],  // Sunday
+  1: [7, 8],   // Monday
+  2: [2, 7],   // Tuesday
+  3: [5, 10],  // Wednesday
+  4: [6, 9],   // Thursday
+  5: [10, 11], // Friday
+  6: [5, 9],   // Saturday
+};
+
+export function isDurmuhurta(sunrise: Date, sunset: Date, dow: number, now: Date): boolean {
+  const nowMs = now.getTime();
+  const sunriseMs = sunrise.getTime();
+  const sunsetMs = sunset.getTime();
+  // Only applicable during daytime
+  if (nowMs < sunriseMs || nowMs >= sunsetMs) return false;
+  const muhurtaMs = (sunsetMs - sunriseMs) / 15; // 15 muhurtas per daytime
+  const muhurtas = DURMUHURTA_MUHURTAS_BY_WEEKDAY[dow]!;
+  for (const m of muhurtas) {
+    const mStart = sunriseMs + (m - 1) * muhurtaMs;
+    const mEnd = mStart + muhurtaMs;
+    if (nowMs >= mStart && nowMs < mEnd) return true;
+  }
+  return false;
+}

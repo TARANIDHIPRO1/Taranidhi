@@ -162,6 +162,20 @@ export interface PersonalParams {
   navamshaHouseLord: string | null;
 }
 
+// Nakshatra names (index 0-26) -- copied from astro.ts to avoid circular import.
+// Keep in sync with astro.ts NAKSHATRA_NAMES array.
+const NAKSHATRA_NAMES_LOCAL = [
+  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu",
+  "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta",
+  "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha",
+  "Uttara Ashadha", "Shravana", "Dhanishtha", "Shatabhisha", "Purva Bhadrapada",
+  "Uttara Bhadrapada", "Revati",
+];
+
+// Inauspicious tithis per Muhurta Chintamani (Rikta: 4, 9, 14; Amavasya: 30; Chaturdashi: 14)
+// Classical sources: Dharmasindhu, Muhurta Chintamani
+const INAUSPICIOUS_TITHIS = new Set([4, 8, 9, 14, 30]);
+
 // Category definitions with house associations
 const CATEGORY_DEFS: Record<
   ProfessionalCategory,
@@ -762,6 +776,21 @@ const CATEGORY_DEFS: Record<
  */
 export function scoreUniversalLayer(category: ProfessionalCategory, params: UniversalParams): UniversalCriteria {
   const def = CATEGORY_DEFS[category];
+
+  // Tithi checks -- computed from currentTithi against benefic/inauspicious lists.
+  // Bug fix: previously used params.inAuspiciousTithi which was always null (never set).
+  const currentTithiName = params.currentTithi !== null ? `Tithi ${params.currentTithi}` : "unknown";
+  const tithiAuspicious = params.currentTithi !== null && def.beneficTithi.includes(params.currentTithi);
+  const tithiInauspicious = params.currentTithi !== null && INAUSPICIOUS_TITHIS.has(params.currentTithi);
+
+  // Nakshatra check -- corrected.
+  // Bug fix: previously checked `currentNakIndex >= 0` which is always true (0-26 are all valid).
+  // Now correctly checks if the current nakshatra name is in the category's beneficNakshatra list.
+  const currentNakName = params.currentNakIndex >= 0 && params.currentNakIndex < 27
+    ? NAKSHATRA_NAMES_LOCAL[params.currentNakIndex]!
+    : "";
+  const nakAuspicious = currentNakName !== "" && def.beneficNakshatra.includes(currentNakName);
+
   const criteria: UniversalCriteria = {
     abhijitMuhurta: { active: false, points: 0, note: "Calculation pending (needs time-based window)" },
     vijayaMuhurta: { active: false, points: 0, note: "Calculation pending (needs time-based window)" },
@@ -770,14 +799,22 @@ export function scoreUniversalLayer(category: ProfessionalCategory, params: Univ
     guruRaviPushya: { active: false, points: 0, note: "Calculation pending (needs Pushya nakshatra check)" },
     pushkaraNavamansha: { active: false, points: 0, note: "Calculation pending (needs Navamsha division)" },
     auspiciousTithi: {
-      active: params.inAuspiciousTithi ?? false,
-      points: params.inAuspiciousTithi ? 15 : 0,
-      note: params.inAuspiciousTithi ? "Auspicious Tithi" : "Tithi data not yet calculated",
+      active: tithiAuspicious,
+      points: tithiAuspicious ? 15 : 0,
+      note: tithiAuspicious
+        ? `${currentTithiName} is auspicious for this category`
+        : params.currentTithi !== null
+          ? `${currentTithiName} is not in benefic list for this category`
+          : "Tithi not calculated",
     },
     auspiciousNakshatra: {
-      active: params.currentNakIndex >= 0 && def.beneficNakshatra.length > 0,
-      points: params.currentNakIndex >= 0 && def.beneficNakshatra.length > 0 ? 10 : 0,
-      note: `Nakshatra index ${params.currentNakIndex}`,
+      active: nakAuspicious,
+      points: nakAuspicious ? 10 : 0,
+      note: nakAuspicious
+        ? `${currentNakName} is benefic for this category`
+        : currentNakName !== ""
+          ? `${currentNakName} is not in benefic list for this category`
+          : "Nakshatra unknown",
     },
     noRahuKaal: { active: !params.inRahuKaal, points: params.inRahuKaal ? -15 : 15, note: params.inRahuKaal ? "Active Rahu Kaal" : "Clear of Rahu" },
     noYamghanda: { active: !(params.inYamghanda ?? false), points: params.inYamghanda ? -10 : 10, note: params.inYamghanda ? "Active Yamghanda" : "Clear of Yamghanda" },
@@ -788,8 +825,18 @@ export function scoreUniversalLayer(category: ProfessionalCategory, params: Univ
       note: params.activeHora ? `${params.activeHora} Hora` : "No active hora",
     },
     noDurmuhurta: { active: !(params.inDurmuhurta ?? false), points: params.inDurmuhurta ? -10 : 10, note: params.inDurmuhurta ? "Durmuhurta active" : "Clear of Durmuhurta" },
-    inauspiciousTithi: { active: params.inAuspiciousTithi === false, points: params.inAuspiciousTithi === false ? -30 : 0, note: params.inAuspiciousTithi === false ? "Inauspicious Tithi" : "Not an inauspicious Tithi" },
-    vishtiKarana: { active: params.inVishtiKarana ?? false, points: params.inVishtiKarana ? -20 : 0, note: params.inVishtiKarana ? "Vishti Karana active" : "No Vishti Karana" },
+    // Bug fix: previously fired whenever inAuspiciousTithi===false (which includes null === false → always false, but also
+    // explicit false). Now correctly fires only when the tithi is in the classical inauspicious set.
+    inauspiciousTithi: {
+      active: tithiInauspicious,
+      points: tithiInauspicious ? -30 : 0,
+      note: tithiInauspicious
+        ? `${currentTithiName} (Rikta/Amavasya) — classically inauspicious`
+        : params.currentTithi !== null
+          ? `${currentTithiName} is not an inauspicious tithi`
+          : "Tithi not calculated",
+    },
+    vishtiKarana: { active: params.inVishtiKarana ?? false, points: params.inVishtiKarana ? -20 : 0, note: params.inVishtiKarana ? "Vishti Karana (Bhadra) active" : "No Vishti Karana" },
     panchakaDosha: { active: params.panchakaActive ?? false, points: params.panchakaActive ? -25 : 0, note: params.panchakaActive ? "Panchaka Dosha active" : "No Panchaka Dosha" },
   };
 
@@ -847,12 +894,35 @@ export function scorePersonalLayer(params: PersonalParams): PersonalAdjustment {
     }
   }
 
-  // Ashtakwarga bindu (0-8)
+  // Ashtakwarga bindu (0-8, Chandrashtakavarga for current transit Moon sign)
+  // Source: BPHS Ashtakavarga chapter. ≥5 bindus = strong transit; ≤2 = weak.
   if (params.ashtakwargaBindu !== null) {
     if (params.ashtakwargaBindu >= 5) {
-      adjustments.ashtakwargaBindu = { value: 15, reason: `High Ashtakwarga (${params.ashtakwargaBindu} bindus)` };
+      adjustments.ashtakwargaBindu = { value: 15, reason: `Strong Chandrashtakavarga (${params.ashtakwargaBindu}/8 bindus)` };
     } else if (params.ashtakwargaBindu <= 2) {
-      adjustments.ashtakwargaBindu = { value: -15, reason: `Low Ashtakwarga (${params.ashtakwargaBindu} bindus)` };
+      adjustments.ashtakwargaBindu = { value: -15, reason: `Weak Chandrashtakavarga (${params.ashtakwargaBindu}/8 bindus)` };
+    } else {
+      adjustments.ashtakwargaBindu = { value: 0, reason: `Neutral Chandrashtakavarga (${params.ashtakwargaBindu}/8 bindus)` };
+    }
+  }
+
+  // Navamsha (D9) lord of natal Moon -- benefic lord improves quality of dasha period.
+  // Source: BPHS, Shodasavarga chapter; Jataka Parijata (Navamsha commentary).
+  // Benefic lords: Jupiter (guru), Venus (shukra), Mercury (budh), Moon (chandra)
+  // Malefic lords: Saturn (shani), Mars (mangal), Sun (ravi), Rahu, Ketu
+  if (params.navamshaHouseLord !== null) {
+    const navamshaBenefics = new Set(["Jupiter", "Venus", "Mercury", "Moon"]);
+    const navamshaMalefics = new Set(["Saturn", "Mars", "Sun", "Rahu", "Ketu"]);
+    if (navamshaBenefics.has(params.navamshaHouseLord)) {
+      adjustments.navamshaDivisional = {
+        value: 10,
+        reason: `Natal Moon in benefic Navamsha (${params.navamshaHouseLord} lord)`,
+      };
+    } else if (navamshaMalefics.has(params.navamshaHouseLord)) {
+      adjustments.navamshaDivisional = {
+        value: -10,
+        reason: `Natal Moon in malefic Navamsha (${params.navamshaHouseLord} lord)`,
+      };
     }
   }
 
