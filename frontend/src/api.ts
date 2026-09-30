@@ -135,3 +135,6 @@ export const knowledgeQuery = (query: string, context?: Record<string, unknown>)
     body: JSON.stringify({ query, context }),
   });
 export const knowledgeSources = () => apiFetch("/knowledge/sources");
+
+// Alias for Muhurta Dashboard — matches the expected import name in muhurta-dashboard.ts
+export const getMuhurtaNow = muhurtaNow;
