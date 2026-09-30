@@ -23,6 +23,12 @@ import {
   lahiriAyanamsa,
   krishnamurtiAyanamsa,
 } from "../lib/astro";
+import {
+  analyzeHouseParashari,
+  detectAllYogas,
+  type ParashariHouseAnalysis,
+  type YogaResult,
+} from "../lib/parashari";
 
 export interface Env extends AuthEnv {
   DB: D1Database;
@@ -123,6 +129,14 @@ export async function handleKpQuery(request: Request, env: Env): Promise<Respons
     );
   }
 
+  // Parashari analysis — runs on the Lahiri-based natalChart (same chart
+  // used for dasha). Parashari graha dignity/bala is ayanamsa-agnostic because
+  // we only care about sign placement, not sub-lord precision.
+  const allYogas: YogaResult[] = detectAllYogas(natalChart);
+  const parasharilLayers: ParashariHouseAnalysis[] = mapping.houses.map((house) =>
+    analyzeHouseParashari(house, natalChart, allYogas)
+  );
+
   const result: KpQueryResult = {
     activitySlug: activity_slug,
     houseVerdicts,
@@ -133,6 +147,11 @@ export async function handleKpQuery(request: Request, env: Env): Promise<Respons
 
   return json({
     ...result,
+    parashari: {
+      _note: "Parashari analysis runs alongside KP. KP gives Promise/Denied (if). Parashari gives strength context (how strong). These are independent layers — do NOT average them.",
+      chartYogas: allYogas,
+      houseAnalysis: parasharilLayers,
+    },
     _multi_house_warning:
       mapping.houses.length > 1
         ? "This activity maps to multiple houses. Per-house verdicts are shown " +
