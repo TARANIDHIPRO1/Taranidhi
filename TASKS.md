@@ -169,3 +169,34 @@
 **When:** Tomorrow, 10 AM IST (after nightly audit runs)
 **What:** Review any new blockers, confirm domain + SMS provider
 **Output:** Updated TASKS.md + deployment readiness report
+
+---
+
+## Task #50 — parashari.ts core engine ✅ COMPLETE (Oct 1, 2026)
+
+**Commit:** `eae9253`
+
+### Delivered
+- `worker/src/lib/parashari.ts` (530 lines, 0 TS errors)
+  - Graha dignity (exalted → debilitated) — BPHS Adhyaya 3
+  - Exaltation/debilitation for all 9 planets incl. Rahu/Ketu — BPHS 3.27-28
+  - Moolatrikona segments (7 planets) — BPHS Adhyaya 3
+  - Naisargika Maitri permanent friendship table — BPHS Adhyaya 3
+  - Natural benefic/malefic with Moon paksha + Mercury context — BPHS 34
+  - House lord mapping from lagnaRashi — BPHS Adhyaya 7
+  - Functional benefic/malefic: Yoga Karaka, trikonesh, Kendradhipati Dosha — BPHS 34
+  - Parashari drishti (7th + special aspects for Mars/Jupiter/Saturn/Rahu/Ketu) — BPHS 28
+  - Yoga detection: Raja Yoga (BPHS 35), Dhana Yoga (BPHS 36), Neechabhanga (BPHS 27)
+  - `analyzeHouseParashari()` — full Bhava scorer (dignity + placement + aspects + yogas)
+
+- Integration in `kpQuery.ts` (POST /kp/query):
+  - Response now includes `parashari.{chartYogas, houseAnalysis}` layer
+  - KP layer = Promise/Denied (IF) | Parashari layer = strength context (HOW STRONG)
+  - Both layers independent — frontend must NOT combine them
+
+### Architecture Note
+Both sciences are now in the prediction pipeline:
+- KP (kpVerdict.ts) → sub-lord chain Promise/Denied verdict
+- Parashari (parashari.ts) → graha dignity, functional nature, yogas, bhava strength
+- Together they answer: "Is this possible?" (KP) + "How strong is the promise?" (Parashari)
+
