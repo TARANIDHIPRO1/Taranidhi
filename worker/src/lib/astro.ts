@@ -117,6 +117,8 @@ export function rahuLongitude(jd: number): number {
 
 export interface PlanetPos {
   planet: string;
+  /** Raw sidereal ecliptic longitude 0–360° (same as `deg`; alias for test compatibility) */
+  longitude: number;
   deg: number;
   rashi: number;
   degInRashi: number;
@@ -179,7 +181,7 @@ export function buildRealChart(birthUtc: Date, latitudeDeg: number, longitudeDeg
     const nakIdx = Math.floor(deg / (360 / 27));
     const nakPada = Math.floor((deg % (360 / 27)) / (360 / 27 / 4)) + 1;
     const house = ((rashi - lagnaRashi + 12) % 12) + 1;
-    return { planet, deg, rashi, degInRashi: deg % 30, nakIdx, nakPada, house };
+    return { planet, longitude: deg, deg, rashi, degInRashi: deg % 30, nakIdx, nakPada, house };
   });
 
   const janmaNakIdx = Math.floor(longitudes.Moon! / (360 / 27));
