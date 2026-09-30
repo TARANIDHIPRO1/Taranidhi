@@ -56,22 +56,46 @@ export function renderDashboard() {
           <span class="card-desc">Share your referral code</span>
         </button>
 
-        <button class="card card--v6" data-route="/kundali">
+        <button class="card card--v6" data-route="/kundali" data-v6-dest="/dasha-timeline">
           <span class="card-icon">🪐</span>
           <span class="card-label">Dasha Timeline</span>
           <span class="card-desc">120-yr Vimshottari cycles</span>
         </button>
 
-        <button class="card card--v6" data-route="/kundali">
+        <button class="card card--v6" data-route="/kundali" data-v6-dest="/kp-sublords">
           <span class="card-icon">🔗</span>
           <span class="card-label">KP Sub-Lords</span>
           <span class="card-desc">Cusp &amp; planet KP chains</span>
         </button>
 
-        <button class="card card--v6" data-route="/kundali">
+        <button class="card card--v6" data-route="/kundali" data-v6-dest="/muhurta-dashboard">
           <span class="card-icon">📊</span>
           <span class="card-label">Muhurta Dashboard</span>
           <span class="card-desc">Personalised Tara &amp; Hora</span>
+        </button>
+
+        <button class="card card--event" data-route="/event-muhurta?purpose=property">
+          <span class="card-icon">🏠</span>
+          <span class="card-label">Property Muhurta</span>
+          <span class="card-desc">Best windows for purchase</span>
+        </button>
+
+        <button class="card card--event" data-route="/event-muhurta?purpose=marriage">
+          <span class="card-icon">💍</span>
+          <span class="card-label">Marriage Muhurta</span>
+          <span class="card-desc">Auspicious wedding dates</span>
+        </button>
+
+        <button class="card card--event" data-route="/event-muhurta?purpose=business">
+          <span class="card-icon">🏢</span>
+          <span class="card-label">Business Launch</span>
+          <span class="card-desc">Launch &amp; opening muhurta</span>
+        </button>
+
+        <button class="card card--event" data-route="/event-muhurta?purpose=medical">
+          <span class="card-icon">🏥</span>
+          <span class="card-label">Medical / Surgery</span>
+          <span class="card-desc">Surgical timing by KP</span>
         </button>
       </div>
 
