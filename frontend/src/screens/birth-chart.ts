@@ -363,9 +363,12 @@ function renderChart(
       </section>
 
       <!-- ── Bottom Nav ── -->
-      <div class="bottom-nav">
-        <button class="btn btn-secondary" id="btn-kp-query-bottom">Run KP Query →</button>
-        <button class="btn btn-outline" id="btn-muhurta-bottom">Muhurta →</button>
+      <div class="bottom-nav bottom-nav--wrap">
+        <button class="btn btn-secondary" id="btn-kp-query-bottom">KP Query →</button>
+        <button class="btn btn-outline"   id="btn-muhurta-bottom">Muhurta →</button>
+        <button class="btn btn-outline"   id="btn-dasha-bottom">Dasha →</button>
+        <button class="btn btn-outline"   id="btn-kp-sublords-bottom">Sub-Lords →</button>
+        <button class="btn btn-outline"   id="btn-muhurta-dashboard-bottom">Dashboard →</button>
       </div>
 
     </div>
@@ -376,4 +379,10 @@ function renderChart(
   document.getElementById("btn-kp")!.addEventListener("click", () => navigate("/kp-query"));
   document.getElementById("btn-kp-query-bottom")!.addEventListener("click", () => navigate("/kp-query"));
   document.getElementById("btn-muhurta-bottom")!.addEventListener("click", () => navigate("/muhurta"));
+  document.getElementById("btn-dasha-bottom")!.addEventListener("click", () =>
+    navigate(`/dasha-timeline?kundali_id=${k.id}`));
+  document.getElementById("btn-kp-sublords-bottom")!.addEventListener("click", () =>
+    navigate(`/kp-sublords?kundali_id=${k.id}`));
+  document.getElementById("btn-muhurta-dashboard-bottom")!.addEventListener("click", () =>
+    navigate(`/muhurta-dashboard?kundali_id=${k.id}`));
 }

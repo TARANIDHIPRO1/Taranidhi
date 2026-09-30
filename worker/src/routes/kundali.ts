@@ -62,6 +62,13 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     return errorJson("timezone is required and must be a string.", 400, "INVALID_TIMEZONE");
   }
 
+  // Sanitize optional label: trim whitespace, enforce max 100 chars
+  const rawLabel: unknown = body.label;
+  const label: string | null =
+    typeof rawLabel === "string" && rawLabel.trim().length > 0
+      ? rawLabel.trim().slice(0, 100)
+      : null;
+
   // Tier-limit check.
   const user = await env.DB.prepare(`SELECT tier FROM users WHERE id = ?`)
     .bind(auth.userId)
@@ -97,7 +104,7 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
   )
     .bind(
       auth.userId,
-      body.label ?? null,
+      label,
       birth_date,
       latitude,
       longitude,

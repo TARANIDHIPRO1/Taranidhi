@@ -55,6 +55,24 @@ export function renderDashboard() {
           <span class="card-label">Refer &amp; Earn</span>
           <span class="card-desc">Share your referral code</span>
         </button>
+
+        <button class="card card--v6" data-route="/kundali">
+          <span class="card-icon">🪐</span>
+          <span class="card-label">Dasha Timeline</span>
+          <span class="card-desc">120-yr Vimshottari cycles</span>
+        </button>
+
+        <button class="card card--v6" data-route="/kundali">
+          <span class="card-icon">🔗</span>
+          <span class="card-label">KP Sub-Lords</span>
+          <span class="card-desc">Cusp &amp; planet KP chains</span>
+        </button>
+
+        <button class="card card--v6" data-route="/kundali">
+          <span class="card-icon">📊</span>
+          <span class="card-label">Muhurta Dashboard</span>
+          <span class="card-desc">Personalised Tara &amp; Hora</span>
+        </button>
       </div>
 
       <footer class="app-footer">
