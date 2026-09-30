@@ -107,6 +107,9 @@ export const muhurtaProfessional = (params: {
   return apiFetch(`/muhurta/professional?${qs}`);
 };
 
+// ── Kundali Chart (full computed birth chart) ──
+export const getKundaliChart = (kundaliId: number) => apiFetch(`/kundali/${kundaliId}/chart`);
+
 // ── KP ──
 export const kpChart = (kundaliId: number) => apiFetch(`/kp/chart/${kundaliId}`);
 export const kpQuery = (kundaliId: number, activitySlug: string) =>

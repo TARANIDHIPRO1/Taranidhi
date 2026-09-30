@@ -82,7 +82,7 @@ function renderKundaliItems(container: HTMLElement, kundalis: any[]): void {
       </div>
       <div class="kundali-actions">
         <button class="btn btn-secondary btn-small view-btn" data-id="${k.id}">
-          View
+          View Chart
         </button>
         <button class="btn btn-danger btn-small delete-btn" data-id="${k.id}">
           Delete
@@ -93,11 +93,11 @@ function renderKundaliItems(container: HTMLElement, kundalis: any[]): void {
     )
     .join("");
 
-  // View button: navigate to detail (TODO: implement detail screen)
+  // View Chart button → Birth Chart screen (V6 Phase 1)
   container.querySelectorAll(".view-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const id = (e.target as HTMLElement).dataset.id;
-      // TODO: showToast("View kundali detail not yet implemented");
+      if (id) navigate(`/birth-chart?id=${id}`);
     });
   });
 
