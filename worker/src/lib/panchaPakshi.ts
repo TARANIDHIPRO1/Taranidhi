@@ -11,9 +11,9 @@
  * Personalization: Nakshatra (1-27) + Moon Phase = Birth Pakshi
  */
 
-type Bird = 'Vulture' | 'Owl' | 'Crow' | 'Cock' | 'Peacock';
-type Activity = 'Rule' | 'Eat' | 'Walk' | 'Sleep' | 'Die';
-type Paksha = 'Shukla' | 'Krishna';
+export type Bird = 'Vulture' | 'Owl' | 'Crow' | 'Cock' | 'Peacock';
+export type Activity = 'Rule' | 'Eat' | 'Walk' | 'Sleep' | 'Die';
+export type Paksha = 'Shukla' | 'Krishna';
 type DayGroup = 'A' | 'B' | 'C' | 'D' | 'E';
 
 const YAMA_MINUTES = 144;
@@ -26,7 +26,9 @@ const MINUTE_MS = 60 * 1000;
 const createMapping = (ranges: {[k: string]: Bird}): Record<number, Bird> => {
   const map: Record<number, Bird> = {};
   for (const [key, bird] of Object.entries(ranges)) {
-    const [start, end] = key.split(':').map(Number);
+    const parts = key.split(':').map(Number);
+    const start = parts[0] ?? 1;
+    const end   = parts[1] ?? start;
     for (let i = start; i <= end; i++) map[i] = bird;
   }
   return map;
@@ -183,7 +185,9 @@ export function getActivity(bird: Bird, yama: number, dayOfWeek: number, paksha:
   const tables = paksha === 'Shukla' ? SHUKLA_TABLES : KRISHNA_TABLES;
   const group = getDayGroup(dayOfWeek, paksha);
   const table = tables[group];
-  return table[yama - 1][bird];
+  // noUncheckedIndexedAccess: guard both the row and the cell
+  const row = table?.[yama - 1];
+  return row?.[bird] ?? 'Die';
 }
 
 export function calculateFavorability(activity: Activity, bird: Bird, _paksha: Paksha = 'Shukla'): number {
@@ -238,4 +242,32 @@ export function scorePakshiFavorability(time: Date, _precisionType: string = 'ST
   return 50; // Will be replaced with full scoring
 }
 
-export type { Bird, Activity, Paksha, PanchaPakshiResult };
+/**
+ * getPakshiAtTime — convenience wrapper expected by muhurta.ts.
+ * Returns a minimal object describing the current Pancha Pakshi state.
+ * Full precision implementation deferred until astro sunrise data is wired.
+ */
+export function getPakshiAtTime(
+  time: Date,
+  _precisionType: string = 'STANDARD'
+): {
+  score: number;
+  bird: Bird;
+  confidence: number;
+  startTime: Date;
+  endTime: Date;
+  precisionMinutes: number;
+} {
+  const start = new Date(time.getTime());
+  const end   = new Date(time.getTime() + YAMA_MINUTES * MINUTE_MS);
+  return {
+    score: 50,
+    bird: 'Vulture',       // placeholder until sunrise wired
+    confidence: 0.5,
+    startTime: start,
+    endTime: end,
+    precisionMinutes: YAMA_MINUTES,
+  };
+}
+
+// Bird, Activity, Paksha exported at declaration; PanchaPakshiResult via export interface above.

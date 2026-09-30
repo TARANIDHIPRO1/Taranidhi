@@ -169,8 +169,13 @@ function reduceToSingleDigit(num: number): number {
  * Method: Sum all digits, don't reduce to single digit (keeps 1-9)
  */
 function calculateChaldeanNumber(date: string, time: string): number {
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, min] = time.split(':').map(Number);
+  const dateParts = date.split('-').map(Number);
+  const year  = dateParts[0] ?? 2000;
+  const month = dateParts[1] ?? 1;
+  const day   = dateParts[2] ?? 1;
+  const timeParts = time.split(':').map(Number);
+  const hour = timeParts[0] ?? 0;
+  const min  = timeParts[1] ?? 0;
 
   let sum = 0;
 
@@ -200,8 +205,13 @@ function calculateChaldeanNumber(date: string, time: string): number {
  * Method: Sum all digits, reduce to single digit
  */
 function calculatePythagoreanNumber(date: string, time: string): number {
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, min] = time.split(':').map(Number);
+  const dateParts = date.split('-').map(Number);
+  const year  = dateParts[0] ?? 2000;
+  const month = dateParts[1] ?? 1;
+  const day   = dateParts[2] ?? 1;
+  const timeParts = time.split(':').map(Number);
+  const hour = timeParts[0] ?? 0;
+  const min  = timeParts[1] ?? 0;
 
   let sum = 0;
 
@@ -311,10 +321,16 @@ export async function calculateNumerology(
     const chaldeanNumber = calculateChaldeanNumber(date, time);
     const pythagoreanNumber = calculatePythagoreanNumber(date, time);
 
-    const chaldeanData = CHALDEAN_MEANINGS[chaldeanNumber] || CHALDEAN_MEANINGS[1];
-    const pythagoreanData = PYTHAGOREAN_MEANINGS[pythagoreanNumber] || PYTHAGOREAN_MEANINGS[1];
-
-    const luckyAttrs = LUCKY_ATTRIBUTES[pythagoreanNumber] || LUCKY_ATTRIBUTES[1];
+    // noUncheckedIndexedAccess: index lookup returns T | undefined; use ?? fallback on [1]
+    const chaldeanData    = CHALDEAN_MEANINGS[chaldeanNumber]
+                         ?? CHALDEAN_MEANINGS[1]
+                         ?? { name: "Unknown", meaning: "", planet: "" };
+    const pythagoreanData = PYTHAGOREAN_MEANINGS[pythagoreanNumber]
+                         ?? PYTHAGOREAN_MEANINGS[1]
+                         ?? { name: "Unknown", meaning: "", planet: "" };
+    const luckyAttrs      = LUCKY_ATTRIBUTES[pythagoreanNumber]
+                         ?? LUCKY_ATTRIBUTES[1]
+                         ?? { colors: [], metals: [], gems: [] };
 
     const muhurtaScore = calculateMuhurtaScore(chaldeanNumber, pythagoreanNumber);
     const recommendations = generateRecommendations(chaldeanNumber, pythagoreanNumber);
@@ -340,4 +356,4 @@ export async function calculateNumerology(
   }
 }
 
-export type { NumerologyResult };
+// NumerologyResult is already exported via `export interface` at the top of this file.

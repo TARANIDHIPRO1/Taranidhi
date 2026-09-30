@@ -315,4 +315,4 @@ ${warnings.length > 0 ? `WARNINGS:\n${warnings.map(w => `• ${w}`).join('\n')}`
   }
 }
 
-export type { ConvergenceResult };
+// ConvergenceResult is already exported via `export interface` at the top of this file.
