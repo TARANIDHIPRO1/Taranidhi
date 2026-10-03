@@ -264,33 +264,48 @@ export function getTithi(moonLon: number, sunLon: number): number {
   return Math.floor(diff / 12) + 1; // 1-30
 }
 
-// ── Vishti Karana (Bhadra) ──
-// Source: Muhurta Chintamani; Brihat Parashara Hora Shastra, Karana chapter.
-// A Karana = half a Tithi (6° of Moon-Sun arc). 60 Karanas in a lunar month.
-// The 7 movable Karanas repeat 8 times (positions 1-56), then 4 fixed (57-60).
-// Vishti (Bhadra) is the 7th in the cycle of movable Karanas.
-// Cycle position in 0-55: Vishti when position % 7 === 6.
-// Fixed Karanas (pos 57-60) have no Vishti; only movable positions 1-56 checked.
+// ── Karana / Vishti (Bhadra) ──
+// A Karana = half a Tithi (6° of Moon-Sun arc). 60 Karanas per lunar month,
+// numbered k = floor(elongation / 6) = 0..59:
+//   k = 0        Kimstughna (fixed; first half of Shukla Pratipada)
+//   k = 1..56    the 7 movable Karanas, repeating 8 times:
+//                Bava, Balava, Kaulava, Taitila, Garaja, Vanija, Vishti
+//   k = 57..59   Shakuni, Chatushpada, Naga (fixed)
+// Vishti (Bhadra) is therefore k = 7, 14, ... 56, i.e. the second half of
+// Shukla Chaturthi / Ekadashi, first half of Shukla Ashtami / Purnima, second
+// half of Krishna Tritiya / Dashami, first half of Krishna Saptami / Chaturdashi.
+// CORRECTED: the previous version treated Kimstughna as the LAST Karana and so
+// flagged Vishti one half-tithi (6°) early.
+export const KARANA_MOVABLE = ["Bava", "Balava", "Kaulava", "Taitila", "Garaja", "Vanija", "Vishti"] as const;
+export const KARANA_FIXED = ["Shakuni", "Chatushpada", "Naga"] as const;
+
+export function getKarana(moonLon: number, sunLon: number): { index: number; name: string; isVishti: boolean } {
+  const diff = (((moonLon - sunLon) % 360) + 360) % 360;
+  const k = Math.floor(diff / 6); // 0..59
+  if (k === 0) return { index: k, name: "Kimstughna", isVishti: false };
+  if (k >= 57) return { index: k, name: KARANA_FIXED[k - 57]!, isVishti: false };
+  const name = KARANA_MOVABLE[(k - 1) % 7]!;
+  return { index: k, name, isVishti: name === "Vishti" };
+}
+
 export function isVishtiKarana(moonLon: number, sunLon: number): boolean {
-  const diff = ((moonLon - sunLon) + 360) % 360;
-  const position = Math.floor(diff / 6) + 1; // Karana 1-60
-  if (position < 1 || position > 56) return false; // fixed Karanas, no Vishti
-  return (position - 1) % 7 === 6; // 7th in each 7-cycle (0-indexed)
+  return getKarana(moonLon, sunLon).isVishti;
 }
 
 // ── Yamghanda Kaal ──
 // Source: Muhurta Chintamani; confirmed against Drik Panchang convention.
 // Daytime (sunrise→sunset) split into 8 equal parts; Yamghanda occupies a
 // fixed part per weekday. Table below (0=Sun … 6=Sat), part index 0-7 from sunrise.
-// Verified: no weekday conflict with Rahu Kaal or Gulika Kaal tables.
+// CORRECTED (was a different, non-classical table): classical 1-indexed parts are
+// Sun 5, Mon 4, Tue 3, Wed 2, Thu 1, Fri 7, Sat 6. No weekday overlaps Rahu Kaal or Gulika.
 const YAMGHANDA_PART_BY_WEEKDAY: Record<number, number> = {
-  0: 4, // Sunday   -- 5th part
-  1: 2, // Monday   -- 3rd part
-  2: 7, // Tuesday  -- 8th part
-  3: 5, // Wednesday-- 6th part
-  4: 6, // Thursday -- 7th part
-  5: 0, // Friday   -- 1st part
-  6: 1, // Saturday -- 2nd part
+  0: 4, // Sunday    -- 5th part (12:00-13:30 on a 06:00-18:00 day)
+  1: 3, // Monday    -- 4th part
+  2: 2, // Tuesday   -- 3rd part
+  3: 1, // Wednesday -- 2nd part
+  4: 0, // Thursday  -- 1st part
+  5: 6, // Friday    -- 7th part
+  6: 5, // Saturday  -- 6th part
 };
 
 export function getYamghanda(sunrise: Date, sunset: Date, dow: number): { start: Date; end: Date } {
@@ -419,4 +434,85 @@ export function getDailyMuhurtaWindows(
     vijaya: win(sr + 10 * day, day),
     nishita: win(ss + 7 * night, night),
   };
+}
+
+// ── Yoga (Panchang Yoga) ──
+// Yoga = (sidereal Sun + sidereal Moon) / 13°20', 27 Yogas. Both longitudes
+// MUST be sidereal (same ayanamsa): using tropical values shifts the Yoga by
+// roughly 2 x ayanamsa (~48°, i.e. 3-4 Yogas).
+export const YOGA_NAMES = [
+  "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
+  "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva",
+  "Vyaghata", "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyan",
+  "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla",
+  "Brahma", "Indra", "Vaidhriti",
+] as const;
+
+/** The nine classically inauspicious Yogas. */
+const INAUSPICIOUS_YOGAS = new Set([
+  "Vishkambha", "Atiganda", "Shula", "Ganda", "Vyaghata", "Vajra", "Vyatipata", "Parigha", "Vaidhriti",
+]);
+/** The two to avoid for essentially all new undertakings. */
+const MAHADOSHA_YOGAS = new Set(["Vyatipata", "Vaidhriti"]);
+
+export function getYoga(moonSidLon: number, sunSidLon: number): {
+  number: number; name: string; inauspicious: boolean; mahadosha: boolean;
+} {
+  const sum = (((moonSidLon + sunSidLon) % 360) + 360) % 360;
+  const idx = Math.floor(sum / (360 / 27)) % 27;
+  const name = YOGA_NAMES[idx]!;
+  return { number: idx + 1, name, inauspicious: INAUSPICIOUS_YOGAS.has(name), mahadosha: MAHADOSHA_YOGAS.has(name) };
+}
+
+// ── Choghadiya ──
+// Each of the 8 day segments (sunrise->sunset) and 8 night segments
+// (sunset->next sunrise) is ruled by a planet:
+//   Sun=Udveg, Venus=Char, Mercury=Labh, Moon=Amrit, Saturn=Kaal, Jupiter=Shubh, Mars=Rog.
+// DAY: starts with the weekday lord and walks the Chaldean order (CHRONO) +1 per segment.
+// NIGHT: starts with the lord 5 places after the weekday lord in CHRONO and walks
+// CHRONO by +5 (i.e. -2) per segment.
+// These reproduce the standard published tables (e.g. Sunday day: Udveg, Char,
+// Labh, Amrit, Kaal, Shubh, Rog, Udveg; Sunday night: Shubh, Amrit, Char, Rog,
+// Kaal, Labh, Udveg, Shubh). Derivation-based -- cross-check one night against
+// Drik Panchang before this feeds paid scoring.
+const CHOGHADIYA_BY_LORD: Record<string, { name: string; nature: "good" | "neutral" | "bad" }> = {
+  Sun: { name: "Udveg", nature: "bad" },
+  Venus: { name: "Char", nature: "neutral" },
+  Mercury: { name: "Labh", nature: "good" },
+  Moon: { name: "Amrit", nature: "good" },
+  Saturn: { name: "Kaal", nature: "bad" },
+  Jupiter: { name: "Shubh", nature: "good" },
+  Mars: { name: "Rog", nature: "bad" },
+};
+const WEEKDAY_LORD = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+
+export interface ChoghadiyaSlot {
+  name: string;
+  nature: "good" | "neutral" | "bad";
+  lord: string;
+  isDaytime: boolean;
+  start: Date;
+  end: Date;
+}
+
+export function getChoghadiya(sunrise: Date, sunset: Date, nextSunrise: Date, dow: number): ChoghadiyaSlot[] {
+  const sr = sunrise.getTime();
+  const ss = sunset.getTime();
+  const nsr = nextSunrise.getTime();
+  if (!(ss > sr) || !(nsr > ss)) {
+    throw new Error("getChoghadiya: expected sunrise < sunset < nextSunrise");
+  }
+  const base = CHRONO.indexOf(WEEKDAY_LORD[dow]!);
+  const dayPart = (ss - sr) / 8;
+  const nightPart = (nsr - ss) / 8;
+  const slots: ChoghadiyaSlot[] = [];
+  for (let i = 0; i < 8; i++) {
+    const lord = CHRONO[(base + i) % 7]!;
+    slots.push({ ...CHOGHADIYA_BY_LORD[lord]!, lord, isDaytime: true, start: new Date(sr + i * dayPart), end: new Date(sr + (i + 1) * dayPart) });
+  }
+  for (let i = 0; i < 8; i++) {
+    const lord = CHRONO[(((base + 5 + 5 * i) % 7) + 7) % 7]!;
+    slots.push({ ...CHOGHADIYA_BY_LORD[lord]!, lord, isDaytime: false, start: new Date(ss + i * nightPart), end: new Date(ss + (i + 1) * nightPart) });
+  }
+  return slots;
 }
