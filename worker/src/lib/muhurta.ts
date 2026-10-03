@@ -360,3 +360,63 @@ export function isDurmuhurta(sunrise: Date, sunset: Date, dow: number, now: Date
   }
   return false;
 }
+
+// ── Daily time-window Muhurtas (Brahma / Abhijit / Vijaya / Nishita) ──
+// A daytime muhurta = (sunset - sunrise) / 15; a night muhurta =
+// (nextSunrise - sunset) / 15. Both vary with the season, so nothing here is
+// a fixed 48 minutes except Brahma (below).
+//
+//   Abhijit  = 8th daytime muhurta (centred on local solar noon).
+//   Vijaya   = 11th daytime muhurta.
+//   Nishita  = 8th night muhurta (centred on local midnight).
+//   Brahma   = 96 min -> 48 min before sunrise (fixed-minute convention).
+//
+// VERIFICATION STATUS: positions follow the commonly published Drik-Panchang
+// convention. Not yet cross-checked against a primary shloka -- do that
+// (FACT_CHECK_ENGINE) before these feed paid scoring.
+//
+// Deliberately NOT implemented: Godhuli (no single agreed window) and
+// Amrit Kaal (nakshatra-dependent; the prototype's sunrise-offset table could
+// not be sourced). Do not add them without a cited source.
+export interface MuhurtaWindow {
+  start: Date;
+  end: Date;
+}
+
+export interface DailyMuhurtaWindows {
+  brahma: MuhurtaWindow;
+  abhijit: MuhurtaWindow;
+  vijaya: MuhurtaWindow;
+  nishita: MuhurtaWindow;
+}
+
+const BRAHMA_START_BEFORE_SUNRISE_MIN = 96;
+const BRAHMA_END_BEFORE_SUNRISE_MIN = 48;
+
+export function getDailyMuhurtaWindows(
+  sunrise: Date,
+  sunset: Date,
+  nextSunrise: Date
+): DailyMuhurtaWindows {
+  const sr = sunrise.getTime();
+  const ss = sunset.getTime();
+  const nsr = nextSunrise.getTime();
+  if (!(ss > sr) || !(nsr > ss)) {
+    throw new Error("getDailyMuhurtaWindows: expected sunrise < sunset < nextSunrise");
+  }
+  const day = (ss - sr) / 15;
+  const night = (nsr - ss) / 15;
+  const win = (startMs: number, lenMs: number): MuhurtaWindow => ({
+    start: new Date(startMs),
+    end: new Date(startMs + lenMs),
+  });
+  return {
+    brahma: {
+      start: new Date(sr - BRAHMA_START_BEFORE_SUNRISE_MIN * 60000),
+      end: new Date(sr - BRAHMA_END_BEFORE_SUNRISE_MIN * 60000),
+    },
+    abhijit: win(sr + 7 * day, day),
+    vijaya: win(sr + 10 * day, day),
+    nishita: win(ss + 7 * night, night),
+  };
+}
