@@ -95,7 +95,7 @@ function renderOnboarding(app: HTMLElement) {
     </div>
   `;
 
-  document.getElementById("btn-create-chart")!.addEventListener("click", () => navigate("/kundali/new"));
+  document.getElementById("btn-create-chart")!.addEventListener("click", () => navigate("/kundali-form"));
   document.getElementById("btn-logout")!.addEventListener("click", () => {
     localStorage.removeItem("ov_session");
     window.location.reload();
@@ -265,7 +265,7 @@ async function renderIntelligenceDashboard(app: HTMLElement, primaryKundali: any
 
       <!-- Secondary tools -->
       <div class="ti-secondary-row">
-        <button class="ti-secondary-btn" data-route="/kp">KP Chart</button>
+        <button class="ti-secondary-btn" data-route="/kp-query">KP Chart</button>
         <button class="ti-secondary-btn" data-route="/kp-sublords">Sub-Lords</button>
         <button class="ti-secondary-btn" data-route="/muhurta-dashboard">Muhurta Dashboard</button>
         <button class="ti-secondary-btn" data-route="/wallet">Wallet</button>
@@ -281,7 +281,7 @@ async function renderIntelligenceDashboard(app: HTMLElement, primaryKundali: any
 
   // Open chart
   document.getElementById("btn-open-chart")!.addEventListener("click", () => {
-    navigate(`/kundali/${primaryKundali.id}/chart`);
+    navigate(`/birth-chart?id=${primaryKundali.id}`);
   });
 
   // Action cards

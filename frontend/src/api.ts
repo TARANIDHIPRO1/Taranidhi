@@ -3,6 +3,8 @@
 // CORS_TODO: In production, API_BASE must match the real Worker URL.
 // For dev, the Vite proxy or a localhost Worker serves the API.
 
+import { navigate } from "./router";
+
 const API_BASE = (import.meta as any).env?.VITE_API_BASE ?? "";
 
 let sessionToken: string | null = localStorage.getItem("ov_session");
@@ -40,6 +42,13 @@ async function apiFetch(
   } catch {
     data = null;
   }
+  // Global 401 handler: session expired or invalidated server-side.
+  // Clear local token and redirect to login so user re-authenticates cleanly.
+  if (res.status === 401) {
+    setSession(null);
+    navigate("/login");
+  }
+
   return { ok: res.ok, status: res.status, data };
 }
 
