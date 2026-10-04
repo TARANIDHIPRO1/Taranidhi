@@ -9,6 +9,8 @@
 //
 // This engine is category-agnostic: same criteria, different weights by purpose.
 
+import { analyzeGochar, gocharToAdjustmentValue } from "./gochar";
+
 export type ProfessionalCategory =
   | "sampatti-bhumi-kharid"
   | "sampatti-bhumi-puja"
@@ -158,6 +160,11 @@ export interface PersonalParams {
   antardashLord: string | null;
   natalMoonRashi: number | null;
   currentMoonRashi: number | null;
+  /** Transit rashis (0–11) for each classical planet at query time.
+   *  Supply as many as available; missing planets are skipped in Gochar scoring.
+   *  Source: calculatePlanetaryPositions() → Math.floor(longitude / 30)
+   *  Minimum required: currentMoonRashi (backward compat); fuller data = richer score. */
+  transitPlanetRashis?: Partial<Record<"Sun" | "Moon" | "Mars" | "Mercury" | "Jupiter" | "Venus" | "Saturn", number>>;
   ashtakwargaBindu: number | null; // 0-8
   navamshaHouseLord: string | null;
 }
@@ -884,13 +891,34 @@ export function scorePersonalLayer(params: PersonalParams): PersonalAdjustment {
     }
   }
 
-  // Gochar adjustment (transit Jupiter/Venus = +, Saturn/Rahu = -)
-  if (params.currentMoonRashi !== null && params.natalMoonRashi !== null) {
-    const transitDistance = (params.currentMoonRashi - params.natalMoonRashi + 12) % 12;
-    if (transitDistance <= 2 || transitDistance >= 10) {
-      adjustments.gocharAdjustment = { value: 20, reason: "Favorable transit position" };
-    } else if (transitDistance === 6) {
-      adjustments.gocharAdjustment = { value: -25, reason: "Opposition transit" };
+  // ── Gochar (Transit) Analysis ──────────────────────────────────────────────
+  // Real 7-planet classical Gochar scoring replacing the flat +20/-25 stub.
+  // Source: Phaladeepika Ch.26 (Mantresvara) — favorable house tables per planet.
+  // Special conditions: Sade Sati (Saturn 12/1/2), Guru Gochar (Jupiter 5/9),
+  //   Ashtama Guru (Jupiter 8), Kantaka/Ashtama Shani (Saturn 4/8),
+  //   Ashtama Chandra (Moon 8).
+  // Partial Vedha: Jupiter in 11th gives relief during Sade Sati (Sarvartha Chintamani).
+  if (params.natalMoonRashi !== null) {
+    // Build transit rashi map: use explicit transitPlanetRashis if provided,
+    // fall back to currentMoonRashi for backward compatibility.
+    const transitMap: Record<string, number> = {};
+    if (params.transitPlanetRashis) {
+      Object.assign(transitMap, params.transitPlanetRashis);
+    } else if (params.currentMoonRashi !== null) {
+      // Legacy: only Moon transit was passed
+      transitMap.Moon = params.currentMoonRashi;
+    }
+    if (params.currentMoonRashi !== null && !transitMap.Moon) {
+      transitMap.Moon = params.currentMoonRashi;
+    }
+
+    if (Object.keys(transitMap).length > 0) {
+      const gocharResult = analyzeGochar(params.natalMoonRashi, transitMap);
+      const adjValue = gocharToAdjustmentValue(gocharResult);
+      adjustments.gocharAdjustment = {
+        value: adjValue,
+        reason: gocharResult.summary,
+      };
     }
   }
 
