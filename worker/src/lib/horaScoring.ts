@@ -51,6 +51,27 @@ export const PURPOSE_WEIGHTS: Record<string, Record<string, number>> = {
   // Source: Muhurta Chintamani Roga-Chikitsa Prakarana; BPHS Muhurta adhyaya.
   // OccultVIISION proprietary numeric weighting.
   medical:  { Sun: 8, Moon: 7, Mars: 6, Mercury: 7, Jupiter: 8, Venus: 5, Saturn: 3, Rahu: 2, Ketu: 2 },
+  // Education / Vidyarambha / learning commencement:
+  // Mercury (Vidyakaraka, 5th house Karak) + Jupiter (Guru/Brahaspati) primary.
+  // Moon for retention; Ketu (moksha-gyan) supports deep spiritual study.
+  // Source: Muhurta Chintamani Vidyarambha adhyaya; BPHS Bhava Significations
+  //         (5th house lord = Vidya; Mercury = Vidyakaraka).
+  // OccultVIISION proprietary numeric weighting.
+  education: { Sun: 5, Moon: 4, Mars: 3, Mercury: 9, Jupiter: 9, Venus: 5, Saturn: 3, Rahu: 2, Ketu: 3 },
+  // Legal / court / document signing / dispute resolution:
+  // Saturn (Nyaya, justice, karma) + Jupiter (Dharma, law) primary.
+  // Mars for contested disputes; Mercury for contracts and documentation.
+  // Source: Muhurta Chintamani Vivad adhyaya; BPHS Bhava 7 (contracts),
+  //         Bhava 9 (dharma/justice), Bhava 6 (litigation).
+  // OccultVIISION proprietary numeric weighting.
+  legal:     { Sun: 6, Moon: 4, Mars: 6, Mercury: 7, Jupiter: 8, Venus: 4, Saturn: 8, Rahu: 3, Ketu: 2 },
+  // Spiritual / puja / diksha (initiation) / pilgrimage / yajna:
+  // Jupiter (Guru, dharma-karaka) + Ketu (moksha, liberation) primary.
+  // Venus for devotional bhakti; Sun for Surya upasana; Moon for Chandra puja.
+  // Source: Muhurta Chintamani Diksha/Upanayana adhyaya; BPHS Bhava 9 (dharma)
+  //         and Bhava 12 (moksha); Brihat Samhita (Varahamihira) Tirthatana.
+  // OccultVIISION proprietary numeric weighting.
+  spiritual: { Sun: 7, Moon: 6, Mars: 3, Mercury: 4, Jupiter: 9, Venus: 7, Saturn: 5, Rahu: 2, Ketu: 9 },
 };
 
 // Functional-nature by Lagna -- which planets are Kendra/Trikona

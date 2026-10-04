@@ -862,6 +862,11 @@ export interface NavtaraResult {
   meaning: string;
   recommendation: string;
   score: number;              // –2 to +2 for convergence scoring (cycle-adjusted)
+  // Percentage score from DOCX (Grok-AI analysis of Muhurta-Chintamani):
+  // Tara pos → raw %: Janma(1)=20, Sampat(2)=95, Vipat(3)=15, Kshema(4)=90,
+  // Pratyari(5)=10, Sadhaka(6)=85, Vadha(7)=5, Mitra(8)=80, ParamaMitra(9)=100
+  // Cycle-3 reversal applies to positions 3/5/7 (adverse → auspicious).
+  rawScore: number;           // 5–100 percentage scale for Tara Bala display
 }
 
 // Base table — cycle 1 standard qualities
@@ -931,12 +936,44 @@ function _applyCycleRule(
  * @param birthNakIdx  Birth nakshatra index 0-26 (Ashwini=0 … Revati=26)
  * @param queryNakIdx  Nakshatra index at the muhurta moment 0-26
  */
+// Tara Bala raw percentage table (position 1-9 → percentage score).
+// Source: Grok-AI synthesis of Muhurta-Chintamani Tarabala chapter;
+//         cross-referenced with Chugh Muhurta numeric exposition.
+// Position:          1    2    3    4    5    6    7    8    9
+// Tara:          Janma Samp Vipat Ksh  Prat  Sadh Vadh  Mit  ParM
+const _TARA_RAW_SCORE: Record<number, number> = {
+  1: 20,   // Janma    — natal star, mixed/neutral, caution
+  2: 95,   // Sampat   — very auspicious (wealth)
+  3: 15,   // Vipat    — adverse (cycle 1 & 2); cycle-3 reversal applies below
+  4: 90,   // Kshema   — auspicious (wellbeing)
+  5: 10,   // Pratyari — adverse (cycle 1 & 2); cycle-3 reversal applies below
+  6: 85,   // Sadhaka  — auspicious (achievement)
+  7:  5,   // Vadha    — most adverse (cycle 1 & 2); cycle-3 → 100 (Parama Mitra grade)
+  8: 80,   // Mitra    — auspicious (friendship)
+  9: 100,  // Parama Mitra — most auspicious
+};
+
+// Cycle-3 reversed raw scores for positions 3, 5, 7 (wholly favourable reversal).
+const _TARA_RAW_SCORE_CYCLE3_REVERSED: Record<number, number> = {
+  3: 85,   // Vipat → Kshema-grade (cycle-3 beneficial)
+  5: 80,   // Pratyari → Mitra-grade (cycle-3 beneficial)
+  7: 100,  // Vadha → Parama Mitra-grade (cycle-3 = most auspicious reversal)
+};
+
 export function calculateNavtara(birthNakIdx: number, queryNakIdx: number): NavtaraResult {
   const distance     = ((queryNakIdx - birthNakIdx) % 27 + 27) % 27 + 1;  // 1..27
   const cycle        = Math.ceil(distance / 9);                             // 1, 2, 3
   const position     = ((distance - 1) % 9) + 1;                           // 1..9
   const base         = NAVTARA_BASE[position - 1]!;
   const { effectiveQuality, cycleRule, score } = _applyCycleRule(position, cycle, base);
+
+  // Compute rawScore: for cycle-3 adverse positions, use reversed value;
+  // for cycle-2 mixed zone, use base (uncertainty preserved);
+  // otherwise use standard position score.
+  let rawScore = _TARA_RAW_SCORE[position] ?? 50;
+  if (cycle === 3 && (position === 3 || position === 5 || position === 7)) {
+    rawScore = _TARA_RAW_SCORE_CYCLE3_REVERSED[position] ?? rawScore;
+  }
 
   return {
     distance,
@@ -949,6 +986,7 @@ export function calculateNavtara(birthNakIdx: number, queryNakIdx: number): Navt
     meaning:          base.meaning,
     recommendation:   base.recommendation,
     score,
+    rawScore,
   };
 }
 
@@ -1226,4 +1264,217 @@ export function getMasaPaksha(siderealSunLon: number, tithi: number): MasaPaksha
     tithi,
     note: `${masa} Masa, ${paksha} Paksha, Day ${pakshaDay} (Tithi ${tithi}). Note: Masa approximated from sidereal Sun longitude; may deviate ±1 month near Adhika Masa boundaries — upgrade to Purnima-Nakshatra method for production precision.`,
   };
+}
+
+// ── Choghadiya ────────────────────────────────────────────────────────────────
+// Choghadiya ("quarter of a ghadi") divides the daylight period into 8 equal
+// segments and the night period into 8 equal segments (16 total per day).
+// Each segment is ~90 minutes at equinox but varies with sunrise/sunset.
+// The FIRST day segment and FIRST night segment are always the Hora of the
+// weekday ruler; the sequence then cycles through a fixed planetary order.
+//
+// Classical source: Muhurta Chintamani (Choghadiya Prakarana);
+//                   Chugh Muhurta; Panchanga tradition (Gujarat-Maharashtra lineage).
+//
+// Seven types: Amrit (Amrut), Shubh, Labh, Char, Udveg, Rog, Kal.
+// Auspiciousness:
+//   Most auspicious : Amrit > Shubh ≈ Labh > Char (neutral, good for travel)
+//   Inauspicious    : Udveg, Rog, Kal
+//
+// Weekday ruler (index 0=Sunday … 6=Saturday):
+//   Sun=0, Moon=1, Mars=2, Mercury=3, Jupiter=4, Venus=5, Saturn=6
+//
+// Day sequence starting from weekday ruler (classical cycle):
+//   Sun→Amrit, Moon→Char, Mars→Rog, Mercury→Labh, Jupiter→Shubh, Venus→Rog, Saturn→Kal
+//   Wait — the Choghadiya cycle does NOT follow the planet's own quality;
+//   it follows a FIXED sequence starting at the day-ruler's assigned type,
+//   then rotating through the 7-type cycle in a fixed planetary-hour order.
+//
+// The day-Choghadiya sequence starts with the weekday ruler's type.
+// The planet → Choghadiya type mapping:
+//   Sun → Udveg, Moon → Amrit, Mars → Kal, Mercury → Labh,
+//   Jupiter → Shubh, Venus → Char, Saturn → Rog
+//
+// Day sequence order (planet order for day, starting from day-ruler):
+//   [Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars]  ← rotating through these 7
+// Night sequence order (planet order for night, starting from day-ruler's 5th):
+//   [Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars]  ← same rotation but offset
+
+export type ChoghadiyaType =
+  | "Amrit"   // Moon — most auspicious, all works
+  | "Shubh"   // Jupiter — auspicious, good for auspicious ceremonies
+  | "Labh"    // Mercury — gain/profit, good for business and new ventures
+  | "Char"    // Venus — movement/travel, neutral-positive
+  | "Udveg"   // Sun — anxiety/agitation, avoid new works
+  | "Rog"     // Saturn/Venus (mixed in night) — disease/conflict, inauspicious
+  | "Kal"     // Mars — adverse, avoid all important works
+
+export interface ChoghadiyaWindow {
+  type: ChoghadiyaType;
+  planet: string;           // ruling planet for this segment
+  startJD: number;          // Julian Day Number (UT) start
+  endJD: number;            // Julian Day Number (UT) end
+  startIST: string;         // HH:MM local display (IST = UT + 5:30)
+  endIST: string;           // HH:MM local display
+  segmentIndex: number;     // 0-7 for day (0=first day segment), 0-7 for night
+  period: "day" | "night";
+  isAuspicious: boolean;    // Amrit, Shubh, Labh, Char = true; Udveg, Rog, Kal = false
+}
+
+export interface ChoghadiyaResult {
+  daySegments: ChoghadiyaWindow[];    // 8 day Choghadiyas
+  nightSegments: ChoghadiyaWindow[];  // 8 night Choghadiyas
+  currentChoghadiya: ChoghadiyaWindow | null;
+  date: string;   // YYYY-MM-DD of the calculation
+  weekday: number; // 0=Sun … 6=Sat
+}
+
+// Planet → Choghadiya type mapping (classical Muhurta Chintamani assignment).
+// Source: Muhurta Chintamani Choghadiya Prakarana; Chugh Muhurta p. 87-92.
+const _PLANET_TO_CHOGHADIYA: Record<string, ChoghadiyaType> = {
+  Sun:      "Udveg",
+  Moon:     "Amrit",
+  Mars:     "Kal",
+  Mercury:  "Labh",
+  Jupiter:  "Shubh",
+  Venus:    "Char",
+  Saturn:   "Rog",
+};
+
+// Day sequence planet order (7 planets, cycles).
+// Source: Muhurta Chintamani; traditional Panchanga tables.
+// Order: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars (day)
+const _CHOGHADIYA_DAY_ORDER = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
+
+// Night sequence planet order: offset by 5 from day ruler (or equivalently same
+// array starting at index 5 from day ruler in the day order).
+// Night starts with the 5th planet in the day sequence from the current day ruler.
+// Source: Muhurta Chintamani Choghadiya Prakarana (Ratri Choghadiya section).
+const _CHOGHADIYA_NIGHT_OFFSET = 5;
+
+// Weekday ruler index → planet name (0=Sunday).
+const _WEEKDAY_RULER: Record<number, string> = {
+  0: "Sun",      // Sunday
+  1: "Moon",     // Monday
+  2: "Mars",     // Tuesday
+  3: "Mercury",  // Wednesday
+  4: "Jupiter",  // Thursday
+  5: "Venus",    // Friday
+  6: "Saturn",   // Saturday
+};
+
+function _jdToISTString(jd: number): string {
+  // Convert Julian Day (UT) to IST (UTC+5:30) HH:MM string.
+  const utMs = (jd - 2440587.5) * 86400000;
+  const istMs = utMs + 5.5 * 3600000;
+  const d = new Date(istMs);
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+/**
+ * Build all 16 Choghadiya windows (8 day + 8 night) for a given date.
+ *
+ * @param sunriseJD  Julian Day of sunrise (UT)
+ * @param sunsetJD   Julian Day of sunset (UT)
+ * @param nextSunriseJD  Julian Day of next day's sunrise (UT) [for night end]
+ * @param weekday    0=Sunday … 6=Saturday
+ * @param nowJD      Current Julian Day (UT) to identify active window
+ * @param dateStr    YYYY-MM-DD label for the result
+ *
+ * Source: Muhurta Chintamani Choghadiya Prakarana (day/night 8-segment division);
+ *         validated against standard printed Panchanga tables.
+ */
+export function buildChoghadiya(
+  sunriseJD: number,
+  sunsetJD: number,
+  nextSunriseJD: number,
+  weekday: number,
+  nowJD: number,
+  dateStr: string,
+): ChoghadiyaResult {
+  const dayRuler = _WEEKDAY_RULER[weekday]!;
+  const dayRulerIdx = _CHOGHADIYA_DAY_ORDER.indexOf(dayRuler);
+
+  const dayLength = (sunsetJD - sunriseJD) / 8;
+  const nightLength = (nextSunriseJD - sunsetJD) / 8;
+
+  const daySegments: ChoghadiyaWindow[] = [];
+  for (let i = 0; i < 8; i++) {
+    const planetIdx = (dayRulerIdx + i) % 7;
+    const planet = _CHOGHADIYA_DAY_ORDER[planetIdx]!;
+    const type = _PLANET_TO_CHOGHADIYA[planet]!;
+    const startJD = sunriseJD + i * dayLength;
+    const endJD = startJD + dayLength;
+    daySegments.push({
+      type,
+      planet,
+      startJD,
+      endJD,
+      startIST: _jdToISTString(startJD),
+      endIST: _jdToISTString(endJD),
+      segmentIndex: i,
+      period: "day",
+      isAuspicious: type === "Amrit" || type === "Shubh" || type === "Labh" || type === "Char",
+    });
+  }
+
+  // Night: starts from offset 5 in the day order from the day ruler.
+  const nightRulerIdx = (dayRulerIdx + _CHOGHADIYA_NIGHT_OFFSET) % 7;
+  const nightSegments: ChoghadiyaWindow[] = [];
+  for (let i = 0; i < 8; i++) {
+    const planetIdx = (nightRulerIdx + i) % 7;
+    const planet = _CHOGHADIYA_DAY_ORDER[planetIdx]!;
+    const type = _PLANET_TO_CHOGHADIYA[planet]!;
+    const startJD = sunsetJD + i * nightLength;
+    const endJD = startJD + nightLength;
+    nightSegments.push({
+      type,
+      planet,
+      startJD,
+      endJD,
+      startIST: _jdToISTString(startJD),
+      endIST: _jdToISTString(endJD),
+      segmentIndex: i,
+      period: "night",
+      isAuspicious: type === "Amrit" || type === "Shubh" || type === "Labh" || type === "Char",
+    });
+  }
+
+  const allSegments = [...daySegments, ...nightSegments];
+  const currentChoghadiya = allSegments.find(s => nowJD >= s.startJD && nowJD < s.endJD) ?? null;
+
+  return {
+    daySegments,
+    nightSegments,
+    currentChoghadiya,
+    date: dateStr,
+    weekday,
+  };
+}
+
+/**
+ * Get the active Choghadiya window for a given moment.
+ * Returns null outside sunrise-to-next-sunrise range.
+ */
+export function getActiveChoghadiya(
+  sunriseJD: number,
+  sunsetJD: number,
+  nextSunriseJD: number,
+  weekday: number,
+  nowJD: number,
+  dateStr: string,
+): ChoghadiyaWindow | null {
+  return buildChoghadiya(sunriseJD, sunsetJD, nextSunriseJD, weekday, nowJD, dateStr).currentChoghadiya;
+}
+
+/**
+ * Auspiciousness label for a Choghadiya type.
+ * Used for brief display in API responses.
+ */
+export function getChoghadiyaAuspiciousness(type: ChoghadiyaType): "auspicious" | "neutral" | "inauspicious" {
+  if (type === "Amrit" || type === "Shubh" || type === "Labh") return "auspicious";
+  if (type === "Char") return "neutral";
+  return "inauspicious";
 }

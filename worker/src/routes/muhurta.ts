@@ -54,6 +54,7 @@ import {
   getYamghanda,
   getGulikaKaal,
   isDurmuhurta,
+  buildChoghadiya,
 } from "../lib/muhurta";
 import { getPakshiAtTime, scorePakshiFavorability } from "../lib/panchaPakshi";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
@@ -237,6 +238,15 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const inGulikaKaal = now.getTime() >= gulikaKaal.start.getTime() && now.getTime() < gulikaKaal.end.getTime();
   const inDurmuhurta = isDurmuhurta(sunrise, sunset, now.getUTCDay(), now);
 
+  // Choghadiya (8-segment day + 8-segment night division).
+  // Built here using JD values from realSunriseSunset.
+  // Source: Muhurta Chintamani Choghadiya Prakarana.
+  const sunriseJD = julianDayFromUtc(sunrise);
+  const sunsetJD = julianDayFromUtc(sunset);
+  const nextSunriseJD = julianDayFromUtc(nextSunrise);
+  const dateStr = now.toISOString().slice(0, 10);
+  const choghadiya = buildChoghadiya(sunriseJD, sunsetJD, nextSunriseJD, now.getUTCDay(), jd, dateStr);
+
   // Pancha Pakshi (5-bird cycles) -- real yama timing wired to sunrise/sunset.
   // Bird is personalized only when kundali nakshatra is known; timing is accurate
   // for all users now that sunrise/sunset are passed in.
@@ -369,6 +379,36 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     yamghanda_kaal: { start: yamghanda.start.toISOString(), end: yamghanda.end.toISOString(), active_now: inYamghanda },
     gulika_kaal: { start: gulikaKaal.start.toISOString(), end: gulikaKaal.end.toISOString(), active_now: inGulikaKaal },
     durmuhurta: { active: inDurmuhurta, note: inDurmuhurta ? "Durmuhurta active -- avoid starting new work" : "No Durmuhurta" },
+
+    // Choghadiya: 8 day + 8 night segments. Source: Muhurta Chintamani.
+    choghadiya: {
+      current: choghadiya.currentChoghadiya
+        ? {
+            type: choghadiya.currentChoghadiya.type,
+            planet: choghadiya.currentChoghadiya.planet,
+            period: choghadiya.currentChoghadiya.period,
+            start_ist: choghadiya.currentChoghadiya.startIST,
+            end_ist: choghadiya.currentChoghadiya.endIST,
+            is_auspicious: choghadiya.currentChoghadiya.isAuspicious,
+          }
+        : null,
+      day_segments: choghadiya.daySegments.map(s => ({
+        segment: s.segmentIndex + 1,
+        type: s.type,
+        planet: s.planet,
+        start_ist: s.startIST,
+        end_ist: s.endIST,
+        is_auspicious: s.isAuspicious,
+      })),
+      night_segments: choghadiya.nightSegments.map(s => ({
+        segment: s.segmentIndex + 1,
+        type: s.type,
+        planet: s.planet,
+        start_ist: s.startIST,
+        end_ist: s.endIST,
+        is_auspicious: s.isAuspicious,
+      })),
+    },
 
     score,
     personalized: lagnaOnlyChart !== null || janmaNakIdx !== null,
