@@ -44,6 +44,8 @@ import {
   getNityaYoga,
   getKarana,
   getNakshatraNature,
+  getNakshatraAttributes,
+  calculateNavtara,
   getAbhijitMuhurta,
   getAmritSiddhiYoga,
   getSarvarthaSiddhiYoga,
@@ -325,7 +327,16 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       note: pakshi.note,
     },
     rahu_kaal: { start: rahuKaal.start.toISOString(), end: rahuKaal.end.toISOString(), active_now: inRahuKaal },
-    current_nakshatra: { idx: currentNakIdx, name: NAKSHATRA_NAMES[currentNakIdx] },
+    current_nakshatra: {
+      idx:        currentNakIdx,
+      name:       NAKSHATRA_NAMES[currentNakIdx],
+      nature:     nakshatraNature,
+      attributes: getNakshatraAttributes(currentNakIdx),
+      // Navtara (Tarabala) is personalized — only when birth nakshatra is known
+      navtara:    janmaNakIdx !== null
+        ? calculateNavtara(janmaNakIdx, currentNakIdx)
+        : null,
+    },
     tara,
     panchaka_dosha: panchaka,
     ganda_moola: gandaMoola,
@@ -343,7 +354,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     kshaya_vridhi: kshayaVridhi,
     nitya_yoga: nityaYoga,
     karana,
-    nakshatra_nature: nakshatraNature,
+    // nakshatra_nature is now nested inside current_nakshatra.nature
     masa_paksha: masaPaksha,
     abhijit_muhurta: {
       start: abhijitMuhurta.start.toISOString(),
