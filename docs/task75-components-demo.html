@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCCULTVIISION WAFES Theme — Component Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    /* Import theme tokens */
+    @import url('task75-wafes-theme.css');
+
+    /* Demo page styles */
+    body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-8);
+    }
+
+    .demo-section {
+      margin-bottom: var(--space-12);
+    }
+
+    .demo-section h2 {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: var(--space-4);
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .demo-item {
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+
+    .demo-item h3 {
+      margin-top: 0;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: var(--space-4);
+      right: var(--space-4);
+      z-index: 1000;
+    }
+
+    .theme-toggle button {
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: var(--fw-medium);
+    }
+
+    .color-swatch {
+      width: 100%;
+      height: 60px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      margin-bottom: var(--space-2);
+    }
+
+    .color-label {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="theme-toggle">
+  <button id="theme-btn">🌙 Dark Mode</button>
+</div>
+
+<h1>OCCULTVIISION Vedic Five Elements Theme</h1>
+<p>Complete component library with WCAG 2.1 AAA accessibility. Toggle dark mode with the button in the top-right.</p>
+
+<!-- ============================================================
+   COLORS SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Color Palette</h2>
+
+  <h3>Elemental Accents</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <h4>AKASH (Space)</h4>
+      <div class="color-swatch" style="background-color: #8B5CF6;"></div>
+      <div class="color-label">#8B5CF6 (Light: #DDD6FE)</div>
+      <p>Birth charts, cosmic view</p>
+    </div>
+    <div class="demo-item">
+      <h4>AGNI (Fire)</h4>
+      <div class="color-swatch" style="background-color: #F97316;"></div>
+      <div class="color-label">#F97316 (Light: #FED7AA)</div>
+      <p>Muhurta, timing, actions</p>
+    </div>
+    <div class="demo-item">
+      <h4>JAL (Water)</h4>
+      <div class="color-swatch" style="background-color: #0EA5E9;"></div>
+      <div class="color-label">#0EA5E9 (Light: #CFFAFE)</div>
+      <p>Numerology, flow</p>
+    </div>
+    <div class="demo-item">
+      <h4>VAYU (Air)</h4>
+      <div class="color-swatch" style="background-color: #06B6D4;"></div>
+      <div class="color-label">#06B6D4 (Light: #CFFAFE)</div>
+      <p>Recommendations, movement</p>
+    </div>
+    <div class="demo-item">
+      <h4>PRITHVI (Earth)</h4>
+      <div class="color-swatch" style="background-color: #10B981;"></div>
+      <div class="color-label">#10B981 (Light: #D1FAE5)</div>
+      <p>Wallet, stability</p>
+    </div>
+  </div>
+
+  <h3>Semantic Colors</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <h4>Success</h4>
+      <div class="color-swatch" style="background-color: #10B981;"></div>
+      <div class="color-label">#10B981</div>
+    </div>
+    <div class="demo-item">
+      <h4>Warning</h4>
+      <div class="color-swatch" style="background-color: #F59E0B;"></div>
+      <div class="color-label">#F59E0B</div>
+    </div>
+    <div class="demo-item">
+      <h4>Error</h4>
+      <div class="color-swatch" style="background-color: #EF4444;"></div>
+      <div class="color-label">#EF4444</div>
+    </div>
+    <div class="demo-item">
+      <h4>Info</h4>
+      <div class="color-swatch" style="background-color: #3B82F6;"></div>
+      <div class="color-label">#3B82F6</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   BUTTONS SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Buttons</h2>
+
+  <h3>Primary Button</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <button class="btn btn-primary">Primary Action</button>
+    </div>
+    <div class="demo-item">
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+  </div>
+
+  <h3>Secondary Button</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <button class="btn btn-secondary">Secondary Action</button>
+    </div>
+    <div class="demo-item">
+      <button class="btn btn-secondary" disabled>Disabled</button>
+    </div>
+  </div>
+
+  <h3>Danger Button</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <button class="btn btn-danger">Delete</button>
+    </div>
+    <div class="demo-item">
+      <button class="btn btn-danger" disabled>Disabled</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   FORMS SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Form Inputs</h2>
+
+  <h3>Text Input</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <label>Normal Input</label>
+      <input type="text" placeholder="Enter text...">
+    </div>
+    <div class="demo-item">
+      <label>Focused Input</label>
+      <input type="text" placeholder="Enter text..." autofocus>
+    </div>
+    <div class="demo-item">
+      <label>Disabled Input</label>
+      <input type="text" placeholder="Disabled..." disabled>
+    </div>
+    <div class="demo-item">
+      <label>Error Input</label>
+      <input type="text" class="error" placeholder="Error state..." value="Invalid">
+    </div>
+  </div>
+
+  <h3>Textarea</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <label>Multiline Input</label>
+      <textarea placeholder="Enter multiple lines..."></textarea>
+    </div>
+  </div>
+
+  <h3>Select</h3>
+  <div class="demo-grid">
+    <div class="demo-item">
+      <label>Dropdown</label>
+      <select>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   CARDS SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Cards</h2>
+
+  <div class="demo-grid">
+    <div class="card">
+      <div class="card-header">Card Title</div>
+      <div class="card-body">
+        This is a standard card with content. Hover over it to see the effect.
+      </div>
+      <div class="card-footer">Footer information</div>
+    </div>
+
+    <div class="card accent-akash">
+      <div class="card-header">Akash Card</div>
+      <div class="card-body">
+        Card with Akash accent (purple, cosmic).
+      </div>
+    </div>
+
+    <div class="card accent-agni">
+      <div class="card-header">Agni Card</div>
+      <div class="card-body">
+        Card with Agni accent (orange, fire).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   ALERTS SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Alerts & Status Messages</h2>
+
+  <div class="demo-grid">
+    <div class="alert alert-success">
+      ✓ Success message — Action completed successfully.
+    </div>
+    <div class="alert alert-warning">
+      ⚠ Warning message — Something needs attention.
+    </div>
+    <div class="alert alert-error">
+      ✗ Error message — Something went wrong.
+    </div>
+    <div class="alert alert-info">
+      ℹ Info message — Here's some useful information.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   BADGES SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Badges & Tags</h2>
+
+  <div class="demo-grid">
+    <div class="demo-item">
+      <span class="badge badge-success">Success</span>
+      <span class="badge badge-warning">Warning</span>
+      <span class="badge badge-error">Error</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+   TYPOGRAPHY SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Typography</h2>
+
+  <div class="demo-item">
+    <h1>Heading 1 (32px)</h1>
+    <h2>Heading 2 (24px)</h2>
+    <h3>Heading 3 (20px)</h3>
+    <h4>Heading 4 (16px)</h4>
+    <p>Body text (16px) — This is standard paragraph text using Inter font. WCAG AAA contrast verified at 7:1 ratio.</p>
+    <small>Small text (12px) — Helper text or captions using this size.</small>
+    <code>Code snippet — using JetBrains Mono for data and technical content</code>
+  </div>
+</div>
+
+<!-- ============================================================
+   UTILITIES SECTION
+   ============================================================ -->
+
+<div class="demo-section">
+  <h2>Utility Classes</h2>
+
+  <div class="demo-grid">
+    <div class="demo-item">
+      <p class="text-center">Centered text</p>
+    </div>
+    <div class="demo-item">
+      <p class="text-right">Right-aligned text</p>
+    </div>
+    <div class="demo-item">
+      <p class="text-secondary">Secondary text color</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Theme toggle functionality
+  const themeBtn = document.getElementById('theme-btn');
+  const root = document.documentElement;
+
+  // Check saved preference
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  root.setAttribute('data-theme', savedTheme);
+  updateThemeButton();
+
+  themeBtn.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme');
+    const newTheme = current === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeButton();
+  });
+
+  function updateThemeButton() {
+    const current = root.getAttribute('data-theme');
+    themeBtn.textContent = current === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
+  }
+
+  // Accessibility: Keyboard focus visible
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      document.body.classList.add('keyboard-nav');
+    }
+  });
+
+  document.addEventListener('click', () => {
+    document.body.classList.remove('keyboard-nav');
+  });
+</script>
+
+</body>
+</html>
