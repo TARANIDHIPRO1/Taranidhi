@@ -44,7 +44,7 @@ import {
   getNityaYoga,
   getKarana,
   getNakshatraNature,
-  getNakshatraAttributes,
+  getNakshatraExceptions,
   calculateNavtara,
   getAbhijitMuhurta,
   getAmritSiddhiYoga,
@@ -331,7 +331,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       idx:        currentNakIdx,
       name:       NAKSHATRA_NAMES[currentNakIdx],
       nature:     nakshatraNature,
-      attributes: getNakshatraAttributes(currentNakIdx),
+      exceptions: getNakshatraExceptions(currentNakIdx),   // textually-attested specific rules only
       // Navtara (Tarabala) is personalized — only when birth nakshatra is known
       navtara:    janmaNakIdx !== null
         ? calculateNavtara(janmaNakIdx, currentNakIdx)
