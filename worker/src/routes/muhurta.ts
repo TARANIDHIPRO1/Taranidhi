@@ -58,6 +58,7 @@ import {
 } from "../lib/muhurta";
 import { getPakshiAtTime, scorePakshiFavorability } from "../lib/panchaPakshi";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
+import { runMuhurtaValidation } from "../lib/muhurtaValidator";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
 
@@ -253,6 +254,12 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const pakshi = getPakshiAtTime(now, "STANDARD", { sunriseTime: sunrise, sunsetTime: sunset });
   const pakshiScore = scorePakshiFavorability(now, "STANDARD");
 
+  // Stages 4 + 5: Lagna Shudhi + SAV Validation.
+  // Transit chart is built at muhurta moment (now) for querier's location.
+  // Source: muhurtaValidator.ts (Muhurta Chintamani + BPHS Ashtakavarga Adhyaya).
+  const transitChart = buildRealChart(now, lat, lon);
+  const muhurtaValidation = runMuhurtaValidation(transitChart);
+
   let score: ReturnType<typeof scoreHora> | null = null;
   if (activeHora) {
     score = scoreHora(
@@ -408,6 +415,29 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
         end_ist: s.endIST,
         is_auspicious: s.isAuspicious,
       })),
+    },
+
+    // Stages 4 + 5: Lagna Shudhi + SAV.
+    // Source: Muhurta Chintamani (Lagna Shudhi Prakarana) + BPHS (Ashtakavarga Adhyaya).
+    muhurta_validation: {
+      overall_grade:      muhurtaValidation.overallGrade,
+      mpi_sav_adjustment: muhurtaValidation.mpiAdjustment,
+      stage4_lagna_shudhi: {
+        grade:            muhurtaValidation.stage4.grade,
+        score:            muhurtaValidation.stage4.score,
+        issues:           muhurtaValidation.stage4.issues,
+        note:             muhurtaValidation.stage4.note,
+        planets_by_house: muhurtaValidation.stage4.planetsByHouse,
+      },
+      stage5_sav: {
+        grade:              muhurtaValidation.stage5.grade,
+        lagna_sign:         muhurtaValidation.stage5.lagnaSign,
+        bindus_in_lagna:    muhurtaValidation.stage5.bindusInLagna,
+        threshold:          muhurtaValidation.stage5.threshold,
+        all_sign_sav:       muhurtaValidation.stage5.allSignSAV,
+        note:               muhurtaValidation.stage5.note,
+      },
+      source: muhurtaValidation.source,
     },
 
     score,
