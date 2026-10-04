@@ -111,6 +111,25 @@ Claude Sonnet 4.6 (this session: wallet + Razorpay integration skeleton)
     - All routes return 503 gracefully when credentials not configured
     - Commit: 8b77b42 (536 insertions, 5 files changed)
 
+11. ✅ **GLOBAL DESIGN SYSTEM v1.0 (Oct 4, 2026 — COMPREHENSIVE):**
+    - **Approach:** Material Design 3 + Apple HIG standards + WCAG 2.1 AAA accessibility
+    - **Vedic Foundation:** Five Elements (Akash/Agni/Jal/Vayu/Prithvi) as SUBTLE accents ONLY (not ornate)
+    - **Color Palette:** Light + Dark modes, WCAG AAA verified, elemental colors for feature mapping
+    - **Typography:** Poppins (display) + Inter (body) + JetBrains Mono (data), type scale 12px-48px
+    - **Components:** Complete specs (buttons, forms, cards, modals, alerts, badges, tabs)
+    - **Spacing:** 8px base grid, responsive (360px→1200px+), 16px side padding
+    - **Dark Mode:** prefers-color-scheme + explicit toggle, equal polish both themes
+    - **Accessibility:** Checklist + testing plan (keyboard nav, ARIA labels, focus rings, color contrast)
+    - **Element-to-Feature Mapping:**
+      - Akash (Purple #8B5CF6) → Birth Charts (/kundali)
+      - Agni (Orange #F97316) → Muhurta Timing (/muhurta)
+      - Jal (Cyan #0EA5E9) → Numerology (/numerology)
+      - Vayu (Teal #06B6D4) → Recommendations (/recommendations)
+      - Prithvi (Green #10B981) → Wallet/Account (/wallet)
+    - **File:** `docs/GLOBAL_DESIGN_SYSTEM.md` + interactive artifact
+    - **Implementation Roadmap:** 7-week build plan (Foundation → Features → QA → Launch)
+    - **Commit:** 84da760 (770 insertions)
+
 ---
 
 ## Current Blockers
@@ -134,40 +153,58 @@ Claude Sonnet 4.6 (this session: wallet + Razorpay integration skeleton)
 
 ---
 
-## Next Steps - Wallet Billing + V6 UI BUILD (Oct 4 - Oct 31)
+## Next Steps - PRIORITY REORDERING (Oct 4 - Oct 31)
 
-**WALLET BILLING PHASE 1: Razorpay Credentials (BLOCKING)**
-- [ ] Naveen creates Razorpay Live account (account owner's own keys, per ARCHITECTURE.md Section 9)
-- [ ] Set RAZORPAY_KEY_ID as Worker secret
-- [ ] Set RAZORPAY_KEY_SECRET as Worker secret
-- [ ] Configure Razorpay webhook URL: https://www.occultviision.com/webhooks/razorpay
-- [ ] Once set: Test payment flow end-to-end (₹100 test topup → point grant)
+**USER PRIORITY (Naveen's reorder, Oct 4 2026):** 2→3→4→5→6→1 (UI/UX FIRST, then backend activation)
 
-**WALLET BILLING PHASE 2: Frontend Screens (post-credentials)**
-- [ ] Implement orders screen (show pending/completed orders)
-- [ ] Add payment status tracking UI
-- [ ] Test Razorpay SDK modal integration
+### TASK 74: Hindi/English i18n Framework (PRIORITY 1 — NEXT SESSION START)
+- [ ] i18n architecture (i18next or similar, no build requirement)
+- [ ] Language toggle (header button, persists to localStorage)
+- [ ] Hindi translations (all screens: labels, buttons, messages)
+- [ ] English fallback (already done, complete proofreading)
+- [ ] RTL support (future: if Arabic expansion planned)
+- [ ] Testing (multiple languages + toggle)
 
-**V6 PHASE 1: Birth Chart Display (Week 1-2)**
-- [ ] Create `/screens/birth-chart.ts` screen
-- [ ] Call `/kundali` endpoint → display verified data
-- [ ] Show: Ascendant, 12 cusps, 9 planets, Nakshatra, Dasha lords, Tara
-- [ ] Test against Naveen's chart (Lahiri Asc: 82.9708°, KP Asc: 82.8743°)
-- [ ] Verify house cusps match onlinejyotish.com ±0.0965°
+### TASK 75: Five Elements Theme System (PRIORITY 2 — PENDING DESIGN SPECS)
+- [ ] Build CSS token system (colors, typography, spacing from GLOBAL_DESIGN_SYSTEM.md)
+- [ ] Component library (buttons, forms, cards, modals using elemental accents)
+- [ ] Dark mode toggle + prefers-color-scheme
+- [ ] Apply to all screens with elemental color mapping
+- [ ] Mobile responsive audit
+- [ ] Accessibility verification (WCAG AAA)
 
-**V6 PHASE 2: Muhurta Dashboard (Week 2)**
-- [ ] Create `/screens/muhurta-dashboard.ts` screen
-- [ ] Real-time Hora/Uphora display (from muhurta endpoint)
-- [ ] Personalized Tara (using birth chart)
-- [ ] Convergence score (20-20-20-20-20)
-- [ ] Event recommendations (Property → Marriage → Business → Medical)
+### TASK 76: Admin Panel Completion (PRIORITY 3 — 99%)
+- [ ] User management (list, view detail, deactivate, tier upgrade)
+- [ ] Query logs viewer (filter, search, export)
+- [ ] Statistics dashboard (charts, metrics, trends)
+- [ ] System settings (SMS gateway config, Razorpay keys, domain)
+- [ ] Audit trail (all admin actions logged)
+- [ ] Mobile responsive (tablets + landscape)
 
-**V6 PHASE 3: Complete Integration (Week 3-4)**
-- [ ] Dasha timeline view
-- [ ] KP sub-lord chain display (from kp endpoint)
-- [ ] Edge case testing (DST, leap years, extreme locations)
-- [ ] Performance optimization
-- [ ] Security review (auth gates, data validation)
+### TASK 77: Mobile Responsive Audit (PRIORITY 4 — 99%)
+- [ ] Test all screens (360px, 768px, 1024px breakpoints)
+- [ ] Touch targets (44×44px minimum)
+- [ ] Orientation changes (portrait↔landscape)
+- [ ] Device testing (iOS Safari, Chrome, Android)
+- [ ] Keyboard navigation (full accessibility)
+- [ ] Performance on slow networks (throttled 3G)
+
+### TASK 78: Website UI Polish (PRIORITY 5 — 99%)
+- [ ] Homepage (hero, value props, CTA, testimonials)
+- [ ] Pricing page (tiers with features comparison)
+- [ ] Features page (detailed capability breakdown)
+- [ ] Blog/resources (articles, guides, FAQ)
+- [ ] Contact/support (form, email, phone)
+- [ ] Footer (links, legal, social)
+
+### TASK 73: Payment → Auto-Activation (PRIORITY 6 — BACKEND LOGIC)
+- [ ] Wire payment.captured webhook → user.tier upgrade
+- [ ] Tier logic (basic→premium→ultra based on order purpose)
+- [ ] Activation notification (email + in-app toast)
+- [ ] Edge cases (failed payment, refund, tier downgrade)
+- [ ] Testing (full payment flow → tier change)
+
+**REFERENCE:** Design System (`docs/GLOBAL_DESIGN_SYSTEM.md`) covers all color, typography, spacing, component, and accessibility specs for above tasks.
 
 **TESTING CHECKLIST:**
 ✅ Backend calculation accuracy (VERIFIED - astro.ts + kp.ts + muhurta.ts)
