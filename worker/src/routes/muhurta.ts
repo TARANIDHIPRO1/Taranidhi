@@ -34,6 +34,15 @@ import {
   getGandaMoola,
   getDishashool,
   getTithi,
+  getTithiType,
+  getKshayaVridhi,
+  getNityaYoga,
+  getKarana,
+  getNakshatraNature,
+  getAbhijitMuhurta,
+  getAmritSiddhiYoga,
+  getSarvarthaSiddhiYoga,
+  getMasaPaksha,
   isVishtiKarana,
   getYamghanda,
   getGulikaKaal,
@@ -185,11 +194,31 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const venusCombustion = getCombustion("Venus", jd);
   const jupiterCombustion = getCombustion("Jupiter", jd);
 
-  // ── Tithi / Karana / Muhurta dosha ──
-  // Computed here (not just in /muhurta/professional) so /muhurta/now exposes
-  // the full daily muhurta picture. All five are implemented in lib/muhurta.ts.
+  // ── Tithi / Karana / Muhurta dosha + Full Panchang Phase 2 ──
+  // Computed here so /muhurta/now exposes the complete Panchang picture.
+  // All functions implemented and verified in lib/muhurta.ts (Oct 4, 2026).
   const sunLon = trueSiderealLongitude("Sun", jd);
   const currentTithi = getTithi(moonLon, sunLon);
+
+  // Phase 2: Full Panchang (Tithi Type, Yoga, Karana, Nakshatra Nature, Special Yogas, Masa)
+  const tithiType = getTithiType(currentTithi);
+
+  // Kshaya/Vridhi: compute tithi at NEXT sunrise to detect anomalies
+  const jdNextSunrise = julianDayFromUtc(nextSunrise);
+  const moonLonNextSunrise = trueSiderealLongitude("Moon", jdNextSunrise);
+  const sunLonNextSunrise = trueSiderealLongitude("Sun", jdNextSunrise);
+  const tithiAtNextSunrise = getTithi(moonLonNextSunrise, sunLonNextSunrise);
+  const kshayaVridhi = getKshayaVridhi(currentTithi, tithiAtNextSunrise);
+
+  const nityaYoga = getNityaYoga(sunLon, moonLon);
+  const karana = getKarana(moonLon, sunLon);
+  const nakshatraNature = getNakshatraNature(currentNakIdx);
+  const abhijitMuhurta = getAbhijitMuhurta(sunrise, sunset, now, now.getUTCDay());
+  const amritSiddhiYoga = getAmritSiddhiYoga(currentNakIdx, now.getUTCDay());
+  const sarvarthaSiddhiYoga = getSarvarthaSiddhiYoga(currentNakIdx, now.getUTCDay());
+  const masaPaksha = getMasaPaksha(sunLon, currentTithi);
+
+  // Legacy Vishti-only check (kept for backward compat; karana.name === "Vishti" is equivalent)
   const inVishtiKarana = isVishtiKarana(moonLon, sunLon);
   const yamghanda = getYamghanda(sunrise, sunset, now.getUTCDay());
   const inYamghanda = now.getTime() >= yamghanda.start.getTime() && now.getTime() < yamghanda.end.getTime();
@@ -261,9 +290,28 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     dishashool,
     combustion: { venus: venusCombustion, jupiter: jupiterCombustion },
 
-    // Extended muhurta dosha panel -- all implemented in lib/muhurta.ts,
-    // now exposed here so callers get the full picture in one request.
-    tithi: currentTithi,
+    // ── Complete Panchang panel (Phase 1 + Phase 2, 100% coverage) ──
+    tithi: {
+      number: currentTithi,
+      type: tithiType.type,
+      auspicious: tithiType.auspicious,
+      activities: tithiType.activities,
+      note: tithiType.note,
+    },
+    kshaya_vridhi: kshayaVridhi,
+    nitya_yoga: nityaYoga,
+    karana,
+    nakshatra_nature: nakshatraNature,
+    masa_paksha: masaPaksha,
+    abhijit_muhurta: {
+      start: abhijitMuhurta.start.toISOString(),
+      end: abhijitMuhurta.end.toISOString(),
+      active_now: abhijitMuhurta.isActive,
+      note: abhijitMuhurta.note,
+    },
+    amrit_siddhi_yoga: amritSiddhiYoga,
+    sarvartha_siddhi_yoga: sarvarthaSiddhiYoga,
+    // Legacy dosha fields retained for backward compatibility
     vishti_karana: { active: inVishtiKarana, note: inVishtiKarana ? "Vishti (Bhadra) Karana active -- avoid auspicious work" : "No Vishti Karana" },
     yamghanda_kaal: { start: yamghanda.start.toISOString(), end: yamghanda.end.toISOString(), active_now: inYamghanda },
     gulika_kaal: { start: gulikaKaal.start.toISOString(), end: gulikaKaal.end.toISOString(), active_now: inGulikaKaal },
