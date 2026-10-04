@@ -59,7 +59,7 @@ export async function renderKundaliForm(): Promise<void> {
             <input
               id="place-search"
               type="text"
-              placeholder="e.g. Bhopal, Delhi, Mumbai"
+              placeholder="e.g. Raghogarh, Vidisha, Mendori, Bhopal"
               style="flex: 1;"
             />
             <button type="button" class="btn btn-small" id="btn-search-place">🔍</button>
@@ -155,41 +155,71 @@ export async function renderKundaliForm(): Promise<void> {
     placeResults.style.display = "none";
     placeResults.innerHTML = "";
     try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`;
-      const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+      // Primary search: India-biased (countrycodes=in), 10 results, full address details
+      // Nominatim supports villages, tehsils, talukas, gram panchayats
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=10&addressdetails=1&countrycodes=in`;
+      const res = await fetch(url, { headers: { "Accept-Language": "en,hi" } });
       const data = await res.json();
+
       if (!data.length) {
-        placeResults.innerHTML = `<div style="padding:8px;color:#7a4800;font-size:0.82rem;">No results found. Try a nearby city.</div>`;
-        placeResults.style.display = "block";
+        // Fallback: try without countrycodes restriction (for NRIs abroad)
+        const url2 = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + " India")}&format=json&limit=10&addressdetails=1`;
+        const res2 = await fetch(url2, { headers: { "Accept-Language": "en,hi" } });
+        const data2 = await res2.json();
+        if (!data2.length) {
+          placeResults.innerHTML = `<div style="padding:8px;color:#7a4800;font-size:0.82rem;">
+            Jagah nahi mili. Try karein:<br>
+            • Poora naam likhein (e.g. "Raghogarh Madhya Pradesh")<br>
+            • Tehsil ya district add karein (e.g. "Mendori Raisen")<br>
+            • Nearest town ka naam try karein
+          </div>`;
+          placeResults.style.display = "block";
+          return;
+        }
+        renderResults(data2);
         return;
       }
-      placeResults.innerHTML = data.map((item: any, i: number) => {
-        const display = item.display_name.split(",").slice(0, 3).join(", ");
-        return `<div class="place-result-item" data-i="${i}" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${display}"
-          style="padding:8px 12px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid #E8C89A;color:#3a1a00;"
-          onmouseover="this.style.background='#FFF0DC'" onmouseout="this.style.background=''">${display}</div>`;
-      }).join("");
-      placeResults.style.display = "block";
-      placeResults.querySelectorAll(".place-result-item").forEach((el) => {
-        el.addEventListener("click", () => {
-          const lat = parseFloat((el as HTMLElement).dataset.lat!);
-          const lon = parseFloat((el as HTMLElement).dataset.lon!);
-          const name = (el as HTMLElement).dataset.name!;
-          latInput.value = lat.toFixed(6);
-          lonInput.value = lon.toFixed(6);
-          placeSearchInput.value = name;
-          placeResults.style.display = "none";
-          placeConfirmed.textContent = `✓ ${name} (${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E)`;
-          placeConfirmed.style.display = "block";
-        });
-      });
+      renderResults(data);
     } catch (err) {
-      placeResults.innerHTML = `<div style="padding:8px;color:#cc0000;font-size:0.82rem;">Search failed. Enter coordinates manually.</div>`;
+      placeResults.innerHTML = `<div style="padding:8px;color:#cc0000;font-size:0.82rem;">Search failed. Manually latitude/longitude fill karein.</div>`;
       placeResults.style.display = "block";
     } finally {
       btnSearchPlace.textContent = "🔍";
       btnSearchPlace.removeAttribute("disabled");
     }
+  }
+
+  function renderResults(data: any[]) {
+    placeResults.innerHTML = data.map((item: any, i: number) => {
+      // Build a meaningful label: village/town + district + state
+      const a = item.address || {};
+      const parts: string[] = [];
+      // Primary name: village, hamlet, suburb, town, city (whichever exists)
+      const primary = a.village || a.hamlet || a.suburb || a.town || a.city || a.municipality || item.display_name.split(",")[0];
+      const district = a.county || a.district || a.state_district || "";
+      const state = a.state || "";
+      if (primary) parts.push(primary.trim());
+      if (district && district !== primary) parts.push(district.trim());
+      if (state) parts.push(state.trim());
+      const display = parts.length >= 2 ? parts.join(", ") : item.display_name.split(",").slice(0, 4).join(", ");
+      return `<div class="place-result-item" data-i="${i}" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${display}"
+        style="padding:8px 12px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid #E8C89A;color:#3a1a00;"
+        onmouseover="this.style.background='#FFF0DC'" onmouseout="this.style.background=''">${display}</div>`;
+    }).join("");
+    placeResults.style.display = "block";
+    placeResults.querySelectorAll(".place-result-item").forEach((el) => {
+      el.addEventListener("click", () => {
+        const lat = parseFloat((el as HTMLElement).dataset.lat!);
+        const lon = parseFloat((el as HTMLElement).dataset.lon!);
+        const name = (el as HTMLElement).dataset.name!;
+        latInput.value = lat.toFixed(6);
+        lonInput.value = lon.toFixed(6);
+        placeSearchInput.value = name;
+        placeResults.style.display = "none";
+        placeConfirmed.textContent = `✓ ${name} (${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E)`;
+        placeConfirmed.style.display = "block";
+      });
+    });
   }
 
   btnSearchPlace.addEventListener("click", (e) => { e.preventDefault(); searchPlace(); });
