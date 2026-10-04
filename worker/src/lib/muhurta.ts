@@ -80,6 +80,99 @@ export function getActiveHora(windows: HoraWindow[], now: Date): HoraWindow | nu
   return windows.find((w) => t >= w.start.getTime() && t < w.end.getTime()) ?? null;
 }
 
+/** 1-based index of the active hora within the 24-hora day (1 = first hora from sunrise). */
+export function getHoraNumber(windows: HoraWindow[], activeHora: HoraWindow | null): number | null {
+  if (!activeHora) return null;
+  const idx = windows.indexOf(activeHora);
+  return idx === -1 ? null : idx + 1;
+}
+
+/**
+ * Classical hora quality per lord.
+ * Source: Muhurta Chintamani (Hora Prakarana); B.V. Raman's "Muhurta"
+ *
+ * Benefic:  Jupiter, Venus, Moon, Mercury
+ * Neutral:  Sun (royal/powerful; not inherently inauspicious)
+ * Malefic:  Mars, Saturn
+ *
+ * Purpose-specific overrides (Muhurta Chintamani):
+ *  - Property/Land: Saturn hora acceptable (Saturn governs property, land)
+ *  - Medical:       Sun hora auspicious (Sun = vitality, healing)
+ *  - Litigation:    Mars hora sometimes recommended (aggression/victory)
+ */
+export const HORA_NATURE: Record<string, "benefic" | "neutral" | "malefic"> = {
+  Jupiter: "benefic",
+  Venus:   "benefic",
+  Moon:    "benefic",
+  Mercury: "benefic",
+  Sun:     "neutral",
+  Mars:    "malefic",
+  Saturn:  "malefic",
+};
+
+/**
+ * Purpose-specific recommended hora lords.
+ * Source: Muhurta Chintamani; Brihat Parashara Hora Shastra (Muhurta adhyaya)
+ */
+const HORA_PURPOSE_RECOMMENDED: Record<string, string[]> = {
+  property:  ["Jupiter", "Venus", "Mercury", "Saturn"], // Saturn governs land (BPHS)
+  marriage:  ["Jupiter", "Venus", "Moon"],
+  business:  ["Mercury", "Jupiter", "Venus"],
+  medical:   ["Sun", "Jupiter", "Moon"],              // Sun = vitality; Jupiter = physicians
+  travel:    ["Mercury", "Jupiter", "Moon"],
+  education: ["Mercury", "Jupiter"],
+  general:   ["Jupiter", "Venus", "Mercury", "Moon"],
+  ivf:       ["Moon", "Jupiter", "Venus"],
+};
+
+export interface HoraQualityResult {
+  nature: "benefic" | "neutral" | "malefic";
+  recommended_for_purpose: boolean;
+  note: string;
+}
+
+/**
+ * Returns quality of the given hora lord for the current purpose.
+ * Source: Muhurta Chintamani; BPHS
+ */
+export function getHoraQuality(lord: string, purpose = "general"): HoraQualityResult {
+  const nature = HORA_NATURE[lord] ?? "neutral";
+  const purposeKey = purpose.toLowerCase();
+  const recommended = HORA_PURPOSE_RECOMMENDED[purposeKey] ?? HORA_PURPOSE_RECOMMENDED["general"]!;
+  const recommended_for_purpose = recommended.includes(lord);
+  const note = recommended_for_purpose
+    ? `${lord} hora is recommended for ${purpose} purposes.`
+    : nature === "malefic"
+    ? `${lord} hora is generally inauspicious. Prefer Jupiter, Venus, or Moon hora.`
+    : `${lord} hora is ${nature} but not specifically recommended for ${purpose}.`;
+  return { nature, recommended_for_purpose, note };
+}
+
+/**
+ * Returns the next hora window after 'now' (i.e., the hora starting after the active one ends).
+ */
+export function getNextHora(windows: HoraWindow[], now: Date): HoraWindow | null {
+  const t = now.getTime();
+  // Find first hora whose start is strictly after now
+  return windows.find((w) => w.start.getTime() > t) ?? null;
+}
+
+/**
+ * Returns the next hora that is recommended for the given purpose,
+ * starting from the hora AFTER the currently active one.
+ * Source: Muhurta Chintamani (recommended hora by purpose)
+ */
+export function getNextGoodHora(windows: HoraWindow[], now: Date, purpose = "general"): (HoraWindow & { quality: HoraQualityResult }) | null {
+  const t = now.getTime();
+  const purposeKey = purpose.toLowerCase();
+  const recommended = HORA_PURPOSE_RECOMMENDED[purposeKey] ?? HORA_PURPOSE_RECOMMENDED["general"]!;
+  // Skip current hora (start <= now) — look only at future horas
+  const future = windows.filter((w) => w.start.getTime() > t);
+  const good = future.find((w) => recommended.includes(w.lord));
+  if (!good) return null;
+  return { ...good, quality: getHoraQuality(good.lord, purpose) };
+}
+
 export interface Uphora {
   sub: string;
   start: Date;

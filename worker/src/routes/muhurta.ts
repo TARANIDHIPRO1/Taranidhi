@@ -25,6 +25,11 @@ import { trueSiderealLongitude, realSunriseSunset, julianDayFromUtc, buildRealCh
 import {
   buildHoraWindows,
   getActiveHora,
+  getHoraNumber,
+  getHoraQuality,
+  getNextHora,
+  getNextGoodHora,
+  HORA_NATURE,
   buildUphoras,
   getActiveUphora,
   getRahuKaal,
@@ -159,6 +164,10 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const { sunrise, sunset, nextSunrise } = realSunriseSunset(now, lat, lon);
   const horaWindows = buildHoraWindows(sunrise, sunset, nextSunrise, now);
   const activeHora = getActiveHora(horaWindows, now);
+  const horaNumber = getHoraNumber(horaWindows, activeHora);
+  const horaQuality = activeHora ? getHoraQuality(activeHora.lord, purpose) : null;
+  const nextHora = getNextHora(horaWindows, now);
+  const nextGoodHora = getNextGoodHora(horaWindows, now, purpose);
   const activeUphora = activeHora ? getActiveUphora(buildUphoras(activeHora), now) : null;
 
   const rahuKaal = getRahuKaal(sunrise, sunset, now.getUTCDay());
@@ -266,8 +275,41 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
     sunrise: sunrise.toISOString(),
     sunset: sunset.toISOString(),
     active_hora: activeHora
-      ? { lord: activeHora.lord, start: activeHora.start.toISOString(), end: activeHora.end.toISOString(), is_daytime: activeHora.isDaytime }
+      ? {
+          lord: activeHora.lord,
+          hora_number: horaNumber,        // 1-24 within the day
+          start: activeHora.start.toISOString(),
+          end: activeHora.end.toISOString(),
+          is_daytime: activeHora.isDaytime,
+          quality: horaQuality,            // nature + purpose recommendation
+        }
       : null,
+    next_hora: nextHora
+      ? {
+          lord: nextHora.lord,
+          starts_at: nextHora.start.toISOString(),
+          ends_at: nextHora.end.toISOString(),
+          is_daytime: nextHora.isDaytime,
+          quality: getHoraQuality(nextHora.lord, purpose),
+        }
+      : null,
+    next_good_hora: nextGoodHora
+      ? {
+          lord: nextGoodHora.lord,
+          starts_at: nextGoodHora.start.toISOString(),
+          ends_at: nextGoodHora.end.toISOString(),
+          is_daytime: nextGoodHora.isDaytime,
+          quality: nextGoodHora.quality,
+        }
+      : null,
+    all_horas: horaWindows.map((w, i) => ({
+      hora_number: i + 1,
+      lord: w.lord,
+      start: w.start.toISOString(),
+      end: w.end.toISOString(),
+      is_daytime: w.isDaytime,
+      nature: HORA_NATURE[w.lord] ?? "neutral",
+    })),
     active_uphora: activeUphora
       ? { sub: activeUphora.sub, start: activeUphora.start.toISOString(), end: activeUphora.end.toISOString() }
       : null,
