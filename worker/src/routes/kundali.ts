@@ -33,6 +33,7 @@ interface CreateKundaliBody {
 }
 
 export async function handleCreateKundali(request: Request, env: Env): Promise<Response> {
+  try {
   const auth = await requireAuth(request, env);
   if (!auth) return unauthorized();
 
@@ -122,6 +123,14 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
     },
     201
   );
+  } catch (err: any) {
+    console.error("[handleCreateKundali] unhandled error:", err?.message ?? err);
+    return errorJson(
+      `Server error: ${err?.message ?? "unknown"}`,
+      500,
+      "INTERNAL_ERROR"
+    );
+  }
 }
 
 export async function handleListKundalis(request: Request, env: Env): Promise<Response> {
