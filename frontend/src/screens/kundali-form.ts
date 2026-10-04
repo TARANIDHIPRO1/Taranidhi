@@ -132,9 +132,8 @@ export async function renderKundaliForm(): Promise<void> {
   const btnCancel = document.getElementById("btn-cancel")!;
   const errorBox = document.getElementById("error-box")!;
 
-  // Set today as default birth date
-  const today = new Date().toISOString().split("T")[0];
-  dateInput.value = today;
+  // Birth date: NO default — user must enter actual birth date
+  // (Previously set to today by mistake — caused wrong kundali)
 
   // Pre-fill location from cache
   const cached = getCachedLocation();
