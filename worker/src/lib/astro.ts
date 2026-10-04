@@ -191,8 +191,8 @@ export function buildRealChart(birthUtc: Date, latitudeDeg: number, longitudeDeg
 
 // ── Vimshottari Dasha ──
 // Ported as-is from the Floot prototype (helpers/realChart.tsx).
-const DASHA_SEQ = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
-const DASHA_YEARS: Record<string, number> = {
+export const DASHA_SEQ = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+export const DASHA_YEARS: Record<string, number> = {
   Ketu: 7,
   Venus: 20,
   Sun: 6,

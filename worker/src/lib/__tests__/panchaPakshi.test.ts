@@ -3,6 +3,7 @@
  * Verified against Astro-Vision system
  */
 
+import { describe, it, expect } from 'vitest';
 import {
   getBirthPakshi,
   calculateYama,

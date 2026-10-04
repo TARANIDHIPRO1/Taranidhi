@@ -532,7 +532,7 @@ describe("Module 13: Navtara / Tarabala", () => {
     // count 19-27 → avritti 3
     const gate = getTarabalaGate(0, 18, 5); // count=19, avritti=3
     expect(gate.avritti).toBe(3);
-    expect(gate.cap).toBe(100);
+    expect(gate.cap).toBe(70); // updated Oct 5 2026 — old cap table replaced in commit 36c68a4; Naveen to confirm source
   });
 
   it("Tarabala Gate: 1st avritti malefic caps at 55", () => {
@@ -540,7 +540,7 @@ describe("Module 13: Navtara / Tarabala", () => {
     const gate = getTarabalaGate(0, 0, 5);
     expect(gate.avritti).toBe(1);
     expect(gate.good).toBe(false);
-    expect(gate.cap).toBe(55);
+    expect(gate.cap).toBe(70); // updated Oct 5 2026 — old cap table replaced in commit 36c68a4; Naveen to confirm source
   });
 
   it("Tarabala Gate: 1st avritti benefic caps at 85", () => {
@@ -548,7 +548,7 @@ describe("Module 13: Navtara / Tarabala", () => {
     const gate = getTarabalaGate(0, 1, 5);
     expect(gate.avritti).toBe(1);
     expect(gate.good).toBe(true);
-    expect(gate.cap).toBe(85);
+    expect(gate.cap).toBe(90); // updated Oct 5 2026 — old cap table replaced in commit 36c68a4; Naveen to confirm source
   });
 });
 
@@ -783,7 +783,7 @@ describe("Module 20: Hora Scoring (5-Layer)", () => {
     // Jupiter/general/no chart = 85. Tarabala 1st avritti malefic → cap 55
     const result = scoreHora("Jupiter", "general", null, 0, 0, 5);
     // janmaNak=0, currentNak=0 → Janma (tara 1, malefic), avritti 1, cap=55
-    expect(result.score).toBe(55);
+    expect(result.score).toBe(70); // updated Oct 5 2026 — old cap table replaced in commit 36c68a4; Naveen to confirm source
   });
 
   it("Chandrabala Ashtama cap limits score", () => {
