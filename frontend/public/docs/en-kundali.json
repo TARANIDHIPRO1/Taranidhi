@@ -1,0 +1,109 @@
+{
+  "page.title": "Birth Chart (Kundali)",
+  "page.description": "View your complete Vedic birth chart with planetary positions, houses, and yogas",
+
+  "section.chart": "Birth Chart",
+  "section.planets": "Planets (Grahas)",
+  "section.houses": "Houses (Bhavas)",
+  "section.nakshatras": "Nakshatras (Star Constellations)",
+  "section.doshas": "Doshas (Afflictions)",
+  "section.yogas": "Yogas (Planetary Combinations)",
+  "section.dasha": "Dasha (Planetary Periods)",
+  "section.analysis": "Chart Analysis",
+
+  "label.ascendant": "Ascendant (Lagna)",
+  "label.sunSign": "Sun Sign",
+  "label.moonSign": "Moon Sign",
+  "label.mercury": "Mercury",
+  "label.venus": "Venus",
+  "label.mars": "Mars",
+  "label.jupiter": "Jupiter",
+  "label.saturn": "Saturn",
+  "label.rahu": "Rahu",
+  "label.ketu": "Ketu",
+
+  "label.degree": "Degree",
+  "label.sign": "Sign (Rashi)",
+  "label.nakshatra": "Nakshatra",
+  "label.nakshataraLord": "Nakshatra Lord",
+  "label.subLord": "Sub-Lord",
+  "label.house": "House",
+  "label.aspect": "Aspect",
+  "label.strength": "Strength",
+
+  "button.generate": "Generate Chart",
+  "button.calculateDasha": "Calculate Dasha",
+  "button.viewAnalysis": "View Full Analysis",
+  "button.printChart": "Print Chart",
+  "button.compareCharts": "Compare Charts",
+  "button.downloadPDF": "Download PDF",
+  "button.shareChart": "Share Chart",
+
+  "doshaType.mangal": "Mangal Dosha",
+  "doshaType.pitra": "Pitra Dosha",
+  "doshaType.kaalsarp": "Kaalsarp Dosha",
+  "doshaType.nadi": "Nadi Dosha",
+
+  "doshaDescription.mangal": "Mars affliction affecting marriage timing",
+  "doshaDescription.pitra": "Ancestral debt requiring remedies",
+  "doshaDescription.kaalsarp": "Both nodes on axis indicating karmic patterns",
+  "doshaDescription.nadi": "Incompatibility due to nakshatra match",
+
+  "yogaType.rajyoga": "Rajyoga",
+  "yogaType.daridrayoga": "Daridra Yoga",
+  "yogaType.panch": "Panch Mahapurusha Yoga",
+  "yogaType.gajkesari": "Gaj Kesari Yoga",
+  "yogaType.chandra": "Chandra Mangal Yoga",
+
+  "message.noChart": "No chart data available. Please generate a chart first.",
+  "message.loadingChart": "Generating chart... Please wait.",
+  "message.chartReady": "Chart generated successfully",
+  "message.invalidData": "Invalid birth data. Please check date, time, and location.",
+  "message.timeMissing": "Exact birth time not available. Chart may be approximate.",
+
+  "tooltip.ascendant": "The rising sign at your birth moment, represents your personality and appearance",
+  "tooltip.nakshatra": "One of 27 lunar mansions, refines your Moon sign characteristics",
+  "tooltip.dosha": "Planetary affliction that may require remedies or lifestyle adjustments",
+  "tooltip.dasha": "Planetary period governing life events, changes every few years",
+  "tooltip.subLord": "Sub-division of nakshatra, refines timing and prediction accuracy",
+
+  "chart.rashiTable": "Rashi Chart (Sign Positions)",
+  "chart.navamshaTable": "Navamsha Chart (9-fold Division)",
+  "chart.dashaTable": "Dasha Periods",
+  "chart.transits": "Current Transits",
+
+  "accuracy.high": "High accuracy - Exact birth time provided",
+  "accuracy.medium": "Medium accuracy - Birth time estimated within ±30 minutes",
+  "accuracy.low": "Low accuracy - Birth time approximate only",
+
+  "analysis.strengths": "Strengths in Your Chart",
+  "analysis.challenges": "Challenges & Growth Areas",
+  "analysis.timing": "Timing of Life Events",
+  "analysis.remedies": "Suggested Remedies",
+
+  "error.invalidEmail": "Invalid email for chart sharing",
+  "error.chartGenerationFailed": "Failed to generate chart. Please try again.",
+  "error.serverError": "Server error. Please contact support.",
+
+  "info.dashaYears": "Current Dasha: {{planet}} - {{years}} years",
+  "info.nextDasha": "Next Dasha: {{planet}} - {{years}} years",
+  "info.dashaChange": "Dasha changes on {{date}}",
+
+  "instruction.selectBirthData": "Enter your birth date, time, and location above to generate your chart",
+  "instruction.interpretChart": "Consult an astrologer for detailed interpretation of your chart",
+
+  "term.graha": "Graha (Planet)",
+  "term.rashi": "Rashi (Sign)",
+  "term.bhava": "Bhava (House)",
+  "term.chakra": "Chakra (Division)",
+  "term.yoga": "Yoga (Combination)",
+  "term.dasha": "Dasha (Period)",
+
+  "export.pdf": "Download as PDF",
+  "export.image": "Download as Image",
+  "export.text": "Download as Text",
+
+  "share.email": "Share via Email",
+  "share.whatsapp": "Share via WhatsApp",
+  "share.copyLink": "Copy Chart Link"
+}

@@ -1,0 +1,90 @@
+{
+  "page.title": "प्रशासन पैनल",
+  "page.description": "उपयोगकर्ता प्रबंधन, क्वेरी लॉग, सिस्टम सेटिंग्स, और ऑडिट ट्रेल",
+
+  "section.userManagement": "उपयोगकर्ता प्रबंधन",
+  "section.queryLogs": "क्वेरी लॉग",
+  "section.statistics": "आंकड़े",
+  "section.systemSettings": "सिस्टम सेटिंग्स",
+  "section.auditTrail": "ऑडिट ट्रेल",
+
+  "userAction.deactivate": "उपयोगकर्ता को निष्क्रिय करें",
+  "userAction.upgradeTier": "स्तर अपग्रेड करें",
+  "userAction.resetPassword": "पासवर्ड रीसेट करें",
+  "userAction.addCredits": "क्रेडिट जोड़ें",
+
+  "setting.smsGateway": "एसएमएस गेटवे कॉन्फ़िगरेशन",
+  "setting.razorpay": "रेज़रपे कुंजियां",
+  "setting.domain": "फ्रंटएंड डोमेन",
+  "setting.emailServer": "ईमेल सर्वर",
+
+  "button.saveSettings": "सेटिंग्स सहेजें",
+  "button.testConnection": "कनेक्शन परीक्षण करें",
+  "button.exportData": "डेटा निर्यात करें",
+
+  "message.settingsSaved": "सेटिंग्स सफलतापूर्वक सहेजी गईं",
+  "message.connectionFailed": "कनेक्शन परीक्षण विफल",
+
+  "table.userId": "उपयोगकर्ता आईडी",
+  "table.userName": "उपयोगकर्ता नाम",
+  "table.email": "ईमेल",
+  "table.tier": "स्तर",
+  "table.status": "स्थिति",
+  "table.joinDate": "शामिल होने की तारीख",
+  "table.lastActive": "आखिरी सक्रिय",
+
+  "stat.queriesThisMonth": "इस महीने की क्वेरीज",
+  "stat.creditBalance": "क्रेडिट शेष",
+  "stat.tierStatus": "स्तर स्थिति",
+  "stat.nextResetDate": "अगली रीसेट तारीख",
+
+  "stat.queries24h": "क्वेरीज (24 घंटे)",
+  "stat.activeUsers": "सक्रिय उपयोगकर्ता",
+  "stat.revenue": "राजस्व (अनुमानित)",
+  "stat.conversionRate": "रूपांतरण दर",
+
+  "filter.queryType": "क्वेरी प्रकार के आधार पर फ़िल्टर करें",
+  "filter.userId": "उपयोगकर्ता आईडी के आधार पर फ़िल्टर करें",
+  "filter.dateRange": "तारीख सीमा के आधार पर फ़िल्टर करें",
+
+  "search.placeholder": "लॉग खोजें...",
+  "search.noResults": "कोई परिणाम नहीं मिला",
+
+  "tier.basic": "बेसिक स्तर",
+  "tier.premium": "प्रीमियम स्तर",
+  "tier.ultra": "अल्ट्रा स्तर",
+
+  "action.deactivate": "निष्क्रिय करें",
+  "action.upgrade": "अपग्रेड करें",
+  "action.viewDetails": "विवरण देखें",
+  "action.export": "निर्यात करें",
+
+  "confirm.deactivateUser": "क्या आप सुनिश्चित हैं कि आप इस उपयोगकर्ता को निष्क्रिय करना चाहते हैं?",
+  "confirm.upgradeTier": "{{tier}} में स्तर अपग्रेड की पुष्टि करें?",
+
+  "activity.queryCount": "क्वेरी गणना",
+  "activity.topActivities": "शीर्ष गतिविधियां (24 घंटे)",
+  "activity.systemHealth": "सिस्टम स्वास्थ्य",
+
+  "health.status": "स्थिति",
+  "health.d1Database": "D1 डेटाबेस",
+  "health.kvStorage": "केवी स्टोरेज",
+  "health.errorRate": "त्रुटि दर (24 घंटे)",
+  "health.rateLimitEvents": "दर सीमा घटनाएं (24 घंटे)",
+
+  "audit.action": "कार्रवाई",
+  "audit.admin": "प्रशासक",
+  "audit.entity": "इकाई",
+  "audit.timestamp": "समय मुहर",
+  "audit.details": "विवरण",
+
+  "audit.userDeactivated": "उपयोगकर्ता निष्क्रिय किया गया",
+  "audit.tierUpgraded": "स्तर अपग्रेड किया गया",
+  "audit.settingsUpdated": "सेटिंग्स अपडेट की गईं",
+  "audit.passwordReset": "पासवर्ड रीसेट किया गया",
+
+  "error.unauthorized": "आपको प्रशासक पहुंच नहीं है",
+  "error.invalidTier": "अमान्य स्तर निर्दिष्ट",
+  "error.userNotFound": "उपयोगकर्ता नहीं मिला",
+  "error.settingsFailed": "सेटिंग्स सहेजने में विफल"
+}

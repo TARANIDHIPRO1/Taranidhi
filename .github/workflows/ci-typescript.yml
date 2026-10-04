@@ -1,0 +1,17 @@
+name: TypeScript Validation
+
+on: [push, pull_request]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: cd worker && npm install && npx tsc --noEmit
+      - run: cd frontend && npm install && npx tsc --noEmit
+      - name: Alert on failure
+        if: failure()
+        run: echo "❌ TYPECHECK FAILED. Push blocked. Fix and retry."

@@ -1,0 +1,90 @@
+{
+  "page.title": "Admin Panel",
+  "page.description": "User management, query logs, system settings, and audit trail",
+
+  "section.userManagement": "User Management",
+  "section.queryLogs": "Query Logs",
+  "section.statistics": "Statistics",
+  "section.systemSettings": "System Settings",
+  "section.auditTrail": "Audit Trail",
+
+  "userAction.deactivate": "Deactivate User",
+  "userAction.upgradeTier": "Upgrade Tier",
+  "userAction.resetPassword": "Reset Password",
+  "userAction.addCredits": "Add Credits",
+
+  "setting.smsGateway": "SMS Gateway Configuration",
+  "setting.razorpay": "Razorpay Keys",
+  "setting.domain": "Frontend Domain",
+  "setting.emailServer": "Email Server",
+
+  "button.saveSettings": "Save Settings",
+  "button.testConnection": "Test Connection",
+  "button.exportData": "Export Data",
+
+  "message.settingsSaved": "Settings saved successfully",
+  "message.connectionFailed": "Connection test failed",
+
+  "table.userId": "User ID",
+  "table.userName": "User Name",
+  "table.email": "Email",
+  "table.tier": "Tier",
+  "table.status": "Status",
+  "table.joinDate": "Join Date",
+  "table.lastActive": "Last Active",
+
+  "stat.queriesThisMonth": "Queries This Month",
+  "stat.creditBalance": "Credit Balance",
+  "stat.tierStatus": "Tier Status",
+  "stat.nextResetDate": "Next Reset Date",
+
+  "stat.queries24h": "Queries (24h)",
+  "stat.activeUsers": "Active Users",
+  "stat.revenue": "Revenue (Est.)",
+  "stat.conversionRate": "Conversion Rate",
+
+  "filter.queryType": "Filter by Query Type",
+  "filter.userId": "Filter by User ID",
+  "filter.dateRange": "Filter by Date Range",
+
+  "search.placeholder": "Search logs...",
+  "search.noResults": "No results found",
+
+  "tier.basic": "Basic Tier",
+  "tier.premium": "Premium Tier",
+  "tier.ultra": "Ultra Tier",
+
+  "action.deactivate": "Deactivate",
+  "action.upgrade": "Upgrade",
+  "action.viewDetails": "View Details",
+  "action.export": "Export",
+
+  "confirm.deactivateUser": "Are you sure you want to deactivate this user?",
+  "confirm.upgradeTier": "Confirm tier upgrade to {{tier}}?",
+
+  "activity.queryCount": "Query Count",
+  "activity.topActivities": "Top Activities (24h)",
+  "activity.systemHealth": "System Health",
+
+  "health.status": "Status",
+  "health.d1Database": "D1 Database",
+  "health.kvStorage": "KV Storage",
+  "health.errorRate": "Error Rate (24h)",
+  "health.rateLimitEvents": "Rate Limit Events (24h)",
+
+  "audit.action": "Action",
+  "audit.admin": "Admin",
+  "audit.entity": "Entity",
+  "audit.timestamp": "Timestamp",
+  "audit.details": "Details",
+
+  "audit.userDeactivated": "User deactivated",
+  "audit.tierUpgraded": "Tier upgraded",
+  "audit.settingsUpdated": "Settings updated",
+  "audit.passwordReset": "Password reset",
+
+  "error.unauthorized": "You do not have admin access",
+  "error.invalidTier": "Invalid tier specified",
+  "error.userNotFound": "User not found",
+  "error.settingsFailed": "Failed to save settings"
+}

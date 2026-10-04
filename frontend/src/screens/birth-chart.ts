@@ -317,10 +317,10 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
 
       <!-- Header -->
       <header class="kc-header">
-        <button class="kc-back" id="btn-back">←</button>
+        <button class="kc-back" id="btn-back" title="Go back">←</button>
         <div class="kc-title">
           <span class="kc-name">${kundali.label ?? "Kundali #" + kundali.id}</span>
-          <span class="kc-sub">Birth Chart</span>
+          <span class="kc-sub" data-i18n="nav.kundali">Birth Chart</span>
         </div>
         <button class="kc-delete" id="btn-delete" title="Delete chart">🗑</button>
       </header>
@@ -349,8 +349,8 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
 
       <!-- Chart Toggle -->
       <div class="kc-chart-toggle">
-        <button class="kc-toggle active" id="btn-ni">North Indian</button>
-        <button class="kc-toggle" id="btn-si">South Indian</button>
+        <button class="kc-toggle active" id="btn-ni" data-i18n="chart.northIndian">North Indian</button>
+        <button class="kc-toggle" id="btn-si" data-i18n="chart.southIndian">South Indian</button>
       </div>
 
       <!-- North Indian Chart -->

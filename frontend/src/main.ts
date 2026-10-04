@@ -9,6 +9,7 @@
 import { Router } from "./router";
 import { navigate } from "./router";
 import { showToast } from "./dom";
+import { initI18n, toggleLanguage, translateDOM } from "./i18n";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Global Error Handling
@@ -135,22 +136,36 @@ async function initApp(): Promise<void> {
   // Initialize theme
   initTheme();
 
+  // Initialize i18n (translations)
+  await initI18n();
+
   // Register Service Worker (non-blocking)
   registerServiceWorker();
 
-  // Expose theme toggle globally (optional, for dev/debug)
+  // Expose toggles globally (optional, for dev/debug)
   (window as any).toggleTheme = toggleTheme;
+  (window as any).toggleLanguage = toggleLanguage;
 
   // Initialize router
   const router = new Router();
 
   // Handle route changes
-  window.addEventListener("hashchange", () => {
-    router.route();
+  window.addEventListener("hashchange", async () => {
+    await router.route();
+    // Translate DOM after route change
+    translateDOM();
+  });
+
+  // Listen for language changes
+  window.addEventListener("i18n-language-changed", () => {
+    // Re-translate DOM when language changes
+    translateDOM();
   });
 
   // Initial route
   await router.route();
+  // Translate initial DOM
+  translateDOM();
 
   console.log("OccultViision PWA initialized");
 }
