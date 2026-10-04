@@ -697,8 +697,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #1e1e2e;
-  background: #0a0a0f;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -714,13 +714,13 @@
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 4px;
-  color: #e8e8f0;
+  color: var(--color-text);
 }
 
 .ti-brand-tag {
   font-size: 0.55rem;
   letter-spacing: 3px;
-  color: #a78bfa;
+  color: var(--color-secondary);
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -753,10 +753,10 @@
 
 .ti-theme-toggle {
   background: none;
-  border: 1px solid #2a2a3e;
-  color: #6b6b80;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   font-size: 1rem;
-  padding: 4px 8px;
+  padding: var(--space-3);
   border-radius: 6px;
   cursor: pointer;
   font-family: inherit;
@@ -764,47 +764,57 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  min-height: 32px;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .ti-theme-toggle:hover {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .ti-lang-toggle {
   background: none;
-  border: 1px solid #2a2a3e;
-  color: #6b6b80;
-  font-size: 0.7rem;
-  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: 6px;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .ti-lang-toggle:hover {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .ti-logout {
   background: none;
-  border: 1px solid #2a2a3e;
-  color: #6b6b80;
-  font-size: 0.7rem;
-  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: 6px;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .ti-logout:hover {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ── LIVE STRIP ──────────────────────────────────────────────────────────── */

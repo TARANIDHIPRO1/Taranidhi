@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-6);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   border: none;
@@ -22,6 +22,8 @@
   white-space: nowrap;
   user-select: none;
   -webkit-user-select: none;
+  min-height: 44px;
+  display: flex;
 }
 
 .btn:disabled {
@@ -69,8 +71,9 @@
 
 /* Small */
 .btn-small {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-sm);
+  min-height: 44px;
 }
 
 /* Loading state */
@@ -401,10 +404,15 @@
   font-size: var(--font-size-lg);
   color: var(--color-primary);
   cursor: pointer;
-  padding: var(--space-2);
+  padding: var(--space-3);
   margin-right: var(--space-2);
   border-radius: var(--radius-md);
   transition: background-color var(--transition-fast);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-back:hover {
