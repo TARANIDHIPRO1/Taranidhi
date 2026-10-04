@@ -130,6 +130,11 @@ export const kpActivities = () => apiFetch("/kp/activities");
 
 // ── Wallet ──
 export const walletBalance = () => apiFetch("/wallet/balance");
+export const walletRecharge = (amountPaise: number) =>
+  apiFetch("/wallet/recharge", {
+    method: "POST",
+    body: JSON.stringify({ amount_paise: amountPaise }),
+  });
 
 // ── Referral ──
 export const referralCode = () => apiFetch("/referral/code");

@@ -9,8 +9,9 @@
 import { handleRequestOtp, handleVerifyOtp } from "./routes/auth";
 import { handleCreateKundali, handleListKundalis, handleGetKundali, handleDeleteKundali } from "./routes/kundali";
 import { handleMuhurtaNow } from "./routes/muhurta";
-import { handleGetBalance } from "./routes/wallet";
+import { handleGetBalance, handlePostRecharge } from "./routes/wallet";
 import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway } from "./routes/orders";
+import { handleRazorpayWebhook } from "./routes/webhooks";
 import { handleGetReferralCode, handleAttributeReferral } from "./routes/referral";
 import {
   handleListUsers,
@@ -143,6 +144,9 @@ export default {
     if (request.method === "GET" && pathname === "/wallet/balance") {
       return handleGetBalance(request, env);
     }
+    if (request.method === "POST" && pathname === "/wallet/recharge") {
+      return handlePostRecharge(request, env);
+    }
 
     if (request.method === "POST" && pathname === "/orders") {
       return handleCreateOrder(request, env);
@@ -205,6 +209,11 @@ export default {
     const knowledgeCacheDeleteMatch = /^\/knowledge\/cache\/([0-9a-f]{64})$/.exec(pathname);
     if (request.method === "DELETE" && knowledgeCacheDeleteMatch?.[1]) {
       return handleDeleteKnowledgeCacheEntry(request, env, knowledgeCacheDeleteMatch[1]);
+    }
+
+    // ── Webhook routes (no auth required, signature-verified) ──────────────────
+    if (request.method === "POST" && pathname === "/webhooks/razorpay") {
+      return handleRazorpayWebhook(request, env);
     }
 
     if (request.method === "POST" && pathname === "/api/log-error") {

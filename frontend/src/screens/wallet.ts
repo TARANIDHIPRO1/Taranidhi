@@ -6,7 +6,7 @@
 
 import { $app, clear, showToast } from "../dom";
 import { navigate } from "../router";
-import { walletBalance } from "../api";
+import { walletBalance, walletRecharge } from "../api";
 
 export async function renderWallet(): Promise<void> {
   const app = $app();
@@ -181,12 +181,86 @@ export async function renderWallet(): Promise<void> {
   btnRefresh.addEventListener("click", loadBalance);
 
   // Top-up button (opens Razorpay modal)
-  btnTopup.addEventListener("click", () => {
-    showToast("Opening payment gateway...", false);
-    // TODO: Wire up Razorpay modal here
-    // For now, just show a placeholder
-    navigate("/orders");
+  btnTopup.addEventListener("click", async () => {
+    // Ask user for topup amount via preset buttons or custom input
+    const topupAmountPaise = await showTopupModal();
+    if (!topupAmountPaise) {
+      return; // User cancelled
+    }
+
+    (btnTopup as HTMLButtonElement).disabled = true;
+    showToast("Initiating payment...", false);
+
+    try {
+      const res = await walletRecharge(topupAmountPaise);
+      if (res.ok && res.data) {
+        const { razorpay_order_id, key_id, points_on_success, amount_paise } = res.data;
+
+        // Check if Razorpay SDK is loaded
+        if (typeof (window as any).Razorpay === "undefined") {
+          showToast("Loading payment gateway...", false);
+          // Load Razorpay SDK
+          await new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = resolve;
+            document.head.appendChild(script);
+          });
+        }
+
+        // Open Razorpay checkout modal
+        const Razorpay = (window as any).Razorpay;
+        const razorpayOptions = {
+          key: key_id,
+          order_id: razorpay_order_id,
+          amount: amount_paise,
+          currency: "INR",
+          name: "OccultViision Kaalchakra Pro",
+          description: `Top up wallet with ${points_on_success} points`,
+          handler: async (response: any) => {
+            // After successful payment, user is redirected back
+            // The webhook will handle point granting
+            showToast("Payment successful! Points will be credited shortly.", true);
+            loadBalance();
+          },
+          prefill: {
+            // Can be customized with user info if available
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+
+        const checkout = new Razorpay(razorpayOptions);
+        checkout.open();
+      } else {
+        const error = res.data?.error || "Failed to initiate payment";
+        showToast(error, false);
+      }
+    } catch (error) {
+      console.error("Topup error:", error);
+      showToast("Error initiating payment. Please try again.", false);
+    } finally {
+      (btnTopup as HTMLButtonElement).disabled = false;
+    }
   });
+
+  // Helper: Show topup amount modal
+  async function showTopupModal(): Promise<number | null> {
+    const amountStr = prompt(
+      "Enter amount to top up (₹):\n\nMin: ₹1, Max: ₹5000\n\nPopular amounts: 100, 500, 1000, 2000, 5000",
+      "500"
+    );
+    if (!amountStr) return null;
+
+    const amount = Number(amountStr);
+    if (isNaN(amount) || amount < 1 || amount > 5000) {
+      showToast("Invalid amount. Please enter ₹1 to ₹5000.", false);
+      return null;
+    }
+
+    return amount * 100; // Convert rupees to paise
+  }
 
   // Initial load
   loadBalance();
