@@ -54,7 +54,23 @@ export async function renderKundaliForm(): Promise<void> {
         </div>
 
         <div class="form-group">
-          <label>Location</label>
+          <label>Place / City</label>
+          <div class="location-row">
+            <input
+              id="place-search"
+              type="text"
+              placeholder="e.g. Bhopal, Delhi, Mumbai"
+              style="flex: 1;"
+            />
+            <button type="button" class="btn btn-small" id="btn-search-place">🔍</button>
+            <button type="button" class="btn btn-small" id="btn-gps">📍</button>
+          </div>
+          <div id="place-results" style="display:none; margin-top:4px; background:#fff8ef; border:1px solid #E8C89A; border-radius:6px; max-height:160px; overflow-y:auto;"></div>
+          <div id="place-confirmed" style="display:none; margin-top:4px; font-size:0.78rem; color:#7a4800;"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Coordinates <span style="font-size:0.75rem; color:#7a4800;">(auto-filled from city search)</span></label>
           <div class="location-row">
             <input
               id="lat"
@@ -74,7 +90,6 @@ export async function renderKundaliForm(): Promise<void> {
               max="180"
               required
             />
-            <button type="button" class="btn btn-small" id="btn-gps">📍</button>
           </div>
         </div>
 
@@ -110,6 +125,10 @@ export async function renderKundaliForm(): Promise<void> {
   const lonInput = document.getElementById("lon") as HTMLInputElement;
   const tzInput = document.getElementById("timezone") as HTMLSelectElement;
   const btnGps = document.getElementById("btn-gps")!;
+  const btnSearchPlace = document.getElementById("btn-search-place")!;
+  const placeSearchInput = document.getElementById("place-search") as HTMLInputElement;
+  const placeResults = document.getElementById("place-results")!;
+  const placeConfirmed = document.getElementById("place-confirmed")!;
   const btnCancel = document.getElementById("btn-cancel")!;
   const errorBox = document.getElementById("error-box")!;
 
@@ -126,6 +145,55 @@ export async function renderKundaliForm(): Promise<void> {
 
   // Default timezone to India
   tzInput.value = "Asia/Kolkata";
+
+  // Place search via Nominatim (OpenStreetMap, no API key)
+  async function searchPlace() {
+    const query = placeSearchInput.value.trim();
+    if (!query) return;
+    btnSearchPlace.textContent = "⏳";
+    btnSearchPlace.setAttribute("disabled", "true");
+    placeResults.style.display = "none";
+    placeResults.innerHTML = "";
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`;
+      const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+      const data = await res.json();
+      if (!data.length) {
+        placeResults.innerHTML = `<div style="padding:8px;color:#7a4800;font-size:0.82rem;">No results found. Try a nearby city.</div>`;
+        placeResults.style.display = "block";
+        return;
+      }
+      placeResults.innerHTML = data.map((item: any, i: number) => {
+        const display = item.display_name.split(",").slice(0, 3).join(", ");
+        return `<div class="place-result-item" data-i="${i}" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${display}"
+          style="padding:8px 12px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid #E8C89A;color:#3a1a00;"
+          onmouseover="this.style.background='#FFF0DC'" onmouseout="this.style.background=''">${display}</div>`;
+      }).join("");
+      placeResults.style.display = "block";
+      placeResults.querySelectorAll(".place-result-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const lat = parseFloat((el as HTMLElement).dataset.lat!);
+          const lon = parseFloat((el as HTMLElement).dataset.lon!);
+          const name = (el as HTMLElement).dataset.name!;
+          latInput.value = lat.toFixed(6);
+          lonInput.value = lon.toFixed(6);
+          placeSearchInput.value = name;
+          placeResults.style.display = "none";
+          placeConfirmed.textContent = `✓ ${name} (${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E)`;
+          placeConfirmed.style.display = "block";
+        });
+      });
+    } catch (err) {
+      placeResults.innerHTML = `<div style="padding:8px;color:#cc0000;font-size:0.82rem;">Search failed. Enter coordinates manually.</div>`;
+      placeResults.style.display = "block";
+    } finally {
+      btnSearchPlace.textContent = "🔍";
+      btnSearchPlace.removeAttribute("disabled");
+    }
+  }
+
+  btnSearchPlace.addEventListener("click", (e) => { e.preventDefault(); searchPlace(); });
+  placeSearchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); searchPlace(); } });
 
   // GPS button
   btnGps.addEventListener("click", async (e) => {
