@@ -1,0 +1,109 @@
+{
+  "page.title": "कुंडली (जन्म पत्रिका)",
+  "page.description": "अपनी संपूर्ण वैदिक कुंडली देखें, ग्रहों की स्थिति, भावों और योगों के साथ",
+
+  "section.chart": "कुंडली",
+  "section.planets": "ग्रह (ग्रहा)",
+  "section.houses": "भाव (घर)",
+  "section.nakshatras": "नक्षत्र (तारामंडल)",
+  "section.doshas": "दोष (कष्ट)",
+  "section.yogas": "योग (ग्रह संयोजन)",
+  "section.dasha": "दशा (ग्रह अवधि)",
+  "section.analysis": "कुंडली विश्लेषण",
+
+  "label.ascendant": "लग्न (आरोही चिन्ह)",
+  "label.sunSign": "सूर्य राशि",
+  "label.moonSign": "चंद्र राशि",
+  "label.mercury": "बुध",
+  "label.venus": "शुक्र",
+  "label.mars": "मंगल",
+  "label.jupiter": "बृहस्पति",
+  "label.saturn": "शनि",
+  "label.rahu": "राहु",
+  "label.ketu": "केतु",
+
+  "label.degree": "डिग्री",
+  "label.sign": "राशि",
+  "label.nakshatra": "नक्षत्र",
+  "label.nakshataraLord": "नक्षत्र स्वामी",
+  "label.subLord": "अनुपति (सब-लॉर्ड)",
+  "label.house": "भाव",
+  "label.aspect": "दृष्टि (पहलू)",
+  "label.strength": "शक्ति",
+
+  "button.generate": "कुंडली बनाएं",
+  "button.calculateDasha": "दशा की गणना करें",
+  "button.viewAnalysis": "पूरा विश्लेषण देखें",
+  "button.printChart": "कुंडली प्रिंट करें",
+  "button.compareCharts": "कुंडलियों की तुलना करें",
+  "button.downloadPDF": "पीडीएफ डाउनलोड करें",
+  "button.shareChart": "कुंडली साझा करें",
+
+  "doshaType.mangal": "मंगल दोष",
+  "doshaType.pitra": "पितृ दोष",
+  "doshaType.kaalsarp": "कालसर्प दोष",
+  "doshaType.nadi": "नाड़ी दोष",
+
+  "doshaDescription.mangal": "विवाह समय को प्रभावित करने वाला मंगल कष्ट",
+  "doshaDescription.pitra": "पूर्वजों का कर्ज, उपचार की आवश्यकता है",
+  "doshaDescription.kaalsarp": "दोनों नोड्स अक्ष पर, कर्मिक पैटर्न दर्शाता है",
+  "doshaDescription.nadi": "नक्षत्र मेल के कारण असंगति",
+
+  "yogaType.rajyoga": "राज योग",
+  "yogaType.daridrayoga": "दरिद्र योग",
+  "yogaType.panch": "पंच महापुरुष योग",
+  "yogaType.gajkesari": "गज केसरी योग",
+  "yogaType.chandra": "चंद्र मंगल योग",
+
+  "message.noChart": "कोई कुंडली डेटा उपलब्ध नहीं है। पहले कुंडली बनाएं।",
+  "message.loadingChart": "कुंडली बना रहे हैं... कृपया प्रतीक्षा करें।",
+  "message.chartReady": "कुंडली सफलतापूर्वक बनाई गई",
+  "message.invalidData": "अमान्य जन्म डेटा। कृपया तारीख, समय और स्थान की जांच करें।",
+  "message.timeMissing": "सटीक जन्म समय उपलब्ध नहीं है। कुंडली अनुमानित हो सकती है।",
+
+  "tooltip.ascendant": "जन्म के समय उदित राशि, व्यक्तित्व और दिखावट का प्रतिनिधित्व करती है",
+  "tooltip.nakshatra": "27 चंद्र मंजिलों में से एक, चंद्र राशि की विशेषताओं को परिष्कृत करता है",
+  "tooltip.dosha": "ग्रह कष्ट जिसके लिए उपचार या जीवन शैली समायोजन की आवश्यकता हो सकती है",
+  "tooltip.dasha": "जीवन घटनाओं को नियंत्रित करने वाली ग्रह अवधि, हर कुछ वर्षों में बदलती है",
+  "tooltip.subLord": "नक्षत्र का उप-विभाजन, समय और भविष्यवाणी सटीकता को परिष्कृत करता है",
+
+  "chart.rashiTable": "राशि चक्र (राशि स्थितियां)",
+  "chart.navamshaTable": "नवांश चक्र (9-गुना विभाजन)",
+  "chart.dashaTable": "दशा अवधि",
+  "chart.transits": "वर्तमान ट्रांजिट",
+
+  "accuracy.high": "उच्च सटीकता - सटीक जन्म समय प्रदान किया गया",
+  "accuracy.medium": "मध्यम सटीकता - जन्म समय ±30 मिनट के भीतर अनुमानित",
+  "accuracy.low": "कम सटीकता - जन्म समय केवल अनुमानित",
+
+  "analysis.strengths": "आपकी कुंडली की शक्तियां",
+  "analysis.challenges": "चुनौतियां और विकास के क्षेत्र",
+  "analysis.timing": "जीवन घटनाओं का समय",
+  "analysis.remedies": "सुझाए गए उपचार",
+
+  "error.invalidEmail": "कुंडली साझा करने के लिए अमान्य ईमेल",
+  "error.chartGenerationFailed": "कुंडली बनाने में विफल। कृपया पुनः प्रयास करें।",
+  "error.serverError": "सर्वर त्रुटि। कृपया समर्थन से संपर्क करें।",
+
+  "info.dashaYears": "वर्तमान दशा: {{planet}} - {{years}} वर्ष",
+  "info.nextDasha": "अगली दशा: {{planet}} - {{years}} वर्ष",
+  "info.dashaChange": "दशा {{date}} को बदलेगी",
+
+  "instruction.selectBirthData": "अपनी कुंडली बनाने के लिए ऊपर अपनी जन्म तारीख, समय और स्थान दर्ज करें",
+  "instruction.interpretChart": "अपनी कुंडली की विस्तृत व्याख्या के लिए एक ज्योतिषी से परामर्श लें",
+
+  "term.graha": "ग्रह",
+  "term.rashi": "राशि",
+  "term.bhava": "भाव",
+  "term.chakra": "चक्र (विभाजन)",
+  "term.yoga": "योग (संयोजन)",
+  "term.dasha": "दशा (अवधि)",
+
+  "export.pdf": "पीडीएफ के रूप में डाउनलोड करें",
+  "export.image": "छवि के रूप में डाउनलोड करें",
+  "export.text": "पाठ के रूप में डाउनलोड करें",
+
+  "share.email": "ईमेल के माध्यम से साझा करें",
+  "share.whatsapp": "व्हाट्सएप के माध्यम से साझा करें",
+  "share.copyLink": "कुंडली लिंक कॉपी करें"
+}
