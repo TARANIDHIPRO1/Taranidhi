@@ -19,6 +19,11 @@ import {
   handleDeactivateUser,
   handleListQueryLogs,
   handleGetSummary,
+  handleUpgradeTier,
+  handleListQueryLogsFiltered,
+  handleGetSettings,
+  handleUpdateSettings,
+  handleGetAuditTrail,
 } from "./routes/admin";
 import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
@@ -171,10 +176,19 @@ export default {
       return handleListUsers(request, env);
     }
     if (request.method === "GET" && pathname === "/admin/query-logs") {
-      return handleListQueryLogs(request, env);
+      return handleListQueryLogsFiltered(request, env);
     }
     if (request.method === "GET" && (pathname === "/admin/summary" || pathname === "/admin/stats")) {
       return handleGetSummary(request, env);
+    }
+    if (request.method === "GET" && pathname === "/admin/settings") {
+      return handleGetSettings(request, env);
+    }
+    if (request.method === "POST" && pathname === "/admin/settings") {
+      return handleUpdateSettings(request, env);
+    }
+    if (request.method === "GET" && pathname === "/admin/audit-trail") {
+      return handleGetAuditTrail(request, env);
     }
     const adminUserMatch = /^\/admin\/users\/(\d+)$/.exec(pathname);
     if (request.method === "GET" && adminUserMatch) {
@@ -183,6 +197,10 @@ export default {
     const adminDeactivateMatch = /^\/admin\/users\/(\d+)\/deactivate$/.exec(pathname);
     if (request.method === "POST" && adminDeactivateMatch) {
       return handleDeactivateUser(request, env, Number(adminDeactivateMatch[1]));
+    }
+    const adminUpgradeTierMatch = /^\/admin\/users\/(\d+)\/upgrade-tier$/.exec(pathname);
+    if (request.method === "POST" && adminUpgradeTierMatch) {
+      return handleUpgradeTier(request, env, Number(adminUpgradeTierMatch[1]));
     }
 
     const kpChartMatch = /^\/kp\/chart\/(\d+)$/.exec(pathname);

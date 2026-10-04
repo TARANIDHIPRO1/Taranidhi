@@ -120,3 +120,136 @@ export async function handleGetSummary(request: Request, env: Env): Promise<Resp
     return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
   }
 }
+
+export async function handleUpgradeTier(request: Request, env: Env, userId: number): Promise<Response> {
+  try {
+    const adminId = await requireAdminAuth(request, env);
+    if (!adminId) return unauthorized();
+
+    const body = await request.json() as any;
+    const newTier = body?.tier;
+
+    if (!newTier || !["basic", "premium", "ultra"].includes(newTier)) {
+      return errorJson("Invalid tier. Must be one of: basic, premium, ultra", 400);
+    }
+
+    await env.DB.prepare("UPDATE users SET tier = ?, tier_upgraded_at = datetime('now') WHERE id = ?")
+      .bind(newTier, userId)
+      .run();
+
+    // Log audit trail
+    await env.DB.prepare(
+      "INSERT INTO audit_log (admin_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)"
+    )
+      .bind(adminId, "tier_upgrade", "user", userId, JSON.stringify({ new_tier: newTier }))
+      .run()
+      .catch(() => {}); // Fail silently if table doesn't exist
+
+    return json({ success: true, new_tier: newTier });
+  } catch (err: any) {
+    console.error("[handleUpgradeTier] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
+}
+
+export async function handleListQueryLogsFiltered(request: Request, env: Env): Promise<Response> {
+  try {
+    const userId = await requireAdminAuth(request, env);
+    if (!userId) return unauthorized();
+
+    const url = new URL(request.url);
+    const queryType = url.searchParams.get("query_type");
+    const userIdFilter = url.searchParams.get("user_id");
+    const limit = Math.min(parseInt(url.searchParams.get("limit") || "100"), 500);
+    const offset = parseInt(url.searchParams.get("offset") || "0");
+
+    let query = "SELECT id, user_id, query_type, verdict, confidence_pct, queried_at FROM query_logs WHERE 1=1";
+    const bindings: any[] = [];
+
+    if (queryType) {
+      query += " AND query_type = ?";
+      bindings.push(queryType);
+    }
+    if (userIdFilter) {
+      query += " AND user_id = ?";
+      bindings.push(parseInt(userIdFilter));
+    }
+
+    query += " ORDER BY queried_at DESC LIMIT ? OFFSET ?";
+    bindings.push(limit, offset);
+
+    const logs = await env.DB.prepare(query).bind(...bindings).all();
+    return json({ logs: logs.results || [], total: logs.results?.length || 0 });
+  } catch (err: any) {
+    console.error("[handleListQueryLogsFiltered] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
+}
+
+export async function handleGetSettings(request: Request, env: Env): Promise<Response> {
+  try {
+    const userId = await requireAdminAuth(request, env);
+    if (!userId) return unauthorized();
+
+    // Return current settings (read from environment)
+    const settings = {
+      sms_gateway_configured: !!(env as any).TWILIO_ACCOUNT_SID,
+      razorpay_configured: !!(env as any).RAZORPAY_KEY_ID,
+      frontend_domain: (env as any).FRONTEND_ORIGIN || "https://occultviision.com",
+    };
+
+    return json(settings);
+  } catch (err: any) {
+    console.error("[handleGetSettings] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
+}
+
+export async function handleUpdateSettings(request: Request, env: Env): Promise<Response> {
+  try {
+    const userId = await requireAdminAuth(request, env);
+    if (!userId) return unauthorized();
+
+    const body = await request.json() as any;
+
+    // NOTE: Actual setting updates would require environment variable management
+    // or a settings table in D1. This is a stub that logs the request.
+    console.log("[handleUpdateSettings] Admin", userId, "requested settings update:", body);
+
+    // Log audit trail
+    await env.DB.prepare(
+      "INSERT INTO audit_log (admin_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)"
+    )
+      .bind(userId, "settings_update", "system", 0, JSON.stringify(body))
+      .run()
+      .catch(() => {}); // Fail silently if table doesn't exist
+
+    return json({ success: true, message: "Settings update request logged. Requires manual Cloudflare deployment." });
+  } catch (err: any) {
+    console.error("[handleUpdateSettings] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
+}
+
+export async function handleGetAuditTrail(request: Request, env: Env): Promise<Response> {
+  try {
+    const userId = await requireAdminAuth(request, env);
+    if (!userId) return unauthorized();
+
+    const url = new URL(request.url);
+    const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 500);
+    const offset = parseInt(url.searchParams.get("offset") || "0");
+
+    const trail = await env.DB.prepare(
+      "SELECT id, admin_id, action, entity_type, entity_id, details, created_at FROM audit_log ORDER BY created_at DESC LIMIT ? OFFSET ?"
+    )
+      .bind(limit, offset)
+      .all()
+      .catch(() => ({ results: [] })); // Return empty if table doesn't exist
+
+    return json({ audit_trail: (trail as any).results || [] });
+  } catch (err: any) {
+    console.error("[handleGetAuditTrail] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
+}

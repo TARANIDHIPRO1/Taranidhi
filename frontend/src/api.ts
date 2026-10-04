@@ -141,6 +141,29 @@ export const referralCode = () => apiFetch("/referral/code");
 
 // ── Admin ──
 export const adminStats = () => apiFetch("/admin/stats");
+export const adminListUsers = () => apiFetch("/admin/users");
+export const adminGetUserDetail = (userId: number) => apiFetch(`/admin/users/${userId}`);
+export const adminDeactivateUser = (userId: number) =>
+  apiFetch(`/admin/users/${userId}/deactivate`, { method: "POST" });
+export const adminUpgradeTier = (userId: number, tier: string) =>
+  apiFetch(`/admin/users/${userId}/upgrade-tier`, { method: "POST", body: JSON.stringify({ tier }) });
+export const adminListQueryLogs = (filters?: { query_type?: string; user_id?: number; limit?: number; offset?: number }) => {
+  const params = new URLSearchParams();
+  if (filters?.query_type) params.set("query_type", filters.query_type);
+  if (filters?.user_id) params.set("user_id", String(filters.user_id));
+  if (filters?.limit) params.set("limit", String(filters.limit));
+  if (filters?.offset) params.set("offset", String(filters.offset));
+  return apiFetch(`/admin/query-logs${params.toString() ? "?" + params.toString() : ""}`);
+};
+export const adminGetSettings = () => apiFetch("/admin/settings");
+export const adminUpdateSettings = (settings: Record<string, any>) =>
+  apiFetch("/admin/settings", { method: "POST", body: JSON.stringify(settings) });
+export const adminGetAuditTrail = (limit?: number, offset?: number) => {
+  const params = new URLSearchParams();
+  if (limit) params.set("limit", String(limit));
+  if (offset) params.set("offset", String(offset));
+  return apiFetch(`/admin/audit-trail${params.toString() ? "?" + params.toString() : ""}`);
+};
 
 // ── Knowledge Search ──
 export const knowledgeQuery = (query: string, context?: Record<string, unknown>) =>
