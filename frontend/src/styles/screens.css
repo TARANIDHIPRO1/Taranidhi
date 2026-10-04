@@ -751,6 +751,45 @@
   font-weight: 600;
 }
 
+.ti-theme-toggle {
+  background: none;
+  border: 1px solid #2a2a3e;
+  color: #6b6b80;
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.ti-theme-toggle:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+.ti-lang-toggle {
+  background: none;
+  border: 1px solid #2a2a3e;
+  color: #6b6b80;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ti-lang-toggle:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
 .ti-logout {
   background: none;
   border: 1px solid #2a2a3e;

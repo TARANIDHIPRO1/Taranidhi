@@ -8,7 +8,7 @@
 
 import { Router } from "./router";
 import { navigate } from "./router";
-import { showToast } from "./dom";
+import { showToast, initializeTheme, toggleTheme as toggleThemeDOM } from "./dom";
 import { initI18n, toggleLanguage, translateDOM } from "./i18n";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -63,38 +63,7 @@ async function logErrorToServer(errorData: any): Promise<void> {
   }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Theme Initialization
-// ────────────────────────────────────────────────────────────────────────────
-
-function initTheme(): void {
-  // Check localStorage for theme preference
-  const saved = localStorage.getItem("theme") || "auto";
-  const root = document.documentElement;
-
-  let theme = saved;
-  if (saved === "auto") {
-    theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
-  root.setAttribute("data-theme", theme);
-
-  // Listen for system theme changes
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    if (localStorage.getItem("theme") === "auto") {
-      const newTheme = e.matches ? "dark" : "light";
-      root.setAttribute("data-theme", newTheme);
-    }
-  });
-}
-
-function toggleTheme(): void {
-  const root = document.documentElement;
-  const current = root.getAttribute("data-theme") || "light";
-  const next = current === "light" ? "dark" : "light";
-  root.setAttribute("data-theme", next);
-  localStorage.setItem("theme", next);
-}
+/* Theme initialization moved to dom.ts — imported as initializeTheme() */
 
 // ────────────────────────────────────────────────────────────────────────────
 // Service Worker Registration
@@ -134,7 +103,7 @@ async function registerServiceWorker(): Promise<void> {
 
 async function initApp(): Promise<void> {
   // Initialize theme
-  initTheme();
+  initializeTheme();
 
   // Initialize i18n (translations)
   await initI18n();
@@ -143,7 +112,7 @@ async function initApp(): Promise<void> {
   registerServiceWorker();
 
   // Expose toggles globally (optional, for dev/debug)
-  (window as any).toggleTheme = toggleTheme;
+  (window as any).toggleTheme = toggleThemeDOM;
   (window as any).toggleLanguage = toggleLanguage;
 
   // Initialize router
@@ -182,4 +151,4 @@ if (document.readyState === "loading") {
 }
 
 // Export for testing/external use
-export { toggleTheme, logErrorToServer };
+export { toggleThemeDOM as toggleTheme, logErrorToServer };

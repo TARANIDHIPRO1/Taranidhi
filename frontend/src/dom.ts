@@ -49,11 +49,50 @@ export function showToast(msg: string, isError = false) {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Header with Language Toggle
+// Theme Management
+// ────────────────────────────────────────────────────────────────────────────
+
+export function initializeTheme(): void {
+  const html = document.documentElement;
+  const stored = localStorage.getItem("theme");
+
+  if (stored === "dark" || stored === "light") {
+    html.setAttribute("data-theme", stored);
+  } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    html.setAttribute("data-theme", "dark");
+  } else {
+    html.setAttribute("data-theme", "light");
+  }
+}
+
+export function toggleTheme(): void {
+  const html = document.documentElement;
+  const current = html.getAttribute("data-theme") || "light";
+  const next = current === "dark" ? "light" : "dark";
+
+  html.setAttribute("data-theme", next);
+  localStorage.setItem("theme", next);
+
+  // Update theme toggle button text
+  const themeToggle = document.getElementById("btn-theme-toggle");
+  if (themeToggle) {
+    const span = themeToggle.querySelector("span");
+    if (span) {
+      span.textContent = next === "dark" ? "☀️" : "🌙";
+    }
+  }
+}
+
+export function getCurrentTheme(): "light" | "dark" {
+  return (document.documentElement.getAttribute("data-theme") || "light") as "light" | "dark";
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Header with Language Toggle & Dark Mode Toggle
 // ────────────────────────────────────────────────────────────────────────────
 
 /**
- * Creates a standard header with brand, language toggle, and logout button.
+ * Creates a standard header with brand, language toggle, theme toggle, and logout button.
  * Usage:
  *  const header = createHeader("OCCULTVIISION", () => navigate("/login"));
  *  app.appendChild(header);
@@ -64,11 +103,18 @@ export function createHeader(
 ): HTMLElement {
   const header = document.createElement("header");
   header.className = "ti-header";
+  const currentTheme = getCurrentTheme();
+  const themeIcon = currentTheme === "dark" ? "☀️" : "🌙";
+
   header.innerHTML = `
     <div class="ti-brand">
       <span class="ti-brand-name">${brandName}</span>
     </div>
     <div class="ti-header-controls">
+      <button id="btn-theme-toggle" class="ti-theme-toggle"
+              title="Toggle dark/light mode">
+        <span>${themeIcon}</span>
+      </button>
       <button id="btn-language-toggle" class="ti-lang-toggle"
               title="Toggle language">
         <span id="lang-display">${getCurrentLanguage() === "en" ? "EN" : "हि"}</span>
@@ -78,6 +124,12 @@ export function createHeader(
       </button>
     </div>
   `;
+
+  // Theme toggle handler
+  const themeToggle = header.querySelector("#btn-theme-toggle");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
+  }
 
   // Language toggle handler
   const langToggle = header.querySelector("#btn-language-toggle");
