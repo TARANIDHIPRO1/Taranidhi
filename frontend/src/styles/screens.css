@@ -648,3 +648,532 @@
     flex: 1;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* TIME INTELLIGENCE DASHBOARD — Professional Dark Design                      */
+/* Targeting: global career professionals, modern tech-savvy users             */
+/* Aesthetic: Linear / Superhuman / Notion — NOT traditional panchang          */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.ti-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #0a0a0f;
+  color: #e8e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  overflow-y: auto;
+  flex-direction: column;
+}
+
+/* Loading state */
+.ti-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 12px;
+}
+
+.ti-logo {
+  font-size: 1.1rem;
+  letter-spacing: 6px;
+  font-weight: 700;
+  color: #a78bfa;
+}
+
+.ti-tagline {
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  color: #6b6b80;
+  text-transform: uppercase;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+
+.ti-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #1e1e2e;
+  background: #0a0a0f;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ti-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ti-brand-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #e8e8f0;
+}
+
+.ti-brand-tag {
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  color: #a78bfa;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.ti-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ti-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: ti-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ti-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.ti-live-label {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.ti-logout {
+  background: none;
+  border: 1px solid #2a2a3e;
+  color: #6b6b80;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ti-logout:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+/* ── LIVE STRIP ──────────────────────────────────────────────────────────── */
+
+.ti-live-strip {
+  display: flex;
+  align-items: center;
+  background: #111118;
+  border-bottom: 1px solid #1e1e2e;
+  padding: 0;
+  overflow-x: auto;
+}
+
+.ti-live-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 3px;
+  min-width: 80px;
+  flex: 1;
+}
+
+.ti-live-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  white-space: nowrap;
+}
+
+.ti-live-key {
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  color: #6b6b80;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ti-live-divider {
+  width: 1px;
+  height: 28px;
+  background: #1e1e2e;
+  flex-shrink: 0;
+}
+
+/* ── SECTION LABELS ──────────────────────────────────────────────────────── */
+
+.ti-section-label {
+  font-size: 0.58rem;
+  letter-spacing: 2.5px;
+  color: #6b6b80;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 20px 20px 8px;
+}
+
+/* ── PROFILE CARD ────────────────────────────────────────────────────────── */
+
+.ti-profile-card {
+  margin: 0 16px;
+  background: linear-gradient(135deg, #13131f 0%, #1a1a2e 100%);
+  border: 1px solid #2a2a3e;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ti-profile-card:hover {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 24px rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+}
+
+.ti-profile-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.ti-profile-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ti-profile-lagna {
+  font-size: 0.72rem;
+  color: #a78bfa;
+  margin-bottom: 3px;
+}
+
+.ti-profile-nak {
+  font-size: 0.68rem;
+  color: #6b6b80;
+}
+
+.ti-profile-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ti-dasha-block {
+  text-align: right;
+}
+
+.ti-dasha-lord {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 1px;
+}
+
+.ti-dasha-antar {
+  color: #60a5fa;
+}
+
+.ti-dasha-label {
+  font-size: 0.6rem;
+  color: #6b6b80;
+  letter-spacing: 0.5px;
+}
+
+.ti-profile-arrow {
+  font-size: 1.2rem;
+  color: #3a3a55;
+  flex-shrink: 0;
+}
+
+/* ── ACTION CARDS ────────────────────────────────────────────────────────── */
+
+.ti-action-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.ti-action-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #111118;
+  border: 1px solid #1e1e2e;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.ti-action-card:hover {
+  border-color: #2a2a3e;
+  background: #16161f;
+  transform: translateX(2px);
+}
+
+.ti-action-primary {
+  border-color: #2a2a3e;
+  background: linear-gradient(135deg, #13131f, #1a1428);
+}
+
+.ti-action-primary:hover {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.15);
+}
+
+.ti-action-icon {
+  font-size: 1.1rem;
+  color: #a78bfa;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.ti-action-body {
+  flex: 1;
+}
+
+.ti-action-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 2px;
+}
+
+.ti-action-desc {
+  font-size: 0.68rem;
+  color: #6b6b80;
+}
+
+.ti-action-arrow {
+  font-size: 1rem;
+  color: #3a3a55;
+  flex-shrink: 0;
+}
+
+/* ── DECISION INTELLIGENCE ROW ───────────────────────────────────────────── */
+
+.ti-decision-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ti-decision-row::-webkit-scrollbar { display: none; }
+
+.ti-decision-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 14px;
+  background: #111118;
+  border: 1px solid #1e1e2e;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: #9090a8;
+  font-weight: 500;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.ti-decision-btn:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+  background: #13131f;
+}
+
+.ti-decision-icon {
+  font-size: 0.75rem;
+  color: #3a3a55;
+}
+
+/* ── SECONDARY ROW ───────────────────────────────────────────────────────── */
+
+.ti-secondary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px;
+  margin-bottom: 4px;
+}
+
+.ti-secondary-btn {
+  font-size: 0.68rem;
+  padding: 5px 10px;
+  background: none;
+  border: 1px solid #1e1e2e;
+  border-radius: 6px;
+  color: #6b6b80;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ti-secondary-btn:hover {
+  border-color: #3a3a55;
+  color: #9090a8;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
+
+.ti-footer {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  color: #3a3a55;
+  text-transform: uppercase;
+  border-top: 1px solid #111118;
+  margin-top: auto;
+}
+
+/* ── ONBOARDING ──────────────────────────────────────────────────────────── */
+
+.ti-onboarding {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 24px;
+}
+
+.ti-onboard-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px 36px;
+  gap: 16px;
+}
+
+.ti-onboard-icon {
+  font-size: 2.5rem;
+  color: #a78bfa;
+  line-height: 1;
+  animation: ti-pulse 3s ease-in-out infinite;
+}
+
+.ti-onboard-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.ti-onboard-sub {
+  font-size: 0.85rem;
+  color: #6b6b80;
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0;
+}
+
+.ti-cta-primary {
+  margin-top: 8px;
+  padding: 14px 32px;
+  background: #a78bfa;
+  color: #0a0a0f;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+}
+
+.ti-cta-primary:hover {
+  background: #c4b5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(167,139,250,0.4);
+}
+
+/* Feature grid on onboarding */
+.ti-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.ti-feature {
+  background: #111118;
+  border: 1px solid #1e1e2e;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.ti-feature-icon {
+  font-size: 1rem;
+  color: #a78bfa;
+  margin-bottom: 8px;
+}
+
+.ti-feature-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 4px;
+}
+
+.ti-feature-desc {
+  font-size: 0.65rem;
+  color: #6b6b80;
+  line-height: 1.4;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  .ti-live-item { padding: 10px 10px; min-width: 68px; }
+  .ti-live-value { font-size: 0.82rem; }
+  .ti-profile-card { padding: 12px; }
+  .ti-feature-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 600px) {
+  .ti-screen {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .ti-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .ti-feature-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
