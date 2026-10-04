@@ -440,3 +440,101 @@ export function getNavamshaLord(deg: number): string {
   const navamshaRashi = (startRashi + pada) % 12;
   return SIGN_LORDS[navamshaRashi]!;
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// NAKSHATRA FULL ATTRIBUTE TABLE
+//
+// SOURCES (verified against multiple classical references):
+//   - Deity + Nature + Gender: templepurohit.com/27-nakshatras-full-nakshatra-names-character-traits/
+//   - Tattva/Element: jyotishmadesimple.wordpress.com/2018/07/02/nakshatras-elememts/
+//   - Guna (3-level Prakriti/Sattvic/Tamasic): barbarapijan.com/bpa/Nakshatra_radical/00nakshatra_guna27.htm
+//   - Star Lord: Classical Vimshottari sequence (Ketu→Venus→Sun→Moon→Mars→Rahu→Jupiter→Saturn→Mercury)
+//     repeating every 9 nakshatras; same as NAKSHATRA_LORDS in this file.
+//
+// GUNA NOTATION: P=Pradhana (Primary), S=Secondary, T=Tertiary
+//   gunaTriad[0]=Primary Guna (most prominent), [1]=Secondary, [2]=Tertiary
+//   R=Rajas (activity/passion), T=Tamas (inertia/darkness), S=Sattva (purity/harmony)
+//
+// NOTE on Shravana (index 21): Lord is Moon in most classical sources.
+//   Some texts (Parashari) give Jupiter as deity/lord variant — left as Moon here.
+//
+// NOTE on body parts: Not included — reliable classical source not found in
+//   accessible texts. BPHS Adhyaya 3-4 has this but requires physical book.
+//   TODO: Add when classical source confirmed.
+// ──────────────────────────────────────────────────────────────────────────────
+
+export type NakshatraNature = "Deva" | "Manushya" | "Rakshasa";
+export type NakshatraGender = "Male" | "Female";
+export type NakshatraTattva = "Earth" | "Water" | "Fire" | "Air" | "Ether";
+export type GunaQuality = "R" | "T" | "S"; // Rajas | Tamas | Sattva
+
+export interface NakshatraAttributes {
+  /** 0-26 index */
+  index: number;
+  name: string;
+  /** Classical star lord (Vimshottari ruling planet) */
+  lord: string;
+  /** Presiding deity */
+  deity: string;
+  /** Nature/type — Deva (divine), Manushya (human), Rakshasa (demonic) */
+  nature: NakshatraNature;
+  /** Biological gender (classical classification) */
+  gender: NakshatraGender;
+  /** Five-element tattva/element */
+  tattva: NakshatraTattva;
+  /**
+   * Three-level guna triad: [Primary, Secondary, Tertiary]
+   * R=Rajas, T=Tamas, S=Sattva
+   */
+  gunaTriad: [GunaQuality, GunaQuality, GunaQuality];
+}
+
+export const NAKSHATRA_ATTRIBUTES: NakshatraAttributes[] = [
+  // ── Cycle 1: Rajas primary (nakshatras 1-9) ──
+  { index: 0,  name: "Ashwini",           lord: "Ketu",    deity: "Ashwini Kumaras", nature: "Deva",     gender: "Male",   tattva: "Earth", gunaTriad: ["R","R","R"] },
+  { index: 1,  name: "Bharani",           lord: "Venus",   deity: "Yama",            nature: "Manushya", gender: "Female", tattva: "Earth", gunaTriad: ["R","R","T"] },
+  { index: 2,  name: "Krittika",          lord: "Sun",     deity: "Agni",            nature: "Rakshasa", gender: "Female", tattva: "Earth", gunaTriad: ["R","R","S"] },
+  { index: 3,  name: "Rohini",            lord: "Moon",    deity: "Prajapati",       nature: "Manushya", gender: "Female", tattva: "Earth", gunaTriad: ["R","T","R"] },
+  { index: 4,  name: "Mrigashira",        lord: "Mars",    deity: "Soma",            nature: "Deva",     gender: "Female", tattva: "Earth", gunaTriad: ["R","T","T"] },
+  { index: 5,  name: "Ardra",             lord: "Rahu",    deity: "Rudra",           nature: "Manushya", gender: "Female", tattva: "Water", gunaTriad: ["R","T","S"] },
+  { index: 6,  name: "Punarvasu",         lord: "Jupiter", deity: "Aditi",           nature: "Deva",     gender: "Male",   tattva: "Water", gunaTriad: ["R","S","R"] },
+  { index: 7,  name: "Pushya",            lord: "Saturn",  deity: "Brihaspati",      nature: "Deva",     gender: "Male",   tattva: "Water", gunaTriad: ["R","S","T"] },
+  { index: 8,  name: "Ashlesha",          lord: "Mercury", deity: "Nagas",           nature: "Rakshasa", gender: "Female", tattva: "Water", gunaTriad: ["R","S","S"] },
+  // ── Cycle 2: Tamas primary (nakshatras 10-18) ──
+  { index: 9,  name: "Magha",             lord: "Ketu",    deity: "Pitris",          nature: "Rakshasa", gender: "Female", tattva: "Water", gunaTriad: ["T","R","R"] },
+  { index: 10, name: "Purva Phalguni",    lord: "Venus",   deity: "Bhaga",           nature: "Manushya", gender: "Female", tattva: "Water", gunaTriad: ["T","R","T"] },
+  { index: 11, name: "Uttara Phalguni",   lord: "Sun",     deity: "Aryaman",         nature: "Manushya", gender: "Female", tattva: "Fire",  gunaTriad: ["T","R","S"] },
+  { index: 12, name: "Hasta",             lord: "Moon",    deity: "Surya",           nature: "Deva",     gender: "Male",   tattva: "Fire",  gunaTriad: ["T","T","R"] },
+  { index: 13, name: "Chitra",            lord: "Mars",    deity: "Vishwakarma",     nature: "Rakshasa", gender: "Female", tattva: "Fire",  gunaTriad: ["T","T","T"] },
+  { index: 14, name: "Swati",             lord: "Rahu",    deity: "Vayu",            nature: "Deva",     gender: "Female", tattva: "Fire",  gunaTriad: ["T","T","S"] },
+  { index: 15, name: "Vishakha",          lord: "Jupiter", deity: "Indra-Agni",      nature: "Rakshasa", gender: "Female", tattva: "Fire",  gunaTriad: ["T","S","R"] },
+  { index: 16, name: "Anuradha",          lord: "Saturn",  deity: "Mitra",           nature: "Deva",     gender: "Male",   tattva: "Fire",  gunaTriad: ["T","S","T"] },
+  { index: 17, name: "Jyeshtha",          lord: "Mercury", deity: "Indra",           nature: "Rakshasa", gender: "Female", tattva: "Air",   gunaTriad: ["T","S","S"] },
+  // ── Cycle 3: Sattva primary (nakshatras 19-27) ──
+  { index: 18, name: "Mula",              lord: "Ketu",    deity: "Nirriti",         nature: "Rakshasa", gender: "Female", tattva: "Air",   gunaTriad: ["S","R","R"] },
+  { index: 19, name: "Purva Ashadha",     lord: "Venus",   deity: "Apas",            nature: "Manushya", gender: "Male",   tattva: "Air",   gunaTriad: ["S","R","T"] },
+  { index: 20, name: "Uttara Ashadha",    lord: "Sun",     deity: "Vishwadevas",     nature: "Manushya", gender: "Female", tattva: "Air",   gunaTriad: ["S","R","S"] },
+  { index: 21, name: "Shravana",          lord: "Moon",    deity: "Vishnu",          nature: "Deva",     gender: "Male",   tattva: "Air",   gunaTriad: ["S","T","R"] },
+  { index: 22, name: "Dhanishtha",        lord: "Mars",    deity: "8 Vasus",         nature: "Rakshasa", gender: "Female", tattva: "Ether", gunaTriad: ["S","T","T"] },
+  { index: 23, name: "Shatabhisha",       lord: "Rahu",    deity: "Varuna",          nature: "Rakshasa", gender: "Female", tattva: "Ether", gunaTriad: ["S","T","S"] },
+  { index: 24, name: "Purva Bhadrapada",  lord: "Jupiter", deity: "Aja Ekapada",     nature: "Manushya", gender: "Male",   tattva: "Ether", gunaTriad: ["S","S","R"] },
+  { index: 25, name: "Uttara Bhadrapada", lord: "Saturn",  deity: "Ahir Budhanya",   nature: "Manushya", gender: "Male",   tattva: "Ether", gunaTriad: ["S","S","T"] },
+  { index: 26, name: "Revati",            lord: "Mercury", deity: "Pushan",          nature: "Deva",     gender: "Female", tattva: "Ether", gunaTriad: ["S","S","S"] },
+];
+
+/**
+ * Get nakshatra attributes by index (0-26).
+ * Fast O(1) lookup — index matches array position.
+ */
+export function getNakshatraAttributes(nakshatraIndex: number): NakshatraAttributes {
+  const attr = NAKSHATRA_ATTRIBUTES[nakshatraIndex];
+  if (!attr) throw new RangeError(`Nakshatra index must be 0-26, got ${nakshatraIndex}`);
+  return attr;
+}
+
+/**
+ * Get nakshatra attributes by name (case-sensitive).
+ */
+export function getNakshatraByName(name: string): NakshatraAttributes | undefined {
+  return NAKSHATRA_ATTRIBUTES.find(n => n.name === name);
+}
