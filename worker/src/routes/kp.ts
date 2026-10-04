@@ -27,6 +27,7 @@ function norm360(x: number): number {
 }
 
 export async function handleGetKpChart(request: Request, env: Env, kundaliId: number): Promise<Response> {
+  try {
   const auth = await requireAuth(request, env);
   if (!auth) return unauthorized();
 
@@ -82,6 +83,10 @@ export async function handleGetKpChart(request: Request, env: Env, kundaliId: nu
     house_cusps: houseCusps,
     planet_sub_lords: planetSubLords,
   });
+  } catch (err: any) {
+    console.error("[handleGetKpChart] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
 }
 
 const SIGN_LORDS = [

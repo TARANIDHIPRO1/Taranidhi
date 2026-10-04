@@ -55,6 +55,7 @@ const SIGN_LORDS = [
 ];
 
 export async function handleGetKundaliChart(request: Request, env: Env): Promise<Response> {
+  try {
   const auth = await requireAuth(request, env);
   if (!auth) return unauthorized();
 
@@ -238,6 +239,10 @@ export async function handleGetKundaliChart(request: Request, env: Env): Promise
       lahiri_ayanamsa: "Lahiri (planet positions + ascendant)",
     },
   });
+  } catch (err: any) {
+    console.error("[handleGetKundaliChart] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
 }
 
 /** Round to 4 decimal places for clean JSON output (preserves arcsec precision) */

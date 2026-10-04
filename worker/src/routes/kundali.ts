@@ -134,60 +134,75 @@ export async function handleCreateKundali(request: Request, env: Env): Promise<R
 }
 
 export async function handleListKundalis(request: Request, env: Env): Promise<Response> {
-  const auth = await requireAuth(request, env);
-  if (!auth) return unauthorized();
+  try {
+    const auth = await requireAuth(request, env);
+    if (!auth) return unauthorized();
 
-  const { results } = await env.DB.prepare(
-    `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
-     FROM kundalis WHERE user_id = ? ORDER BY created_at ASC`
-  )
-    .bind(auth.userId)
-    .all();
+    const { results } = await env.DB.prepare(
+      `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
+       FROM kundalis WHERE user_id = ? ORDER BY created_at ASC`
+    )
+      .bind(auth.userId)
+      .all();
 
-  return json({ kundalis: results });
+    return json({ kundalis: results });
+  } catch (err: any) {
+    console.error("[handleListKundalis] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
 }
 
 export async function handleGetKundali(request: Request, env: Env): Promise<Response> {
-  const auth = await requireAuth(request, env);
-  if (!auth) return unauthorized();
+  try {
+    const auth = await requireAuth(request, env);
+    if (!auth) return unauthorized();
 
-  const url = new URL(request.url);
-  const idStr = url.pathname.split("/").pop();
-  const id = parseInt(idStr || "", 10);
+    const url = new URL(request.url);
+    const idStr = url.pathname.split("/").pop();
+    const id = parseInt(idStr || "", 10);
 
-  if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
+    if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
 
-  const kundali = await env.DB.prepare(
-    `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
-     FROM kundalis WHERE id = ? AND user_id = ?`
-  )
-    .bind(id, auth.userId)
-    .first();
+    const kundali = await env.DB.prepare(
+      `SELECT id, label, birth_date, latitude, longitude, timezone, janma_nakshatra_idx, lagna_rashi_idx, created_at
+       FROM kundalis WHERE id = ? AND user_id = ?`
+    )
+      .bind(id, auth.userId)
+      .first();
 
-  if (!kundali) return errorJson("Kundali not found.", 404);
+    if (!kundali) return errorJson("Kundali not found.", 404);
 
-  return json(kundali);
+    return json(kundali);
+  } catch (err: any) {
+    console.error("[handleGetKundali] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
+  }
 }
 
 export async function handleDeleteKundali(request: Request, env: Env): Promise<Response> {
-  const auth = await requireAuth(request, env);
-  if (!auth) return unauthorized();
+  try {
+    const auth = await requireAuth(request, env);
+    if (!auth) return unauthorized();
 
-  const url = new URL(request.url);
-  const idStr = url.pathname.split("/").pop();
-  const id = parseInt(idStr || "", 10);
+    const url = new URL(request.url);
+    const idStr = url.pathname.split("/").pop();
+    const id = parseInt(idStr || "", 10);
 
-  if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
+    if (isNaN(id)) return errorJson("Invalid kundali ID.", 400);
 
-  const result = await env.DB.prepare(
-    `DELETE FROM kundalis WHERE id = ? AND user_id = ?`
-  )
-    .bind(id, auth.userId)
-    .run();
+    const result = await env.DB.prepare(
+      `DELETE FROM kundalis WHERE id = ? AND user_id = ?`
+    )
+      .bind(id, auth.userId)
+      .run();
 
-  if (!result.success || result.meta.changes === 0) {
-    return errorJson("Kundali not found.", 404);
+    if (!result.success || result.meta.changes === 0) {
+      return errorJson("Kundali not found.", 404);
+    }
+
+    return json({ deleted: true }, 200);
+  } catch (err: any) {
+    console.error("[handleDeleteKundali] unhandled error:", err?.message ?? err);
+    return errorJson(`Server error: ${err?.message ?? "unknown"}`, 500, "INTERNAL_ERROR");
   }
-
-  return json({ deleted: true }, 200);
 }
