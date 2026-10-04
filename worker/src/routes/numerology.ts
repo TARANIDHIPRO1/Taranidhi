@@ -63,30 +63,37 @@ export async function handleGetNumerology(request: Request, env: Env): Promise<R
 
   const isUnlimited = UNLIMITED_TIERS.has(user.tier);
   if (!isUnlimited) {
-    try {
-      await debitWallet(env, auth.userId, NUMEROLOGY_COST, "query");
-    } catch (err) {
-      if (err instanceof InsufficientBalanceError) {
-        return errorJson(
-          `Insufficient points balance (have ${err.available}, need ${err.requested}). Top up or upgrade your tier.`,
-          402,
-          "INSUFFICIENT_BALANCE"
-        );
-      }
-      throw err;
+    // debitWallet returns {success, message} -- does NOT throw InsufficientBalanceError.
+    // Check return value explicitly.
+    const debitResult = await debitWallet(env, auth.userId, NUMEROLOGY_COST, "query");
+    if (!debitResult.success) {
+      return errorJson(
+        `Insufficient points balance. Top up or upgrade your tier.`,
+        402,
+        "INSUFFICIENT_BALANCE"
+      );
     }
   }
 
   // ── Calculation ──────────────────────────────────────────────────────────
   const result = await calculateNumerology(date, time, system);
 
-  // ── Query log ────────────────────────────────────────────────────────────
-  await env.DB.prepare(
-    `INSERT INTO query_logs (user_id, kundali_id, query_type, muhurta_pct, points_charged)
-     VALUES (?, NULL, 'numerology', ?, ?)`
-  )
-    .bind(auth.userId, result.muhurtaScore, isUnlimited ? 0 : NUMEROLOGY_COST)
-    .run();
+  // ── Query log (non-fatal: wrapped in try/catch) ───────────────────────────
+  // Uses 'general_lookup' until migration 0002 adds 'numerology' to the
+  // query_type CHECK constraint on query_logs. After migration is applied by
+  // Naveen, change this back to 'numerology'.
+  // TODO: change to 'numerology' after migration 0002_query_logs_add_numerology.sql is applied.
+  try {
+    await env.DB.prepare(
+      `INSERT INTO query_logs (user_id, kundali_id, query_type, muhurta_pct, points_charged)
+       VALUES (?, NULL, 'general_lookup', ?, ?)`
+    )
+      .bind(auth.userId, result.muhurtaScore, isUnlimited ? 0 : NUMEROLOGY_COST)
+      .run();
+  } catch (_logErr) {
+    // Logging is supplemental — never fail the primary response for it.
+    console.error("[numerology] query_log insert failed:", _logErr);
+  }
 
   return json({
     date:                  result.date,
