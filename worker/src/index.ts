@@ -24,6 +24,7 @@ import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
 import { handleGetKundaliChart } from "./routes/kundaliChart";
+import { handleGetNumerology } from "./routes/numerology";
 import {
   handleKnowledgeQuery,
   handleKnowledgeSources,
@@ -133,6 +134,10 @@ export default {
     }
     if (request.method === "GET" && pathname === "/muhurta/professional") {
       return handleMuhurtaProfessional(request, env);
+    }
+
+    if (request.method === "GET" && pathname === "/numerology") {
+      return handleGetNumerology(request, env);
     }
 
     if (request.method === "GET" && pathname === "/wallet/balance") {

@@ -55,7 +55,14 @@ import {
   getGulikaKaal,
   isDurmuhurta,
   buildChoghadiya,
+  getVara,
 } from "../lib/muhurta";
+import {
+  calculatePanchangScore,
+  calculateKPScore,
+  convertNumerologyScore,
+} from "../lib/convergenceIndex";
+import { calculateNumerology } from "../lib/numerology";
 import { getPakshiAtTime, scorePakshiFavorability } from "../lib/panchaPakshi";
 import { scoreHora, type LagnaOnlyChart, type DashaContext, type ChandrabalaContext } from "../lib/horaScoring";
 import { runMuhurtaValidation } from "../lib/muhurtaValidator";
@@ -260,6 +267,88 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const transitChart = buildRealChart(now, lat, lon);
   const muhurtaValidation = runMuhurtaValidation(transitChart);
 
+  // ── Vara (weekday quality) ────────────────────────────────────────────────
+  // Classical Vedic weekday lord, quality, and activity recommendations.
+  // Source: Muhurta Chintamani, Vara Prakarana §2.
+  const vara = getVara(now.getUTCDay());
+
+  // ── Surya Rashi + Chandra Rashi ───────────────────────────────────────────
+  // Sun's and Moon's current sidereal sign (rashi).
+  // These are already computed above (sunLon, moonLon) but were not returned.
+  const RASHI_NAMES = ["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya",
+                       "Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
+  const suryaRashiIdx  = Math.floor(sunLon  / 30) % 12;
+  const chandraRashiIdx = Math.floor(moonLon / 30) % 12;
+
+  // ── Convergence Index (master formula, all 5 systems) ────────────────────
+  // Combines KP + Panchang + PanchaPakshi + Numerology + Planetary scores
+  // into a single 0-100 convergence score.
+  // Source: convergenceIndex.ts + RESEARCH_SYNTHESIS.md §5.
+  // Formula: 20% each across 5 systems.
+  let convergenceIndex: {
+    panchang_score:      number;
+    kp_score:            number;
+    pancha_pakshi_score: number;
+    numerology_score:    number;
+    planetary_score:     number;
+    convergence_score:   number;
+    convergence_rating:  string;
+    note:                string;
+  } | null = null;
+
+  try {
+    const panchangScore = calculatePanchangScore(
+      currentTithi,
+      currentNakIdx,
+      nityaYoga.index + 1, // NityaYogaResult.index is 0-26; convergenceIndex expects 1-27
+      karana.position,     // KaranaResult.position is 1-60
+    );
+    const kpScore = dashaContext?.mahaLord && dashaContext?.antarLord
+      ? calculateKPScore(dashaContext.mahaLord, dashaContext.antarLord, purpose)
+      : 75; // neutral fallback without dasha data
+    // pakshiScore from scorePakshiFavorability() is already 0-100.
+    // calculatePanchaPakshiScore expects activity string + bird strength 0-1;
+    // here we use the pre-computed score directly for accuracy.
+    const ppScore    = Math.round(Math.min(Math.max(pakshiScore, 0), 100));
+    const numResult  = await calculateNumerology(
+      now.toISOString().slice(0, 10),
+      now.toISOString().slice(11, 16),
+    );
+    const numerologyScore  = convertNumerologyScore(numResult.muhurtaScore);
+    // Planetary score: derived from SAV bindus (already computed in muhurtaValidation).
+    // Max SAV bindus per sign = 64; average ≈42; normalize to 0-100.
+    const planetaryScore = Math.round(
+      Math.min((muhurtaValidation.stage5.bindusInLagna / 64) * 100, 100)
+    );
+    const convergenceScore = Math.round(
+      kpScore * 0.20 +
+      ppScore * 0.20 +
+      numerologyScore * 0.20 +
+      panchangScore * 0.20 +
+      planetaryScore * 0.20
+    );
+    let convergenceRating: string;
+    if (convergenceScore >= 85)      convergenceRating = "Excellent";
+    else if (convergenceScore >= 70) convergenceRating = "Very Good";
+    else if (convergenceScore >= 55) convergenceRating = "Good";
+    else if (convergenceScore >= 40) convergenceRating = "Average";
+    else                             convergenceRating = "Poor";
+
+    convergenceIndex = {
+      panchang_score:      panchangScore,
+      kp_score:            kpScore,
+      pancha_pakshi_score: ppScore,
+      numerology_score:    numerologyScore,
+      planetary_score:     planetaryScore,
+      convergence_score:   convergenceScore,
+      convergence_rating:  convergenceRating,
+      note: "Formula: 20% KP + 20% PanchaPakshi + 20% Numerology + 20% Panchang + 20% Planetary (SAV-derived)",
+    };
+  } catch (_err) {
+    // Convergence index is supplemental; never fail the primary muhurta response
+    convergenceIndex = null;
+  }
+
   let score: ReturnType<typeof scoreHora> | null = null;
   if (activeHora) {
     score = scoreHora(
@@ -439,6 +528,33 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       },
       source: muhurtaValidation.source,
     },
+
+    // ── Vara (weekday) ──────────────────────────────────────────────────────
+    vara: {
+      weekday:       vara.weekday,
+      name:          vara.name,
+      lord:          vara.lord,
+      quality:       vara.quality,
+      auspicious_for: vara.auspicious_for,
+      avoid:         vara.avoid,
+      note:          vara.note,
+      source:        vara.source,
+    },
+
+    // ── Surya Rashi + Chandra Rashi (explicit sign positions) ───────────────
+    surya_rashi: {
+      idx:  suryaRashiIdx,
+      name: RASHI_NAMES[suryaRashiIdx] ?? "Unknown",
+      sun_longitude_deg: Math.round(sunLon * 1000) / 1000,
+    },
+    chandra_rashi: {
+      idx:  chandraRashiIdx,
+      name: RASHI_NAMES[chandraRashiIdx] ?? "Unknown",
+      moon_longitude_deg: Math.round(moonLon * 1000) / 1000,
+    },
+
+    // ── Convergence Index (all-5-systems master score) ───────────────────────
+    convergence_index: convergenceIndex,
 
     score,
     personalized: lagnaOnlyChart !== null || janmaNakIdx !== null,

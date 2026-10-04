@@ -1478,3 +1478,96 @@ export function getChoghadiyaAuspiciousness(type: ChoghadiyaType): "auspicious" 
   if (type === "Char") return "neutral";
   return "inauspicious";
 }
+
+// ============================================================================
+// VARA (WEEKDAY) QUALITY
+// Classical Vedic weekday system: each day has a ruling planet, inherent
+// quality, and recommended / contraindicated activities.
+// Source: Muhurta Chintamani (Vara Prakarana), Muhurta Martanda.
+// ============================================================================
+
+export interface VaraResult {
+  weekday:       number;          // 0=Sun … 6=Sat
+  name:          string;          // e.g. "Ravivar (Sunday)"
+  lord:          string;          // ruling planet
+  quality:       "auspicious" | "mixed" | "inauspicious";
+  auspicious_for: string[];       // activities that thrive on this day
+  avoid:         string[];        // activities to avoid
+  note:          string;
+  source:        string;
+}
+
+const VARA_DATA: Record<number, Omit<VaraResult, "weekday">> = {
+  0: { // Sunday
+    name:           "Ravivar (Sunday)",
+    lord:           "Sun",
+    quality:        "mixed",
+    auspicious_for: ["Government work", "Medical treatments", "Pilgrimages", "Vedic rituals", "Gold purchases"],
+    avoid:          ["Marriage", "Long journeys", "Planting crops"],
+    note:           "Sun's day — powerful for authority and health matters; avoid new relationships.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  1: { // Monday
+    name:           "Somavar (Monday)",
+    lord:           "Moon",
+    quality:        "auspicious",
+    auspicious_for: ["Travel", "Liquid businesses", "Agriculture", "Education", "Medical", "Peace rituals"],
+    avoid:          ["Debt collection", "Litigation"],
+    note:           "Moon's day — nurturing and fluid; excellent for beginnings and travel.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  2: { // Tuesday
+    name:           "Mangalvar (Tuesday)",
+    lord:           "Mars",
+    quality:        "mixed",
+    auspicious_for: ["Surgery", "Military operations", "Machinery work", "Land purchase", "Debt recovery"],
+    avoid:          ["Marriage", "Partnerships", "Signing agreements"],
+    note:           "Mars's day — energetic and forceful; suitable for assertive or physical work, not contracts.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  3: { // Wednesday
+    name:           "Budhvar (Wednesday)",
+    lord:           "Mercury",
+    quality:        "auspicious",
+    auspicious_for: ["Commerce", "Writing", "Learning", "Communication", "Artistic work", "Marriage"],
+    avoid:          ["Nothing specific — highly versatile day"],
+    note:           "Mercury's day — the most versatile; excellent for intellectual and business activities.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  4: { // Thursday
+    name:           "Guruvar (Thursday)",
+    lord:           "Jupiter",
+    quality:        "auspicious",
+    auspicious_for: ["Marriage", "Religious ceremonies", "Education", "Expansion", "Charity", "Property"],
+    avoid:          ["Hair cutting (mild tradition only)"],
+    note:           "Jupiter's day — most auspicious; ideal for all auspicious ceremonies and new ventures.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  5: { // Friday
+    name:           "Shukravar (Friday)",
+    lord:           "Venus",
+    quality:        "auspicious",
+    auspicious_for: ["Marriage", "Beauty", "Arts", "Music", "Romance", "Vehicle purchase", "Luxury goods"],
+    avoid:          ["Fasting for spiritual purposes (Venus opposes abstinence)"],
+    note:           "Venus's day — auspicious for love, beauty, and material pleasures.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+  6: { // Saturday
+    name:           "Shanivar (Saturday)",
+    lord:           "Saturn",
+    quality:        "inauspicious",
+    auspicious_for: ["Iron/steel work", "Oil-related businesses", "Labour matters", "Debt repayment"],
+    avoid:          ["Marriage", "Starting new ventures", "Surgery", "Long journeys"],
+    note:           "Saturn's day — challenging for new beginnings; suited to completion and hard work only.",
+    source:         "Muhurta Chintamani, Vara Prakarana §2",
+  },
+};
+
+/**
+ * Return the Vara (weekday) quality for a given UTC weekday index.
+ * @param dow  UTC weekday: 0 = Sunday … 6 = Saturday
+ */
+export function getVara(dow: number): VaraResult {
+  const d = VARA_DATA[dow] ?? VARA_DATA[0]!;
+  return { weekday: dow, ...d };
+}
