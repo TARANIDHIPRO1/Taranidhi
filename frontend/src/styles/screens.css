@@ -67,7 +67,7 @@
 .login-screen h1 {
   font-size: 1.6rem;
   letter-spacing: 3px;
-  color: #3a1a00;
+  color: var(--text-primary);
   text-align: center;
   margin-bottom: 0;
   text-transform: uppercase;
@@ -77,7 +77,7 @@
 .login-screen .subtitle {
   font-size: 0.78rem;
   letter-spacing: 2px;
-  color: #C8960C;
+  color: var(--color-secondary);
   text-align: center;
   text-transform: uppercase;
   margin-bottom: var(--space-4);
@@ -88,8 +88,8 @@
 .login-screen #step-otp {
   width: 100%;
   max-width: 360px;
-  background: #FFFAF4;
-  border: 1px solid #E8C89A;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: 0 4px 20px rgba(204,0,0,0.1);
@@ -116,8 +116,8 @@
 }
 
 .input-row .prefix {
-  background: #F5DEB3;
-  color: #7a4800;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.9rem;
   padding: var(--space-2) var(--space-3);
@@ -142,7 +142,7 @@
 
 /* Focus ring on the wrapper */
 .input-row:focus-within {
-  border-color: #CC0000;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(200,150,12,0.18);
 }
 
@@ -155,18 +155,18 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
-  background: #FFFAF4;
+  background: var(--bg-secondary);
 }
 
 .login-screen #otp-code:focus {
-  border-color: #CC0000;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(200,150,12,0.18);
 }
 
 /* Primary button */
 .btn-primary {
   width: 100%;
-  background: #CC0000;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -181,7 +181,7 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #990000;
+  background: var(--color-primary-hover);
   box-shadow: 0 4px 14px rgba(204,0,0,0.4);
   transform: translateY(-1px);
 }
@@ -204,7 +204,7 @@
   padding: var(--space-1);
 }
 
-.login-screen .btn-link:hover { color: #CC0000; }
+.login-screen .btn-link:hover { color: var(--color-primary); }
 
 /* Legacy login containers — kept for backward compat */
 .login-container { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; padding: var(--space-6); gap: var(--space-6); }
@@ -219,7 +219,7 @@
 
 .app-header {
   background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00);
-  border-bottom: 3px solid #C8960C;
+  border-bottom: 3px solid var(--color-secondary);
   padding: var(--space-4) var(--space-6);
   display: flex;
   align-items: center;
@@ -231,7 +231,7 @@
 }
 
 .app-header h1 {
-  color: #C8960C;
+  color: var(--color-secondary);
   font-family: 'Georgia', serif;
   font-size: 1.15rem;
   letter-spacing: 3px;
@@ -242,7 +242,7 @@
 
 .app-header .badge {
   background: rgba(200, 150, 12, 0.18);
-  color: #C8960C;
+  color: var(--color-secondary);
   border: 1px solid rgba(200,150,12,0.5);
   font-size: 0.72rem;
   padding: 0.15rem 0.55rem;
@@ -280,8 +280,8 @@
   gap: var(--space-2);
   cursor: pointer;
   padding: var(--space-5) var(--space-4);
-  background: #FFFAF4;
-  border: 1px solid #E8C89A;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
   min-height: 110px;
@@ -294,8 +294,8 @@
 }
 
 .card-grid .card:hover {
-  border-color: #CC0000;
-  background: #FFF0DC;
+  border-color: var(--color-primary);
+  background: var(--bg-secondary);
   box-shadow: 0 4px 14px rgba(204,0,0,0.16);
   transform: translateY(-3px);
 }
@@ -314,14 +314,14 @@
 .card-label {
   font-weight: 600;
   font-size: 0.85rem;
-  color: #3a1a00;
+  color: var(--text-primary);
   display: block;
   line-height: 1.2;
 }
 
 .card-desc {
   font-size: 0.7rem;
-  color: #7a4800;
+  color: var(--text-secondary);
   display: block;
   line-height: 1.3;
 }
@@ -355,8 +355,8 @@
 
 /* Dashboard legacy aliases (kept for any older references) */
 .dashboard-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-.dashboard-header { padding: var(--space-6); background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00); color: #C8960C; border-bottom: 3px solid #C8960C; }
-.dashboard-header h1 { margin-bottom: var(--space-2); color: #C8960C; letter-spacing: 3px; }
+.dashboard-header { padding: var(--space-6); background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00); color: var(--color-secondary); border-bottom: 3px solid var(--color-secondary); }
+.dashboard-header h1 { margin-bottom: var(--space-2); color: var(--color-secondary); letter-spacing: 3px; }
 .dashboard-content { padding: var(--space-6); flex: 1; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); }
 .action-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; cursor: pointer; transition: all var(--transition-base); }
