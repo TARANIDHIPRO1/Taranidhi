@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory
 
 ## Me
-Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
+Claude Sonnet 4.6 (this session: wallet + Razorpay integration skeleton)
 
 ---
 
@@ -103,6 +103,13 @@ Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
    - **Backend Status:** 90% done (astro.ts ✓, kp.ts ✓, muhurta.ts 60%, horaScoring.ts 70%)
    - **Frontend Status:** 10% done (Birth Chart + Muhurta Dashboard + Event Categories all new)
    - **v6 Ready:** Week 1-4 execution roadmap finalized; pending 3 key decisions from Naveen
+10. ✅ **WALLET + RAZORPAY INTEGRATION SKELETON (Oct 4, 2026):**
+    - Backend: POST /wallet/recharge (Razorpay order creation)
+    - Backend: POST /webhooks/razorpay (payment.captured → point grant)
+    - Backend: GET /wallet/balance extended (batches + transactions)
+    - Frontend: wallet screen top-up flow with Razorpay SDK
+    - All routes return 503 gracefully when credentials not configured
+    - Commit: 8b77b42 (536 insertions, 5 files changed)
 
 ---
 
@@ -118,17 +125,30 @@ Claude Haiku 4.5 (this session: working on OCCULTVIISION deployment)
 
 ## Session Artifacts
 
-- **Commits:** 4 signed commits (all pushed)
-- **Code written:** 2,190 lines (fixes + features)
-- **Tests:** All critical paths verified
-- **Compilation:** 0 critical errors
-- **Token efficiency:** 5x improvement (15M → 3M/session)
+- **Commits:** 1 new signed commit (8b77b42) — wallet + Razorpay skeleton
+- **Code written:** 536 lines (wallet routes + webhooks + frontend)
+- **Files modified:** 5 (wallet.ts, webhooks.ts, index.ts, api.ts, wallet.ts frontend)
+- **Tests:** TypeScript compilation clean (0 errors)
+- **Endpoints wired:** POST /wallet/recharge, POST /webhooks/razorpay, extended GET /wallet/balance
+- **Blockers cleared:** None — Razorpay credentials (RAZORPAY_KEY_ID/SECRET) still pending from Naveen
 
 ---
 
-## Next Steps - V6 UI BUILD (Sept 29 - Oct 31)
+## Next Steps - Wallet Billing + V6 UI BUILD (Oct 4 - Oct 31)
 
-**V6 PHASE 1: Birth Chart Display (Week 1)**
+**WALLET BILLING PHASE 1: Razorpay Credentials (BLOCKING)**
+- [ ] Naveen creates Razorpay Live account (account owner's own keys, per ARCHITECTURE.md Section 9)
+- [ ] Set RAZORPAY_KEY_ID as Worker secret
+- [ ] Set RAZORPAY_KEY_SECRET as Worker secret
+- [ ] Configure Razorpay webhook URL: https://www.occultviision.com/webhooks/razorpay
+- [ ] Once set: Test payment flow end-to-end (₹100 test topup → point grant)
+
+**WALLET BILLING PHASE 2: Frontend Screens (post-credentials)**
+- [ ] Implement orders screen (show pending/completed orders)
+- [ ] Add payment status tracking UI
+- [ ] Test Razorpay SDK modal integration
+
+**V6 PHASE 1: Birth Chart Display (Week 1-2)**
 - [ ] Create `/screens/birth-chart.ts` screen
 - [ ] Call `/kundali` endpoint → display verified data
 - [ ] Show: Ascendant, 12 cusps, 9 planets, Nakshatra, Dasha lords, Tara
