@@ -15,7 +15,7 @@
 // Server-side port, per ARCHITECTURE.md Section 8: scoring logic must never
 // run client-side or be exposed to the client.
 
-import { TARA_NAMES } from "./muhurta";
+import { calculateNavtara } from "./muhurta";
 
 // Deliberately narrower than the full RealChart from lib/astro.ts -- this
 // scoring function only ever needs the Lagna rashi, and callers that already
@@ -25,13 +25,32 @@ export interface LagnaOnlyChart {
   lagnaRashi: number;
 }
 
-// Purpose-weight: how favourable each graha is for each purpose (0-10)
+// Purpose-weight: how favourable each graha is for each purpose (0-10).
+// Sources: Muhurta Chintamani (Prayojana-bheda); Chugh Muhurta;
+//          BPHS Muhurta adhyaya.
+// OccultVIISION proprietary weighting where no classical numeric split exists —
+// labeled here to avoid misrepresenting invented values as classical rules.
 export const PURPOSE_WEIGHTS: Record<string, Record<string, number>> = {
-  general: { Sun: 6, Moon: 6, Mars: 4, Mercury: 7, Jupiter: 9, Venus: 8, Saturn: 3, Rahu: 2, Ketu: 2 },
+  // General: broadly auspicious planets per Muhurta Chintamani
+  general:  { Sun: 6, Moon: 6, Mars: 4, Mercury: 7, Jupiter: 9, Venus: 8, Saturn: 3, Rahu: 2, Ketu: 2 },
+  // Business / commerce: Mercury (Vanik) and Jupiter (Dhana) primary
   business: { Sun: 7, Moon: 4, Mars: 5, Mercury: 9, Jupiter: 8, Venus: 6, Saturn: 4, Rahu: 5, Ketu: 2 },
-  travel: { Sun: 5, Moon: 5, Mars: 4, Mercury: 8, Jupiter: 8, Venus: 7, Saturn: 3, Rahu: 3, Ketu: 2 },
+  // Travel / journey: Mercury and Jupiter favour movement; Saturn/Rahu obstruct
+  travel:   { Sun: 5, Moon: 5, Mars: 4, Mercury: 8, Jupiter: 8, Venus: 7, Saturn: 3, Rahu: 3, Ketu: 2 },
+  // Marriage / Vivaha: Venus (Kalatrakaraka) + Jupiter primary; Mars caution
   marriage: { Sun: 4, Moon: 7, Mars: 3, Mercury: 5, Jupiter: 9, Venus: 9, Saturn: 2, Rahu: 2, Ketu: 2 },
-  finance: { Sun: 6, Moon: 5, Mars: 4, Mercury: 8, Jupiter: 9, Venus: 7, Saturn: 5, Rahu: 4, Ketu: 2 },
+  // Finance / wealth: Jupiter (Dhanakaraka) + Mercury primary
+  finance:  { Sun: 6, Moon: 5, Mars: 4, Mercury: 8, Jupiter: 9, Venus: 7, Saturn: 5, Rahu: 4, Ketu: 2 },
+  // Property / Griha Pravesh / land acquisition: Mars (Bhumikaraka) primary;
+  // Saturn for construction (durable but slow); Ketu and Rahu adverse.
+  // Source basis: Muhurta Chintamani Griha Pravesh adhyaya; BPHS Bhumi-yoga.
+  // OccultVIISION proprietary numeric weighting.
+  property: { Sun: 7, Moon: 5, Mars: 9, Mercury: 5, Jupiter: 8, Venus: 6, Saturn: 7, Rahu: 2, Ketu: 2 },
+  // Medical / surgery / treatment commencement: Sun (health) + Mars (surgery);
+  // Moon must be strong (not waning 8th, not in Ganda Moola).
+  // Source: Muhurta Chintamani Roga-Chikitsa Prakarana; BPHS Muhurta adhyaya.
+  // OccultVIISION proprietary numeric weighting.
+  medical:  { Sun: 8, Moon: 7, Mars: 6, Mercury: 7, Jupiter: 8, Venus: 5, Saturn: 3, Rahu: 2, Ketu: 2 },
 };
 
 // Functional-nature by Lagna -- which planets are Kendra/Trikona
@@ -59,35 +78,33 @@ export function getFunctionalNature(chart: LagnaOnlyChart | null, planet: string
   return { label: "Neutral", score: 2 };
 }
 
-// Tarabala-Gate -- Avritti-graded (3rd-avritti = fully auspicious; 1st =
-// fully caution; 2nd = degree-zone check). Proven grading from the
-// standalone build.
-export function getTarabalaGate(janmaNakIdx: number, currentNakIdx: number, currentNakDeg: number) {
-  const count = ((currentNakIdx - janmaNakIdx + 27) % 27) + 1;
-  const taraNum = ((count - 1) % 9) + 1;
-  const avritti = Math.ceil(count / 9);
-  const BENEFIC = new Set([2, 4, 6, 8, 9]);
-  const good = BENEFIC.has(taraNum);
-  let cap = 100;
-  let note = "";
-  if (avritti === 3) {
-    cap = 100;
-    note = "3rd Avritti -- most auspicious, no restriction";
-  } else if (avritti === 1) {
-    cap = good ? 85 : 55;
-    note = "1st Avritti -- " + (good ? "auspicious" : "exercise caution");
-  } else {
-    const zoneWidth = 360 / 27 / 3;
-    const zone = Math.floor(currentNakDeg / zoneWidth);
-    if (!good && zone === 1) {
-      cap = 55;
-      note = "2nd Avritti, middle zone -- exercise caution";
-    } else {
-      cap = good ? 90 : 70;
-      note = "2nd Avritti";
-    }
-  }
-  return { taraNum, taraName: TARA_NAMES[taraNum]!, avritti, good, cap, note };
+// Tarabala-Gate -- delegates to calculateNavtara() in muhurta.ts, which
+// implements the Muhurta-Chintamani cycle rule (Cycle 3 fully reverses
+// Vipat/Pratyari/Vadha). Cap is derived from the cycle-adjusted score:
+//   +2 → 100 (most benefic, no restriction)
+//   +1 → 90  (benefic, mild restriction)
+//    0 → 70  (neutral or Cycle-2 mixed zone — insufficient data for full trust)
+//   -1 → 60  (adverse)
+//   -2 → 45  (most adverse)
+// NOTE: currentNakDeg is accepted for API compatibility but currently unused
+// inside calculateNavtara() — the Cycle-2 zone requires nakshatra degree and
+// is flagged "mixed"/score=0 until that data is wired (see muhurta.ts).
+export function getTarabalaGate(janmaNakIdx: number, currentNakIdx: number, _currentNakDeg: number) {
+  const result = calculateNavtara(janmaNakIdx, currentNakIdx);
+  const scoreToCap: Record<number, number> = { 2: 100, 1: 90, 0: 70, "-1": 60, "-2": 45 };
+  const cap = scoreToCap[result.score] ?? 70;
+  const good = result.score > 0;
+  return {
+    taraNum:  result.position,
+    taraName: result.name,
+    avritti:  result.cycle,           // kept as "avritti" for backward compat with callers
+    cycle:    result.cycle,
+    good,
+    cap,
+    effectiveQuality: result.effectiveQuality,
+    cycleRule: result.cycleRule,
+    note: result.cycleRule,
+  };
 }
 
 // Chandrabala-Gate -- ARCHITECTURE.md Section 4: rashi-count check, the
@@ -208,7 +225,12 @@ export function scoreHora(
   if (janmaNakIdx !== null) {
     const gate = getTarabalaGate(janmaNakIdx, currentNakIdx, currentNakDeg);
     if (score > gate.cap) score = gate.cap;
-    layers.push({ name: "Tarabala Gate", detail: `${gate.taraName} (Avritti ${gate.avritti})`, impact: gate.note });
+    const cycleLabel = gate.cycle === 1 ? "1st cycle" : gate.cycle === 2 ? "2nd cycle (mixed zone)" : "3rd cycle";
+    layers.push({
+      name: "Tarabala Gate",
+      detail: `${gate.taraName} — ${cycleLabel} (${gate.effectiveQuality})`,
+      impact: gate.note,
+    });
   } else {
     layers.push({
       name: "Tarabala Gate",
