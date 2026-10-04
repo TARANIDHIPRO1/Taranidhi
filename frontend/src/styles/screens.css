@@ -1177,3 +1177,508 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BIRTH CHART SCREEN  (kc- = kundali chart)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.kc-screen {
+  background: #0a0a14;
+  color: #e8e8f0;
+  min-height: 100vh;
+  padding-bottom: 80px;
+  font-family: var(--font-body, sans-serif);
+}
+
+/* ── Header ── */
+.kc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #0d0d1a;
+  border-bottom: 1px solid #1e1e30;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.kc-back {
+  background: none;
+  border: none;
+  color: #a78bfa;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.kc-back:hover { background: rgba(167,139,250,.15); }
+.kc-title { flex: 1; }
+.kc-name  { display: block; font-size: 0.95rem; font-weight: 600; color: #e8e8f0; }
+.kc-sub   { display: block; font-size: 0.7rem; color: #6b6b80; }
+.kc-delete {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  opacity: 0.6;
+}
+.kc-delete:hover { opacity: 1; background: rgba(248,113,113,.1); }
+
+/* ── Warning banner ── */
+.kc-warning {
+  background: rgba(251,191,36,.08);
+  border: 1px solid rgba(251,191,36,.3);
+  border-radius: 8px;
+  margin: 12px 16px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.kc-warn-btn {
+  background: rgba(251,191,36,.15);
+  border: 1px solid rgba(251,191,36,.4);
+  color: #fbbf24;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── Birth details banner ── */
+.kc-birth-banner {
+  margin: 12px 16px;
+  background: #111120;
+  border: 1px solid #1e1e30;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.kc-birth-row {
+  display: flex;
+  gap: 10px;
+  font-size: 0.78rem;
+  padding: 3px 0;
+}
+.kc-birth-label { color: #6b6b80; min-width: 68px; }
+.kc-birth-val   { color: #c4c4d8; }
+
+/* ── Chart toggle ── */
+.kc-chart-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  margin: 14px 0 8px;
+}
+.kc-toggle {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #1e1e30;
+  background: #111120;
+  color: #6b6b80;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.kc-toggle.active {
+  background: rgba(167,139,250,.12);
+  border-color: #a78bfa;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+/* ── Chart wrapper ── */
+.kc-chart-wrap {
+  padding: 4px 16px 12px;
+}
+
+/* ── North Indian chart (4×4 grid) ── */
+.ni-chart {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-areas:
+    "h12 h1  h2  h3"
+    "h11 ctr ctr h4"
+    "h10 ctr ctr h5"
+    "h9  h8  h7  h6";
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(167,139,250,.5);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0d0d1a;
+}
+.ni-cell {
+  border: 1px solid rgba(167,139,250,.15);
+  padding: 4px 5px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.ni-h1  { grid-area: h1; }
+.ni-h2  { grid-area: h2; }
+.ni-h3  { grid-area: h3; }
+.ni-h4  { grid-area: h4; }
+.ni-h5  { grid-area: h5; }
+.ni-h6  { grid-area: h6; }
+.ni-h7  { grid-area: h7; }
+.ni-h8  { grid-area: h8; }
+.ni-h9  { grid-area: h9; }
+.ni-h10 { grid-area: h10; }
+.ni-h11 { grid-area: h11; }
+.ni-h12 { grid-area: h12; }
+.ni-center {
+  grid-area: ctr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(167,139,250,.04);
+  border: 1px solid rgba(167,139,250,.15);
+}
+.ni-center-spacer { display: none; }
+.ni-center-text {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(167,139,250,.4);
+}
+.ni-center-sub {
+  font-size: 0.5rem;
+  color: rgba(167,139,250,.3);
+  margin-top: 2px;
+}
+.ni-house-num {
+  font-size: 0.45rem;
+  color: rgba(167,139,250,.4);
+  line-height: 1;
+}
+.ni-rashi {
+  font-size: 0.58rem;
+  color: #8888aa;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.ni-asc {
+  font-size: 0.5rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+.ni-planets {
+  font-size: 0.62rem;
+  line-height: 1.4;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+/* ── South Indian chart (4×4 grid) ── */
+.si-chart {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-areas:
+    "r11 r0  r1  r2"
+    "r10 ctr ctr r3"
+    "r9  ctr ctr r4"
+    "r8  r7  r6  r5";
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(167,139,250,.5);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0d0d1a;
+}
+.si-cell {
+  border: 1px solid rgba(167,139,250,.15);
+  padding: 4px 5px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.si-r0  { grid-area: r0; }
+.si-r1  { grid-area: r1; }
+.si-r2  { grid-area: r2; }
+.si-r3  { grid-area: r3; }
+.si-r4  { grid-area: r4; }
+.si-r5  { grid-area: r5; }
+.si-r6  { grid-area: r6; }
+.si-r7  { grid-area: r7; }
+.si-r8  { grid-area: r8; }
+.si-r9  { grid-area: r9; }
+.si-r10 { grid-area: r10; }
+.si-r11 { grid-area: r11; }
+.si-center {
+  grid-area: ctr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(167,139,250,.04);
+  border: 1px solid rgba(167,139,250,.15);
+}
+.si-center-sp { display: none; }
+.si-center-text {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(167,139,250,.4);
+}
+.si-asc { background: rgba(251,191,36,.06) !important; }
+.si-rashi-name {
+  font-size: 0.58rem;
+  color: #8888aa;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.si-la {
+  font-size: 0.5rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+.si-house-num {
+  font-size: 0.45rem;
+  color: rgba(167,139,250,.4);
+}
+.si-planets {
+  font-size: 0.62rem;
+  line-height: 1.4;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+/* ── Legend ── */
+.kc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 0 16px 12px;
+  font-size: 0.64rem;
+}
+.kc-leg-item { opacity: 0.8; }
+
+/* ── Sections ── */
+.kc-section {
+  margin: 0 16px 16px;
+  background: #111120;
+  border: 1px solid #1e1e30;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.kc-section-title {
+  background: #0d0d1a;
+  padding: 8px 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #a78bfa;
+  border-bottom: 1px solid #1e1e30;
+}
+
+/* ── Panchang grid ── */
+.kc-panchang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #1e1e30;
+}
+.kc-panch-item {
+  background: #111120;
+  padding: 10px 12px;
+}
+.kc-panch-label {
+  font-size: 0.62rem;
+  color: #6b6b80;
+  margin-bottom: 3px;
+}
+.kc-panch-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e8e8f0;
+  margin-bottom: 2px;
+}
+.kc-panch-sub {
+  font-size: 0.62rem;
+  color: #8888aa;
+}
+
+/* ── Ascendant card ── */
+.kc-asc-card {
+  padding: 12px 14px;
+}
+.kc-asc-sign {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #a78bfa;
+  margin-bottom: 4px;
+}
+.kc-asc-deg {
+  font-size: 0.82rem;
+  color: #c4c4d8;
+  font-family: monospace;
+  margin-bottom: 4px;
+}
+.kc-asc-nak {
+  font-size: 0.78rem;
+  color: #8888aa;
+  margin-bottom: 6px;
+}
+.kc-kp {
+  font-size: 0.72rem;
+  color: #6b6b80;
+  font-family: monospace;
+}
+
+/* ── Dasha row ── */
+.kc-dasha-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+.kc-dasha-item {
+  flex: 1;
+}
+.kc-dasha-planet {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-bottom: 2px;
+}
+.kc-antar .kc-dasha-planet {
+  color: #fb923c;
+  font-size: 0.9rem;
+}
+.kc-dasha-type {
+  font-size: 0.62rem;
+  color: #6b6b80;
+  margin-bottom: 3px;
+}
+.kc-dasha-dates {
+  font-size: 0.68rem;
+  color: #8888aa;
+}
+.kc-dasha-arrow {
+  font-size: 1.2rem;
+  color: rgba(167,139,250,.4);
+}
+
+/* ── Janma Nakshatra + Tara ── */
+.kc-nak-tara {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #1e1e30;
+}
+.kc-nak-card,
+.kc-tara-card {
+  background: #111120;
+  padding: 12px 14px;
+}
+.kc-nak-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  margin-bottom: 4px;
+}
+.kc-nak-detail {
+  font-size: 0.72rem;
+  color: #8888aa;
+}
+.kc-tara-num {
+  font-size: 0.65rem;
+  color: #6b6b80;
+  margin-bottom: 2px;
+}
+.kc-tara-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.kc-tara-sub {
+  font-size: 0.65rem;
+  color: #8888aa;
+}
+.tara-good .kc-tara-name { color: #4ade80; }
+.tara-bad  .kc-tara-name { color: #f87171; }
+.tara-mid  .kc-tara-name { color: #fbbf24; }
+
+/* ── Tables ── */
+.kc-table-wrap {
+  overflow-x: auto;
+}
+.kc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+.kc-table th {
+  background: #0d0d1a;
+  color: #6b6b80;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.kc-table td {
+  padding: 6px 10px;
+  border-top: 1px solid #1a1a2a;
+  color: #c4c4d8;
+  white-space: nowrap;
+}
+.kc-table .tc { text-align: center; }
+.kc-table .mono { font-family: monospace; font-size: 0.65rem; }
+.kc-table .kp-cell { font-family: monospace; font-size: 0.62rem; color: #8888aa; }
+.kc-table .row-alt td { background: rgba(167,139,250,.025); }
+
+/* ── Engine note ── */
+.kc-engine-note {
+  text-align: center;
+  font-size: 0.62rem;
+  color: #3a3a50;
+  margin: 0 16px 16px;
+}
+
+/* ── Bottom nav ── */
+.kc-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 0;
+  background: #0d0d1a;
+  border-top: 1px solid #1e1e30;
+  z-index: 20;
+}
+.kc-nav-btn {
+  flex: 1;
+  padding: 12px 4px;
+  background: none;
+  border: none;
+  color: #6b6b80;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.kc-nav-btn:hover { color: #a78bfa; }
+
+/* Responsive: wider screens */
+@media (min-width: 480px) {
+  .ni-house-num, .si-house-num { font-size: 0.52rem; }
+  .ni-rashi, .si-rashi-name    { font-size: 0.65rem; }
+  .ni-planets, .si-planets     { font-size: 0.7rem; }
+  .ni-center-text, .si-center-text { font-size: 0.65rem; }
+}
+@media (min-width: 600px) {
+  .kc-screen { max-width: 520px; margin: 0 auto; }
+  .kc-bottom-nav { max-width: 520px; left: 50%; transform: translateX(-50%); }
+}
