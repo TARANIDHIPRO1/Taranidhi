@@ -1,14 +1,26 @@
 /**
  * Hash-based SPA Router
- * Routes: #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
+ * Routes: #/home, #/pricing, #/features, #/blog, #/contact (public)
+ *         #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
  *         #/kundali, #/kundali-form, #/wallet, #/referral, #/birth-chart,
  *         #/muhurta-dashboard, #/dasha-timeline, #/kp-sublords,
  *         #/event-muhurta?purpose=property|marriage|business|medical
+ *
+ * Default route (empty hash): #/home (public landing page).
+ * Login required for all app routes; the login screen handles auth redirect.
  *
  * Query-string support: #/birth-chart?id=5 → route "/birth-chart", params "id=5"
  * The handler receives no args; screens parse window.location.hash themselves.
  */
 
+// Public site
+import { renderPublicHome }     from "./screens/public-home";
+import { renderPublicPricing }  from "./screens/public-pricing";
+import { renderPublicFeatures } from "./screens/public-features";
+import { renderPublicBlog }     from "./screens/public-blog";
+import { renderPublicContact }  from "./screens/public-contact";
+
+// App screens
 import { renderLogin } from "./screens/login";
 import { renderDashboard } from "./screens/dashboard";
 import { renderMuhurta } from "./screens/muhurta";
@@ -31,7 +43,14 @@ export class Router {
   private routes = new Map<string, RouteHandler>();
 
   constructor() {
-    // Register routes
+    // Public marketing site
+    this.routes.set("/home",     renderPublicHome);
+    this.routes.set("/pricing",  renderPublicPricing);
+    this.routes.set("/features", renderPublicFeatures);
+    this.routes.set("/blog",     renderPublicBlog);
+    this.routes.set("/contact",  renderPublicContact);
+
+    // App routes
     this.routes.set("/login", renderLogin);
     this.routes.set("/dashboard", renderDashboard);
     this.routes.set("/muhurta", renderMuhurta);
@@ -50,7 +69,7 @@ export class Router {
   }
 
   currentRoute(): string {
-    return window.location.hash.slice(1) || "/login";
+    return window.location.hash.slice(1) || "/home";
   }
 
   /** Strip query string from hash path before looking up the handler.
@@ -71,8 +90,8 @@ export class Router {
         console.error(`Route handler error for ${path}:`, error);
       }
     } else {
-      // Fallback to login
-      const fallback = this.routes.get("/login");
+      // Fallback: unknown hash → public home
+      const fallback = this.routes.get("/home");
       if (fallback) await fallback();
     }
   }
