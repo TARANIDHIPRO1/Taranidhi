@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCCULTVIISION — उपहोरा परीक्षण यंत्र</title>
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #13132a;
+    --surface2: #1a1a35;
+    --border: #2a2a50;
+    --accent: #7c3aed;
+    --gold: #f59e0b;
+    --sun: #f97316;
+    --moon: #93c5fd;
+    --mars: #ef4444;
+    --mercury: #10b981;
+    --jupiter: #a78bfa;
+    --venus: #f9a8d4;
+    --saturn: #6b7280;
+    --shubha: #22c55e;
+    --ashubha: #ef4444;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --mono: 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .header { background: linear-gradient(135deg, #1a0533 0%, #0d0d1a 100%); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .header-logo { font-size: 22px; font-weight: 800; letter-spacing: 2px; color: var(--gold); }
+  .header-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .header-time { margin-left: auto; text-align: right; }
+  .live-clock { font-family: var(--mono); font-size: 20px; color: var(--gold); letter-spacing: 2px; }
+  .live-date  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── INPUTS ── */
+  .config-panel { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
+  .cfg-group { display: flex; flex-direction: column; gap: 4px; }
+  .cfg-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .cfg-input, .cfg-select {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none;
+  }
+  .cfg-input:focus, .cfg-select:focus { border-color: var(--accent); }
+  .cfg-input { width: 120px; }
+  .cfg-btn {
+    background: var(--accent); color: white; border: none; padding: 7px 16px;
+    border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  .cfg-btn:hover { background: #6d28d9; }
+
+  /* ── MAIN GRID ── */
+  .main { padding: 16px 20px; display: grid; grid-template-columns: 340px 1fr; gap: 16px; }
+  @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .card-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  /* ── SUN INFO ── */
+  .sun-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+  .sun-val { font-family: var(--mono); color: var(--gold); }
+
+  /* ── HORA CARD ── */
+  .hora-card { border: 2px solid var(--accent); position: relative; overflow: hidden; }
+  .hora-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--gold)); }
+  .hora-lord-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .hora-planet-dot { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .hora-lord-name { font-size: 22px; font-weight: 700; }
+  .hora-lord-hindi { font-size: 13px; color: var(--muted); }
+  .hora-quality-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+  .badge-shubha { background: rgba(34,197,94,0.15); color: var(--shubha); border: 1px solid var(--shubha); }
+  .badge-ashubha { background: rgba(239,68,68,0.15); color: var(--ashubha); border: 1px solid var(--ashubha); }
+  .hora-time-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .hora-progress { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+  .hora-progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 1s linear; }
+  .hora-remaining { text-align: center; font-family: var(--mono); font-size: 13px; color: var(--gold); margin-top: 6px; }
+
+  /* ── NAKSHATRA TARA CARD ── */
+  .tara-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .tara-row:last-child { border-bottom: none; }
+  .tara-label { color: var(--muted); }
+  .tara-val { font-weight: 600; }
+
+  /* ── UPHORA TABLE ── */
+  .uphora-section { grid-column: 1 / -1; }
+  .uphora-grid { display: grid; gap: 8px; }
+  .uphora-row {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; display: grid;
+    grid-template-columns: 32px 120px 90px 90px 70px 1fr 110px;
+    align-items: center; gap: 10px; transition: all 0.3s;
+  }
+  .uphora-row.active {
+    background: rgba(124,58,237,0.12); border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 20px rgba(124,58,237,0.2);
+  }
+  .uphora-row.past { opacity: 0.45; }
+  .uphora-idx { font-size: 11px; color: var(--muted); font-family: var(--mono); text-align: center; }
+  .uphora-lord-cell { display: flex; align-items: center; gap: 8px; }
+  .planet-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .uphora-lord-text .en { font-size: 13px; font-weight: 700; }
+  .uphora-lord-text .hi { font-size: 10px; color: var(--muted); }
+  .time-cell { font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .dur-cell { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--gold); }
+  .quality-cell { }
+  .activity-cell { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .score-cell { }
+  .score-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 3px; }
+  .score-text { font-size: 11px; margin-top: 3px; text-align: right; font-family: var(--mono); }
+  .active-badge { display: inline-block; background: var(--accent); color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; letter-spacing: 1px; margin-top: 2px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  /* Planet colors */
+  .p-Sun      { background: rgba(249,115,22,0.2); }
+  .p-Moon     { background: rgba(147,197,253,0.2); }
+  .p-Mars     { background: rgba(239,68,68,0.2); }
+  .p-Mercury  { background: rgba(16,185,129,0.2); }
+  .p-Jupiter  { background: rgba(167,139,250,0.2); }
+  .p-Venus    { background: rgba(249,168,212,0.2); }
+  .p-Saturn   { background: rgba(107,114,128,0.2); }
+  .c-Sun      { color: var(--sun); }
+  .c-Moon     { color: var(--moon); }
+  .c-Mars     { color: var(--mars); }
+  .c-Mercury  { color: var(--mercury); }
+  .c-Jupiter  { color: var(--jupiter); }
+  .c-Venus    { color: var(--venus); }
+  .c-Saturn   { color: var(--saturn); }
+
+  /* ── BEST UPHORA ── */
+  .best-uphora-card { background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(245,158,11,0.08)); border-color: var(--gold); }
+  .best-countdown { font-family: var(--mono); font-size: 28px; color: var(--gold); text-align: center; margin: 8px 0; }
+  .best-details { font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .best-details strong { color: var(--text); }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .debug-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 12px; white-space: pre-wrap; }
+
+  /* Column header row */
+  .uphora-header {
+    display: grid;
+    grid-template-columns: 32px 120px 90px 90px 70px 1fr 110px;
+    gap: 10px; padding: 6px 14px;
+    font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">⬡ OCCULTVIISION</div>
+    <div class="header-sub">उपहोरा परीक्षण यंत्र · Uphora Testing Tool</div>
+  </div>
+  <div class="header-time">
+    <div class="live-clock" id="clock">--:--:--</div>
+    <div class="live-date" id="dateDisp">--</div>
+  </div>
+</div>
+
+<div class="config-panel">
+  <div class="cfg-group">
+    <div class="cfg-label">Latitude</div>
+    <input class="cfg-input" id="lat" type="number" step="0.001" value="23.2505" placeholder="23.2505">
+  </div>
+  <div class="cfg-group">
+    <div class="cfg-label">Longitude</div>
+    <input class="cfg-input" id="lon" type="number" step="0.001" value="77.4065" placeholder="77.4065">
+  </div>
+  <div class="cfg-group">
+    <div class="cfg-label">Janma Nakshatra (Birth Star)</div>
+    <select class="cfg-select" id="janmaNak" style="width:240px">
+      <option value="-1">-- जन्म नक्षत्र चुनें --</option>
+      <option value="0">1. अश्विनी (Ashwini) — Ketu</option>
+      <option value="1">2. भरणी (Bharani) — Venus</option>
+      <option value="2">3. कृत्तिका (Krittika) — Sun</option>
+      <option value="3">4. रोहिणी (Rohini) — Moon</option>
+      <option value="4">5. मृगशिरा (Mrigashira) — Mars</option>
+      <option value="5">6. आर्द्रा (Ardra) — Rahu</option>
+      <option value="6">7. पुनर्वसु (Punarvasu) — Jupiter</option>
+      <option value="7">8. पुष्य (Pushya) — Saturn</option>
+      <option value="8">9. आश्लेषा (Ashlesha) — Mercury</option>
+      <option value="9">10. मघा (Magha) — Ketu</option>
+      <option value="10">11. पूर्वा फाल्गुनी (Purva Phalguni) — Venus</option>
+      <option value="11">12. उत्तरा फाल्गुनी (Uttara Phalguni) — Sun</option>
+      <option value="12">13. हस्त (Hasta) — Moon</option>
+      <option value="13">14. चित्रा (Chitra) — Mars</option>
+      <option value="14">15. स्वाती (Swati) — Rahu</option>
+      <option value="15">16. विशाखा (Vishakha) — Jupiter</option>
+      <option value="16">17. अनुराधा (Anuradha) — Saturn</option>
+      <option value="17">18. ज्येष्ठा (Jyeshtha) — Mercury</option>
+      <option value="18">19. मूल (Moola) — Ketu</option>
+      <option value="19">20. पूर्वाषाढ़ा (Purva Ashadha) — Venus</option>
+      <option value="20">21. उत्तराषाढ़ा (Uttara Ashadha) — Sun</option>
+      <option value="21">22. श्रवण (Shravana) — Moon</option>
+      <option value="22">23. धनिष्ठा (Dhanishtha) — Mars</option>
+      <option value="23">24. शतभिषा (Shatabhisha) — Rahu</option>
+      <option value="24">25. पूर्वा भाद्रपद (Purva Bhadrapada) — Jupiter</option>
+      <option value="25">26. उत्तरा भाद्रपद (Uttara Bhadrapada) — Saturn</option>
+      <option value="26">27. रेवती (Revati) — Mercury</option>
+    </select>
+  </div>
+  <div class="cfg-group">
+    <div class="cfg-label">Event Category</div>
+    <select class="cfg-select" id="eventCat">
+      <option value="general">General / सामान्य</option>
+      <option value="property">Property / संपत्ति</option>
+      <option value="marriage">Marriage / विवाह</option>
+      <option value="business">Business / व्यापार</option>
+      <option value="medical">Medical / चिकित्सा</option>
+      <option value="travel">Travel / यात्रा</option>
+      <option value="education">Education / शिक्षा</option>
+    </select>
+  </div>
+  <div class="cfg-group">
+    <div class="cfg-label">&nbsp;</div>
+    <button class="cfg-btn" onclick="refresh()">🔄 Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Left column -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <!-- Sun card -->
+    <div class="card" id="sunCard">
+      <div class="card-title">☀ आज का सूर्योदय / अस्त</div>
+      <div class="sun-row"><span>Sunrise (उदय)</span><span class="sun-val" id="sunriseDisp">—</span></div>
+      <div class="sun-row"><span>Sunset (अस्त)</span><span class="sun-val" id="sunsetDisp">—</span></div>
+      <div class="sun-row"><span>Day duration</span><span class="sun-val" id="dayDurDisp">—</span></div>
+      <div class="sun-row"><span>Current Hora #</span><span class="sun-val" id="horaNumDisp">—</span></div>
+    </div>
+
+    <!-- Active Hora card -->
+    <div class="card hora-card" id="horaCard">
+      <div class="card-title">🕐 सक्रिय होरा (Active Hora)</div>
+      <div class="hora-lord-row">
+        <div class="hora-planet-dot" id="horaDot">☀</div>
+        <div>
+          <div class="hora-lord-name" id="horaLordName">—</div>
+          <div class="hora-lord-hindi" id="horaLordHindi">—</div>
+          <div id="horaQualityBadge"></div>
+        </div>
+      </div>
+      <div class="hora-time-row">
+        <span id="horaStart">—</span>
+        <span id="horaEnd">—</span>
+      </div>
+      <div class="hora-progress"><div class="hora-progress-bar" id="horaBar" style="width:0%"></div></div>
+      <div class="hora-remaining" id="horaRemaining">— मिनट शेष</div>
+    </div>
+
+    <!-- Best upcoming Uphora -->
+    <div class="card best-uphora-card" id="bestCard">
+      <div class="card-title">⭐ सर्वोत्तम आगामी उपहोरा</div>
+      <div id="bestUphora">गणना हो रही है…</div>
+    </div>
+
+    <!-- Scoring legend -->
+    <div class="card">
+      <div class="card-title">📖 स्कोर लेजेंड</div>
+      <div style="font-size:12px;line-height:1.9;color:var(--muted)">
+        <div><span style="color:var(--shubha)">●</span> <strong style="color:var(--text)">≥75</strong> — अति शुभ (Most Auspicious)</div>
+        <div><span style="color:#86efac">●</span> <strong style="color:var(--text)">55–74</strong> — शुभ (Auspicious)</div>
+        <div><span style="color:var(--gold)">●</span> <strong style="color:var(--text)">40–54</strong> — मध्यम (Mixed)</div>
+        <div><span style="color:var(--ashubha)">●</span> <strong style="color:var(--text)">&lt;40</strong> — अशुभ (Avoid)</div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:8px 0">
+        <div style="font-size:11px">Score = Uphora quality (60%) + Hora quality (25%) + Janma Nakshatra match (15%)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Uphora table -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="card uphora-section">
+      <div class="card-title">⏱ उपहोरा विश्लेषण — Vimshottari अनुपात (6:20:17:10:19:16:7)</div>
+      <div class="uphora-header">
+        <div>#</div>
+        <div>ग्रह / Planet</div>
+        <div>आरंभ / Start</div>
+        <div>समाप्त / End</div>
+        <div>अवधि / Dur</div>
+        <div>कार्य / Activity</div>
+        <div>स्कोर / Score</div>
+      </div>
+      <div class="uphora-grid" id="uphoraGrid">
+        <div style="text-align:center;padding:20px;color:var(--muted)">Loading…</div>
+      </div>
+    </div>
+
+    <!-- All 7 Horas mini-list for context -->
+    <div class="card">
+      <div class="card-title">📋 आज की पूरी होरा सूची (Day Horas)</div>
+      <div id="horaList" style="font-size:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔬 Debug — Raw Calculation Values</div>
+      <div class="debug-box" id="debugBox">—</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+
+const CHALDEAN = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
+
+// Vimshottari periods — 7-planet (Rahu/Ketu excluded)
+// Classical KP proportions for Uphora timing
+const VIMSHOTTARI = { Sun:6, Moon:10, Mars:7, Mercury:17, Jupiter:16, Venus:20, Saturn:19 };
+const VIMSHOTTARI_TOTAL = 95;
+
+const PLANET_META = {
+  Sun:     { hi:'सूर्य', sym:'☀', nature:'Ashubha', score:45,  cat:'shubha-special' },
+  Moon:    { hi:'चंद्र', sym:'☽', nature:'Shubha',  score:75,  cat:'shubha' },
+  Mars:    { hi:'मंगल', sym:'♂', nature:'Ashubha', score:35,  cat:'ashubha' },
+  Mercury: { hi:'बुध',  sym:'☿', nature:'Shubha',  score:70,  cat:'shubha' },
+  Jupiter: { hi:'गुरु', sym:'♃', nature:'Shubha',  score:85,  cat:'shubha' },
+  Venus:   { hi:'शुक्र', sym:'♀', nature:'Shubha', score:80,  cat:'shubha' },
+  Saturn:  { hi:'शनि', sym:'♄', nature:'Ashubha', score:30,  cat:'ashubha' },
+};
+
+// Hora base score (more nuanced than nature alone)
+const HORA_SCORE = { Sun:50, Moon:78, Mars:32, Mercury:72, Jupiter:88, Venus:82, Saturn:28 };
+
+// Activities by planet — general + by event category
+const ACTIVITIES = {
+  general: {
+    Sun:     'सरकारी कार्य · नई नौकरी · चिकित्सा · पित्र कार्य',
+    Moon:    'यात्रा · जल कार्य · सार्वजनिक व्यवहार · खेती',
+    Mars:    'निर्माण · संपत्ति · शल्य चिकित्सा · वाहन',
+    Mercury: 'व्यापार · शिक्षा · लेखन · संचार · अनुबंध',
+    Jupiter: 'विवाह · आध्यात्मिक · निवेश · शिक्षा · संतान',
+    Venus:   'विवाह · वाहन · कला · सौंदर्य · प्रेम · वस्त्र',
+    Saturn:  'कृषि · श्रम · उत्खनन · दीर्घकालीन कार्य',
+  },
+  property: {
+    Sun:     'पंजीकरण · सरकारी अनुमति', Moon:'जल-भूमि · फार्म',
+    Mars:    '★ आदर्श — संपत्ति खरीद-बिक्री · भूमि पूजन · निर्माण',
+    Mercury: 'अनुबंध · कागजात', Jupiter:'शुभ — मुख्य खरीद',
+    Venus:   'आवासीय · सुंदर संपत्ति', Saturn:'कृषि भूमि · गोदाम',
+  },
+  marriage: {
+    Sun:     'विवाह — टालें', Moon:'सामाजिक मिलन',
+    Mars:    'विवाह — टालें (क्लेश)', Mercury:'विवाह वार्ता · अनुबंध',
+    Jupiter: '★ सर्वश्रेष्ठ — विवाह मुहूर्त', Venus:'★ आदर्श — प्रेम विवाह',
+    Saturn:  'विवाह — टालें',
+  },
+  business: {
+    Sun:     'सरकारी टेंडर · नेतृत्व', Moon:'जन-व्यवहार · खुदरा',
+    Mars:    'तकनीक · मशीनरी', Mercury:'★ सर्वश्रेष्ठ — व्यापार · साझेदारी',
+    Jupiter: 'निवेश · विस्तार · बैंकिंग', Venus:'फैशन · मनोरंजन · FMCG',
+    Saturn:  'खनन · श्रम ठेका',
+  },
+  medical: {
+    Sun:     '★ चिकित्सा · नेत्र · हृदय', Moon:'मन · स्त्री रोग · तरल',
+    Mars:    'शल्य चिकित्सा (आपातकाल)', Mercury:'न्यूरो · त्वचा · संचार',
+    Jupiter: 'लीवर · वसा · वैकल्पिक चिकित्सा', Venus:'मूत्र · मधुमेह',
+    Saturn:  'हड्डी · पुराना रोग — टालें',
+  },
+  travel: {
+    Sun:     'पूर्व दिशा यात्रा', Moon:'★ जल-मार्ग · उत्तर · पश्चिम',
+    Mars:    'दक्षिण यात्रा (सावधान)', Mercury:'व्यापारिक यात्रा · उत्तर',
+    Jupiter: 'पूर्वोत्तर · तीर्थ यात्रा', Venus:'पश्चिम · मनोरंजन यात्रा',
+    Saturn:  'पश्चिम यात्रा — टालें',
+  },
+  education: {
+    Sun:     'प्रशासन · नेतृत्व पाठ्यक्रम', Moon:'कला · पोषण · ज्योतिष',
+    Mars:    'इंजीनियरिंग · खेल · NCC', Mercury:'★ सर्वश्रेष्ठ — सभी शिक्षा',
+    Jupiter: 'दर्शन · कानून · आध्यात्मिक', Venus:'ललित कला · संगीत',
+    Saturn:  'भूविज्ञान · कृषि',
+  },
+};
+
+// Nakshatra lord mapping (0-indexed, 0=Ashwini)
+// Lords: Ketu(K), Venus(V), Sun(Su), Moon(Mo), Mars(Ma), Rahu(R), Jupiter(J), Saturn(Sa), Mercury(Me)
+const NAK_LORDS = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+                   'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+                   'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+
+// ═══════════════════════════════════════════════════════════
+// SUNRISE / SUNSET (Meeus algorithm)
+// ═══════════════════════════════════════════════════════════
+function sunriseSunset(date, lat, lon) {
+  const D2R = Math.PI / 180;
+  const jd = Math.floor(date.getTime() / 86400000) + 2440587.5;
+  const n = Math.floor(jd - 2451545.0 + 0.0008);
+  const jStar = n - lon / 360;
+  const M = (357.5291 + 0.98560028 * jStar) % 360;
+  const Mr = M * D2R;
+  const C = 1.9148 * Math.sin(Mr) + 0.0200 * Math.sin(2 * Mr) + 0.0003 * Math.sin(3 * Mr);
+  const lam = (M + C + 180 + 102.9372) % 360;
+  const lamR = lam * D2R;
+  const jTransit = 2451545.0 + jStar + 0.0053 * Math.sin(Mr) - 0.0069 * Math.sin(2 * lamR);
+  const decl = Math.asin(Math.sin(lamR) * Math.sin(23.4397 * D2R));
+  const cosH = (Math.sin(-0.8333 * D2R) - Math.sin(lat * D2R) * Math.sin(decl))
+               / (Math.cos(lat * D2R) * Math.cos(decl));
+  if (cosH < -1 || cosH > 1) return null;
+  const H = Math.acos(cosH) / D2R;
+  const jRise = jTransit - H / 360;
+  const jSet  = jTransit + H / 360;
+  const toDate = jd => new Date((jd - 2440587.5) * 86400000);
+  return { sunrise: toDate(jRise), sunset: toDate(jSet) };
+}
+
+// ═══════════════════════════════════════════════════════════
+// HORA ENGINE
+// ═══════════════════════════════════════════════════════════
+const WEEKDAY_LORD = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+
+function buildHoras(weekday, sunrise, sunset, nextSunrise) {
+  const dayLord = WEEKDAY_LORD[weekday];
+  const startIdx = CHALDEAN.indexOf(dayLord);
+  const srMs = sunrise.getTime();
+  const ssMs = sunset.getTime();
+  const nsrMs = nextSunrise.getTime();
+  const dayDur = (ssMs - srMs) / 12;
+  const ngtDur = (nsrMs - ssMs) / 12;
+  return Array.from({length: 24}, (_, i) => {
+    const isNight = i >= 12;
+    const lord = CHALDEAN[(startIdx + i) % 7];
+    const start = isNight ? new Date(ssMs + (i-12) * ngtDur) : new Date(srMs + i * dayDur);
+    const end   = isNight ? new Date(ssMs + (i-11) * ngtDur) : new Date(srMs + (i+1) * dayDur);
+    return { lord, index: i, isNight, start, end };
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UPHORA ENGINE — Vimshottari proportional
+// ═══════════════════════════════════════════════════════════
+function buildUphoras(hora) {
+  const base = CHALDEAN.indexOf(hora.lord);
+  const totalMs = hora.end - hora.start;
+  let offsetMs = 0;
+  const uphoras = [];
+  for (let i = 0; i < 7; i++) {
+    const lord = CHALDEAN[(base + i) % 7];
+    const durationMs = (VIMSHOTTARI[lord] / VIMSHOTTARI_TOTAL) * totalMs;
+    const start = new Date(hora.start.getTime() + offsetMs);
+    const end   = i === 6 ? hora.end : new Date(hora.start.getTime() + offsetMs + durationMs);
+    uphoras.push({ lord, position: i, start, end, durationMs });
+    offsetMs += durationMs;
+  }
+  return uphoras;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════════════════════════════
+function scoreUphora(uphoraLord, horaLord, janmaNakIdx, eventCat) {
+  // Base: Uphora lord's inherent quality for this event (0-100)
+  const baseScores = {
+    general:   { Sun:50, Moon:75, Mars:35, Mercury:70, Jupiter:88, Venus:80, Saturn:28 },
+    property:  { Sun:55, Moon:40, Mars:90, Mercury:60, Jupiter:72, Venus:65, Saturn:45 },
+    marriage:  { Sun:20, Moon:60, Mars:15, Mercury:55, Jupiter:92, Venus:90, Saturn:12 },
+    business:  { Sun:52, Moon:65, Mars:40, Mercury:90, Jupiter:80, Venus:68, Saturn:30 },
+    medical:   { Sun:80, Moon:60, Mars:55, Mercury:65, Jupiter:58, Venus:50, Saturn:20 },
+    travel:    { Sun:55, Moon:82, Mars:35, Mercury:75, Jupiter:70, Venus:65, Saturn:22 },
+    education: { Sun:55, Moon:60, Mars:40, Mercury:90, Jupiter:85, Venus:62, Saturn:35 },
+  };
+  let score = (baseScores[eventCat] || baseScores.general)[uphoraLord];
+
+  // Hora modifier: good hora +8, bad hora -8
+  const horaGood = ['Moon','Mercury','Jupiter','Venus'].includes(horaLord);
+  score += horaGood ? 8 : -8;
+
+  // Janma Nakshatra compatibility: +12 if Uphora lord rules native's birth nakshatra
+  if (janmaNakIdx >= 0) {
+    const janmaLord = NAK_LORDS[janmaNakIdx];
+    // Map nakshatra lords to Chaldean planets (skip Rahu/Ketu → neutral)
+    const nakToHora = { Sun:'Sun', Moon:'Moon', Mars:'Mars', Mercury:'Mercury',
+                        Jupiter:'Jupiter', Venus:'Venus', Saturn:'Saturn',
+                        Rahu: null, Ketu: null };
+    const janmaHoraLord = nakToHora[janmaLord];
+    if (janmaHoraLord === uphoraLord) score += 12;
+    // Tara bonus: if janma lord = hora lord (same planet cycle) → minor bonus
+    if (janmaHoraLord === horaLord) score += 5;
+  }
+
+  return Math.max(5, Math.min(98, Math.round(score)));
+}
+
+function scoreColor(s) {
+  if (s >= 75) return '#22c55e';
+  if (s >= 55) return '#86efac';
+  if (s >= 40) return '#f59e0b';
+  return '#ef4444';
+}
+
+// ═══════════════════════════════════════════════════════════
+// FORMATTING
+// ═══════════════════════════════════════════════════════════
+function fmt(d) {
+  return d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+}
+function fmtMs(ms) {
+  const tot = Math.round(ms / 1000);
+  const m = Math.floor(tot / 60);
+  const s = tot % 60;
+  return `${m}m ${String(s).padStart(2,'0')}s`;
+}
+function fmtCountdown(ms) {
+  if (ms <= 0) return '00:00';
+  const tot = Math.ceil(ms / 1000);
+  const m = Math.floor(tot / 60);
+  const s = tot % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+let state = null;
+
+function refresh() {
+  const lat = parseFloat(document.getElementById('lat').value) || 23.2505;
+  const lon = parseFloat(document.getElementById('lon').value) || 77.4065;
+  const now = new Date();
+  const today = now;
+  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const sr = sunriseSunset(today, lat, lon);
+  const nsr = sunriseSunset(tomorrow, lat, lon);
+  if (!sr || !nsr) { alert('Sunrise calculation failed'); return; }
+
+  let sunrise = sr.sunrise, sunset = sr.sunset, nextSunrise = nsr.sunrise;
+  let weekday = today.getDay();
+
+  // Pre-dawn fix: if now < today's sunrise, use yesterday's window
+  if (now < sunrise) {
+    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
+    const psr = sunriseSunset(yesterday, lat, lon);
+    if (psr) { sunrise = psr.sunrise; sunset = psr.sunset; nextSunrise = sr.sunrise; weekday = yesterday.getDay(); }
+  }
+
+  const horas = buildHoras(weekday, sunrise, sunset, nextSunrise);
+  const horaIdx = horas.findIndex(h => now >= h.start && now < h.end);
+  const hora = horaIdx >= 0 ? horas[horaIdx] : null;
+  const uphoras = hora ? buildUphoras(hora) : [];
+  const uphoraIdx = uphoras.findIndex(u => now >= u.start && now < u.end);
+
+  state = { now, sunrise, sunset, nextSunrise, horas, horaIdx, hora, uphoras, uphoraIdx, lat, lon };
+  renderAll();
+}
+
+function renderAll() {
+  if (!state) return;
+  const { now, sunrise, sunset, horas, horaIdx, hora, uphoras, uphoraIdx } = state;
+  const janmaNakIdx = parseInt(document.getElementById('janmaNak').value);
+  const eventCat = document.getElementById('eventCat').value;
+
+  // Sun info
+  const dayDurMin = Math.round((sunset - sunrise) / 60000);
+  document.getElementById('sunriseDisp').textContent = fmt(sunrise);
+  document.getElementById('sunsetDisp').textContent  = fmt(sunset);
+  document.getElementById('dayDurDisp').textContent  = `${Math.floor(dayDurMin/60)}h ${dayDurMin%60}m`;
+  document.getElementById('horaNumDisp').textContent  = horaIdx >= 0 ? `#${horaIdx+1} of 24` : '—';
+
+  // Hora card
+  if (hora) {
+    const m = PLANET_META[hora.lord];
+    const dot = document.getElementById('horaDot');
+    dot.textContent = m.sym;
+    dot.className = `hora-planet-dot p-${hora.lord}`;
+    document.getElementById('horaLordName').textContent = `${hora.lord} Hora`;
+    document.getElementById('horaLordHindi').textContent = m.hi + ' होरा';
+    const badge = document.getElementById('horaQualityBadge');
+    badge.innerHTML = `<span class="hora-quality-badge ${m.nature==='Shubha'?'badge-shubha':'badge-ashubha'}">${m.nature}</span>`;
+    document.getElementById('horaStart').textContent = fmt(hora.start);
+    document.getElementById('horaEnd').textContent   = fmt(hora.end);
+    const elapsed = now - hora.start;
+    const total   = hora.end - hora.start;
+    const pct = Math.min(100, (elapsed / total) * 100);
+    document.getElementById('horaBar').style.width = pct + '%';
+    const rem = Math.max(0, hora.end - now);
+    document.getElementById('horaRemaining').textContent = `${fmtMs(rem)} शेष`;
+  }
+
+  // Uphora grid
+  const grid = document.getElementById('uphoraGrid');
+  if (!uphoras.length) { grid.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center">No Hora found for current time</div>'; return; }
+
+  let bestScore = -1, bestIdx = -1;
+  const scores = uphoras.map((u,i) => {
+    const s = scoreUphora(u.lord, hora.lord, janmaNakIdx, eventCat);
+    if (s > bestScore && i >= uphoraIdx) { bestScore = s; bestIdx = i; }
+    return s;
+  });
+
+  grid.innerHTML = uphoras.map((u, i) => {
+    const isPast   = i < uphoraIdx;
+    const isActive = i === uphoraIdx;
+    const m = PLANET_META[u.lord];
+    const score = scores[i];
+    const acts = (ACTIVITIES[eventCat] || ACTIVITIES.general)[u.lord] || '';
+    const rem = isActive ? Math.max(0, u.end - now) : 0;
+    return `
+<div class="uphora-row ${isActive?'active':''} ${isPast?'past':''}">
+  <div class="uphora-idx">${i+1}</div>
+  <div class="uphora-lord-cell">
+    <div class="planet-dot p-${u.lord} c-${u.lord}">${m.sym}</div>
+    <div class="uphora-lord-text">
+      <div class="en c-${u.lord}">${u.lord}</div>
+      <div class="hi">${m.hi}</div>
+      ${isActive ? '<div class="active-badge">ACTIVE</div>' : ''}
+    </div>
+  </div>
+  <div class="time-cell">${fmt(u.start)}</div>
+  <div class="time-cell">${fmt(u.end)}</div>
+  <div class="dur-cell">${fmtMs(u.durationMs)}${isActive?`<div style="font-size:10px;color:var(--muted);margin-top:2px">⏳ ${fmtMs(rem)} left</div>`:''}</div>
+  <div class="activity-cell">${acts}</div>
+  <div class="score-cell">
+    <div class="score-bar-wrap"><div class="score-bar" style="width:${score}%;background:${scoreColor(score)}"></div></div>
+    <div class="score-text" style="color:${scoreColor(score)}">${score}/100</div>
+  </div>
+</div>`;
+  }).join('');
+
+  // Best Uphora panel
+  const best = document.getElementById('bestUphora');
+  if (bestIdx >= 0) {
+    const bu = uphoras[bestIdx];
+    const bm = PLANET_META[bu.lord];
+    const timeToStart = Math.max(0, bu.start - now);
+    const acts = (ACTIVITIES[eventCat] || ACTIVITIES.general)[bu.lord] || '';
+    best.innerHTML = `
+<div style="text-align:center;margin-bottom:10px">
+  <div class="planet-dot p-${bu.lord} c-${bu.lord}" style="width:48px;height:48px;font-size:24px;margin:0 auto 6px">${bm.sym}</div>
+  <div style="font-size:18px;font-weight:700" class="c-${bu.lord}">${bu.lord} Uphora — ${bm.hi}</div>
+  <div style="font-size:12px;color:var(--muted);margin-top:2px">Uphora #${bestIdx+1} | Score: <strong style="color:${scoreColor(bestScore)}">${bestScore}/100</strong></div>
+</div>
+<div class="best-countdown">${bestIdx === uphoraIdx ? 'NOW ACTIVE' : fmtCountdown(timeToStart)}</div>
+<div style="font-size:10px;color:var(--muted);text-align:center;margin-top:-6px;margin-bottom:10px">${bestIdx===uphoraIdx?'शेष: '+fmtMs(Math.max(0,bu.end-now)):'शुरू होने में'}</div>
+<div class="best-details">
+  <strong>Start:</strong> ${fmt(bu.start)} &nbsp;|&nbsp; <strong>End:</strong> ${fmt(bu.end)}<br>
+  <strong>Duration:</strong> ${fmtMs(bu.durationMs)}<br>
+  <strong>Category:</strong> ${eventCat.charAt(0).toUpperCase()+eventCat.slice(1)}<br>
+  <strong>Activities:</strong> ${acts}
+</div>`;
+  } else {
+    best.innerHTML = '<div style="color:var(--muted);font-size:13px">No upcoming auspicious Uphora in current Hora. Check next Hora.</div>';
+  }
+
+  // Hora list (day horas only, mini)
+  const horaList = document.getElementById('horaList');
+  const dayHoras = horas.slice(0, 12);
+  horaList.innerHTML = dayHoras.map((h, i) => {
+    const isNow = i === horaIdx;
+    const m = PLANET_META[h.lord];
+    return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);${isNow?'background:rgba(124,58,237,0.08);border-radius:4px;padding:4px 6px;':''}">
+      <span class="c-${h.lord}" style="font-size:14px">${m.sym}</span>
+      <span style="font-size:12px;font-weight:${isNow?700:400};color:${isNow?'white':'var(--muted)'}">${h.lord}</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto">${fmt(h.start)} – ${fmt(h.end)}</span>
+      ${isNow?'<span style="font-size:9px;background:var(--accent);color:white;padding:1px 5px;border-radius:3px">NOW</span>':''}
+    </div>`;
+  }).join('');
+
+  // Debug box
+  const debug = document.getElementById('debugBox');
+  debug.textContent = [
+    `Lat: ${state.lat} | Lon: ${state.lon}`,
+    `Sunrise: ${state.sunrise.toISOString()} (${fmt(state.sunrise)} IST)`,
+    `Sunset:  ${state.sunset.toISOString()}  (${fmt(state.sunset)} IST)`,
+    hora ? `Active Hora: #${horaIdx+1} ${hora.lord} [${fmt(hora.start)} – ${fmt(hora.end)}]` : 'No active Hora',
+    uphoras.length ? `Active Uphora: #${uphoraIdx+1} ${uphoras[uphoraIdx]?.lord||'—'}` : '',
+    '',
+    'Uphora durations in current Hora:',
+    ...uphoras.map((u,i) => `  ${i+1}. ${u.lord.padEnd(8)} ${fmtMs(u.durationMs).padEnd(12)} ${VIMSHOTTARI[u.lord]}/95 = ${(VIMSHOTTARI[u.lord]/VIMSHOTTARI_TOTAL*100).toFixed(2)}%`),
+    '',
+    `Total check: ${fmtMs(uphoras.reduce((a,u)=>a+u.durationMs,0))} (should = Hora duration)`,
+    `Hora duration: ${fmtMs(hora?.end-hora?.start||0)}`,
+    '',
+    `Janma Nakshatra: ${janmaNakIdx>=0 ? ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Moola','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'][janmaNakIdx]+' (Lord: '+NAK_LORDS[janmaNakIdx]+')' : 'Not set'}`,
+    `Event category: ${eventCat}`,
+  ].filter(Boolean).join('\n');
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIVE CLOCK + AUTO REFRESH
+// ═══════════════════════════════════════════════════════════
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent = fmt(now);
+  document.getElementById('dateDisp').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Update countdown & progress bars without full rebuild every second
+  if (state) {
+    state.now = now;
+    // Update hora remaining
+    if (state.hora) {
+      const rem = Math.max(0, state.hora.end - now);
+      const pct = Math.min(100, ((now - state.hora.start) / (state.hora.end - state.hora.start)) * 100);
+      const horaBar = document.getElementById('horaBar');
+      if (horaBar) horaBar.style.width = pct + '%';
+      const horaRem = document.getElementById('horaRemaining');
+      if (horaRem) horaRem.textContent = `${fmtMs(rem)} शेष`;
+    }
+    // Full re-render every 30s or if active uphora changed
+    const newUphoraIdx = state.uphoras.findIndex(u => now >= u.start && now < u.end);
+    if (newUphoraIdx !== state.uphoraIdx || now.getSeconds() % 30 === 0) {
+      state.uphoraIdx = newUphoraIdx;
+      renderAll();
+    }
+    // Refresh horas if we've crossed into a new hora
+    if (state.hora && now >= state.hora.end) refresh();
+  }
+}
+
+// Init
+refresh();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
