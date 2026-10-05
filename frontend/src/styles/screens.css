@@ -1257,7 +1257,13 @@
   color: #a78bfa;
   font-size: 1.25rem;
   cursor: pointer;
-  padding: 4px 8px;
+  /* Fix 4: WCAG 2.5.5 – minimum 44×44px touch target */
+  padding: 10px 12px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
 }
 .kc-back:hover { background: rgba(167,139,250,.15); }
@@ -1269,7 +1275,13 @@
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
-  padding: 6px 8px;
+  /* Fix 4: WCAG 2.5.5 – minimum 44×44px touch target */
+  padding: 10px 12px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
   opacity: 0.6;
 }
@@ -1707,6 +1719,8 @@
   background: #0d0d1a;
   border-top: 1px solid #1e1e30;
   z-index: 20;
+  /* Fix 6: iOS safe area for iPhone X+ home indicator */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .kc-nav-btn {
   flex: 1;
@@ -1720,6 +1734,37 @@
 }
 .kc-nav-btn:hover { color: #a78bfa; }
 
+/* ── Wallet screen ── */
+/* Fix 3: CSS classes used by wallet.ts but previously undefined */
+.wallet-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* account for fixed bottom-nav */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+.balance-card {
+  background: linear-gradient(135deg, #1a0a2e 0%, #16213e 100%);
+  border: 1px solid #2d1b69;
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+}
+.balance-label {
+  font-size: 0.75rem;
+  color: #6b6b80;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.balance-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #a78bfa;
+  line-height: 1.1;
+}
+
 /* Responsive: wider screens */
 @media (min-width: 480px) {
   .ni-house-num, .si-house-num { font-size: 0.52rem; }
@@ -1730,4 +1775,31 @@
 @media (min-width: 600px) {
   .kc-screen { max-width: 520px; margin: 0 auto; }
   .kc-bottom-nav { max-width: 520px; left: 50%; transform: translateX(-50%); }
+}
+
+/* Fix 7: Landscape orientation — chart screens */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Reduce header height to reclaim vertical space */
+  .kc-header {
+    padding: 8px 16px;
+  }
+  /* Shrink bottom-nav text; keep touch targets */
+  .kc-nav-btn {
+    padding: 8px 4px;
+    font-size: 0.58rem;
+  }
+  /* Chart cells: allow slightly larger text in landscape (more width) */
+  .ni-chart, .si-chart {
+    font-size: 0.55rem;
+  }
+  .ni-planets, .si-planets {
+    font-size: 0.72rem;
+  }
+  /* Balance card compacts vertically in landscape */
+  .balance-card {
+    padding: 12px 20px;
+  }
+  .balance-amount {
+    font-size: 1.8rem;
+  }
 }
