@@ -253,11 +253,23 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
 
   const jd = julianDayFromUtc(now);
   const moonLon = trueSiderealLongitude("Moon", jd);
-  const sunLon = trueSiderealLongitude("Sun", jd);
-  const currentNakIdx = Math.floor(moonLon / (360 / 27));
-  const currentNakDeg = moonLon % (360 / 27);
+  const sunLon  = trueSiderealLongitude("Sun", jd);
+  const currentNakIdx   = Math.floor(moonLon / (360 / 27));
+  const currentNakDeg   = moonLon % (360 / 27);
   const currentMoonRashi = Math.floor(moonLon / 30);
   const dow = now.getUTCDay();
+
+  // Build 7-planet transit rashi map for full Gochar scoring (Phaladeepika Ch.26).
+  // All planets calculated at the query JD using Lahiri sidereal.
+  const transitPlanetRashis: Partial<Record<"Sun"|"Moon"|"Mars"|"Mercury"|"Jupiter"|"Venus"|"Saturn", number>> = {
+    Sun:     Math.floor(sunLon / 30),
+    Moon:    currentMoonRashi,
+    Mars:    Math.floor(trueSiderealLongitude("Mars",    jd) / 30),
+    Mercury: Math.floor(trueSiderealLongitude("Mercury", jd) / 30),
+    Jupiter: Math.floor(trueSiderealLongitude("Jupiter", jd) / 30),
+    Venus:   Math.floor(trueSiderealLongitude("Venus",   jd) / 30),
+    Saturn:  Math.floor(trueSiderealLongitude("Saturn",  jd) / 30),
+  };
 
   // Panchaka / Ganda Moola / Dishashool
   const panchaka = getPanchakaDosha(currentNakIdx, currentNakDeg, dow);
@@ -310,6 +322,7 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     currentMoonRashi,
     ashtakwargaBindu,
     navamshaHouseLord,
+    transitPlanetRashis,  // Full 7-planet Gochar (replaces Moon-only fallback)
   };
 
   // ── Professional Scoring ──

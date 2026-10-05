@@ -485,19 +485,19 @@ describe("calculateNavtara() — result fields", () => {
 
 describe("calculateNavtara() — real-world scenario cross-checks", () => {
   it("complete 27-nakshatra sweep: exactly 3 cycles of 9 positions", () => {
-    const cycle1Count = [0, 0, 0, 0];
-    const cycle2Count = [0, 0, 0, 0];
-    const cycle3Count = [0, 0, 0, 0];
+    let cycle1Count = 0;
+    let cycle2Count = 0;
+    let cycle3Count = 0;
     for (let query = 0; query < 27; query++) {
       const r = calculateNavtara(0, query);
-      if (r.cycle === 1) cycle1Count[r.position <= 9 ? 1 : 0]++;
-      if (r.cycle === 2) cycle2Count[r.position <= 9 ? 1 : 0]++;
-      if (r.cycle === 3) cycle3Count[r.position <= 9 ? 1 : 0]++;
+      if (r.cycle === 1) cycle1Count++;
+      else if (r.cycle === 2) cycle2Count++;
+      else if (r.cycle === 3) cycle3Count++;
     }
     // Each cycle gets exactly 9 nakshatras
-    expect(cycle1Count[1]).toBe(9);
-    expect(cycle2Count[1]).toBe(9);
-    expect(cycle3Count[1]).toBe(9);
+    expect(cycle1Count).toBe(9);
+    expect(cycle2Count).toBe(9);
+    expect(cycle3Count).toBe(9);
   });
 
   it("in a full 27-nakshatra sweep, Vadha occurs exactly 3 times (once per cycle)", () => {
