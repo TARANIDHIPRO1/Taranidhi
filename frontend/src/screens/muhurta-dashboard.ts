@@ -84,6 +84,22 @@ interface TaraResult {
   beneficence: "benefic" | "neutral" | "malefic";
 }
 
+// Navatara (Tarabala) — full result from calculateNavtara() in muhurta.ts
+// Returned under current_nakshatra.navtara when birth kundali is on file
+interface NavtaraResult {
+  distance: number;          // 1-27 count from birth nakshatra
+  cycle: number;             // 1, 2, or 3 (avritti)
+  position: number;          // 1-9 within the cycle (tara number)
+  name: string;              // Janma / Sampat / Vipat / Kshema / Pratyari / Sadhaka / Vadha / Mitra / Parama Mitra
+  baseQuality: string;
+  effectiveQuality: string;  // cycle-adjusted; "benefic" | "neutral" | "malefic" | "most_benefic" | "most_malefic" | "mixed"
+  cycleRule: string;         // classical source text for this cycle rule
+  meaning: string;
+  recommendation: string;
+  score: number;             // -2 to +2 convergence score
+  rawScore: number;          // 5-100 percentage for display
+}
+
 interface ScoreLayer {
   name: string;
   score: number;
@@ -117,7 +133,13 @@ interface MuhurtaResponse {
   active_uphora: UphloraWindow | null;
   pancha_pakshi: PanchaPakshi | null;
   rahu_kaal: { start: string; end: string; active_now: boolean };
-  current_nakshatra: { idx: number; name: string };
+  current_nakshatra: {
+    idx: number;
+    name: string;
+    nature?: string;
+    exceptions?: string[];
+    navtara: NavtaraResult | null;  // null when no birth kundali on file
+  };
   tara: TaraResult | null;
   panchaka_dosha: { active: boolean; dosha?: string; note?: string } | null;
   ganda_moola: { active: boolean; nakshatra?: string } | null;
@@ -371,7 +393,7 @@ function buildHoraSection(d: MuhurtaResponse): string {
   const uphoraCard = uphora
     ? `
       <div class="md-uphora-card">
-        <div class="uphora-label">Uphora (1/8 Hora)</div>
+        <div class="uphora-label">Uphora (1/7 Hora)</div>
         <div class="uphora-lord">${uphora.sub}</div>
         <div class="uphora-window">${toIST(uphora.start)} → ${toIST(uphora.end)}</div>
       </div>`
@@ -453,6 +475,60 @@ function buildNakshatraTaraSection(d: MuhurtaResponse): string {
     `;
   }
 
+  // ── Navatara (Tarabala) card ──────────────────────────────────────────────
+  const navtara = nak.navtara;
+  let navtaraHtml = `
+    <div class="navtara-unavailable">
+      <div class="navtara-unavail-icon">🌟</div>
+      <div>Navatara requires your Janma Nakshatra</div>
+      <a href="#/kundali" class="navtara-add-link">Add Kundali →</a>
+    </div>`;
+
+  if (navtara) {
+    const cycleOrdinal = navtara.cycle === 1 ? "1st" : navtara.cycle === 2 ? "2nd" : "3rd";
+    const qualityClass: Record<string, string> = {
+      most_benefic: "navtara-most-benefic",
+      benefic:      "navtara-benefic",
+      neutral:      "navtara-neutral",
+      mixed:        "navtara-mixed",
+      malefic:      "navtara-malefic",
+      most_malefic: "navtara-most-malefic",
+    };
+    const qualityLabel: Record<string, string> = {
+      most_benefic: "✅✅ Most Auspicious",
+      benefic:      "✅ Auspicious",
+      neutral:      "⚪ Neutral",
+      mixed:        "🟡 Mixed",
+      malefic:      "❌ Inauspicious",
+      most_malefic: "❌❌ Most Inauspicious",
+    };
+    const qClass = qualityClass[navtara.effectiveQuality] ?? "navtara-neutral";
+    const qLabel = qualityLabel[navtara.effectiveQuality] ?? navtara.effectiveQuality;
+    const rawPct = navtara.rawScore;
+    const barClass = rawPct >= 80 ? "navtara-bar-high"
+                   : rawPct >= 50 ? "navtara-bar-mid"
+                   : "navtara-bar-low";
+
+    navtaraHtml = `
+      <div class="md-navtara-card ${qClass}">
+        <div class="navtara-header">
+          <div class="navtara-position">
+            <span class="navtara-num">Tara ${navtara.position}</span>
+            <span class="navtara-name">${navtara.name}</span>
+          </div>
+          <div class="navtara-cycle">${cycleOrdinal} Avritti</div>
+        </div>
+        <div class="navtara-quality">${qLabel}</div>
+        <div class="navtara-bar-wrap">
+          <div class="navtara-bar ${barClass}" style="width:${rawPct}%"></div>
+          <span class="navtara-bar-pct">${rawPct}%</span>
+        </div>
+        <div class="navtara-meaning">${navtara.meaning}</div>
+        <div class="navtara-rec">${navtara.recommendation}</div>
+        <div class="navtara-cycle-rule">${navtara.cycleRule}</div>
+      </div>`;
+  }
+
   return `
     <section class="md-section">
       <h3 class="md-section-title">⭐ Nakshatra + Tara</h3>
@@ -463,6 +539,10 @@ function buildNakshatraTaraSection(d: MuhurtaResponse): string {
           <div class="nak-idx">Nakshatra ${nak.idx + 1}/27</div>
         </div>
         ${taraHtml}
+      </div>
+      <div class="md-navtara-row">
+        <h4 class="md-navtara-title">🔯 Navatara (Tarabala)</h4>
+        ${navtaraHtml}
       </div>
     </section>
   `;
@@ -689,6 +769,43 @@ function injectStyles(): void {
 .tara-name { font-size:var(--font-size-lg); font-weight:700; margin:var(--space-1) 0; }
 .tara-beneficence { font-size:var(--font-size-sm); font-weight:600; }
 .tara-unavailable { padding:var(--space-4); font-size:var(--font-size-sm); color:var(--color-text-secondary); text-align:center; flex:1; }
+
+/* Navatara (Tarabala) */
+.md-navtara-row { margin-top:var(--space-4); }
+.md-navtara-title { font-size:var(--font-size-xs); font-weight:600; color:var(--color-text-secondary); letter-spacing:.04em; text-transform:uppercase; margin:0 0 var(--space-3); }
+.md-navtara-card { padding:var(--space-4); border-radius:var(--radius-md); border:2px solid var(--color-border); }
+.navtara-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-2); }
+.navtara-position { display:flex; flex-direction:column; gap:2px; }
+.navtara-num { font-size:var(--font-size-xs); color:var(--color-text-secondary); }
+.navtara-name { font-size:var(--font-size-lg); font-weight:800; }
+.navtara-cycle { font-size:var(--font-size-sm); font-weight:600; color:var(--color-text-secondary); }
+.navtara-quality { font-size:var(--font-size-sm); font-weight:600; margin-bottom:var(--space-2); }
+.navtara-bar-wrap { display:flex; align-items:center; gap:var(--space-2); background:var(--color-surface-2); border-radius:99px; height:8px; overflow:visible; margin-bottom:var(--space-3); position:relative; }
+.navtara-bar { height:8px; border-radius:99px; transition:width 0.6s ease; }
+.navtara-bar-high { background:#2e7d32; }
+.navtara-bar-mid  { background:#f57f17; }
+.navtara-bar-low  { background:#c62828; }
+.navtara-bar-pct { font-size:var(--font-size-xs); font-weight:700; margin-left:8px; white-space:nowrap; }
+.navtara-meaning { font-size:var(--font-size-sm); font-weight:600; margin-bottom:4px; }
+.navtara-rec { font-size:var(--font-size-sm); color:var(--color-text-secondary); margin-bottom:var(--space-2); }
+.navtara-cycle-rule { font-size:var(--font-size-xs); color:var(--color-text-secondary); font-style:italic; padding-top:var(--space-2); border-top:1px solid var(--color-border); }
+/* Navatara quality border + bg */
+.navtara-most-benefic { border-color:#2e7d32; background:#e8f5e9; }
+.navtara-benefic      { border-color:#558b2f; background:#f1f8e9; }
+.navtara-neutral      { border-color:var(--color-border); }
+.navtara-mixed        { border-color:#f57f17; background:#fff8e1; }
+.navtara-malefic      { border-color:#e65100; background:#fff3e0; }
+.navtara-most-malefic { border-color:#c62828; background:#fce4ec; }
+@media (prefers-color-scheme:dark) {
+  .navtara-most-benefic { background:#0a1f0c; }
+  .navtara-benefic      { background:#0d2200; }
+  .navtara-mixed        { background:#221600; }
+  .navtara-malefic      { background:#2a1500; }
+  .navtara-most-malefic { background:#3b0a14; }
+}
+.navtara-unavailable { padding:var(--space-4); border-radius:var(--radius-md); border:1px dashed var(--color-border); text-align:center; display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:var(--color-text-secondary); font-size:var(--font-size-sm); }
+.navtara-unavail-icon { font-size:1.5rem; }
+.navtara-add-link { font-size:var(--font-size-xs); color:var(--color-primary); text-decoration:none; }
 
 /* Warnings */
 .md-warnings-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--space-2); }
