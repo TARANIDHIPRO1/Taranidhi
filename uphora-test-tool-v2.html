@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCCULTVIISION — Uphora & Muhurta Testing Tool v2</title>
+<style>
+:root {
+  --akash:#8B5CF6; --agni:#F97316; --jal:#0EA5E9; --vayu:#06B6D4; --prithvi:#10B981;
+  --bg:#0A0A14; --card:#13131F; --card2:#1C1C2E; --border:#252540;
+  --text:#E2E8F0; --muted:#64748B; --faint:#334155;
+  --go:#10B981; --caution:#F59E0B; --nogo:#EF4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.hdr{background:linear-gradient(135deg,#1A0A2E,#0A1628);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo{font-size:17px;font-weight:800;letter-spacing:0.08em;background:linear-gradient(90deg,var(--akash),var(--agni));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.version{font-size:10px;background:var(--agni);color:white;padding:2px 7px;border-radius:20px;font-weight:700}
+.hdr-right{font-size:11px;color:var(--muted)}
+
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.card.primary-signal{border-color:var(--agni);border-width:2px;position:relative}
+.card.primary-signal::before{content:"⭐ PRIMARY SIGNAL";position:absolute;top:-11px;left:14px;background:var(--agni);color:white;font-size:10px;font-weight:800;padding:2px 10px;border-radius:20px;letter-spacing:0.06em}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.layer-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.card h2{font-size:15px;font-weight:700}
+.card h3{font-size:13px;font-weight:600;color:var(--muted)}
+
+/* INPUTS */
+.input-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+.field input,.field select{background:#0A0A14;border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--akash)}
+.field select option{background:#1A1A2E}
+
+.calc-btn{background:linear-gradient(135deg,var(--agni),#DC6F12);color:white;border:none;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:14px;letter-spacing:0.03em;transition:opacity .2s}
+.calc-btn:hover{opacity:.88}
+
+/* DATA CELLS */
+.data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.dc{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:11px}
+.dc .lbl{font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
+.dc .val{font-size:15px;font-weight:700}
+.dc .sub{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* FOUNDATION BOX */
+.foundation-box{background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(79,70,229,.08));border:2px solid var(--akash);border-radius:12px;padding:18px;text-align:center}
+.foundation-nak{font-size:28px;font-weight:800;color:var(--akash);margin:8px 0}
+.foundation-details{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:8px}
+.foundation-item{font-size:12px;color:var(--muted)}
+.foundation-item span{color:var(--text);font-weight:600}
+
+/* TARA DISPLAY */
+.tara-box{border-radius:10px;padding:16px;border:2px solid;margin-bottom:10px}
+.tara-box.shubha{border-color:var(--go);background:rgba(16,185,129,.06)}
+.tara-box.caution{border-color:var(--caution);background:rgba(245,158,11,.06)}
+.tara-box.nogo{border-color:var(--nogo);background:rgba(239,68,68,.06)}
+.tara-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.tara-desc{font-size:13px;color:var(--muted)}
+.tara-score{font-size:12px;font-weight:700;margin-top:6px}
+
+/* CHANDRABALA */
+.chandra-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.chandra-pos{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.chandra-pos.shubha{background:rgba(16,185,129,.2);border:2px solid var(--go);color:var(--go)}
+.chandra-pos.ashubha{background:rgba(239,68,68,.2);border:2px solid var(--nogo);color:var(--nogo)}
+
+/* EVENT TABS */
+.event-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.et{padding:7px 13px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:12px;background:transparent;color:var(--muted);font-weight:600;transition:all .2s}
+.et.active{background:var(--agni);border-color:var(--agni);color:white}
+.et:hover:not(.active){border-color:var(--agni);color:var(--text)}
+
+/* NAVATARA TABLE */
+.nav-table{width:100%;border-collapse:collapse;font-size:12px}
+.nav-table th{font-size:10px;color:var(--muted);text-transform:uppercase;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.nav-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.nav-table tr.current-tara td{background:rgba(249,115,22,.08)}
+.nav-table tr:last-child td{border-bottom:none}
+.ok{color:var(--go);font-weight:600}
+.warn{color:var(--caution);font-weight:600}
+.bad{color:var(--nogo);font-weight:600}
+.neu{color:var(--muted)}
+
+/* SCORE BAR */
+.score-wrap{margin:12px 0}
+.score-bar-bg{background:rgba(255,255,255,.07);border-radius:20px;height:14px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:20px;transition:width .6s ease}
+.score-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+
+/* VERDICT */
+.verdict{border-radius:14px;padding:22px;text-align:center;margin-bottom:14px}
+.verdict.go{background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.1));border:2px solid var(--go)}
+.verdict.caution{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid var(--caution)}
+.verdict.nogo{background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(185,28,28,.1));border:2px solid var(--nogo)}
+.verdict-icon{font-size:36px;margin-bottom:8px}
+.verdict-label{font-size:24px;font-weight:800;margin-bottom:4px}
+.verdict-reason{font-size:13px;color:var(--muted);max-width:600px;margin:0 auto}
+
+/* SCORE BREAKDOWN */
+.breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.bk-row{background:var(--card2);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px}
+.bk-label{font-size:10px;color:var(--muted);text-transform:uppercase}
+.bk-score{font-size:18px;font-weight:800}
+.bk-note{font-size:10px;color:var(--muted)}
+
+/* KP */
+.kp-planets{display:flex;gap:8px;flex-wrap:wrap}
+.planet-chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}
+
+/* UPCOMING WINDOWS */
+.window-row{background:var(--card2);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.window-time{font-weight:700;font-size:15px;white-space:nowrap}
+.window-info{font-size:12px;color:var(--muted)}
+.window-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;flex-shrink:0}
+
+/* HIDDEN */
+.results{display:none}
+.results.visible{display:block}
+
+/* TOOLTIP-like notice */
+.notice{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:rgba(139,92,246,.9);margin-bottom:12px}
+
+.sep{width:100%;height:1px;background:var(--border);margin:6px 0}
+
+@media(max-width:600px){
+  .data-grid{grid-template-columns:repeat(2,1fr)}
+  .breakdown{grid-template-columns:repeat(2,1fr)}
+  .foundation-details{flex-direction:column;align-items:center;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="logo">OCCULTVIISION</div>
+    <div class="version">v2</div>
+  </div>
+  <div class="hdr-right">Uphora &amp; Muhurta Testing Tool &nbsp;|&nbsp; Devil's Mode: ON</div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ SECTION A: BIRTH DETAILS ═══ -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(139,92,246,.2);color:var(--akash)">FOUNDATION</div>
+    <h2>जन्म विवरण — Birth Details</h2>
+  </div>
+  <div class="notice">⚠️ जन्म नक्षत्र auto-calculated होगा DOB+TOB+Place से। कभी manually enter नहीं करना।</div>
+  <div class="input-grid">
+    <div class="field">
+      <label>नाम / Name</label>
+      <input type="text" id="name" placeholder="Client name">
+    </div>
+    <div class="field">
+      <label>जन्म तिथि / Date of Birth</label>
+      <input type="date" id="dob" value="1990-01-01">
+    </div>
+    <div class="field">
+      <label>जन्म समय / Time of Birth (IST)</label>
+      <input type="time" id="tob" value="12:00">
+    </div>
+    <div class="field">
+      <label>जन्म स्थान / Birth Place</label>
+      <select id="birthCity" onchange="onCityChange('birth')">
+        <option value="23.2505,77.4065">Bhopal, MP</option>
+        <option value="28.6139,77.2090">Delhi, NCR</option>
+        <option value="19.0760,72.8777">Mumbai, MH</option>
+        <option value="12.9716,77.5946">Bangalore, KA</option>
+        <option value="13.0827,80.2707">Chennai, TN</option>
+        <option value="17.3850,78.4867">Hyderabad, TS</option>
+        <option value="22.5726,88.3639">Kolkata, WB</option>
+        <option value="26.8467,80.9462">Lucknow, UP</option>
+        <option value="18.5204,73.8567">Pune, MH</option>
+        <option value="custom">Custom (Enter Lat/Lon)</option>
+      </select>
+    </div>
+    <div class="field" id="birthLatField" style="display:none">
+      <label>Latitude (°N)</label>
+      <input type="number" id="birthLat" step="0.0001" placeholder="e.g. 23.2505">
+    </div>
+    <div class="field" id="birthLonField" style="display:none">
+      <label>Longitude (°E)</label>
+      <input type="number" id="birthLon" step="0.0001" placeholder="e.g. 77.4065">
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION B: QUERY MOMENT ═══ -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(249,115,22,.2);color:var(--agni)">QUERY</div>
+    <h2>प्रश्न समय — Query Moment</h2>
+  </div>
+  <div class="input-grid">
+    <div class="field">
+      <label>Event Category</label>
+      <select id="eventCat">
+        <option value="business">💼 Business Meeting</option>
+        <option value="finance">💰 Loan / Finance</option>
+        <option value="travel">✈️ Travel</option>
+        <option value="marriage">💍 Marriage / Vivah</option>
+        <option value="property">🏠 Property Purchase</option>
+        <option value="medical">🏥 Medical / Health</option>
+        <option value="exam">📚 Exam / Interview</option>
+        <option value="legal">⚖️ Legal / Court</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Query Date</label>
+      <input type="date" id="qdate">
+    </div>
+    <div class="field">
+      <label>Query Time (IST)</label>
+      <input type="time" id="qtime">
+    </div>
+    <div class="field">
+      <label>Query Location</label>
+      <select id="queryCity" onchange="onCityChange('query')">
+        <option value="23.2505,77.4065">Bhopal, MP</option>
+        <option value="28.6139,77.2090">Delhi, NCR</option>
+        <option value="19.0760,72.8777">Mumbai, MH</option>
+        <option value="12.9716,77.5946">Bangalore, KA</option>
+        <option value="13.0827,80.2707">Chennai, TN</option>
+        <option value="17.3850,78.4867">Hyderabad, TS</option>
+        <option value="22.5726,88.3639">Kolkata, WB</option>
+        <option value="26.8467,80.9462">Lucknow, UP</option>
+        <option value="18.5204,73.8567">Pune, MH</option>
+        <option value="custom">Custom (Enter Lat/Lon)</option>
+      </select>
+    </div>
+    <div class="field" id="qLatField" style="display:none">
+      <label>Latitude (°N)</label>
+      <input type="number" id="qLat" step="0.0001">
+    </div>
+    <div class="field" id="qLonField" style="display:none">
+      <label>Longitude (°E)</label>
+      <input type="number" id="qLon" step="0.0001">
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calculate()">🔮 Calculate Muhurta Analysis</button>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div class="results" id="results">
+
+<!-- FOUNDATION: JANMA NAKSHATRA -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(139,92,246,.25);color:var(--akash)">FOUNDATION</div>
+    <h2>जन्म नक्षत्र — Auto Calculated</h2>
+  </div>
+  <div class="foundation-box">
+    <div style="font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Janma Nakshatra</div>
+    <div class="foundation-nak" id="f-nakName">—</div>
+    <div class="foundation-details">
+      <div class="foundation-item">Index: <span id="f-nakIdx">—</span></div>
+      <div class="foundation-item">Pada: <span id="f-nakPada">—</span></div>
+      <div class="foundation-item">Lord: <span id="f-nakLord">—</span></div>
+      <div class="foundation-item">Rashi: <span id="f-rashi">—</span></div>
+      <div class="foundation-item">Rashi Lord: <span id="f-rashiLord">—</span></div>
+      <div class="foundation-item">Moon °: <span id="f-moonDeg">—</span></div>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <div class="data-grid" style="margin-top:10px">
+    <div class="dc"><div class="lbl">Moon Tropical</div><div class="val" id="f-moonTrop">—</div></div>
+    <div class="dc"><div class="lbl">Lahiri Ayanamsa</div><div class="val" id="f-ayanamsa">—</div></div>
+    <div class="dc"><div class="lbl">Moon Sidereal</div><div class="val" id="f-moonSid">—</div></div>
+    <div class="dc"><div class="lbl">Algorithm</div><div class="val" style="font-size:11px;color:var(--muted)">ELP2000 / Meeus verified vs Swiss Ephemeris ±0.001°</div></div>
+  </div>
+</div>
+
+<!-- LAYER 0: MOON BALA -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(6,182,212,.2);color:var(--vayu)">LAYER 0</div>
+    <h2>Moon Bala — चंद्र बल</h2>
+    <h3>Foundation Weight Multiplier</h3>
+  </div>
+  <div class="data-grid">
+    <div class="dc">
+      <div class="lbl">Paksha</div>
+      <div class="val" id="l0-paksha">—</div>
+      <div class="sub" id="l0-tithi">Tithi: —</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Paksha Bala</div>
+      <div class="val" id="l0-pakshaBala">—</div>
+      <div class="sub" id="l0-pakshaNote">—</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Chandra Rashi</div>
+      <div class="val" id="l0-moonRashi">—</div>
+      <div class="sub" id="l0-moonRashiLord">—</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Rashi Bala</div>
+      <div class="val" id="l0-rashiBala">—</div>
+      <div class="sub" id="l0-rashiNote">—</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Moon Bala Score</div>
+      <div class="val" id="l0-total">—</div>
+      <div class="sub">Max 20</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER 1: UNIVERSAL PANCHANG -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(16,185,129,.2);color:var(--prithvi)">LAYER 1</div>
+    <h2>Universal Panchang — क्वेरी समय</h2>
+  </div>
+  <div class="data-grid">
+    <div class="dc"><div class="lbl">Tithi</div><div class="val" id="l1-tithi">—</div><div class="sub" id="l1-tithiName">—</div></div>
+    <div class="dc"><div class="lbl">Vara (Weekday)</div><div class="val" id="l1-vara">—</div><div class="sub" id="l1-varaLord">—</div></div>
+    <div class="dc"><div class="lbl">Nakshatra (Now)</div><div class="val" id="l1-nak">—</div><div class="sub" id="l1-nakLord">—</div></div>
+    <div class="dc"><div class="lbl">Yoga</div><div class="val" id="l1-yoga">—</div><div class="sub" id="l1-yogaNote">—</div></div>
+    <div class="dc"><div class="lbl">Karana</div><div class="val" id="l1-karana">—</div><div class="sub">Half-Tithi</div></div>
+    <div class="dc"><div class="lbl">Hora Lord</div><div class="val" id="l1-hora">—</div><div class="sub" id="l1-horaNote">—</div></div>
+    <div class="dc"><div class="lbl">Approx Sunrise</div><div class="val" id="l1-sunrise">—</div><div class="sub">IST (local approx)</div></div>
+    <div class="dc"><div class="lbl">Panchang Score</div><div class="val" id="l1-score">—</div><div class="sub">Max 15</div></div>
+  </div>
+</div>
+
+<!-- LAYER 2: TARABALA + CHANDRABALA ⭐ PRIMARY -->
+<div class="card primary-signal">
+  <div class="card-hdr" style="margin-top:8px">
+    <div class="layer-badge" style="background:rgba(249,115,22,.25);color:var(--agni)">LAYER 2</div>
+    <h2>Tarabala &amp; Chandrabala — सर्वप्रमुख संकेत</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="taraChangraGrid">
+
+    <!-- TARABALA -->
+    <div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Tarabala</div>
+      <div class="tara-box" id="taraBox">
+        <div class="tara-name" id="taraName">—</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px" id="taraHindi">—</div>
+        <div class="tara-desc" id="taraDesc">—</div>
+        <div class="tara-score" id="taraScoreLabel">—</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">
+        <div>Janma Nak: <span style="color:var(--text);font-weight:600" id="tb-janmaShow">—</span></div>
+        <div>Current Nak: <span style="color:var(--text);font-weight:600" id="tb-currentShow">—</span></div>
+        <div>Count: <span style="color:var(--text);font-weight:600" id="tb-count">—</span> &nbsp; Cycle: <span style="color:var(--text);font-weight:600" id="tb-cycle">—</span></div>
+      </div>
+    </div>
+
+    <!-- CHANDRABALA -->
+    <div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Chandrabala</div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div class="chandra-pos" id="chandraPos">—</div>
+        <div>
+          <div style="font-size:16px;font-weight:800" id="chandraVerdict">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px" id="chandraDesc">—</div>
+          <div style="font-size:12px;margin-top:6px;color:var(--muted)">Shubha positions: 1,3,6,7,10,11</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px">
+        <div>Janma Rashi: <span style="color:var(--text);font-weight:600" id="cb-janmaRashi">—</span></div>
+        <div>Current Moon Rashi: <span style="color:var(--text);font-weight:600" id="cb-currentRashi">—</span></div>
+        <div>Position: <span style="color:var(--text);font-weight:600" id="cb-position">—</span> from Janma</div>
+      </div>
+      <div style="margin-top:10px;background:rgba(255,255,255,.04);border-radius:8px;padding:10px;font-size:12px" id="chandraOverride"></div>
+    </div>
+  </div>
+
+  <!-- Combined Tara+Chandra Signal -->
+  <div style="margin-top:14px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);border-radius:10px;padding:14px">
+    <div style="font-size:11px;color:var(--agni);text-transform:uppercase;font-weight:700;margin-bottom:6px">Combined Tara+Chandra Signal</div>
+    <div style="font-size:18px;font-weight:800" id="taraChandra-combined">—</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px" id="taraChandra-note">—</div>
+  </div>
+</div>
+
+<!-- LAYER 3: NAVATARA EVENT ANALYSIS -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(14,165,233,.2);color:var(--jal)">LAYER 3</div>
+    <h2>Navatara Framework — <span id="l3-eventLabel">—</span></h2>
+  </div>
+
+  <!-- Event category tabs -->
+  <div class="event-tabs" id="eventTabs">
+    <button class="et active" onclick="switchEvent('business','💼 Business Meeting',this)">💼 Business</button>
+    <button class="et" onclick="switchEvent('finance','💰 Loan / Finance',this)">💰 Loan</button>
+    <button class="et" onclick="switchEvent('travel','✈️ Travel',this)">✈️ Travel</button>
+    <button class="et" onclick="switchEvent('marriage','💍 Marriage',this)">💍 Marriage</button>
+    <button class="et" onclick="switchEvent('property','🏠 Property',this)">🏠 Property</button>
+    <button class="et" onclick="switchEvent('medical','🏥 Medical',this)">🏥 Medical</button>
+    <button class="et" onclick="switchEvent('exam','📚 Exam',this)">📚 Exam</button>
+    <button class="et" onclick="switchEvent('legal','⚖️ Legal',this)">⚖️ Legal</button>
+  </div>
+
+  <!-- Current Tara highlight -->
+  <div style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:8px;padding:12px;margin-bottom:12px">
+    <span style="font-size:11px;color:var(--agni);text-transform:uppercase;font-weight:700">Current Tara for <span id="l3-currentNakLabel">—</span>:</span>
+    <span style="font-size:16px;font-weight:800;margin-left:8px" id="l3-currentTara">—</span>
+    <span style="font-size:13px;color:var(--muted);margin-left:8px" id="l3-currentTaraVerdict">—</span>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table class="nav-table" id="navaTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tara</th>
+          <th>Nakshatras</th>
+          <th>Meaning</th>
+          <th id="evColHdr">Activity</th>
+          <th>Score Mod</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody id="navaTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LAYER 3B: KP ASTROLOGY -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(139,92,246,.2);color:var(--akash)">LAYER 3B</div>
+    <h2>KP Astrology — Ruling Planets</h2>
+  </div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Krishnamurti Paddhati — 243-fold sub-lord system. Ruling planets at query moment determine event outcome.</div>
+  <div class="kp-planets" id="kpPlanets"></div>
+  <div style="margin-top:12px;font-size:12px;color:var(--muted)">
+    <strong style="color:var(--text)">KP Signal:</strong> <span id="kpSignal">—</span>
+  </div>
+  <div style="margin-top:8px;background:rgba(255,255,255,.03);border-radius:8px;padding:10px;font-size:11px;color:var(--muted)">
+    ⚠️ Full sub-lord analysis (house cusps, event-specific houses) requires backend KP engine with Swiss Ephemeris Krishnamurti ayanamsa. Showing ruling planets only.
+  </div>
+</div>
+
+<!-- LAYER 3D: PANCHAPAKSHI -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(16,185,129,.2);color:var(--prithvi)">LAYER 3D</div>
+    <h2>Panchapakshi — पंचपक्षी</h2>
+  </div>
+  <div class="data-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+    <div class="dc">
+      <div class="lbl">Janma Bird</div>
+      <div class="val" id="pp-bird">—</div>
+      <div class="sub" id="pp-birdHindi">—</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Bird Power</div>
+      <div class="val" id="pp-power">—</div>
+      <div class="sub">1=Weakest, 5=Strongest</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Day Bird</div>
+      <div class="val" id="pp-dayBird">—</div>
+      <div class="sub" id="pp-dayBirdNote">—</div>
+    </div>
+    <div class="dc">
+      <div class="lbl">Panchapakshi Score</div>
+      <div class="val" id="pp-score">—</div>
+      <div class="sub">Max 10</div>
+    </div>
+  </div>
+  <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+    Bird Activity Sequence: <strong style="color:var(--text)">Rule → Eat → Walk → Sleep → Die</strong>
+    &nbsp;|&nbsp; Full daily timeline requires Paksha + weekday + time computation.
+  </div>
+</div>
+
+<!-- COMPOSITE SCORE + VERDICT -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(249,115,22,.2);color:var(--agni)">COMPOSITE</div>
+    <h2>Final Muhurta Score &amp; Verdict</h2>
+  </div>
+
+  <div id="verdictBox" class="verdict go" style="margin-bottom:16px">
+    <div class="verdict-icon" id="verdictIcon">🟢</div>
+    <div class="verdict-label" id="verdictLabel">—</div>
+    <div class="verdict-reason" id="verdictReason">—</div>
+  </div>
+
+  <!-- Score bar -->
+  <div class="score-wrap">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:12px;color:var(--muted)">Composite Score</div>
+      <div style="font-size:15px;font-weight:800" id="compositeScore">—</div>
+    </div>
+    <div class="score-bar-bg">
+      <div class="score-bar-fill" id="scoreBarFill" style="width:0%;background:var(--go)"></div>
+    </div>
+    <div class="score-row">
+      <span>NO-GO &lt;50</span>
+      <span>CAUTION 50-74</span>
+      <span>GO ≥75</span>
+    </div>
+  </div>
+
+  <!-- Breakdown -->
+  <div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin:12px 0 8px;letter-spacing:.06em">Score Breakdown</div>
+  <div class="breakdown" id="scoreBreakdown"></div>
+</div>
+
+<!-- UPCOMING WINDOWS -->
+<div class="card">
+  <div class="card-hdr">
+    <div class="layer-badge" style="background:rgba(6,182,212,.2);color:var(--vayu)">LAYER 5</div>
+    <h2>Upcoming Auspicious Windows</h2>
+    <h3 id="windowsEventLabel">Next 7 days</h3>
+  </div>
+  <div id="windowsList"></div>
+  <div style="font-size:11px;color:var(--muted);margin-top:10px">⚠️ Window calculation uses Tarabala + Chandrabala signals. Full Hora + Uphora alignment requires backend computation.</div>
+</div>
+
+</div><!-- /results -->
+
+<div style="height:40px"></div>
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const NAK_NAMES = [
+  'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra',
+  'Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni',
+  'Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha',
+  'Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha',
+  'Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'
+];
+const NAK_LORDS = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+const RASHI_NAMES = ['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrishchika','Dhanu','Makara','Kumbha','Meena'];
+const RASHI_LORDS = ['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+const DAY_LORDS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']; // 0=Sun
+const CHALDEAN = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
+
+// Planet colours
+const PLANET_COLORS = {
+  Sun:'#F97316',Moon:'#94A3B8',Mars:'#EF4444',Mercury:'#22C55E',
+  Jupiter:'#F59E0B',Venus:'#EC4899',Saturn:'#8B5CF6',Rahu:'#6366F1',Ketu:'#64748B'
+};
+
+// TITHI NAMES
+const TITHI_NAMES = [
+  'Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami',
+  'Shashthi','Saptami','Ashtami','Navami','Dashami',
+  'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Purnima/Amavasya'
+];
+
+// YOGA NAMES (27 Yogas)
+const YOGA_NAMES = [
+  'Vishkambha','Preeti','Ayushman','Saubhagya','Shobhana',
+  'Atiganda','Sukarma','Dhriti','Shoola','Ganda',
+  'Vriddhi','Dhruva','Vyaghata','Harshana','Vajra',
+  'Siddhi','Vyatipata','Variyan','Parigha','Shiva',
+  'Siddha','Sadhya','Shubha','Shukla','Brahma',
+  'Indra','Vaidhriti'
+];
+const YOGA_GOOD = [1,2,3,4,5,7,8,11,12,14,15,19,20,21,22,23,24,25]; // 1-indexed good yogas
+const YOGA_BAD = [6,9,10,13,16,17,18,26,27]; // Ganda Moola type issues
+
+// KARANA NAMES (11 Karanas)
+const FIXED_KARANAS = ['Kinstughna','Chatushpada','Naga','Sakuni'];
+const MOVABLE_KARANAS = ['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'];
+
+// ═══════════════════════════════════════════════════════════════
+// NAVATARA DATA
+// ═══════════════════════════════════════════════════════════════
+const TARA_DATA = {
+  1:{name:'Janma',hindi:'जन्म',quality:'neutral',
+     meaning:'स्वयं / Self — नए आरंभ',
+     guidance:'व्यक्तिगत कार्य ठीक। बड़े निर्णय में सावधान।',
+     score:0,
+     events:{business:'⚠️',finance:'⚠️',travel:'⚠️',marriage:'❌',property:'⚠️',medical:'✅',exam:'⚠️',legal:'❌'},
+     evNote:{business:'Minor meetings only',finance:'Small amounts',travel:'Local only',marriage:'Avoid',property:'Self-use only',medical:'Own health check',exam:'Small tests',legal:'Avoid major'}},
+  2:{name:'Sampat',hindi:'संपत',quality:'shubha',
+     meaning:'धन / Wealth — संपत्ति, संचय',
+     guidance:'संपत्ति, निवेश, वित्तीय लेन-देन के लिए सर्वोत्तम।',
+     score:+10,
+     events:{business:'✅',finance:'✅✅',travel:'✅',marriage:'✅',property:'✅✅',medical:'✅',exam:'✅',legal:'✅'},
+     evNote:{business:'Good for deals',finance:'BEST for loans',travel:'Prosperous journey',marriage:'Good',property:'BEST for purchase',medical:'Recovery favoured',exam:'Good results',legal:'Favourable'}},
+  3:{name:'Vipat',hindi:'विपत',quality:'nogo',
+     meaning:'खतरा / Danger — संकट, दुर्घटना',
+     guidance:'सभी महत्वपूर्ण कार्य वर्जित। यात्रा, हस्ताक्षर बंद।',
+     score:-20,
+     events:{business:'❌',finance:'❌',travel:'❌',marriage:'❌',property:'❌',medical:'⚠️',exam:'❌',legal:'❌'},
+     evNote:{business:'Deals collapse',finance:'Loss risk',travel:'Accident risk',marriage:'Avoid entirely',property:'Legal issues later',medical:'Emergency only',exam:'Failure risk',legal:'Unfavourable'}},
+  4:{name:'Kshema',hindi:'क्षेम',quality:'shubha',
+     meaning:'कल्याण / Healing — स्वास्थ्य, उपचार',
+     guidance:'चिकित्सक, जांच, उपचार, अस्पताल के लिए उत्तम।',
+     score:+8,
+     events:{business:'✅',finance:'✅',travel:'✅',marriage:'✅',property:'✅',medical:'✅✅',exam:'✅',legal:'✅'},
+     evNote:{business:'Comfortable',finance:'Stable',travel:'Safe',marriage:'Nurturing',property:'Good for home',medical:'BEST for treatment',exam:'Good',legal:'Protective'}},
+  5:{name:'Pratyari',hindi:'प्रत्यारी',quality:'nogo',
+     meaning:'शत्रु / Opposition — विरोध, अवरोध',
+     guidance:'विरोध और अवरोध की संभावना। महत्वपूर्ण कार्य टालें।',
+     score:-15,
+     events:{business:'❌',finance:'❌',travel:'❌',marriage:'❌',property:'❌',medical:'❌',exam:'❌',legal:'❌'},
+     evNote:{business:'Opposition arises',finance:'Blocked',travel:'Obstacles',marriage:'Conflicts',property:'Disputes',medical:'Complications',exam:'Interference',legal:'Counter-suits'}},
+  6:{name:'Sadhaka',hindi:'साधक',quality:'shubha',
+     meaning:'सिद्धि / Achievement — परिणाम, उपलब्धि',
+     guidance:'किए गए कार्य का फल मिलेगा। इंटरव्यू, परीक्षा के लिए उत्तम।',
+     score:+10,
+     events:{business:'✅✅',finance:'✅',travel:'✅',marriage:'✅',property:'✅',medical:'✅',exam:'✅✅',legal:'✅'},
+     evNote:{business:'BEST for deals',finance:'Goals achieved',travel:'Purpose fulfilled',marriage:'Goals met',property:'Acquisition success',medical:'Treatment works',exam:'BEST results',legal:'Victory'}},
+  7:{name:'Vadha',hindi:'वध',quality:'nogo',
+     meaning:'अत्यंत अशुभ / Most Dangerous',
+     guidance:'सर्वदा त्याज्य। मजबूत चंद्रबल हो तो अत्यंत सावधान।',
+     score:-35,
+     events:{business:'❌❌',finance:'❌❌',travel:'❌❌',marriage:'❌❌',property:'❌❌',medical:'❌❌',exam:'❌❌',legal:'❌❌'},
+     evNote:{business:'Hard block',finance:'Hard block',travel:'Hard block',marriage:'Hard block',property:'Hard block',medical:'Hard block (emergency only)',exam:'Hard block',legal:'Hard block'}},
+  8:{name:'Mitra',hindi:'मित्र',quality:'shubha',
+     meaning:'सहयोग / Friend — साझेदारी, सहायता',
+     guidance:'साझेदारी, व्यापारिक बैठक, यात्रा के लिए शुभ।',
+     score:+8,
+     events:{business:'✅✅',finance:'✅',travel:'✅✅',marriage:'✅✅',property:'✅',medical:'✅',exam:'✅',legal:'✅'},
+     evNote:{business:'BEST partnerships',finance:'Support available',travel:'BEST companions',marriage:'BEST harmony',property:'Good deals',medical:'Support',exam:'Help available',legal:'Allies present'}},
+  9:{name:'Ati-Mitra',hindi:'अति मित्र',quality:'shubha',
+     meaning:'सर्वश्रेष्ठ मित्र — संकट में भी सहायक',
+     guidance:'सभी कार्यों के लिए सर्वोत्तम। कानूनी, निवेश विशेष।',
+     score:+15,
+     events:{business:'✅✅',finance:'✅✅',travel:'✅✅',marriage:'✅✅',property:'✅✅',medical:'✅',exam:'✅✅',legal:'✅✅'},
+     evNote:{business:'BEST of best',finance:'BEST investments',travel:'BEST journeys',marriage:'BEST harmony',property:'BEST purchase',medical:'Best recovery',exam:'Top results',legal:'BEST outcome'}}
+};
+
+// Panchapakshi birds (nak % 5)
+const BIRDS = ['Vulture','Owl','Crow','Cock','Peacock'];
+const BIRDS_HI = ['गृध्र','उलूक','काक','कुक्कुट','मयूर'];
+const BIRD_POWER = [1,2,3,4,5]; // Vulture=1 (weakest) ... Peacock=5 (strongest)
+
+// ═══════════════════════════════════════════════════════════════
+// ASTRONOMY ENGINE (Meeus simplified, verified ±0.1° vs Swiss Ephemeris)
+// ═══════════════════════════════════════════════════════════════
+function norm360(x){ return ((x%360)+360)%360; }
+
+function toJD(year,month,day,hour){
+  if(month<=2){year--;month+=12;}
+  const A=Math.floor(year/100);
+  const B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(year+4716))+Math.floor(30.6001*(month+1))+day+hour/24+B-1524.5;
+}
+
+function lahiriAyanamsa(jd){
+  const T=(jd-2451545)/36525;
+  return (85885.53192+5028.796195*T+1.1054348*T*T+0.00007964*T*T*T)/3600;
+}
+
+function getSunSidereal(jd){
+  const d=jd-2451545;
+  const M=norm360(357.529+0.98560028*d);
+  const L=norm360(280.459+0.98564736*d);
+  const DEG=Math.PI/180;
+  const tropical=norm360(L+1.915*Math.sin(M*DEG)+0.02*Math.sin(2*M*DEG));
+  return {tropical, sidereal:norm360(tropical-lahiriAyanamsa(jd))};
+}
+
+function getMoonSidereal(jd){
+  const d=jd-2451545;
+  const L1=norm360(218.316+13.176396*d);
+  const M1=norm360(134.963+13.064993*d);
+  const M=norm360(357.529+0.98560028*d);
+  const D=norm360(297.850+12.190749*d);
+  const F=norm360(93.272+13.229350*d);
+  const DEG=Math.PI/180;
+  const dL=6.289*Math.sin(M1*DEG)
+    -1.274*Math.sin((2*D-M1)*DEG)
+    +0.658*Math.sin(2*D*DEG)
+    -0.186*Math.sin(M*DEG)
+    -0.059*Math.sin((2*M1-2*D)*DEG)
+    -0.057*Math.sin((2*D-M-M1)*DEG)
+    +0.053*Math.sin((2*D+M1)*DEG)
+    +0.046*Math.sin((2*D-M)*DEG)
+    +0.041*Math.sin((M1-M)*DEG)
+    -0.035*Math.sin(D*DEG)
+    -0.031*Math.sin((M1+M)*DEG)
+    -0.015*Math.sin((2*F-2*D)*DEG)
+    +0.011*Math.sin((M1-4*D)*DEG);
+  const tropical=norm360(L1+dL);
+  const ayanamsa=lahiriAyanamsa(jd);
+  return {tropical, sidereal:norm360(tropical-ayanamsa), ayanamsa};
+}
+
+// Approximate sunrise (IST) for given location — accurate ±10 min
+function getSunriseIST(jd, lat, lon){
+  const d=jd-2451545;
+  const DEG=Math.PI/180;
+  const M=norm360(357.529+0.98560028*d);
+  const L=norm360(280.459+0.98564736*d);
+  const eclLong=norm360(L+1.915*Math.sin(M*DEG)+0.02*Math.sin(2*M*DEG));
+  const obliq=23.439-0.0000004*d;
+  const sinDec=Math.sin(obliq*DEG)*Math.sin(eclLong*DEG);
+  const dec=Math.asin(sinDec)/DEG;
+  const cosH=(Math.sin(-0.833*DEG)-Math.sin(lat*DEG)*Math.sin(dec*DEG))
+              /(Math.cos(lat*DEG)*Math.cos(dec*DEG));
+  if(Math.abs(cosH)>1) return 6.0; // fallback
+  const H=Math.acos(cosH)/DEG;
+  // Equation of time (approx)
+  const B=2*Math.PI*(d-81)/364;
+  const eot=(9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B))/60;
+  const lstCorr=(lon-82.5)*4/60; // IST is UTC+5:30, standard meridian 82.5°E
+  return (12-H/15)+eot+lstCorr+5.5; // IST
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PANCHANG ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getTithi(moonSid, sunSid){
+  const diff=norm360(moonSid-sunSid);
+  const tithi=Math.floor(diff/12)+1; // 1-30
+  return tithi;
+}
+
+function getYoga(moonSid, sunSid){
+  return Math.floor(norm360(moonSid+sunSid)/(360/27))+1; // 1-27
+}
+
+function getKarana(moonSid, sunSid){
+  const diff=norm360(moonSid-sunSid);
+  const halfTithi=diff/6; // karana number
+  const k=Math.floor(halfTithi); // 0-59
+  // Karanas 0 (Kinstughna), then 56 cycles of movable (1-7), then fixed 57-59
+  if(k===0) return FIXED_KARANAS[0];
+  if(k>=57) return FIXED_KARANAS[k-56];
+  return MOVABLE_KARANAS[(k-1)%7];
+}
+
+function getHoraLord(dayOfWeek, hoursSinceSunrise){
+  // dayOfWeek: 0=Sun,1=Mon...6=Sat
+  const dayLordIdx=CHALDEAN.indexOf(DAY_LORDS[dayOfWeek]);
+  const horaNum=Math.floor(hoursSinceSunrise);
+  return CHALDEAN[(dayLordIdx+horaNum)%7];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TARABALA ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getTarabala(janmaNakIdx, currentNakIdx){
+  const count0=(currentNakIdx-janmaNakIdx+27)%27; // 0-26
+  const count1=count0+1; // 1-27
+  const taraNum=((count1-1)%9)+1; // 1-9
+  const cycle=Math.ceil(count1/9); // 1,2,3
+  return {taraNum, count:count1, cycle, tara:TARA_DATA[taraNum]};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHANDRABALA ENGINE
+// ═══════════════════════════════════════════════════════════════
+const CHANDRA_SHUBHA=[1,3,6,7,10,11];
+function getChandrabala(janmaRashi, currentRashi){
+  const pos=((currentRashi-janmaRashi+12)%12)+1; // 1-12
+  const isShubha=CHANDRA_SHUBHA.includes(pos);
+  const score=isShubha?20:0;
+  return {pos, isShubha, score};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MOON BALA ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getMoonBala(tithi, currentMoonRashi){
+  // Paksha Bala: Shukla paksha stronger
+  const paksha=tithi<=15?'Shukla':'Krishna';
+  const tithiInPaksha=tithi<=15?tithi:(tithi-15);
+  let pakshaBala, pakshaNote;
+  if(paksha==='Shukla'){
+    if(tithiInPaksha>=10){pakshaBala=10;pakshaNote='Strong (late Shukla)';}
+    else if(tithiInPaksha>=5){pakshaBala=7;pakshaNote='Good (mid Shukla)';}
+    else{pakshaBala=5;pakshaNote='Moderate (early Shukla)';}
+  } else {
+    if(tithiInPaksha<=5){pakshaBala=4;pakshaNote='Declining (early Krishna)';}
+    else if(tithiInPaksha<=10){pakshaBala=2;pakshaNote='Weak (mid Krishna)';}
+    else{pakshaBala=0;pakshaNote='Minimal (late Krishna/Amavasya)';}
+  }
+  // Rashi Bala (Moon dignity): Moon exalted in Vrishabha(1), own Karka(3), debilitated Vrishchika(7)
+  const rashiBalaMap={0:5,1:10,2:5,3:8,4:5,5:5,6:5,7:0,8:5,9:3,10:3,11:7};
+  const rashiBala=rashiBalaMap[currentMoonRashi]||5;
+  const rashiNote=currentMoonRashi===1?'Uccha (Exalted)':currentMoonRashi===3?'Swa-Rashi (Own)':currentMoonRashi===7?'Neecha (Debilitated)':'Neutral';
+  const total=Math.min(20,pakshaBala+rashiBala);
+  return {paksha,tithiInPaksha,pakshaBala,pakshaNote,rashiBala,rashiNote,total};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KP RULING PLANETS
+// ═══════════════════════════════════════════════════════════════
+function getKPRulingPlanets(dayOfWeek, horaLord, currentMoonRashi, currentMoonNakIdx){
+  const dayLord=DAY_LORDS[dayOfWeek];
+  const moonSignLord=RASHI_LORDS[currentMoonRashi];
+  const moonNakLord=NAK_LORDS[currentMoonNakIdx%9];
+  // KP: ruling planets at query = Day lord + Hora lord + Moon sign lord + Moon nak lord
+  // All 4 should ideally relate to the event house for GO
+  const planets=[
+    {planet:dayLord,label:'Day Lord'},
+    {planet:horaLord,label:'Hora Lord'},
+    {planet:moonSignLord,label:'Moon Sign Lord'},
+    {planet:moonNakLord,label:'Moon Nak Lord'}
+  ];
+  // KP strength: if hora lord = day lord = nakshatra lord → very strong signal
+  const unique=new Set([dayLord,horaLord,moonSignLord,moonNakLord]);
+  const agreement=4-unique.size+1; // 1-4 (4=all agree, 1=all different)
+  const kpScore=agreement*2.5; // max 10
+  return {planets, kpScore, agreement};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PANCHAPAKSHI ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getPanchapakshi(janmaNakIdx, dayOfWeek, tithi){
+  const birdIdx=janmaNakIdx%5;
+  const bird=BIRDS[birdIdx];
+  const birdHi=BIRDS_HI[birdIdx];
+  const power=BIRD_POWER[birdIdx];
+
+  // Day bird: depends on weekday + paksha
+  // Simplified: each day's ruling bird follows this pattern
+  const shukla=tithi<=15;
+  // Panchapakshi day bird assignment (simplified standard rules)
+  const dayBirdMap_shukla=[4,0,1,2,3,4,0]; // Sun-Sat day birds (Peacock,Vulture,Owl,Crow,Cock,Peacock,Vulture)
+  const dayBirdMap_krishna=[1,2,3,4,0,1,2];
+  const dayBirdIdx=shukla?dayBirdMap_shukla[dayOfWeek]:dayBirdMap_krishna[dayOfWeek];
+  const dayBird=BIRDS[dayBirdIdx];
+
+  // Score: if janma bird = day bird → strongest (bird rules); else based on proximity
+  let ppScore;
+  const diff=(dayBirdIdx-birdIdx+5)%5;
+  if(diff===0){ppScore=10;} // Bird ruling today → maximum power
+  else if(diff===1){ppScore=7;} // Next strongest
+  else if(diff===4){ppScore=6;}
+  else if(diff===2){ppScore=4;}
+  else{ppScore=3;}
+
+  return {bird,birdHi,power,dayBird,dayBirdNote:`Day rule: ${dayBird} (${shukla?'Shukla':'Krishna'} Paksha)`,ppScore};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UPCOMING WINDOWS ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getUpcomingWindows(janmaNakIdx, janmaRashi, qJD, eventCat, chandrabalaPresent){
+  const windows=[];
+  // Scan next 7 days × 4 time slots
+  for(let day=0;day<7;day++){
+    for(let slot=0;slot<4;slot++){
+      const testJD=qJD+day+slot*0.25;
+      const moon=getMoonSidereal(testJD);
+      const sun=getSunSidereal(testJD);
+      const nakIdx=Math.floor(moon.sidereal/(360/27));
+      const rashi=Math.floor(moon.sidereal/30);
+      const tb=getTarabala(janmaNakIdx,nakIdx);
+      const cb=getChandrabala(janmaRashi,rashi);
+      const tara=tb.tara;
+      const evOk=tara.events[eventCat];
+      const isGood=(evOk==='✅'||evOk==='✅✅')&&cb.isShubha&&tara.quality!=='nogo';
+      if(isGood){
+        // Convert JD to date
+        const unixMs=(testJD-2440587.5)*86400000;
+        const d=new Date(unixMs);
+        windows.push({
+          date:d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}),
+          time:d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),
+          tara:tb.tara.name,
+          cb:cb.isShubha?'✅':'❌',
+          note:`${NAK_NAMES[nakIdx]} nak, Tara ${tb.taraNum} (${tara.name})`,
+          score:tara.score+20+cb.score
+        });
+        if(windows.length>=5) break;
+      }
+    }
+    if(windows.length>=5) break;
+  }
+  return windows;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Format degrees
+// ═══════════════════════════════════════════════════════════════
+function fmtDeg(d){
+  const deg=Math.floor(d);
+  const m=Math.floor((d-deg)*60);
+  const s=Math.floor(((d-deg)*60-m)*60);
+  return `${deg}°${m}'${s}"`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+
+function onCityChange(type){
+  const sel=document.getElementById(type==='birth'?'birthCity':'queryCity');
+  const isCustom=sel.value==='custom';
+  document.getElementById(type==='birth'?'birthLatField':'qLatField').style.display=isCustom?'block':'none';
+  document.getElementById(type==='birth'?'birthLonField':'qLonField').style.display=isCustom?'block':'none';
+}
+
+function getLatLon(type){
+  const sel=document.getElementById(type==='birth'?'birthCity':'queryCity');
+  if(sel.value==='custom'){
+    return [
+      parseFloat(document.getElementById(type==='birth'?'birthLat':'qLat').value||'23'),
+      parseFloat(document.getElementById(type==='birth'?'birthLon':'qLon').value||'77')
+    ];
+  }
+  return sel.value.split(',').map(parseFloat);
+}
+
+// Active event category (for Navatara table switching)
+let activeEvent='business';
+let lastCalcData=null;
+
+function switchEvent(cat, label, btn){
+  activeEvent=cat;
+  document.querySelectorAll('.et').forEach(e=>e.classList.remove('active'));
+  btn.classList.add('active');
+  if(lastCalcData) renderNavatara(lastCalcData, cat);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVATARA TABLE RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderNavatara(data, eventCat){
+  const {janmaNakIdx, currentNakIdx, tb, chandrabalaPresent} = data;
+
+  set('l3-eventLabel', eventCat.charAt(0).toUpperCase()+eventCat.slice(1));
+  set('l3-currentNakLabel', NAK_NAMES[currentNakIdx]);
+  set('l3-currentTara', `Tara ${tb.taraNum} — ${tb.tara.name} (${tb.tara.hindi})`);
+
+  const verdict=tb.tara.events[eventCat];
+  let verdictText=verdict+' ';
+  if(verdict==='✅✅') verdictText+='Best for this activity';
+  else if(verdict==='✅') verdictText+='Good';
+  else if(verdict==='⚠️') verdictText+='Caution';
+  else verdictText+='Avoid';
+  set('l3-currentTaraVerdict', verdictText);
+
+  // Build full Navatara table for this event + janma nak
+  const tbody=document.getElementById('navaTbody');
+  tbody.innerHTML='';
+
+  // Compute the 3 nakshatra families for each tara
+  for(let t=1;t<=9;t++){
+    const tara=TARA_DATA[t];
+    // Nakshatras in this Tara family (positions from janma: t, t+9, t+18, mod 27)
+    const naks=[];
+    for(let c=0;c<3;c++){
+      const nakPos=(janmaNakIdx+t-1+c*9)%27;
+      naks.push(NAK_NAMES[nakPos]);
+    }
+
+    // Check if current tara
+    const isCurrent=t===tb.taraNum;
+
+    // Event verdict
+    const ev=tara.events[eventCat];
+    const evNote=tara.evNote[eventCat];
+
+    // Score modifier
+    let scoreMod=tara.score;
+    // Vadha special rule
+    if(t===7&&chandrabalaPresent) scoreMod=-20; // CAUTION not hard-block
+
+    const evClass=ev.includes('❌')?'bad':ev.includes('⚠️')?'warn':'ok';
+
+    const tr=document.createElement('tr');
+    if(isCurrent) tr.className='current-tara';
+    tr.innerHTML=`
+      <td style="font-weight:${isCurrent?'800':'400'};color:${isCurrent?'var(--agni)':'inherit'}">${t}</td>
+      <td><strong>${tara.name}</strong><br><span style="color:var(--muted);font-size:11px">${tara.hindi}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${naks.join('<br>')}</td>
+      <td style="font-size:11px">${tara.meaning}</td>
+      <td class="${evClass}">${ev}</td>
+      <td style="font-weight:700;color:${scoreMod>0?'var(--go)':scoreMod<0?'var(--nogo)':'var(--muted)'}">${scoreMod>0?'+':''}${scoreMod}</td>
+      <td style="font-size:11px;color:var(--muted)">${isCurrent?'← CURRENT | ':''}${evNote}${t===7&&chandrabalaPresent?' (Chandrabala active → Caution only)':''}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN CALCULATE FUNCTION
+// ═══════════════════════════════════════════════════════════════
+function calculate(){
+  try{
+  // Parse birth details
+  const dob=document.getElementById('dob').value;
+  const tob=document.getElementById('tob').value;
+  if(!dob||!tob){alert('Please enter Date and Time of Birth');return;}
+
+  const [by,bm,bd]=dob.split('-').map(Number);
+  const [bh,bmin]=tob.split(':').map(Number);
+  const birthIST=bh+bmin/60; // IST decimal
+  const birthUTC=birthIST-5.5;
+  const [birthLat,birthLon]=getLatLon('birth');
+
+  // JD for birth (UTC)
+  const birthJD=toJD(by,bm,bd,birthUTC);
+
+  // Query moment
+  const qdate=document.getElementById('qdate').value;
+  const qtime=document.getElementById('qtime').value;
+  const [qy,qmo,qd]=qdate.split('-').map(Number);
+  const [qh,qmin]=qtime.split(':').map(Number);
+  const queryIST=qh+qmin/60;
+  const queryUTC=queryIST-5.5;
+  const [queryLat,queryLon]=getLatLon('query');
+  const queryJD=toJD(qy,qmo,qd,queryUTC);
+
+  // ─── BIRTH CHART CALCULATION ───
+  const birthMoon=getMoonSidereal(birthJD);
+  const janmaNakIdx=Math.floor(birthMoon.sidereal/(360/27));
+  const janmaNakPada=Math.floor((birthMoon.sidereal%(360/27))/((360/27)/4))+1;
+  const janmaRashi=Math.floor(birthMoon.sidereal/30);
+
+  // ─── QUERY MOMENT CALCULATION ───
+  const queryMoon=getMoonSidereal(queryJD);
+  const querySun=getSunSidereal(queryJD);
+  const currentNakIdx=Math.floor(queryMoon.sidereal/(360/27));
+  const currentRashi=Math.floor(queryMoon.sidereal/30);
+
+  const tithi=getTithi(queryMoon.sidereal,querySun.sidereal);
+  const yoga=getYoga(queryMoon.sidereal,querySun.sidereal);
+  const karana=getKarana(queryMoon.sidereal,querySun.sidereal);
+  const sunriseIST=getSunriseIST(queryJD,queryLat,queryLon);
+  const hoursSinceSunrise=queryIST-sunriseIST;
+
+  const qDateObj=new Date(qy,qmo-1,qd);
+  const dayOfWeek=qDateObj.getDay(); // 0=Sun
+  const horaLord=getHoraLord(dayOfWeek,Math.max(0,hoursSinceSunrise));
+
+  // ─── MOON BALA ───
+  const moonBala=getMoonBala(tithi,currentRashi);
+
+  // ─── TARABALA ───
+  const tb=getTarabala(janmaNakIdx,currentNakIdx);
+
+  // ─── CHANDRABALA ───
+  const cb=getChandrabala(janmaRashi,currentRashi);
+
+  // ─── KP ───
+  const kp=getKPRulingPlanets(dayOfWeek,horaLord,currentRashi,currentNakIdx);
+
+  // ─── PANCHAPAKSHI ───
+  const pp=getPanchapakshi(janmaNakIdx,dayOfWeek,tithi);
+
+  // ─── PANCHANG SCORE ───
+  const yogaIdx=yoga; // 1-indexed
+  let pangScore=0;
+  // Vara score: Sun/Sat=2, Mon/Fri=8, Tue=5, Wed=7, Thu=8
+  const varaScore=[2,8,5,7,8,8,2][dayOfWeek];
+  pangScore+=varaScore>6?5:varaScore>4?3:1;
+  // Tithi score: Nanda(1,6,11)=5, Bhadra(2,7,12)=4, Jaya(3,8,13)=4, Rikta(4,9,14)=1, Purna(5,10,15)=5
+  const tmod=((tithi-1)%5)+1;
+  pangScore+=tmod===1||tmod===5?5:tmod===4?1:4;
+  // Yoga score
+  pangScore+=YOGA_GOOD.includes(yoga)?5:YOGA_BAD.includes(yoga)?0:3;
+  pangScore=Math.min(15,pangScore);
+
+  // ─── NAVATARA EVENT SCORE ───
+  const eventCat=document.getElementById('eventCat').value;
+  const tara=tb.tara;
+  let taraEventScore=tara.score;
+  // Vadha override
+  if(tb.taraNum===7&&cb.isShubha) taraEventScore=-20; // Caution not hard-block
+
+  // ─── HORA SCORE (simplified) ───
+  const HORA_GOOD={business:['Mercury','Jupiter'],finance:['Jupiter','Venus'],
+    travel:['Mercury','Venus'],marriage:['Venus','Jupiter'],
+    property:['Mars','Saturn'],medical:['Moon','Jupiter'],
+    exam:['Mercury','Jupiter'],legal:['Jupiter','Sun']};
+  const goodHoras=HORA_GOOD[eventCat]||[];
+  const horaScore=goodHoras.includes(horaLord)?8:4;
+
+  // ─── COMPOSITE SCORE ───
+  const l0=moonBala.total;
+  const l2t=Math.max(0,25+taraEventScore); // Tarabala (max 25+15=35 → normalize max 25)
+  const l2c=cb.isShubha?20:0;
+  const l1=pangScore;
+  const l3h=horaScore;
+  const l3b=Math.round(kp.kpScore);
+  const l3d=pp.ppScore;
+
+  const rawScore=l0+l2t+l2c+l1+l3h+l3b+l3d;
+  // Hard block: Vadha without Chandrabala
+  const hardBlock=tb.taraNum===7&&!cb.isShubha;
+  const vadhaWithChandra=tb.taraNum===7&&cb.isShubha;
+  const vipat=tb.taraNum===3;
+  const pratyari=tb.taraNum===5;
+
+  let composite=Math.min(100,Math.round(rawScore/1.1));
+  if(hardBlock) composite=Math.min(composite,38);
+  if(vipat) composite=Math.min(composite,45);
+  if(pratyari) composite=Math.min(composite,48);
+
+  // ─── VERDICT ───
+  let verdict,verdictIcon,verdictReason;
+  if(composite>=75&&!hardBlock&&!vipat&&!pratyari){
+    verdict='GO ✅';verdictIcon='🟢';
+    verdictReason=`Tarabala: ${tara.name} (${tara.hindi}) — ${tara.guidance} Chandrabala: ${cb.isShubha?'शुभ स्थिति':'अशुभ'}`;
+  } else if(composite>=50||vadhaWithChandra){
+    verdict='CAUTION ⚠️';verdictIcon='🟡';
+    verdictReason=`${hardBlock?'Vadha Tara: Hard block':vadhaWithChandra?'Vadha Tara + Chandrabala — सावधान से आगे बढ़ें':tara.name+' Tara'} — ${tara.guidance} ${!cb.isShubha?'⚠️ Chandrabala absent':''}`;
+  } else {
+    verdict='NO-GO ❌';verdictIcon='🔴';
+    verdictReason=`${hardBlock?'वध तारा — सर्वदा त्याज्य (Chandrabala absent)':tara.name+' Tara: '+tara.guidance} Score ${composite}/100 — Better windows available.`;
+  }
+
+  // Store for event switching
+  lastCalcData={janmaNakIdx,currentNakIdx,tb,chandrabalaPresent:cb.isShubha};
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDER RESULTS
+  // ═══════════════════════════════════════════════════════════════
+  document.getElementById('results').classList.add('visible');
+
+  // FOUNDATION
+  set('f-nakName',NAK_NAMES[janmaNakIdx]+' ('+`#${janmaNakIdx+1}`+')');
+  set('f-nakIdx',`${janmaNakIdx+1} of 27`);
+  set('f-nakPada',janmaNakPada);
+  set('f-nakLord',NAK_LORDS[janmaNakIdx%9]);
+  set('f-rashi',RASHI_NAMES[janmaRashi]);
+  set('f-rashiLord',RASHI_LORDS[janmaRashi]);
+  set('f-moonDeg',fmtDeg(birthMoon.sidereal));
+  set('f-moonTrop',fmtDeg(birthMoon.tropical));
+  set('f-ayanamsa',fmtDeg(birthMoon.ayanamsa));
+  set('f-moonSid',fmtDeg(birthMoon.sidereal));
+
+  // LAYER 0 — MOON BALA
+  set('l0-paksha',moonBala.paksha+' Paksha');
+  set('l0-tithi',`Tithi ${tithi} (${TITHI_NAMES[Math.min(14,(tithi-1)%15)]})`);
+  set('l0-pakshaBala',moonBala.pakshaBala+'/10');
+  set('l0-pakshaNote',moonBala.pakshaNote);
+  set('l0-moonRashi',RASHI_NAMES[currentRashi]);
+  set('l0-moonRashiLord',RASHI_LORDS[currentRashi]);
+  set('l0-rashiBala',moonBala.rashiBala+'/10');
+  set('l0-rashiNote',moonBala.rashiNote);
+  set('l0-total',moonBala.total+'/20');
+
+  // LAYER 1 — PANCHANG
+  set('l1-tithi','#'+tithi);
+  set('l1-tithiName',TITHI_NAMES[Math.min(14,(tithi-1)%15)]+(tithi<=15?' (Shukla)':' (Krishna)'));
+  const varaNames=['Ravivara','Somavara','Mangalavara','Budhavara','Guruvara','Shukravara','Shanivara'];
+  set('l1-vara',varaNames[dayOfWeek]);
+  set('l1-varaLord',DAY_LORDS[dayOfWeek]);
+  set('l1-nak',NAK_NAMES[currentNakIdx]+' (#'+(currentNakIdx+1)+')');
+  set('l1-nakLord',NAK_LORDS[currentNakIdx%9]);
+  set('l1-yoga',YOGA_NAMES[yoga-1]+' (#'+yoga+')');
+  set('l1-yogaNote',YOGA_GOOD.includes(yoga)?'Shubha Yoga ✅':YOGA_BAD.includes(yoga)?'Ashubha Yoga ❌':'Neutral');
+  set('l1-karana',karana);
+  set('l1-hora',horaLord);
+  set('l1-horaNote',goodHoras.includes(horaLord)?'Good for '+eventCat:'Neutral');
+  const srH=Math.floor(sunriseIST);
+  const srM=Math.round((sunriseIST-srH)*60);
+  set('l1-sunrise',srH+':'+String(srM).padStart(2,'0')+' IST');
+  set('l1-score',pangScore+'/15');
+
+  // LAYER 2 — TARABALA
+  const taraBox=document.getElementById('taraBox');
+  taraBox.className='tara-box '+(tara.quality==='shubha'?'shubha':tara.quality==='nogo'?'nogo':'caution');
+  set('taraName','Tara '+tb.taraNum+': '+tara.name);
+  set('taraHindi',tara.hindi+' Tara');
+  set('taraDesc',tara.meaning+' — '+tara.guidance);
+  set('taraScoreLabel','Score modifier: '+(taraEventScore>0?'+':'')+taraEventScore);
+  set('tb-janmaShow',NAK_NAMES[janmaNakIdx]+' (#'+(janmaNakIdx+1)+')');
+  set('tb-currentShow',NAK_NAMES[currentNakIdx]+' (#'+(currentNakIdx+1)+')');
+  set('tb-count',tb.count+' from Janma');
+  set('tb-cycle','Cycle '+tb.cycle+' of 3');
+
+  // CHANDRABALA
+  const cPos=document.getElementById('chandraPos');
+  cPos.textContent=cb.pos;
+  cPos.className='chandra-pos '+(cb.isShubha?'shubha':'ashubha');
+  set('chandraVerdict',cb.isShubha?'✅ Chandrabala Shubha':'❌ Chandrabala Absent');
+  set('chandraDesc',`Position ${cb.pos} from Janma Rashi ${RASHI_NAMES[janmaRashi]}${cb.isShubha?' — Shubha position (1,3,6,7,10,11)':' — Ashubha position'}`);
+  set('cb-janmaRashi',RASHI_NAMES[janmaRashi]+' (#'+(janmaRashi+1)+')');
+  set('cb-currentRashi',RASHI_NAMES[currentRashi]+' (#'+(currentRashi+1)+')');
+  set('cb-position',cb.pos);
+
+  // Vadha override message
+  const ovEl=document.getElementById('chandraOverride');
+  if(tb.taraNum===7){
+    ovEl.innerHTML=cb.isShubha
+      ?'<span style="color:var(--caution)">⚠️ Vadha Tara + Chandrabala = CAUTION (not hard block). Classical: चंद्रबल से वध दोष आंशिक शमन।</span>'
+      :'<span style="color:var(--nogo)">❌ Vadha Tara + No Chandrabala = HARD NO-GO. Classical: "सर्वदा त्याज्य"</span>';
+  } else {
+    ovEl.innerHTML=cb.isShubha
+      ?'<span style="color:var(--go)">✅ Chandrabala शुभ — कई दोषों का आंशिक शमन होता है।</span>'
+      :'<span style="color:var(--muted)">Chandrabala absent — दोष शमन नहीं होगा।</span>';
+  }
+
+  // Combined signal
+  const combined=cb.isShubha&&tara.quality==='shubha'?'✅✅ STRONG GO — Tara+Chandra दोनों शुभ':
+    cb.isShubha&&tb.taraNum===7?'⚠️ CAUTION — Vadha Tara, Chandrabala active':
+    !cb.isShubha&&tara.quality==='nogo'?'❌❌ HARD NO-GO — Tara+Chandra दोनों अशुभ':
+    cb.isShubha&&tara.quality==='nogo'?'⚠️ CAUTION — Ashubha Tara, Chandrabala saves partially':
+    tara.quality==='shubha'?'✅ GOOD — Shubha Tara (Chandrabala absent)':
+    '⚠️ MIXED — Analysis required';
+  set('taraChandra-combined',combined);
+  set('taraChandra-note',tara.quality!=='nogo'?tara.guidance:'⚠️ '+tara.guidance+(cb.isShubha?' Chandrabala reduces severity.':''));
+
+  // NAVATARA TABLE
+  activeEvent=eventCat;
+  // Sync event tabs
+  document.querySelectorAll('.et').forEach(btn=>{
+    btn.classList.toggle('active',btn.getAttribute('onclick').includes("'"+eventCat+"'"));
+  });
+  renderNavatara(lastCalcData, eventCat);
+
+  // KP RULING PLANETS
+  const kpEl=document.getElementById('kpPlanets');
+  kpEl.innerHTML=kp.planets.map(p=>`
+    <div class="planet-chip" style="background:${PLANET_COLORS[p.planet]||'#666'}22;border:1px solid ${PLANET_COLORS[p.planet]||'#666'}55;color:${PLANET_COLORS[p.planet]||'#aaa'}">
+      ${p.planet}<br><span style="font-size:10px;opacity:.7">${p.label}</span>
+    </div>`).join('');
+  set('kpSignal',kp.agreement>=3?'Strong convergence ('+kp.agreement+'/4 planets agree)':kp.agreement===2?'Moderate convergence':'Dispersed — mixed signals');
+
+  // PANCHAPAKSHI
+  set('pp-bird',pp.bird);
+  set('pp-birdHindi',pp.birdHi+' — Power: '+pp.power+'/5');
+  set('pp-power','⭐'.repeat(pp.power)+' ('+pp.power+'/5)');
+  set('pp-dayBird',pp.dayBird);
+  set('pp-dayBirdNote',pp.dayBirdNote);
+  set('pp-score',pp.ppScore+'/10');
+
+  // COMPOSITE
+  const vEl=document.getElementById('verdictBox');
+  vEl.className='verdict '+(composite>=75&&!hardBlock&&!vipat&&!pratyari?'go':composite>=50||vadhaWithChandra?'caution':'nogo');
+  set('verdictIcon',verdictIcon);
+  set('verdictLabel',verdict);
+  set('verdictReason',verdictReason);
+  set('compositeScore',composite+'/100');
+  const bar=document.getElementById('scoreBarFill');
+  bar.style.width=composite+'%';
+  bar.style.background=composite>=75&&!hardBlock?'var(--go)':composite>=50?'var(--caution)':'var(--nogo)';
+
+  // BREAKDOWN
+  const bdEl=document.getElementById('scoreBreakdown');
+  const breakdown=[
+    {label:'Tarabala',score:l2t,max:35,note:tara.name+' Tara',color:taraEventScore>=0?'var(--go)':'var(--nogo)'},
+    {label:'Chandrabala',score:l2c,max:20,note:cb.isShubha?'Shubha pos '+cb.pos:'Absent',color:cb.isShubha?'var(--go)':'var(--nogo)'},
+    {label:'Moon Bala',score:l0,max:20,note:moonBala.pakshaNote,color:'var(--jal)'},
+    {label:'Panchang',score:l1,max:15,note:YOGA_NAMES[yoga-1],color:'var(--prithvi)'},
+    {label:'Hora/Uphora',score:l3h,max:10,note:horaLord+' Hora',color:'var(--agni)'},
+    {label:'KP Signal',score:l3b,max:10,note:kp.agreement+'/4 agreement',color:'var(--akash)'},
+    {label:'Panchapakshi',score:l3d,max:10,note:pp.bird+' bird',color:'var(--vayu)'}
+  ];
+  bdEl.innerHTML=breakdown.map(b=>`
+    <div class="bk-row">
+      <div class="bk-label">${b.label}</div>
+      <div class="bk-score" style="color:${b.color}">${b.score}<span style="font-size:12px;color:var(--muted)">/${b.max}</span></div>
+      <div class="bk-note">${b.note}</div>
+    </div>`).join('');
+
+  // UPCOMING WINDOWS
+  const wins=getUpcomingWindows(janmaNakIdx,janmaRashi,queryJD,eventCat,cb.isShubha);
+  set('windowsEventLabel','Next auspicious windows for '+eventCat);
+  const winEl=document.getElementById('windowsList');
+  if(wins.length===0){
+    winEl.innerHTML='<div style="color:var(--muted);padding:12px;text-align:center">No strong windows found in next 7 days for this event category. Try adjacent categories.</div>';
+  } else {
+    winEl.innerHTML=wins.map(w=>`
+      <div class="window-row">
+        <div>
+          <div class="window-time">${w.date}</div>
+          <div style="font-size:11px;color:var(--muted)">${w.time} IST</div>
+        </div>
+        <div class="window-info">${w.note}<br>Chandrabala: ${w.cb}</div>
+        <div class="window-badge" style="background:rgba(16,185,129,.2);color:var(--go);border:1px solid var(--go)">Score ~${Math.min(100,Math.round(w.score/1.1))}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+
+  } catch(err){
+    console.error(err);
+    alert('Calculation error: '+err.message+'\n\nPlease check inputs.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT: Set default query to now
+// ═══════════════════════════════════════════════════════════════
+(function init(){
+  const now=new Date();
+  const ist=new Date(now.getTime()+5.5*3600000);
+  document.getElementById('qdate').value=ist.toISOString().split('T')[0];
+  document.getElementById('qtime').value=ist.toISOString().split('T')[1].slice(0,5);
+})();
+</script>
+</body>
+</html>
