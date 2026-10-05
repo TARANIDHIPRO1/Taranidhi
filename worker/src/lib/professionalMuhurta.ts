@@ -105,6 +105,46 @@ export interface PersonalAdjustment {
   totalPersonalAdjustment: number;
 }
 
+/**
+ * 8-Layer Confidence Framework
+ * Source: Muhurta Chintamani Ch.2, Phaladeepika Ch.26, Dharmasindhu, BPHS
+ *
+ * Each layer scores 0-100 independently; weighted sum = finalScore.
+ * "Convergence" measures how many layers agree — more agreement = more confidence.
+ *
+ * Layer weights (total 100%):
+ *   L1 Panchanga        22% — Tithi + Nakshatra + Yoga (Muhurta Chintamani Ch.2)
+ *   L2 Hora              8% — Planetary hour match (Hora Shastra)
+ *   L3 Dosha Avoidance  12% — Rahu Kaal, Yamghanda, Gulika, Panchaka, Vishti
+ *   L4 Tarabala         15% — Birth star → query star (Muhurta Chintamani, mandatory)
+ *   L5 Chandrabala      10% — Moon house from natal Moon (Muhurta Chintamani)
+ *   L6 Gochar           12% — Full 7-planet transit (Phaladeepika Ch.26)
+ *   L7 Dasha Bhukti     10% — Mahadasha/Antardasha lord (BPHS Dasha chapters)
+ *   L8 Ashtakavarga     11% — BAV bindus + Navamsha (BPHS Ashtakavarga Adhyaya)
+ */
+export interface ConfidenceLayer {
+  id: "panchanga" | "hora" | "dosha" | "tarabala" | "chandrabala" | "gochar" | "dasha" | "ashtakavarga";
+  name: string;
+  weight: number;          // layer weight percentage (e.g. 22)
+  score: number;           // 0-100 for this layer
+  weightedScore: number;   // score × weight / 100
+  status: "strong" | "neutral" | "weak" | "missing";
+  notes: string;
+  requiresKundali: boolean;
+}
+
+export interface ConfidenceIndex {
+  layers: ConfidenceLayer[];
+  layersPresent: number;          // How many layers have data
+  layersMissing: number;          // Layers lacking kundali data
+  layersStrong: number;           // Layers scoring ≥ 65
+  layersNeutral: number;          // Layers scoring 40-64
+  layersWeak: number;             // Layers scoring < 40
+  convergenceGrade: "CONVERGENT" | "PARTIAL" | "DIVERGENT";
+  convergenceNote: string;
+  normalizedFinalScore: number;   // Weighted sum normalised over present layers
+}
+
 export interface ProfessionalMuhurtaResult {
   category: ProfessionalCategory;
   categoryDomain: string; // sampatti, vyapar, dhan, etc
@@ -112,7 +152,7 @@ export interface ProfessionalMuhurtaResult {
   queryDate: string; // ISO date of query
   location: { lat: number; lon: number };
 
-  // Layer 1: Universal scoring
+  // Layer 1: Universal scoring (retained for backward compatibility)
   universalScore: {
     totalPoints: number;
     maxPoints: number;
@@ -120,19 +160,22 @@ export interface ProfessionalMuhurtaResult {
     criteria: UniversalCriteria;
   };
 
-  // Layer 2: Personal scoring (if kundali provided)
+  // Layer 2: Personal scoring (if kundali provided; retained for backward compat)
   personalAdjustment: PersonalAdjustment | null;
 
+  // 8-Layer Confidence Index (new, replaces 40/60 split as primary score)
+  confidenceIndex: ConfidenceIndex;
+
   // Combined result
-  finalScore: number; // 0-100
+  finalScore: number; // 0-100 (now derived from 8-layer weighted sum)
   verdict: string; // Excellent / Good / Acceptable / Caution / Poor / Avoid
   verdictEmoji: string; // 🟢 🟡 🔴 etc
   recommendation: string; // Action text
 
   // Transparency
   methodology: {
-    universalWeight: number; // 40%
-    personalWeight: number; // 60%
+    universalWeight: number; // legacy field, now 0 (8-layer replaces)
+    personalWeight: number;  // legacy field, now 0
     formula: string;
   };
 }
@@ -1003,6 +1046,302 @@ export function calculateFinalScore(universalPercentage: number, personalAdjustm
   return { score: Math.round(finalScore), verdict, emoji };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 8-LAYER CONFIDENCE INDEX
+// Source hierarchy: Muhurta Chintamani > Dharmasindhu > Phaladeepika > BPHS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LAYER_WEIGHTS: Record<ConfidenceLayer["id"], number> = {
+  panchanga:    22,
+  hora:          8,
+  dosha:        12,
+  tarabala:     15,
+  chandrabala:  10,
+  gochar:       12,
+  dasha:        10,
+  ashtakavarga: 11,
+};
+
+function layerStatus(score: number): ConfidenceLayer["status"] {
+  if (score >= 65) return "strong";
+  if (score >= 40) return "neutral";
+  return "weak";
+}
+
+/**
+ * Build the 8-layer confidence index from universal + personal scores.
+ *
+ * Each layer is independently scored 0-100, then weighted.
+ * Missing personal data → layer "missing" (weight redistributed when computing final).
+ */
+export function buildConfidenceIndex(
+  universal: UniversalCriteria,
+  personal: PersonalAdjustment | null,
+  personalParams: PersonalParams,
+): ConfidenceIndex {
+  // ── Layer 1: Panchanga ────────────────────────────────────────────────────
+  // Source: Muhurta Chintamani Ch.2, shloka 4-12.
+  // Tithi is the primary criterion; Nakshatra second; Yoga boosts.
+  let panchangaScore = 50; // neutral baseline
+  if (universal.auspiciousTithi.active) panchangaScore += 25;
+  if (universal.inauspiciousTithi.active) panchangaScore -= 40;
+  if (universal.auspiciousNakshatra.active) panchangaScore += 25;
+  if (universal.sarvarthaSiddhi.active) panchangaScore += 15;
+  if (universal.guruRaviPushya.active) panchangaScore += 20;
+  if (universal.abhijitMuhurta.active) panchangaScore += 15;
+  if (universal.vijayaMuhurta.active) panchangaScore += 10;
+  if (universal.brahmaMuhurta.active) panchangaScore += 10;
+  panchangaScore = Math.max(0, Math.min(100, panchangaScore));
+
+  // ── Layer 2: Hora ─────────────────────────────────────────────────────────
+  // Source: Hora Shastra (Kalyana Varma). Matching planetary hour to category.
+  let horaScore: number;
+  let horaNotes: string;
+  if (universal.horaMatch.points > 0) {
+    horaScore = 85;
+    horaNotes = universal.horaMatch.note;
+  } else if (universal.horaMatch.note === "No active hora") {
+    horaScore = 50;
+    horaNotes = "Hora data unavailable";
+  } else {
+    horaScore = 35;
+    horaNotes = universal.horaMatch.note;
+  }
+
+  // ── Layer 3: Dosha Avoidance ──────────────────────────────────────────────
+  // Source: Dharmasindhu (Kashinatha Upadhyaya), Muhurta Chintamani Ch.9.
+  // Hard prohibitions — each active dosha subtracts significantly.
+  let doshaSore = 100;
+  const doshaNotesList: string[] = [];
+  if (universal.noRahuKaal.points < 0) { doshaSore -= 35; doshaNotesList.push("Rahu Kaal"); }
+  if (universal.noYamghanda.points < 0) { doshaSore -= 20; doshaNotesList.push("Yamghanda"); }
+  if (universal.noGulikaKaal.points < 0) { doshaSore -= 15; doshaNotesList.push("Gulika Kaal"); }
+  if (universal.noDurmuhurta.points < 0) { doshaSore -= 15; doshaNotesList.push("Durmuhurta"); }
+  if (universal.vishtiKarana.active) { doshaSore -= 20; doshaNotesList.push("Vishti Karana"); }
+  if (universal.panchakaDosha.active) { doshaSore -= 25; doshaNotesList.push("Panchaka"); }
+  doshaSore = Math.max(0, doshaSore);
+  const doshaNotes = doshaNotesList.length > 0
+    ? `Active doshas: ${doshaNotesList.join(", ")}`
+    : "No active doshas — clear window";
+
+  // ── Layer 4: Tarabala ─────────────────────────────────────────────────────
+  // Source: Muhurta Chintamani Ch.2, shloka 13-21. Critical personal criterion.
+  // "Without Tarabala, a muhurta should not be accepted" (MC 2.17).
+  // New weights correct the prior ±40 over-dominance.
+  let tarabalaScore: number;
+  let tarabalaNotes: string;
+  if (personal === null || personalParams.taraBeneficence === null) {
+    tarabalaScore = 50;
+    tarabalaNotes = "Birth nakshatra required for Tarabala";
+  } else if (personalParams.taraBeneficence === "benefic") {
+    tarabalaScore = 90;
+    tarabalaNotes = personal.taraAdjustment.reason;
+  } else if (personalParams.taraBeneficence === "neutral") {
+    tarabalaScore = 50;
+    tarabalaNotes = personal.taraAdjustment.reason;
+  } else {
+    tarabalaScore = 10;
+    tarabalaNotes = personal.taraAdjustment.reason;
+  }
+  const tarabalaMissing = personalParams.taraBeneficence === null;
+
+  // ── Layer 5: Chandrabala ──────────────────────────────────────────────────
+  // Source: Muhurta Chintamani Ch.2 shloka 22-26.
+  // Moon's transit house from natal Moon: strong in 1,3,6,7,10,11; weak in 4,8,12.
+  let chandrabalaScore: number;
+  let chandraNotes: string;
+  const chandralaMissing = personalParams.natalMoonRashi === null || personalParams.currentMoonRashi === null;
+  if (chandralaMissing) {
+    chandrabalaScore = 50;
+    chandraNotes = "Natal Moon rashi required for Chandrabala";
+  } else {
+    const moonHouse = ((personalParams.currentMoonRashi! - personalParams.natalMoonRashi! + 12) % 12) + 1;
+    const strongHouses = new Set([1, 3, 6, 7, 10, 11]);
+    const weakHouses = new Set([4, 8, 12]);
+    if (strongHouses.has(moonHouse)) {
+      chandrabalaScore = 80;
+      chandraNotes = `Moon in house ${moonHouse} from natal Moon — Chandrabala strong`;
+    } else if (weakHouses.has(moonHouse)) {
+      chandrabalaScore = 20;
+      chandraNotes = `Moon in house ${moonHouse} from natal Moon — Chandrabala weak`;
+    } else {
+      chandrabalaScore = 50;
+      chandraNotes = `Moon in house ${moonHouse} from natal Moon — Chandrabala neutral`;
+    }
+  }
+
+  // ── Layer 6: Gochar (7-planet transit) ────────────────────────────────────
+  // Source: Phaladeepika Ch.26 (Mantresvara). Full transit from natal Moon.
+  // gocharAdjustment.value is ±range — convert to 0-100.
+  let gocharScore: number;
+  let gocharNotes: string;
+  const gocharMissing = personal === null || personalParams.natalMoonRashi === null;
+  if (gocharMissing) {
+    gocharScore = 50;
+    gocharNotes = "Natal kundali required for Gochar analysis";
+  } else {
+    // gocharAdjustment ranges roughly -40 to +40 from analyzeGochar → gocharToAdjustmentValue
+    const adj = personal!.gocharAdjustment.value;
+    gocharScore = Math.max(0, Math.min(100, 50 + adj * 1.25)); // scale ±40 → ±50
+    gocharNotes = personal!.gocharAdjustment.reason;
+  }
+
+  // ── Layer 7: Dasha Bhukti ─────────────────────────────────────────────────
+  // Source: BPHS Mahadasha Adhyaya; Phaladeepika Ch.27.
+  // Reduced penalty: Dasha sets long-term context but doesn't veto a specific moment.
+  let dashaScore: number;
+  let dashaNotes: string;
+  const dashaMissing = personal === null || personalParams.mahadashLord === null;
+  if (dashaMissing) {
+    dashaScore = 50;
+    dashaNotes = "Dasha data unavailable";
+  } else {
+    // Personal layer already computed a ±20/30 adjustment — convert to 0-100
+    const adj = personal!.dashaAdjustment.value;
+    // Benefic = +20 → 70, Malefic = -30 → 25; keep proportional
+    dashaScore = Math.max(0, Math.min(100, 50 + adj * 1.5));
+    dashaNotes = personal!.dashaAdjustment.reason;
+    // Antardasha qualification
+    if (personalParams.antardashLord !== null) {
+      dashaNotes += ` (Antardasha: ${personalParams.antardashLord})`;
+    }
+  }
+
+  // ── Layer 8: Ashtakavarga + Navamsha ─────────────────────────────────────
+  // Source: BPHS Ashtakavarga Adhyaya (Chandrashtakavarga); Shodasavarga Ch.
+  // BAV bindus 0-8: ≥5 strong transit, ≤2 weak transit.
+  // Navamsha benefic/malefic lord provides secondary divisional quality.
+  let ashtaScore: number;
+  let ashtaNotes: string;
+  const ashtaMissing = personal === null || personalParams.ashtakwargaBindu === null;
+  if (ashtaMissing) {
+    ashtaScore = 50;
+    ashtaNotes = "Ashtakavarga data unavailable";
+  } else {
+    const bindu = personalParams.ashtakwargaBindu!;
+    if (bindu >= 6) { ashtaScore = 90; }
+    else if (bindu >= 5) { ashtaScore = 75; }
+    else if (bindu >= 3) { ashtaScore = 50; }
+    else { ashtaScore = 20; }
+    ashtaNotes = personal!.ashtakwargaBindu.reason;
+    // Navamsha modifier
+    if (personal!.navamshaDivisional.value > 0) {
+      ashtaScore = Math.min(100, ashtaScore + 10);
+      ashtaNotes += `; ${personal!.navamshaDivisional.reason}`;
+    } else if (personal!.navamshaDivisional.value < 0) {
+      ashtaScore = Math.max(0, ashtaScore - 10);
+      ashtaNotes += `; ${personal!.navamshaDivisional.reason}`;
+    }
+  }
+
+  // ── Build layer objects ───────────────────────────────────────────────────
+  const layerData: Array<{
+    id: ConfidenceLayer["id"];
+    score: number;
+    notes: string;
+    missing: boolean;
+  }> = [
+    { id: "panchanga",    score: panchangaScore,   notes: `Tithi: ${universal.auspiciousTithi.note}; Nakshatra: ${universal.auspiciousNakshatra.note}`, missing: false },
+    { id: "hora",         score: horaScore,         notes: horaNotes,       missing: false },
+    { id: "dosha",        score: doshaSore,         notes: doshaNotes,      missing: false },
+    { id: "tarabala",     score: tarabalaScore,     notes: tarabalaNotes,   missing: tarabalaMissing },
+    { id: "chandrabala",  score: chandrabalaScore,  notes: chandraNotes,    missing: chandralaMissing },
+    { id: "gochar",       score: gocharScore,       notes: gocharNotes,     missing: gocharMissing },
+    { id: "dasha",        score: dashaScore,        notes: dashaNotes,      missing: dashaMissing },
+    { id: "ashtakavarga", score: ashtaScore,        notes: ashtaNotes,      missing: ashtaMissing },
+  ];
+
+  const LAYER_NAMES: Record<ConfidenceLayer["id"], string> = {
+    panchanga:    "Panchanga (Tithi + Nakshatra + Yoga)",
+    hora:         "Hora (Planetary Hour)",
+    dosha:        "Dosha Avoidance (Rahu / Gulika / Panchaka)",
+    tarabala:     "Tarabala (Birth Star Timing)",
+    chandrabala:  "Chandrabala (Moon Transit)",
+    gochar:       "Gochar (7-Planet Transit)",
+    dasha:        "Dasha Bhukti",
+    ashtakavarga: "Ashtakavarga + Navamsha",
+  };
+  const LAYER_REQUIRES_KUNDALI: Record<ConfidenceLayer["id"], boolean> = {
+    panchanga:    false,
+    hora:         false,
+    dosha:        false,
+    tarabala:     true,
+    chandrabala:  true,
+    gochar:       true,
+    dasha:        true,
+    ashtakavarga: true,
+  };
+
+  // Normalize final score over *present* layer weights only
+  let presentWeightSum = 0;
+  let weightedScoreSum = 0;
+  let layersStrong = 0;
+  let layersNeutral = 0;
+  let layersWeak = 0;
+  let layersPresent = 0;
+  let layersMissing = 0;
+
+  const layers: ConfidenceLayer[] = layerData.map((ld) => {
+    const w = LAYER_WEIGHTS[ld.id];
+    const status: ConfidenceLayer["status"] = ld.missing ? "missing" : layerStatus(ld.score);
+    const weighted = ld.missing ? 0 : (ld.score * w) / 100;
+
+    if (!ld.missing) {
+      presentWeightSum += w;
+      weightedScoreSum += ld.score * w;
+      layersPresent++;
+      if (status === "strong") layersStrong++;
+      else if (status === "neutral") layersNeutral++;
+      else layersWeak++;
+    } else {
+      layersMissing++;
+    }
+
+    return {
+      id: ld.id,
+      name: LAYER_NAMES[ld.id],
+      weight: w,
+      score: ld.missing ? 50 : ld.score,
+      weightedScore: parseFloat(weighted.toFixed(2)),
+      status,
+      notes: ld.notes,
+      requiresKundali: LAYER_REQUIRES_KUNDALI[ld.id],
+    };
+  });
+
+  // Normalize: score / present_weight_sum * 100
+  const normalizedFinalScore = presentWeightSum > 0
+    ? Math.round(weightedScoreSum / presentWeightSum)
+    : 50;
+
+  // Convergence grade
+  const strongRatio = layersPresent > 0 ? layersStrong / layersPresent : 0;
+  let convergenceGrade: ConfidenceIndex["convergenceGrade"];
+  let convergenceNote: string;
+  if (strongRatio >= 0.75) {
+    convergenceGrade = "CONVERGENT";
+    convergenceNote = `${layersStrong}/${layersPresent} layers agree — high confidence in score`;
+  } else if (strongRatio >= 0.5) {
+    convergenceGrade = "PARTIAL";
+    convergenceNote = `${layersStrong}/${layersPresent} layers positive — moderate confidence`;
+  } else {
+    convergenceGrade = "DIVERGENT";
+    convergenceNote = `Only ${layersStrong}/${layersPresent} layers favorable — conflicting signals`;
+  }
+
+  return {
+    layers,
+    layersPresent,
+    layersMissing,
+    layersStrong,
+    layersNeutral,
+    layersWeak,
+    convergenceGrade,
+    convergenceNote,
+    normalizedFinalScore,
+  };
+}
+
 /**
  * Main scoring function: combines both layers
  */
@@ -1017,13 +1356,27 @@ export function scoreProfessionalMuhurta(
   const universal = scoreUniversalLayer(category, universalParams);
   const personal = personalParams.kundaliId !== null ? scorePersonalLayer(personalParams) : null;
 
-  // Calculate universal score percentage
+  // ── 8-layer confidence index (primary score) ──────────────────────────────
+  const confidenceIndex = buildConfidenceIndex(universal, personal, personalParams);
+  const finalScore = confidenceIndex.normalizedFinalScore;
+
+  // ── Legacy 2-layer fields (backward compat) ───────────────────────────────
   const universalPoints = Object.values(universal).reduce((sum, c) => sum + (c.points > 0 ? c.points : 0), 0);
   const universalPercentage = (universalPoints / 220) * 100;
 
-  // Calculate final score
-  const personalAdjustment = personal ? personal.totalPersonalAdjustment : 0;
-  const { score: finalScore, verdict, emoji } = calculateFinalScore(universalPercentage, personalAdjustment);
+  // Verdict from 8-layer score
+  const { verdict, emoji } = (() => {
+    if (finalScore >= 85) return { verdict: "EXCELLENT — Proceed immediately", emoji: "🟢" };
+    if (finalScore >= 70) return { verdict: "GOOD — Highly auspicious", emoji: "🟢" };
+    if (finalScore >= 55) return { verdict: "ACCEPTABLE — Favorable but not perfect", emoji: "🟡" };
+    if (finalScore >= 40) return { verdict: "CAUTION — Mixed factors", emoji: "🟠" };
+    if (finalScore >= 25) return { verdict: "POOR — Avoid if possible", emoji: "🔴" };
+    return { verdict: "AVOID — Inauspicious", emoji: "🔴" };
+  })();
+
+  const kundaliNote = personalParams.kundaliId
+    ? `${confidenceIndex.layersPresent}/8 layers active (${confidenceIndex.convergenceGrade})`
+    : `${confidenceIndex.layersPresent}/8 layers active — add kundali for Tara/Gochar/Dasha`;
 
   return {
     category,
@@ -1038,14 +1391,15 @@ export function scoreProfessionalMuhurta(
       criteria: universal,
     },
     personalAdjustment: personal,
+    confidenceIndex,
     finalScore,
     verdict,
     verdictEmoji: emoji,
-    recommendation: `${emoji} ${verdict}. ${personalParams.kundaliId ? "Personal adjustments applied." : "Add kundali for personalized scoring."}`,
+    recommendation: `${emoji} ${verdict}. ${kundaliNote}.`,
     methodology: {
-      universalWeight: 40,
-      personalWeight: 60,
-      formula: "(UNIVERSAL × 0.4) + (PERSONAL × 0.6)",
+      universalWeight: 0,  // legacy: replaced by 8-layer framework
+      personalWeight: 0,
+      formula: "8-layer weighted sum: Panchanga(22%) + Hora(8%) + Dosha(12%) + Tara(15%) + Chandra(10%) + Gochar(12%) + Dasha(10%) + Ashtak(11%)",
     },
   };
 }
