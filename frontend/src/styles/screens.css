@@ -2542,6 +2542,228 @@
   }
 }
 
+/* ── PRICING — Freemium additions ────────────────────────────────── */
+
+/* Intro offer banner */
+.pricing-intro-banner {
+  background: linear-gradient(90deg, rgba(249,115,22,.18) 0%, rgba(139,92,246,.12) 100%);
+  border-bottom: 1px solid rgba(249,115,22,.3);
+  padding: 10px 24px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #e8e8f0;
+}
+.pricing-intro-fire {
+  margin-right: 6px;
+}
+
+/* Free vs Paid split explanation */
+.pricing-split-explain {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 36px;
+}
+.pricing-split-col {
+  padding: 24px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #c0c0d0;
+}
+.pricing-split--free {
+  background: rgba(16,185,129,.07);
+  border: 1px solid rgba(16,185,129,.2);
+}
+.pricing-split--paid {
+  background: rgba(139,92,246,.07);
+  border: 1px solid rgba(139,92,246,.2);
+}
+.pricing-split-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #10b981;
+}
+.pricing-split--paid .pricing-split-label {
+  color: #a78bfa;
+}
+.pricing-split-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #e8e8f0;
+  margin-bottom: 12px;
+}
+.pricing-split-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pricing-split-col ul .note {
+  font-size: 0.775rem;
+  color: #6b6b80;
+  margin-top: 4px;
+}
+.pricing-split-col ul .highlight {
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+/* Period toggle */
+.price-period-wrap {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.price-period-toggle {
+  display: inline-flex;
+  background: #0d0d1a;
+  border: 1px solid #1e1e30;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+}
+.period-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  color: #6b6b80;
+  transition: all .15s;
+}
+.period-btn.active {
+  background: #7c3aed;
+  color: #fff;
+}
+.period-btn:hover:not(.active) {
+  color: #c0c0d0;
+}
+.price-period-savings {
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  color: #f97316;
+  font-weight: 600;
+  min-height: 20px;
+}
+
+/* Tier colours */
+.pub-tier--free {
+  border-color: rgba(16,185,129,.25);
+}
+.pub-tier--demo {
+  border-color: rgba(14,165,233,.2);
+}
+.pub-tier--taranidhi {
+  border-color: #7c3aed;
+  background: linear-gradient(160deg, #12082a 0%, #0d082a 100%);
+}
+
+/* Intro badge inside tier */
+.intro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(249,115,22,.12);
+  border: 1px solid rgba(249,115,22,.3);
+  color: #f97316;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+/* Ad labels inside tier features */
+.ad-label-inline {
+  display: inline-block;
+  font-size: 0.7rem;
+  background: rgba(255,255,255,.05);
+  border: 1px solid #1e1e30;
+  color: #6b6b80;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+.ad-label-note {
+  font-size: 0.7rem;
+  color: #4a4a5a;
+}
+
+/* No ads note */
+.tier-no-ads-note {
+  text-align: center;
+  font-size: 0.775rem;
+  color: #6b6b80;
+  margin-top: 12px;
+}
+
+/* TaraNidhi explain box */
+.pub-taranidhi-explain {
+  margin-top: 64px;
+  background: rgba(139,92,246,.06);
+  border: 1px solid rgba(139,92,246,.2);
+  border-radius: 16px;
+  padding: 36px;
+}
+.pub-taranidhi-explain h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e8e8f0;
+  margin-bottom: 16px;
+}
+.pub-taranidhi-explain p {
+  font-size: 0.9rem;
+  color: #9090a8;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.pub-taranidhi-explain p:last-child {
+  margin-bottom: 0;
+}
+
+/* Ad transparency note */
+.pub-ad-transparency {
+  margin-top: 32px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid #1e1e30;
+  border-radius: 12px;
+  padding: 24px;
+}
+.pub-ad-transparency h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8888a0;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+}
+.pub-ad-transparency p {
+  font-size: 0.85rem;
+  color: #6b6b80;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.pub-ad-transparency p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .pricing-split-explain {
+    grid-template-columns: 1fr;
+  }
+  .pricing-intro-banner {
+    font-size: 0.8rem;
+    padding: 10px 16px;
+  }
+}
+
 /* ── FEATURES ────────────────────────────────────────────────────── */
 .pub-features-hero {
   background: linear-gradient(180deg, #0a0318 0%, #080812 100%);
