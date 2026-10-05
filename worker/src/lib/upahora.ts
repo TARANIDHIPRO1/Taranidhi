@@ -1,21 +1,33 @@
 // ──────────────────────────────────────────────────────────────────────────────
 // UPHORA (Sub-Hora) Engine
 //
-// SOURCE: KAALCHAKRA_CORE_ARCHITECTURE.pdf Section 4.4 (v15, Naveen K Rai)
-//   "Har Hora ko further 7 barabar parts mein baanta jaata hai"
-//   Uphora Lord = CHRONO[(horaLordIndex + i) % 7]  for i = 0 to 6
-//   Duration of each Uphora = HoraDuration / 7
+// SOURCE: Classical Muhurta Siddhanta + KP system (7-planet Vimshottari)
+//
+// SEQUENCE (same as Hora / Chaldean order):
+//   Lord = CHRONO[(horaLordIndex + i) % 7]  for i = 0 to 6
+//
+// DURATION — PROPORTIONAL, NOT EQUAL (Naveen K. Rai correction, Oct 5 2026):
+//   Each planet's Uphora is proportional to its Vimshottari period.
+//   Classical 7-planet Vimshottari (excluding Rahu/Ketu):
+//     Sun=6, Moon=10, Mars=7, Mercury=17, Jupiter=16, Venus=20, Saturn=19
+//     Total = 95 units
+//   Uphora duration for planet P = (VIMSHOTTARI[P] / 95) × HoraDuration
+//
+//   Example — within a Sun Hora (60 min):
+//     Sun:     6/95 × 60 = 3m 47s
+//     Venus:  20/95 × 60 = 12m 38s
+//     Mercury:17/95 × 60 = 10m 44s
+//     Moon:   10/95 × 60 =  6m 19s
+//     Saturn: 19/95 × 60 = 12m 0s
+//     Jupiter:16/95 × 60 = 10m 6s
+//     Mars:    7/95 × 60 =  4m 25s
+//     Total = 60 min ✓
+//
+// ⚠️  PREVIOUS (WRONG): HoraDuration / 7 (equal parts — kaalchakra_v15.html
+//     also had this bug; reference corrected by Naveen 5 Oct 2026)
 //
 // CLASSICAL BASIS: Same Chaldean sequence as Hora (fastest→slowest apparent
-// motion: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars). This is the
-// same sequence used in horaScoring.ts's CHALDEAN constant.
-//
-// VERIFIED: Algorithm matches buildUphoras7() in kaalchakra_v8-1.html and
-// buildUphoras() in kaalchakra_v15.html — both independently implemented
-// identically. Cross-checked against Section 4.2 CHRONO sequence.
-//
-// NOTE: 7-fold (not 12-fold, not 8-fold). v8 comment explicitly states
-// "classical 7-fold, not 12" — this is the traditional Indian/KP standard.
+// motion: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars).
 // ──────────────────────────────────────────────────────────────────────────────
 
 export type Planet = "Sun" | "Venus" | "Mercury" | "Moon" | "Saturn" | "Jupiter" | "Mars";
@@ -25,6 +37,21 @@ export type Planet = "Sun" | "Venus" | "Mercury" | "Moon" | "Saturn" | "Jupiter"
 export const CHALDEAN: Planet[] = [
   "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars",
 ];
+
+// Vimshottari periods for the 7 classical planets (Rahu/Ketu excluded).
+// These are the authoritative KP proportions for all sub-period calculations.
+// Sun:6 + Moon:10 + Mars:7 + Mercury:17 + Jupiter:16 + Venus:20 + Saturn:19 = 95
+export const VIMSHOTTARI_PERIODS: Record<Planet, number> = {
+  Sun:     6,
+  Moon:   10,
+  Mars:    7,
+  Mercury: 17,
+  Jupiter: 16,
+  Venus:   20,
+  Saturn:  19,
+} as const;
+
+export const VIMSHOTTARI_TOTAL = 95; // sum of all 7 periods
 
 export interface HoraPeriod {
   /** Hora lord (one of the 7 Chaldean planets) */
@@ -98,26 +125,41 @@ export function buildHoras(
 /**
  * Build the 7 Uphoras (sub-horas) for a given hora period.
  *
- * Algorithm (ARCHITECTURE.md Section 4.4):
- *   Start from the hora lord's index in CHALDEAN.
- *   Divide hora duration into 7 equal parts.
- *   Each part's lord = CHALDEAN[(horaLordIndex + i) % 7]
+ * SEQUENCE: Chaldean order starting from the hora lord.
+ *   lord = CHALDEAN[(horaLordIndex + i) % 7]  for i = 0..6
+ *
+ * DURATION: Proportional to each planet's Vimshottari period (not equal).
+ *   duration_i = (VIMSHOTTARI[lord_i] / 95) × HoraDuration
+ *
+ * This ensures each planet occupies its classical share of the Hora.
+ * Muhurta Siddhanta: "ek second ki bhi galti nahi kar sakte" — exact timing.
  *
  * @param hora  A HoraPeriod (from buildHoras)
- * @returns     Array of 7 UphoraPeriod objects
+ * @returns     Array of 7 UphoraPeriod objects, durations proportional to Vimshottari
  */
 export function buildUphoras(hora: HoraPeriod): UphoraPeriod[] {
   const base = CHALDEAN.indexOf(hora.lord);
   const totalMs = hora.end.getTime() - hora.start.getTime();
-  const partMs = totalMs / 7;
 
-  return Array.from({ length: 7 }, (_, i) => ({
-    lord: CHALDEAN[(base + i) % 7]!,
-    position: i,
-    start: new Date(hora.start.getTime() + i * partMs),
-    end: new Date(hora.start.getTime() + (i + 1) * partMs),
-    durationMs: partMs,
-  }));
+  // Compute proportional durations using Vimshottari ratios
+  // Each planet's share = (its_period / 95) * totalMs
+  // Use floating point internally for precision; boundaries are exact sums
+  const uphoras: UphoraPeriod[] = [];
+  let offsetMs = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const lord = CHALDEAN[(base + i) % 7]!;
+    const durationMs = (VIMSHOTTARI_PERIODS[lord] / VIMSHOTTARI_TOTAL) * totalMs;
+    const start = new Date(hora.start.getTime() + offsetMs);
+    // For the last uphora, force end = hora.end to avoid any floating-point drift
+    const end = i === 6
+      ? hora.end
+      : new Date(hora.start.getTime() + offsetMs + durationMs);
+    uphoras.push({ lord, position: i, start, end, durationMs });
+    offsetMs += durationMs;
+  }
+
+  return uphoras;
 }
 
 /**
