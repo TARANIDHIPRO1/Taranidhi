@@ -2,7 +2,7 @@
 // Dual-layer architecture: Universal (40%) + Personal/Kundali (60%)
 //
 // SPECIFICATION: MUHURTA_PROFESSIONAL_SPECIFICATION.md
-// SOURCE: Muhurta Chintamani, Dharmasindhu, Karma Vipak Samhita
+// SOURCE: Muhurta Chintamani, Dharmasindhu (verse-level citations unverified; see docs/RULES_VERIFICATION_2026-10.md)
 //
 // Layer 1 (Universal): No kundali needed, ~220 base points across all criteria
 // Layer 2 (Personal): Kundali-based adjustments (Tara, Dasha, Gochar, Ashtakwarga)
@@ -93,6 +93,8 @@ export interface UniversalCriteria {
   inauspiciousTithi: { active: boolean; points: number; note: string };
   vishtiKarana: { active: boolean; points: number; note: string };
   panchakaDosha: { active: boolean; points: number; note: string };
+  /** Nitya Yoga rejection (Vyatipata/Vaidhriti whole yoga; 7 others only in their opening ghatis). Optional for backward compat. */
+  nityaYogaRejection?: { active: boolean; points: number; note: string };
 }
 
 export interface PersonalAdjustment {
@@ -189,6 +191,9 @@ export interface UniversalParams {
   inGulikaKaal?: boolean;
   inDurmuhurta?: boolean;
   inVishtiKarana?: boolean;
+  /** true when getNityaYoga().rejectedNow (Vyatipata/Vaidhriti, or inside a rejected opening portion). */
+  nityaYogaRejected?: boolean;
+  nityaYogaNote?: string;
   panchakaActive?: boolean;
   inAuspiciousTithi?: boolean;
   inAuspiciousNakshatra?: boolean;
@@ -203,6 +208,8 @@ export interface PersonalParams {
   antardashLord: string | null;
   natalMoonRashi: number | null;
   currentMoonRashi: number | null;
+  /** true = Shukla (waxing Moon), false = Krishna; omitted/null = unknown. Chandrabala 2/5/9 depend on it. */
+  moonWaxing?: boolean | null;
   /** Transit rashis (0–11) for each classical planet at query time.
    *  Supply as many as available; missing planets are skipped in Gochar scoring.
    *  Source: calculatePlanetaryPositions() → Math.floor(longitude / 30)
@@ -888,6 +895,11 @@ export function scoreUniversalLayer(category: ProfessionalCategory, params: Univ
     },
     vishtiKarana: { active: params.inVishtiKarana ?? false, points: params.inVishtiKarana ? -20 : 0, note: params.inVishtiKarana ? "Vishti Karana (Bhadra) active" : "No Vishti Karana" },
     panchakaDosha: { active: params.panchakaActive ?? false, points: params.panchakaActive ? -25 : 0, note: params.panchakaActive ? "Panchaka Dosha active" : "No Panchaka Dosha" },
+    nityaYogaRejection: {
+      active: params.nityaYogaRejected ?? false,
+      points: params.nityaYogaRejected ? -30 : 0, // proprietary weight; the rejection itself is classical (MC, verse unverified)
+      note: params.nityaYogaRejected ? (params.nityaYogaNote ?? "Nitya Yoga rejected for new auspicious work") : "No Nitya Yoga rejection",
+    },
   };
 
   // Placeholder for Abhijit, Vijaya, Brahma (would need time-based calculation)
@@ -1119,14 +1131,16 @@ export function buildConfidenceIndex(
   if (universal.noDurmuhurta.points < 0) { doshaSore -= 15; doshaNotesList.push("Durmuhurta"); }
   if (universal.vishtiKarana.active) { doshaSore -= 20; doshaNotesList.push("Vishti Karana"); }
   if (universal.panchakaDosha.active) { doshaSore -= 25; doshaNotesList.push("Panchaka"); }
+  if (universal.nityaYogaRejection?.active) { doshaSore -= 30; doshaNotesList.push("Nitya Yoga rejected"); }
   doshaSore = Math.max(0, doshaSore);
   const doshaNotes = doshaNotesList.length > 0
     ? `Active doshas: ${doshaNotesList.join(", ")}`
     : "No active doshas — clear window";
 
   // ── Layer 4: Tarabala ─────────────────────────────────────────────────────
-  // Source: Muhurta Chintamani Ch.2, shloka 13-21. Critical personal criterion.
-  // "Without Tarabala, a muhurta should not be accepted" (MC 2.17).
+  // Source: Muhurta Chintamani, Gochara Prakarana (Tarabala method confirmed;
+  // verse numbers NOT located -- earlier "Ch.2 shloka 13-21 / MC 2.17" refs and the
+  // quoted sentence were unverified and have been removed).
   // New weights correct the prior ±40 over-dominance.
   let tarabalaScore: number;
   let tarabalaNotes: string;
@@ -1146,8 +1160,10 @@ export function buildConfidenceIndex(
   const tarabalaMissing = personalParams.taraBeneficence === null;
 
   // ── Layer 5: Chandrabala ──────────────────────────────────────────────────
-  // Source: Muhurta Chintamani Ch.2 shloka 22-26.
-  // Moon's transit house from natal Moon: strong in 1,3,6,7,10,11; weak in 4,8,12.
+  // Rule per Muhurta Chintamani, Gochara Prakarana (verse number not located;
+  // see 2026-10-07 verification report): Moon counted from natal Moon is
+  // favorable in 1,3,6,7,10,11 always; in 2,5,9 ONLY in Shukla Paksha;
+  // unfavorable in 4,8,12. Scores below are proprietary weights.
   let chandrabalaScore: number;
   let chandraNotes: string;
   const chandralaMissing = personalParams.natalMoonRashi === null || personalParams.currentMoonRashi === null;
@@ -1157,10 +1173,23 @@ export function buildConfidenceIndex(
   } else {
     const moonHouse = ((personalParams.currentMoonRashi! - personalParams.natalMoonRashi! + 12) % 12) + 1;
     const strongHouses = new Set([1, 3, 6, 7, 10, 11]);
+    const shuklaOnlyHouses = new Set([2, 5, 9]);
     const weakHouses = new Set([4, 8, 12]);
+    const waxing = personalParams.moonWaxing ?? null;
     if (strongHouses.has(moonHouse)) {
       chandrabalaScore = 80;
       chandraNotes = `Moon in house ${moonHouse} from natal Moon — Chandrabala strong`;
+    } else if (shuklaOnlyHouses.has(moonHouse)) {
+      if (waxing === true) {
+        chandrabalaScore = 80;
+        chandraNotes = `Moon in house ${moonHouse} from natal Moon, Shukla Paksha — Chandrabala strong (2/5/9 favorable in the bright half)`;
+      } else if (waxing === false) {
+        chandrabalaScore = 30;
+        chandraNotes = `Moon in house ${moonHouse} from natal Moon, Krishna Paksha — not favorable (2/5/9 are good only in Shukla Paksha)`;
+      } else {
+        chandrabalaScore = 50;
+        chandraNotes = `Moon in house ${moonHouse} from natal Moon — conditional (2/5/9 are good only in Shukla Paksha; paksha not supplied)`;
+      }
     } else if (weakHouses.has(moonHouse)) {
       chandrabalaScore = 20;
       chandraNotes = `Moon in house ${moonHouse} from natal Moon — Chandrabala weak`;

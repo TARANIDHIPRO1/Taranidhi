@@ -26,9 +26,13 @@ export const NAKSHATRA_NAMES = [
 export const TARA_NAMES = ["", "Janma", "Sampat", "Vipat", "Kshema", "Pratyari", "Sadhak", "Vadha", "Mitra", "Atimitra"];
 // Tara beneficence classification:
 // - TARA_BENEFIC: Classically auspicious (Sampat, Kshema, Sadhak, Mitra, Atimitra)
-// - TARA_NEUTRAL: Neutral or context-dependent (Janma: karma marker, not inherent defect per Karma Vipak Samhita)
+// - TARA_NEUTRAL: Neutral or context-dependent. NOTE: Janma tara is DISPUTED between authorities --
+//   Muhurta Chintamani's tara list counts it bad (1,3,5,7 bad) with a vegetable-donation remedy,
+//   while some authorities call it good. "Neutral" here is a project decision (CLAUDE.md #3);
+//   the Karma Vipak Samhita source claim was NOT located in the 2026-10 verification.
 // - Implicitly malefic: Vipat, Pratyari, Vadha (not listed above)
-// Source: B.V. Raman (context-dependent), Karma Vipak Samhita (Janma Nakshatra as karmic marker with remedies)
+// Source: Muhurta Chintamani (Gochara Prakarana: tara method, 2/4/6/8/9 good, cycle rule, remedies).
+//   B.V. Raman / Karma Vipak Samhita claims for Janma-as-neutral: unverified.
 export const TARA_BENEFIC = new Set([2, 4, 6, 8, 9]);
 export const TARA_NEUTRAL = new Set([1]); // Janma — no inherent malefic quality
 
@@ -208,9 +212,10 @@ export function getActiveUphora(uphoras: Uphora[], now: Date): Uphora | null {
  * Returns three-state beneficence: "benefic" (2,4,6,8,9), "neutral" (1 Janma),
  * or "malefic" (3,5,7 Vipat, Pratyari, Vadha).
  *
- * Janma (1) is classified as neutral, not malefic, per Karma Vipak Samhita
- * (Janma Nakshatra as karmic marker, not inherent defect) and B.V. Raman's
- * context-dependent model (favorable for certain purposes, unfavorable for others).
+ * Janma (1) is classified as neutral by project decision. This is DISPUTED:
+ * Muhurta Chintamani lists Janma among the bad taras (with a vegetable-donation
+ * remedy) and exempts specific events (upanayana; marriage of a second-born). The
+ * earlier Karma Vipak Samhita / B.V. Raman attribution is unverified.
  */
 export function computeTara(
   janmaNakIdx: number,
@@ -232,9 +237,12 @@ export function computeTara(
 }
 
 /**
- * Rahu Kaal -- standard classical formula. Daytime (sunrise->sunset) split
- * into 8 equal parts; Rahu Kaal occupies a fixed part-index per weekday,
- * universally agreed across Panchang traditions.
+ * Rahu Kaal -- daytime (sunrise->sunset) split into 8 equal parts; Rahu Kaal
+ * occupies a fixed part-index per weekday. LABEL: this is a later, mainly South
+ * Indian Panchang tradition (Drik Panchang: several competing Rahu methods exist;
+ * this "Yamardha 1/8 of daytime" method is the most popular). It is NOT among the
+ * rejections listed in Muhurta Chintamani or Brihat Samhita (2026-10 verification).
+ * Treat as a regional/traditional layer, not a classical Muhurta rule.
  */
 const RAHU_KAAL_PART_BY_WEEKDAY: Record<number, number> = {
   0: 7, // Sunday   -- 8th part
@@ -556,20 +564,14 @@ export function getKshayaVridhi(tithiAtTodaySunrise: number, tithiAtNextSunrise:
 }
 
 // ── 27 Nitya Yogas ──
-// Source: Muhurta Chintamani (Yoga Prakarana); Brihat Parashara Hora Shastra (Yoga adhyaya).
-//   Surya Siddhanta (foundational formula).
+// Formula (standard Panchang definition; Surya Siddhanta basis, verse not located):
+//   Yoga index = floor(((sunLon + moonLon) mod 360) / (360/27)), each yoga = 13°20'.
+// The 27 names/order were confirmed against a published Panchang list.
 //
-// Formula: Yoga index = floor(((sunLon + moonLon) % 360) / (360/27))
-//   = floor(((sunLon + moonLon) mod 360) / 13.3333°)
-//
-// The 27 Nitya Yogas (0-indexed):
-// Malefic yogas (avoid for auspicious work — Muhurta Chintamani):
-//   Vishkambha(0), Atiganda(5), Shoola(8), Ganda(9), Vyaghata(12),
-//   Vajra(14), Vyatipata(16), Parigha(18), Vaidhriti(26)
-//
-// Highly auspicious yogas:
-//   Siddhi(15), Amrit(6 — Sukarman gives amrit-like quality per some traditions),
-//   Shiva(19), Siddha(20), Brahma(24), Mahendra(25)
+// WHICH YOGAS ARE REJECTED: see NITYA_YOGA_FULL_REJECT / NITYA_YOGA_OPENING_GHATIS
+// below. (Earlier versions of this file treated nine yogas as bad for their whole
+// span; the Muhurta Chintamani rule rejects only Vyatipata and Vaidhriti in full.)
+// The "highly auspicious" grading is a proprietary tiering, not a classical ranking.
 export const NITYA_YOGA_NAMES = [
   "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana",
   "Atiganda", "Sukarman", "Dhriti", "Shoola", "Ganda",
@@ -579,37 +581,84 @@ export const NITYA_YOGA_NAMES = [
   "Mahendra", "Vaidhriti",
 ];
 
-// Malefic yoga indices (0-based) — Muhurta Chintamani
-const NITYA_YOGA_MALEFIC = new Set([0, 5, 8, 9, 12, 14, 16, 18, 26]);
-// Highly auspicious yoga indices
+// ── Nitya Yoga rejection rule ────────────────────────────────────────────────
+// Per the Muhurta Chintamani rule quoted in the 2026-10-07 verification report
+// (docs/RULES_VERIFICATION_2026-10.md): only Vyatipata and Vaidhriti are rejected
+// for the WHOLE yoga. The other seven "bad" yogas are rejected only for their
+// OPENING ghatis:
+//   Vishkambha 3, Vajra 3, Parigha half (= 30), Shula 5, Ganda 6, Atiganda 6, Vyaghata 9.
+// Verse reference: "MC Shubhashubha 1.34-35" comes from a secondary citation
+// and is NOT yet checked against the Sanskrit edition (verified=false).
+//
+// A ghati is 1/60 of a day; a Nitya Yoga lasts ~56 ghatis, so the rule is applied
+// proportionally by ARC: one ghati = (360/27)/60 degrees of the yoga. This
+// proportional reading is an implementation choice; editions may differ.
+export const NITYA_YOGA_FULL_REJECT = new Set([16, 26]); // Vyatipata, Vaidhriti
+export const NITYA_YOGA_OPENING_GHATIS: Record<number, number> = {
+  0: 3,   // Vishkambha
+  5: 6,   // Atiganda
+  8: 5,   // Shula
+  9: 6,   // Ganda
+  12: 9,  // Vyaghata
+  14: 3,  // Vajra
+  18: 30, // Parigha ("half" of the yoga)
+};
+const NITYA_YOGA_SPAN_DEG = 360 / 27;
+// Highly auspicious yoga indices (proprietary grading, not a classical ranking)
 const NITYA_YOGA_HIGHLY_AUSPICIOUS = new Set([1, 2, 3, 4, 7, 10, 11, 13, 15, 19, 20, 21, 22, 23, 24, 25]);
 
 export interface NityaYogaResult {
   index: number; // 0-26
   name: string;
   quality: "auspicious" | "malefic" | "neutral";
+  /** "full" = whole yoga rejected; "opening" = only the opening ghatis rejected; "none". */
+  rejection: "full" | "opening" | "none";
+  /** True only when the Moon/Sun position is inside the rejected portion right now. */
+  rejectedNow: boolean;
+  degreesIntoYoga: number;
+  /** For "opening" yogas: arc (deg) of the rejected opening portion. */
+  rejectedUptoDeg: number | null;
   note: string;
+  verified: false; // flips only after FACT_CHECK sign-off against the Sanskrit edition
 }
 
 export function getNityaYoga(sunLon: number, moonLon: number): NityaYogaResult {
   const combined = ((sunLon + moonLon) % 360 + 360) % 360;
-  const index = Math.floor(combined / (360 / 27));
+  const index = Math.floor(combined / NITYA_YOGA_SPAN_DEG);
   const name = NITYA_YOGA_NAMES[index]!;
-  const quality = NITYA_YOGA_MALEFIC.has(index)
+  const degreesIntoYoga = combined - index * NITYA_YOGA_SPAN_DEG;
+
+  let rejection: "full" | "opening" | "none" = "none";
+  let rejectedUptoDeg: number | null = null;
+  let rejectedNow = false;
+  if (NITYA_YOGA_FULL_REJECT.has(index)) {
+    rejection = "full";
+    rejectedNow = true;
+  } else if (NITYA_YOGA_OPENING_GHATIS[index] !== undefined) {
+    rejection = "opening";
+    rejectedUptoDeg = (NITYA_YOGA_OPENING_GHATIS[index]! / 60) * NITYA_YOGA_SPAN_DEG;
+    rejectedNow = degreesIntoYoga < rejectedUptoDeg;
+  }
+
+  const quality: NityaYogaResult["quality"] = rejectedNow
     ? "malefic"
     : NITYA_YOGA_HIGHLY_AUSPICIOUS.has(index)
     ? "auspicious"
     : "neutral";
-  return {
-    index,
-    name,
-    quality,
-    note: quality === "malefic"
-      ? `${name} Yoga is a malefic Nitya Yoga — classically inauspicious for new auspicious work (Muhurta Chintamani).`
-      : quality === "auspicious"
-      ? `${name} Yoga is auspicious — favorable for new beginnings.`
-      : `${name} Yoga — neutral quality, no specific prohibition or promotion.`,
-  };
+
+  let note: string;
+  if (rejection === "full") {
+    note = `${name} Yoga is rejected for the whole yoga for auspicious work (Muhurta Chintamani rule; verse unverified).`;
+  } else if (rejection === "opening") {
+    note = rejectedNow
+      ? `${name} Yoga: inside its rejected opening portion (first ${NITYA_YOGA_OPENING_GHATIS[index]} ghatis) — avoid new auspicious work now.`
+      : `${name} Yoga: its rejected opening portion (first ${NITYA_YOGA_OPENING_GHATIS[index]} ghatis) has passed — not rejected now.`;
+  } else if (quality === "auspicious") {
+    note = `${name} Yoga is auspicious — favorable for new beginnings.`;
+  } else {
+    note = `${name} Yoga — neutral quality, no specific prohibition or promotion.`;
+  }
+  return { index, name, quality, rejection, rejectedNow, degreesIntoYoga, rejectedUptoDeg, note, verified: false };
 }
 
 // ── Full 11 Karanas (7 Movable + 4 Fixed) ──
@@ -862,7 +911,7 @@ export interface NavtaraResult {
   meaning: string;
   recommendation: string;
   score: number;              // –2 to +2 for convergence scoring (cycle-adjusted)
-  // Percentage score from DOCX (Grok-AI analysis of Muhurta-Chintamani):
+  // Percentage score: proprietary display weighting (originally AI-synthesised; NOT a classical numeric table):
   // Tara pos → raw %: Janma(1)=20, Sampat(2)=95, Vipat(3)=15, Kshema(4)=90,
   // Pratyari(5)=10, Sadhaka(6)=85, Vadha(7)=5, Mitra(8)=80, ParamaMitra(9)=100
   // Cycle-3 reversal applies to positions 3/5/7 (adverse → auspicious).
@@ -937,8 +986,8 @@ function _applyCycleRule(
  * @param queryNakIdx  Nakshatra index at the muhurta moment 0-26
  */
 // Tara Bala raw percentage table (position 1-9 → percentage score).
-// Source: Grok-AI synthesis of Muhurta-Chintamani Tarabala chapter;
-//         cross-referenced with Chugh Muhurta numeric exposition.
+// Source: proprietary weighting (originally AI-synthesised); only the good/bad
+//         classification of the 9 taras is classical (Muhurta Chintamani).
 // Position:          1    2    3    4    5    6    7    8    9
 // Tara:          Janma Samp Vipat Ksh  Prat  Sadh Vadh  Mit  ParM
 const _TARA_RAW_SCORE: Record<number, number> = {
@@ -953,7 +1002,8 @@ const _TARA_RAW_SCORE: Record<number, number> = {
   9: 100,  // Parama Mitra — most auspicious
 };
 
-// Cycle-3 reversed raw scores for positions 3, 5, 7 (wholly favourable reversal).
+// Cycle-3 raw scores for positions 3, 5, 7. Classical basis: MC says all taras are auspicious
+// in the 3rd cycle. The specific Kshema/Mitra/Parama-Mitra grades below are proprietary.
 const _TARA_RAW_SCORE_CYCLE3_REVERSED: Record<number, number> = {
   3: 85,   // Vipat → Kshema-grade (cycle-3 beneficial)
   5: 80,   // Pratyari → Mitra-grade (cycle-3 beneficial)
@@ -1058,8 +1108,9 @@ export function getNakshatraExceptions(nakIdx: number): NakshatraException[] {
 
 
 // ── Abhijit Muhurta ──
-// Source: Muhurta Chintamani (Abhijit Prakarana, shloka 1-4);
-//   Brihat Parashara Hora Shastra; Muhurta Martanda.
+// Source: 8th of the 15 day-muhurtas, at midday; quoted as "destroys all doshas"
+//   in muhurta literature (verse attribution to a specific MC verse NOT confirmed;
+//   the earlier "Abhijit Prakarana shloka 1-4" / "MC 2.1-3" references were wrong or unverified).
 //
 // Abhijit = the most powerful auspicious muhurta, occurring at solar noon.
 // Duration: 48 minutes (2 ghatis), centered on solar noon.
@@ -1068,10 +1119,9 @@ export function getNakshatraExceptions(nakIdx: number): NakshatraException[] {
 // Solar noon = (sunrise + sunset) / 2 (approximation; exact noon from ephemeris
 // is preferred for precision work, but this matches standard Panchang practice).
 //
-// Classical exceptions (Muhurta Chintamani):
-//   Monday: Abhijit on Monday is NOT auspicious for long journeys eastward.
-//   Wednesday: Abhijit is particularly powerful (Budha = Mercury, noon = peak).
-//   Shraddha/funeral rites: Abhijit is specifically recommended for these.
+// Exception: the only one found in the sources checked is that Abhijit is NOT used for
+//   travel to the SOUTH (याम्यदिग्गमनं विना). The earlier Monday-eastward caveat and
+//   "Wednesday is particularly powerful" notes had no primary-source support and were removed.
 //
 // Note: Abhijit as a nakshatra (28th, between Uttara Ashadha and Shravana at 6°40'
 // in Capricorn) is a SEPARATE concept from Abhijit Muhurta — do not conflate them.
@@ -1090,11 +1140,8 @@ export function getAbhijitMuhurta(sunrise: Date, sunset: Date, now: Date, dow: n
   const isActive = now.getTime() >= start.getTime() && now.getTime() < end.getTime();
 
   let note = `Abhijit Muhurta: ${start.toISOString()} – ${end.toISOString()} (centered on solar noon). Highly auspicious for most activities.`;
-  if (dow === 1) {
-    note += " Classical caveat: Abhijit on Monday is inauspicious for long eastward journeys (Muhurta Chintamani).";
-  } else if (dow === 3) {
-    note += " Wednesday Abhijit is particularly powerful (Budha-hora alignment).";
-  }
+  note += " Exception: not for travel towards the south.";
+  void dow; // weekday-specific Abhijit rules were unsupported by primary sources
 
   return { start, end, isActive, note };
 }
@@ -1116,8 +1163,9 @@ export function getAbhijitMuhurta(sunrise: Date, sunset: Date, now: Date, dow: n
 //   Friday (5)    + Revati (26)
 //   Saturday (6)  + Rohini (3)
 //
-// Source: Muhurta Chintamani (adhyaya 7, shloka 12-14); verified against
-//   Drik Panchang and Prokerala published Panchang tables.
+// Source: matches published Panchang tables (Drik Panchang / Prokerala); the earlier
+//   "Muhurta Chintamani adhyaya 7, shloka 12-14" reference is UNVERIFIED (MC's Nakshatra
+//   prakarana is chapter 2; verse not located).
 const AMRIT_SIDDHI_YOGA_TABLE: Record<number, number> = {
   0: 12, // Sunday + Hasta
   1: 4,  // Monday + Mrigashira

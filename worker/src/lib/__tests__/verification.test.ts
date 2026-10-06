@@ -700,17 +700,40 @@ describe("Module 18: Chandrabala Gate", () => {
     expect(r.cap).toBe(40);
   });
 
-  it("all present positions are {1,2,3,5,7,9,10,11}", () => {
+  it("always-favorable positions are {1,3,6,7,10,11} regardless of paksha (6th IS favorable)", () => {
     for (let c = 1; c <= 12; c++) {
       const currentRashi = (0 + c - 1) % 12;
-      const r = getChandrabalaGate(0, currentRashi);
-      expect(r.count).toBe(c);
-      if ([1, 2, 3, 5, 7, 9, 10, 11].includes(c)) {
-        expect(r.present).toBe(true);
-      } else {
-        expect(r.present).toBe(false);
+      for (const waxing of [true, false, null] as const) {
+        const r = getChandrabalaGate(0, currentRashi, waxing);
+        expect(r.count).toBe(c);
+        if ([1, 3, 6, 7, 10, 11].includes(c)) {
+          expect(r.present).toBe(true);
+          expect(r.cap).toBe(100);
+        }
       }
     }
+  });
+
+  it("2/5/9 are favorable ONLY in Shukla Paksha (Muhurta Chintamani Gochara rule)", () => {
+    for (const c of [2, 5, 9]) {
+      const currentRashi = c - 1;
+      expect(getChandrabalaGate(0, currentRashi, true).present).toBe(true);
+      expect(getChandrabalaGate(0, currentRashi, false).present).toBe(false);
+      expect(getChandrabalaGate(0, currentRashi, false).cap).toBe(70);
+      const unknown = getChandrabalaGate(0, currentRashi, null);
+      expect(unknown.present).toBe(false);
+      expect(unknown.conditional).toBe(true);
+      expect(unknown.cap).toBe(85);
+    }
+  });
+
+  it("4, 8, 12 are never favorable (8 = Ashtama, cap 40)", () => {
+    for (const c of [4, 8, 12]) {
+      for (const waxing of [true, false, null] as const) {
+        expect(getChandrabalaGate(0, c - 1, waxing).present).toBe(false);
+      }
+    }
+    expect(getChandrabalaGate(0, 7, true).cap).toBe(40);
   });
 });
 

@@ -12,7 +12,7 @@
 //   time    HH:MM       (required) -- the time to analyse (IST, 24-hour)
 //   system  Chaldean | Pythagorean (optional, default: Pythagorean)
 //
-// Source: lib/numerology.ts -- Ancient Vedic numerology + Chaldean system.
+// Source: lib/numerology.ts -- Chaldean/Pythagorean numerology (modern; not a classical Muhurta rule).
 
 import { requireAuth, unauthorized, type Env as AuthEnv } from "../lib/auth-middleware";
 import { calculateNumerology, type NumerologySystem } from "../lib/numerology";

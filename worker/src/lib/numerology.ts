@@ -3,7 +3,9 @@
  *
  * Number analysis for Muhurta selection and life guidance
  * Supports both Chaldean (1-8) and Pythagorean (1-9) systems
- * Source: Ancient Vedic texts + Modern numerological research
+ * Source: Chaldean/Pythagorean numerology (modern, NON-classical-Jyotish). No Muhurta text
+ * (Muhurta Chintamani, Brihat Samhita) uses day-number timing -- label this layer as
+ * numerology, never as a classical Muhurta rule (2026-10 verification).
  * Status: Phase 2 Complete
  */
 

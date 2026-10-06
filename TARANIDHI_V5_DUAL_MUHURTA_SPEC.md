@@ -1,3 +1,11 @@
+> **⚠ CORRECTED 2026-10-07 — DO NOT USE THE YOGA / CITATION SECTIONS BELOW.**
+> A verification pass (see `docs/RULES_VERIFICATION_2026-10.md`) found that this draft's "27 Yogas"
+> list, its verse citations (MC/BS/JP/PD numbers), the "Reach/Publicity" and "Financial" yoga lists,
+> "Sarvaristha Yoga", the surgery/Krishna-Paksha bonus and the numerology weighting are NOT supported
+> by classical sources. The real 27 are the Nitya Yogas (implemented in `lib/muhurta.ts`). Campaign
+> (film/election/product) scoring has only classical analogues; anything beyond that is contemporary
+> practice and must be labelled as such. The "all 4 gates approved" status was based on this unverified draft.
+
 # TaraNidhi v5 — Dual Muhurta System Specification
 
 **Status:** Phase 1 (Data Preparation) — Started 2026-10-07  

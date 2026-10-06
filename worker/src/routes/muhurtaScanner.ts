@@ -218,7 +218,9 @@ export async function handleMuhurtaScan(request: Request, env: Env): Promise<Res
 
     let chandrabalaContext: ChandrabalaContext | null = null;
     if (natalMoonRashi !== null) {
-      chandrabalaContext = { natalMoonRashi, currentMoonRashi: Math.floor(moonLon / 30) };
+      const sunLonForPaksha = trueSiderealLongitude("Sun", jd);
+      const waxing = (((moonLon - sunLonForPaksha) % 360) + 360) % 360 < 180;
+      chandrabalaContext = { natalMoonRashi, currentMoonRashi: Math.floor(moonLon / 30), moonWaxing: waxing };
     }
 
     const score = scoreHora(

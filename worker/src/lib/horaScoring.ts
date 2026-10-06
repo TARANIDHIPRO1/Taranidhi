@@ -128,31 +128,52 @@ export function getTarabalaGate(janmaNakIdx: number, currentNakIdx: number, _cur
   };
 }
 
-// Chandrabala-Gate -- ARCHITECTURE.md Section 4: rashi-count check, the
-// transiting Moon's rashi counted from the natal Moon's rashi.
-// 1,2,3,5,7,9,10,11 = present (favorable); 4,6,8,12 = absent.
-// 8th position ("Ashtama Chandra") is the worst placement.
+// Chandrabala-Gate -- transiting Moon's rashi counted from the natal Moon's rashi.
 //
-// NOT implemented: the documented exception -- "for women, marriage on
-// one's own janma nakshatra is considered auspicious" (a narrow override of
-// the general rule for a specific gender + specific purpose + specific
-// nakshatra condition). This function always applies the general rule.
-// Flagging rather than silently guessing how to encode that exception,
-// since ARCHITECTURE.md gives no further detail on how it should interact
-// with Chandrabala specifically (it's actually a Tarabala note in the
-// source research, not stated as a Chandrabala exception -- do not conflate
-// the two when this gets revisited).
-const CHANDRABALA_PRESENT = new Set([1, 2, 3, 5, 7, 9, 10, 11]);
+// RULE (Muhurta Chintamani, Gochara Prakarana -- per the 2026-10-07 verification
+// report; verse number NOT yet checked against the Sanskrit edition):
+//   Always favorable:            1, 3, 6, 7, 10, 11
+//   Favorable ONLY in Shukla:    2, 5, 9   (waxing Moon)
+//   Unfavorable:                 4, 8, 12  (8th = Ashtama Chandra, worst)
+// Earlier code marked {1,2,3,5,7,9,10,11} present and 6 absent -- that was
+// wrong on two counts (6th is always good; 2/5/9 are Shukla-only).
+//
+// moonWaxing: true = Shukla (Moon-Sun elongation < 180deg), false = Krishna,
+// null/undefined = unknown. For 2/5/9 with unknown paksha the result is
+// "conditional" (cap 85) rather than silently favorable.
+//
+// NOT implemented: the vedha (obstruction) cancellations and the "emergency"
+// rule from MC, and any event-specific exceptions. The "worst = 8th" weighting
+// is traditional, not a located MC verse.
+const CHANDRABALA_ALWAYS = new Set([1, 3, 6, 7, 10, 11]);
+const CHANDRABALA_SHUKLA_ONLY = new Set([2, 5, 9]);
 
-export function getChandrabalaGate(natalMoonRashi: number, currentMoonRashi: number) {
+export function getChandrabalaGate(
+  natalMoonRashi: number,
+  currentMoonRashi: number,
+  moonWaxing: boolean | null = null
+) {
   const count = ((currentMoonRashi - natalMoonRashi + 12) % 12) + 1;
-  const present = CHANDRABALA_PRESENT.has(count);
   const isAshtama = count === 8;
+  let present = false;
+  let conditional = false;
   let cap = 100;
   let note = "";
-  if (present) {
-    cap = 100;
+  if (CHANDRABALA_ALWAYS.has(count)) {
+    present = true;
     note = `Chandrabala present (position ${count}) -- favorable`;
+  } else if (CHANDRABALA_SHUKLA_ONLY.has(count)) {
+    if (moonWaxing === true) {
+      present = true;
+      note = `Chandrabala present (position ${count}, Shukla Paksha) -- favorable in the bright half`;
+    } else if (moonWaxing === false) {
+      cap = 70;
+      note = `Chandrabala absent (position ${count} is favorable only in Shukla Paksha; Moon is waning)`;
+    } else {
+      conditional = true;
+      cap = 85;
+      note = `Chandrabala conditional (position ${count} is favorable only in Shukla Paksha; paksha not supplied)`;
+    }
   } else if (isAshtama) {
     cap = 40;
     note = "Ashtama Chandra (8th position) -- most unfavorable Chandrabala placement";
@@ -160,7 +181,7 @@ export function getChandrabalaGate(natalMoonRashi: number, currentMoonRashi: num
     cap = 70;
     note = `Chandrabala absent (position ${count}) -- exercise caution`;
   }
-  return { count, present, isAshtama, cap, note };
+  return { count, present, conditional, isAshtama, cap, note };
 }
 
 // Dasha-Gate -- ARCHITECTURE.md Section 4: "Dasha determines what is
@@ -200,6 +221,8 @@ export interface DashaContext {
 export interface ChandrabalaContext {
   natalMoonRashi: number;
   currentMoonRashi: number;
+  /** true = Shukla (waxing), false = Krishna (waning), omitted/null = unknown. */
+  moonWaxing?: boolean | null;
 }
 
 /**
@@ -261,7 +284,7 @@ export function scoreHora(
   }
 
   if (chandrabalaContext) {
-    const cGate = getChandrabalaGate(chandrabalaContext.natalMoonRashi, chandrabalaContext.currentMoonRashi);
+    const cGate = getChandrabalaGate(chandrabalaContext.natalMoonRashi, chandrabalaContext.currentMoonRashi, chandrabalaContext.moonWaxing ?? null);
     if (score > cGate.cap) score = cGate.cap;
     layers.push({ name: "Chandrabala Gate", detail: `Position ${cGate.count}`, impact: cGate.note });
   } else {

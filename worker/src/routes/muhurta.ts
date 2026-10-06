@@ -190,7 +190,9 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
   const currentNakDeg = moonLon % (360 / 27);
 
   if (chandrabalaContext) {
-    chandrabalaContext = { ...chandrabalaContext, currentMoonRashi: Math.floor(moonLon / 30) };
+    const sunLonForPaksha = trueSiderealLongitude("Sun", jd);
+    const waxing = (((moonLon - sunLonForPaksha) % 360) + 360) % 360 < 180;
+    chandrabalaContext = { ...chandrabalaContext, currentMoonRashi: Math.floor(moonLon / 30), moonWaxing: waxing };
   }
 
   let tara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" } | null = null;
@@ -302,6 +304,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       currentNakIdx,
       nityaYoga.index + 1, // NityaYogaResult.index is 0-26; convergenceIndex expects 1-27
       karana.position,     // KaranaResult.position is 1-60
+      nityaYoga.rejectedNow,
     );
     const kpScore = dashaContext?.mahaLord && dashaContext?.antarLord
       ? calculateKPScore(dashaContext.mahaLord, dashaContext.antarLord, purpose)
@@ -342,7 +345,7 @@ export async function handleMuhurtaNow(request: Request, env: Env): Promise<Resp
       planetary_score:     planetaryScore,
       convergence_score:   convergenceScore,
       convergence_rating:  convergenceRating,
-      note: "Formula: 20% KP + 20% PanchaPakshi + 20% Numerology + 20% Panchang + 20% Planetary (SAV-derived)",
+      note: "Formula: 20% KP + 20% PanchaPakshi + 20% Numerology + 20% Panchang + 20% Planetary (SAV-derived). Proprietary blend; the Numerology layer is modern numerology, not a classical Muhurta rule.",
     };
   } catch (_err) {
     // Convergence index is supplemental; never fail the primary muhurta response

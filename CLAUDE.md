@@ -83,7 +83,7 @@ Claude Haiku 4.5 (this session: Task 76 complete, Task 75 complete, Task 74 COMP
 
 1. ✅ **Phase 1 Complete:** All 14 blocking issues fixed (compilation 0 errors)
 2. ✅ **Phase 2 Complete:** 3 UI screens built (scanner, wallet, referral)
-3. ✅ **Janma Tara Classification:** Changed from malefic → neutral (Karma Vipak Samhita sourced)
+3. 🟡 **Janma Tara Classification:** Changed from malefic → neutral (Karma Vipak Samhita claimed; NOT verified — MC lists Janma bad; disputed, see docs/RULES_VERIFICATION_2026-10.md)
 4. ✅ **Market Research Complete:** TAM ₹1B by 2030, 5% capture = ₹40-55Cr revenue potential
 5. 🟡 **Phase 3 Starting:** SMS gateway testing BEFORE full Cloudflare deployment
 6. 📊 **Event Category Priority:** Property (P0) → Marriage (P1) → Business (P2) → Medical (P3)
@@ -182,7 +182,8 @@ Claude Haiku 4.5 (this session: Task 76 complete, Task 75 complete, Task 74 COMP
     - **Next:** Apply to all screens (/kundali, /muhurta, /numerology, /recommendations, /wallet, /dashboard, /admin)
     - **Ownership:** Development team ready to start Phase 3 frontend build (Week 1-2)
 
-14. 🟢 **TARANIDHI v5: DUAL MUHURTA SYSTEM — PHASE 1 STARTED (Oct 7, 2026):**
+14. 🟡 **TARANIDHI v5: DUAL MUHURTA — CORRECTED AFTER VERIFICATION (Oct 7, 2026):** The Phase-1 spec below contained unverified/invented yoga lists and verse citations. Verification report: `docs/RULES_VERIFICATION_2026-10.md`. Fixed in code (commit pending push): Chandrabala (6th favorable; 2/5/9 Shukla-only), Nitya Yoga rejection by ghati, Amavasya scoring, Abhijit notes, unsupported source claims relabelled; rules locked by `lib/__tests__/rulesVerification.test.ts`. Reach/Financial yogas and numerology-as-classical are WITHDRAWN. Open: sign-off of verse numbers vs Sanskrit edition, Janma tara default, tithi-tier rebuild, Dagdha port. Original (superseded) entry follows:
+    - 🟢 **(SUPERSEDED) TARANIDHI v5: DUAL MUHURTA SYSTEM — PHASE 1 STARTED (Oct 7, 2026):**
     - **Strategic Insight:** Bollywood, political campaigns, major brands ALL use Muhurta timing for launches
     - **Architecture:** TWO separate pages (Traditional + Modern) with different scoring algorithms
     - **Timeline:** 7 weeks total (Phase 1: 1w | Phase 2: 3w | Phase 3: 2w | Phase 4: 1w)

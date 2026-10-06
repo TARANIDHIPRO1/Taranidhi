@@ -196,7 +196,7 @@ export interface HouseVerdict {
   subLordSignifiesUnfavorable: boolean;
   /** Navtara of the sub-lord planet relative to natal Moon's nakshatra.
    *  Beneficence: "benefic" (2,4,6,8,9), "neutral" (1 Janma), or "malefic" (3,5,7).
-   *  Janma is neutral per Karma Vipak Samhita: karmic marker, not inherent defect. */
+   *  Janma is treated as neutral by project decision; this is DISPUTED between authorities (MC lists it bad) and the Karma Vipak Samhita attribution is unverified. */
   navtara: { number: number; name: string; beneficence: "benefic" | "neutral" | "malefic" };
   /** Raw verdict: "promised" or "denied". */
   verdict: "promised" | "denied";
@@ -248,7 +248,7 @@ export function evaluateHouse(
   // - If sub-lord signifies more unfavorable than favorable → Denied
   // - Tie-break: Navtara benefic → Promised, malefic → Denied, neutral → defer to
   //   context (no bias applied; this reflects that Janma Tara is context-dependent per
-  //   B.V. Raman and Karma Vipak Samhita — favorable for nuptials/sacrifices/coronations,
+  //   B.V. Raman and Karma Vipak Samhita (UNVERIFIED attribution; disputed) — favorable for nuptials/sacrifices/coronations,
   //   unfavorable for business/war; remedies mitigate per KVS)
   // - If sub-lord directly signifies the queried house itself, that's a
   //   strong positive signal (adds to favorable count conceptually)

@@ -48,8 +48,13 @@ export interface ConvergenceResult {
  * Auspicious tithis: 2, 3, 5, 7, 10, 12, 13, 15 (Purnima), 25, 27, 30 (Amavasya)
  * Less favorable: 4, 6, 8, 9, 11, 14, 29 (Ganda Moola)
  */
+// tithi is 1-30 (15 = Purnima, 30 = Amavasya). Fixed 2026-10-07: Amavasya (30) was scored
+// 90 "auspicious"; Muhurta Chintamani rejects Amavasya for all auspicious work (verse
+// unverified), so it now scores 20. The other tiers below are proprietary and have NOT
+// been re-derived from the Nanda/Bhadra/Jaya/Rikta/Purna + paksha grading (follow-up).
 function calculateTithiScore(tithi: number): number {
-  const auspiciousTithis = [2, 3, 5, 7, 10, 12, 13, 15, 25, 27, 30];
+  if (tithi === 30) return 20;
+  const auspiciousTithis = [2, 3, 5, 7, 10, 12, 13, 15, 25, 27];
   const moderateTithis = [1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26];
   const inauspiciousTithis = [4, 6, 8, 9, 11, 14, 28, 29];
 
@@ -79,14 +84,27 @@ function calculateNakshatraScore(nakshatra: number): number {
  * Convert Yoga to score (0-100)
  * Auspicious yogas: Auspicious yogas favor undertakings
  */
-function calculateYogaScore(yoga: number): number {
-  const veryAuspicious = [3, 6, 7, 11, 13, 16, 18, 20, 22]; // Ayushman, Shukla, Brahma, Harsha, Siddhi, Parigha, Siddha, Sadhya, Shubha
-  const moderatelyAuspicious = [1, 2, 4, 5, 9, 10, 12, 14, 15, 19, 21, 23, 24, 25, 26, 27];
-  const lessAuspicious = [8, 17]; // Indra, Shiva
+// yoga is 1-BASED (1 Vishkambha ... 27 Vaidhriti). Fixed 2026-10-07: the previous
+// lists scored Atiganda(6) and Vyaghata(13) as "very auspicious", Vishkambha, Shula,
+// Ganda, Vajra, Parigha and Vaidhriti as "moderately auspicious", and Vyatipata as 45.
+// Rejection rule (Muhurta Chintamani, verse unverified): Vyatipata(17) and
+// Vaidhriti(27) are rejected for the whole yoga; Vishkambha(1), Vajra(15), Parigha(19),
+// Shula(9), Ganda(10), Atiganda(6), Vyaghata(13) only for their opening ghatis.
+// The 92/70/60 tiers for the remaining yogas are proprietary, not classical.
+const YOGA_FULL_REJECT = [17, 27];
+const YOGA_OPENING_REJECT = [1, 6, 9, 10, 13, 15, 19];
 
+function calculateYogaScore(yoga: number, rejectedNow?: boolean): number {
+  const veryAuspicious = [3, 7, 11, 16, 18, 20, 22]; // Ayushman, Sukarma, Vriddhi, Siddhi, Variyan, Shiva, Sadhya
+  const moderatelyAuspicious = [2, 4, 5, 12, 14, 21, 23, 24, 25, 26];
+
+  if (YOGA_FULL_REJECT.includes(yoga)) return 15;
+  if (YOGA_OPENING_REJECT.includes(yoga)) {
+    // Unknown position inside the yoga (rejectedNow undefined) is treated conservatively as rejected.
+    return rejectedNow === false ? 60 : 35;
+  }
   if (veryAuspicious.includes(yoga)) return 92;
   if (moderatelyAuspicious.includes(yoga)) return 70;
-  if (lessAuspicious.includes(yoga)) return 45;
 
   return 60;
 }
@@ -109,11 +127,12 @@ export function calculatePanchangScore(
   tithi: number,
   nakshatra: number,
   yoga: number,
-  karana: number
+  karana: number,
+  yogaRejectedNow?: boolean
 ): number {
   const tithiScore = calculateTithiScore(tithi);
   const nakshatraScore = calculateNakshatraScore(nakshatra);
-  const yogaScore = calculateYogaScore(yoga);
+  const yogaScore = calculateYogaScore(yoga, yogaRejectedNow);
   const karanaScore = calculateKaranaScore(karana);
 
   // Weighted average (Tithi is most important in traditional texts)

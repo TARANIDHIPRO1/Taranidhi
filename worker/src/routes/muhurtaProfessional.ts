@@ -33,6 +33,7 @@ import {
   getDishashool,
   getTithi,
   isVishtiKarana,
+  getNityaYoga,
   getYamghanda,
   getGulikaKaal,
   isDurmuhurta,
@@ -285,6 +286,7 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
   // ── Tithi / Karana / Muhurta dosha calculations ──
   const currentTithi = getTithi(moonLon, sunLon);
   const inVishtiKarana = isVishtiKarana(moonLon, sunLon);
+  const nityaYogaNow = getNityaYoga(sunLon, moonLon);
   const yamghanda = getYamghanda(sunrise, sunset, dow);
   const inYamghanda = now.getTime() >= yamghanda.start.getTime() && now.getTime() < yamghanda.end.getTime();
   const gulikaKaal = getGulikaKaal(sunrise, sunset, dow);
@@ -307,6 +309,8 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     inGulikaKaal,
     inDurmuhurta,
     inVishtiKarana,
+    nityaYogaRejected: nityaYogaNow.rejectedNow,
+    nityaYogaNote: nityaYogaNow.note,
     panchakaActive: panchaka.active && !panchaka.auspicious,
   };
 
@@ -320,6 +324,7 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     antardashLord,
     natalMoonRashi,
     currentMoonRashi,
+    moonWaxing: (((moonLon - sunLon) % 360) + 360) % 360 < 180,
     ashtakwargaBindu,
     navamshaHouseLord,
     transitPlanetRashis,  // Full 7-planet Gochar (replaces Moon-only fallback)
