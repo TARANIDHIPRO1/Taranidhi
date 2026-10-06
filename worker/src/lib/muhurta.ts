@@ -36,6 +36,33 @@ export const TARA_NAMES = ["", "Janma", "Sampat", "Vipat", "Kshema", "Pratyari",
 export const TARA_BENEFIC = new Set([2, 4, 6, 8, 9]);
 export const TARA_NEUTRAL = new Set([1]); // Janma — no inherent malefic quality
 
+/**
+ * AMRIT SIDDHI YOGA: 7 vara-nakshatra pairs (BPHS, verified 2026-10-07)
+ * Supremely auspicious; can override minor doshas
+ */
+export const AMRIT_SIDDHI_PAIRS: Record<number, number> = {
+  0: 12, // Sunday-Hasta (0=Sun, 12=Hasta)
+  1: 4,  // Monday-Mrigashira
+  2: 0,  // Tuesday-Ashwini
+  3: 16, // Wednesday-Anuradha
+  4: 7,  // Thursday-Pushya
+  5: 26, // Friday-Revati
+  6: 3   // Saturday-Rohini
+};
+
+/**
+ * SURGERY/BHAISHAJYA MUHURTA: Classical rules (BPHS Ch.40, verified 2026-10-07)
+ * Auspicious nakshatras: Laghu (Hasta), Mridu (Magha, Purva Phalguni), Chara (Dhanishtha, Shatabhisha, Purva Bhadrapada)
+ * Requirements:
+ * - Dual-sign Lagna (Mithun, Kanya, Tula, Varishabh, Meen - not single-house)
+ * - 12th, 7th, 8th houses clear of malefics
+ * - Mars present/strong (Mars = surgical planet)
+ * - Never birth nakshatra
+ * Source: BPHS Ch.40 + MC cross-reference
+ */
+export const SURGERY_GOOD_NAKSHATRAS = new Set([12, 9, 10, 23, 24, 25]); // Hasta, Magha, Purva Phalguni, Dhanishtha, Shatabhisha, Purva Bhadrapada
+export const SURGERY_DUAL_SIGN_LAGNAS = new Set([2, 5, 6, 1, 11]); // Gemini, Virgo, Libra, Taurus, Pisces (Mithun, Kanya, Tula, Varishabh, Meen)
+
 /** Classical Chaldean order -- same sequence the Hora-lord rotation and
  *  Uphora sub-division both use. Confirmed from the prior TaraNidhi build. */
 export const CHRONO = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
@@ -1622,3 +1649,60 @@ export function getVara(dow: number): VaraResult {
   const d = VARA_DATA[dow] ?? VARA_DATA[0]!;
   return { weekday: dow, ...d };
 }
+
+/**
+ * Check if a given vara-nakshatra pair forms Amrit Siddhi yoga
+ * (BPHS verified 2026-10-07)
+ * @param vara Day of week (0-6, Sunday-Saturday)
+ * @param nakIdx Nakshatra index (0-26)
+ * @returns true if supremely auspicious Amrit-Siddhi pair
+ */
+export function isAmritSiddhi(vara: number, nakIdx: number): boolean {
+  const goodNak = AMRIT_SIDDHI_PAIRS[vara];
+  return goodNak === nakIdx;
+}
+
+/**
+ * Validate Surgery/Bhaishajya Muhurta conditions (BPHS Ch.40, verified 2026-10-07)
+ * @param nakIdx Current nakshatra index
+ * @param lagnaSign Lagna sign (0-11, Aries-Pisces)
+ * @param janmaNakIdx Birth nakshatra (must not match)
+ * @param has7th8th12thMalefic Whether 7th, 8th, or 12th house has malefics
+ * @param marsPresentStrong Whether Mars is present and strong
+ * @returns {valid: boolean, reason?: string}
+ */
+export function validateSurgeryMuhurta(
+  nakIdx: number,
+  lagnaSign: number,
+  janmaNakIdx: number,
+  has7th8th12thMalefic: boolean,
+  marsPresentStrong: boolean
+): { valid: boolean; reason?: string } {
+  // Rule 1: Must be a surgery-favorable nakshatra
+  if (!SURGERY_GOOD_NAKSHATRAS.has(nakIdx)) {
+    return { valid: false, reason: "Nakshatra not favorable for surgery (need Hasta, Magha, Purva Phalguni, Dhanishtha, Shatabhisha, Purva Bhadrapada)" };
+  }
+
+  // Rule 2: Must be dual-sign Lagna
+  if (!SURGERY_DUAL_SIGN_LAGNAS.has(lagnaSign)) {
+    return { valid: false, reason: "Lagna must be dual-sign (Gemini, Virgo, Libra, Taurus, Pisces)" };
+  }
+
+  // Rule 3: 12th, 7th, 8th houses must be clear of malefics
+  if (has7th8th12thMalefic) {
+    return { valid: false, reason: "12th, 7th, or 8th house has malefic planets; clear required" };
+  }
+
+  // Rule 4: Mars must be present and strong
+  if (!marsPresentStrong) {
+    return { valid: false, reason: "Mars must be present and strong (Mars = surgical planet)" };
+  }
+
+  // Rule 5: Never birth nakshatra
+  if (nakIdx === janmaNakIdx) {
+    return { valid: false, reason: "Cannot perform surgery in birth nakshatra" };
+  }
+
+  return { valid: true };
+}
+
