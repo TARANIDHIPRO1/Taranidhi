@@ -445,7 +445,10 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       </div>
     </div>
 
-    <button class="btn-primary" onclick="goScreen('tara')">
+    <!-- NAK NATURE CARD — injected by renderNakNature() -->
+    <div id="nakNatureCard" style="display:none"></div>
+
+    <button class="btn-primary btn-row" onclick="goScreen('tara')">
       ⭐ View Tara Intelligence →
     </button>
     <div style="height:16px"></div>
@@ -659,6 +662,236 @@ const BIRDS_H=['गृध्र','उलूक','काक','कुक्कु�
 const BIRD_ICONS=['🦅','🦉','🐦‍⬛','🐓','🦚'];
 const PLANET_CLR={Sun:'#F97316',Moon:'#94A3B8',Mars:'#EF4444',Mercury:'#22C55E',Jupiter:'#F59E0B',Venus:'#EC4899',Saturn:'#8B5CF6',Rahu:'#6366F1',Ketu:'#64748B'};
 const HORA_GOOD={business:['Mercury','Jupiter'],finance:['Jupiter','Venus'],travel:['Mercury','Venus'],marriage:['Venus','Jupiter'],property:['Mars','Saturn'],medical:['Moon','Jupiter'],exam:['Mercury','Jupiter'],legal:['Jupiter','Sun']};
+
+// ══════════════════════════════════════════════════════════
+// NAK_DATA — Complete 27-Nakshatra Classification
+// Sources: Muhurta Chintamani, Jataka Parijata, Karma Vipak Samhita
+//          + Video research (Acharya Lov Gautam series)
+// type: laghu/mridu/sthira/chara/mishra/ugra/tikshna
+// mukha: urdhva(up)/adho(down)/tiryak(sideways)
+// locha: sulochan(good vision)/andhlochan(blind)/madhya(medium)
+// gana: deva/manav/rakshasa
+// remedy: classical upay for that nakshatra's natives
+// trait: personality trait of janma nakshatra native
+// ══════════════════════════════════════════════════════════
+const NAK_DATA=[
+  // 0:Ashwini
+  {type:'laghu',typeH:'लघु/क्षिप्र',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Ashwini Kumars',deityH:'अश्विनी कुमार',symbol:'⚡',
+   goodFor:'Medical treatment, travel, vehicle purchase, sports, learning',
+   goodEv:['medical','travel','exam'],
+   typeDesc:'Swift & Light — rapid execution, good for new starts',
+   remedy:'गणेश पूजा + दवा का दान (Ganesh puja + medicine donation)',
+   trait:'हीलिंग पावर, त्वरित कार्य (Healing power, swift execution)'},
+  // 1:Bharani
+  {type:'ugra',typeH:'उग्र',mukha:'adho',locha:'andhlochan',gana:'manav',
+   deity:'Yama',deityH:'यम',symbol:'⚖️',
+   goodFor:'Court cases, legal battles, confrontation, punishment',
+   goodEv:['legal'],
+   typeDesc:'Fierce — intense energy, good for legal & confrontation only',
+   remedy:'शुक्रवार को कन्याओं को खीर खिलाना (Feed kheer to girls on Friday)',
+   trait:'न्याय और नैतिकता (Sense of justice, moral authority)'},
+  // 2:Krittika
+  {type:'mishra',typeH:'मिश्र',mukha:'adho',locha:'andhlochan',gana:'rakshasa',
+   deity:'Agni',deityH:'अग्नि',symbol:'🔥',
+   goodFor:'Cooking, fire rituals, technical work, cutting',
+   goodEv:['exam'],
+   typeDesc:'Mixed — dual energy, use selectively',
+   remedy:'सूर्य को जल + गायत्री मंत्र (Offer water to Sun + Gayatri mantra)',
+   trait:'तीक्ष्ण बुद्धि, काटने की क्षमता (Sharp intellect, cutting decisiveness)'},
+  // 3:Rohini
+  {type:'sthira',typeH:'स्थिर',mukha:'urdhva',locha:'sulochan',gana:'manav',
+   deity:'Brahma/Prajapati',deityH:'ब्रह्मा / प्रजापति',symbol:'🌱',
+   goodFor:'Construction, investment, property, long-term agreements, griha pravesh',
+   goodEv:['property','finance','business','marriage'],
+   typeDesc:'Fixed & Stable — best for permanent, long-lasting work',
+   remedy:'गाय की सेवा + माता का सम्मान (Serve cows + respect your mother)',
+   trait:'सौंदर्य प्रेम, स्थिरता, चंद्रमा की प्रिय (Love of beauty, stability — Moon\'s favourite)'},
+  // 4:Mrigashira
+  {type:'mridu',typeH:'मृदु',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Soma (Chandra)',deityH:'सोम (चंद्र)',symbol:'🦌',
+   goodFor:'Negotiations, persuasion, reconciliation, travel, shopping',
+   goodEv:['business','travel','marriage'],
+   typeDesc:'Soft & Gentle — ideal for harmony, agreements, persuasion',
+   remedy:'पक्षियों को दाना + शिव पूजा (Feed birds + Shiva worship)',
+   trait:'जिज्ञासु, हमेशा खोज में रहना (Perpetually curious, always seeking)'},
+  // 5:Ardra
+  {type:'tikshna',typeH:'तीक्ष्ण/उग्र',mukha:'urdhva',locha:'andhlochan',gana:'manav',
+   deity:'Rudra',deityH:'रुद्र',symbol:'🌪️',
+   goodFor:'Demolition, removing obstacles, fierce action, storms',
+   goodEv:['legal'],
+   typeDesc:'Sharp/Fierce — destructive energy, avoid auspicious starts',
+   remedy:'रुद्राभिषेक + कुत्तों की सेवा (Rudra abhishek + serve dogs)',
+   trait:'तीव्र भावनाएं, रूपांतरण की शक्ति (Intense emotions, transformative force)'},
+  // 6:Punarvasu
+  {type:'chara',typeH:'चर',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Aditi',deityH:'अदिति',symbol:'🔄',
+   goodFor:'Vehicle purchase, return journeys, restoration, travel',
+   goodEv:['travel','business','medical'],
+   typeDesc:'Movable — excellent for travel, vehicles, dynamic activity',
+   remedy:'बड़ों का आशीर्वाद + चने की दाल का दान (Elders\' blessings + donate chana dal)',
+   trait:'नवीनीकरण की शक्ति, वापसी (Power of renewal and restoration)'},
+  // 7:Pushya
+  {type:'laghu',typeH:'लघु/क्षिप्र',mukha:'urdhva',locha:'sulochan',gana:'deva',
+   deity:'Brihaspati',deityH:'बृहस्पति',symbol:'⭐',
+   goodFor:'New medicine, all auspicious works, investment, education — supreme',
+   goodEv:['medical','finance','business','marriage','exam'],
+   typeDesc:'Light & Auspicious — सर्वकार्य शुभ (best for all activities)',
+   remedy:'पीपल की सेवा + गुरु का सम्मान ⚠️ विवाह वर्जित (Peepal service + respect guru — No marriage)',
+   trait:'पोषण, शुभता, गुरु भक्ति (Nourishing, auspicious, devoted to teacher)'},
+  // 8:Ashlesha
+  {type:'tikshna',typeH:'तीक्ष्ण',mukha:'adho',locha:'andhlochan',gana:'rakshasa',
+   deity:'Nagas (Serpents)',deityH:'नाग देव',symbol:'🐍',
+   goodFor:'Secret work, poisons research, occult practices',
+   goodEv:[],
+   typeDesc:'Sharp & Serpentine — avoid all auspicious works',
+   remedy:'शिव उपासना + नाग-नागिन का जोड़ा जल में प्रवाह (Shiva worship + immerse snake pair in water)',
+   trait:'पकड़ने की प्रवृत्ति, नहीं छोड़ना (Clinging nature, doesn\'t let go)'},
+  // 9:Magha
+  {type:'ugra',typeH:'उग्र',mukha:'adho',locha:'andhlochan',gana:'rakshasa',
+   deity:'Pitrus (Ancestors)',deityH:'पितृ देव',symbol:'👑',
+   goodFor:'Ancestor rituals (Shraddha), demolition, coronation',
+   goodEv:[],
+   typeDesc:'Fierce — for ancestor rites only; avoid new ventures',
+   remedy:'पूर्वजों के नाम से दान + पीपल की सेवा (Donate in ancestors\' name + serve Peepal)',
+   trait:'राजसी व्यक्तित्व, पूर्वज सम्मान (Regal personality, ancestral pride)'},
+  // 10:Purva Phalguni
+  {type:'ugra',typeH:'उग्र',mukha:'adho',locha:'madhya',gana:'manav',
+   deity:'Bhaga',deityH:'भग',symbol:'🎭',
+   goodFor:'Rest, pleasure, entertainment (limited use)',
+   goodEv:['marriage'],
+   typeDesc:'Fierce — associated with pleasure; avoid major decisions',
+   remedy:'लक्ष्मी पूजा + इत्र का प्रयोग (Lakshmi puja + use of perfume/itar)',
+   trait:'सामाजिक, विश्राम प्रेमी, आनंदप्रिय (Social butterfly, loves rest and pleasure)'},
+  // 11:Uttara Phalguni
+  {type:'sthira',typeH:'स्थिर',mukha:'urdhva',locha:'madhya',gana:'manav',
+   deity:'Aryaman',deityH:'अर्यमन',symbol:'☀️',
+   goodFor:'Long-term agreements, property, investment, partnership',
+   goodEv:['business','property','marriage','finance'],
+   typeDesc:'Fixed & Stable — excellent for lasting commitments',
+   remedy:'सूर्य को अर्घ्य + वचन का पालन (Offer arghya to Sun + honour commitments)',
+   trait:'प्रतिबद्धता की शक्ति, वचन पालन (Unbreakable commitment, honour-bound)'},
+  // 12:Hasta
+  {type:'laghu',typeH:'लघु/क्षिप्र',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Savitar (Sun)',deityH:'सविता / सूर्य',symbol:'✋',
+   goodFor:'New medicine, skilled crafts, learning, detail work',
+   goodEv:['medical','exam','business'],
+   typeDesc:'Light & Skilled — best for precision work, medicine, learning',
+   remedy:'गायत्री मंत्र + मूंग का दान (Gayatri mantra + donate moong lentils)',
+   trait:'हाथों की कला, चालाकी, संभालने की क्षमता (Skilled hands, clever, tactful)'},
+  // 13:Chitra
+  {type:'mridu',typeH:'मृदु',mukha:'tiryak',locha:'madhya',gana:'rakshasa',
+   deity:'Vishwakarma',deityH:'विश्वकर्मा',symbol:'🎨',
+   goodFor:'Architecture, design, art, negotiation, creative work',
+   goodEv:['business','travel'],
+   typeDesc:'Soft & Creative — ideal for creative, artistic and negotiation work',
+   remedy:'कार्यस्थल की सफाई + रंगीन फूलों का बागबान (Clean workspace + colorful garden)',
+   trait:'सौंदर्य बोध, वास्तुकला, कला (Aesthetic sense, architecture, illusion)'},
+  // 14:Swati
+  {type:'chara',typeH:'चर',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Vayu',deityH:'वायु',symbol:'💨',
+   goodFor:'Vehicle purchase, trade, travel, business deals, import-export',
+   goodEv:['travel','business','finance'],
+   typeDesc:'Movable & Airy — prime for travel, trade, vehicles',
+   remedy:'हनुमान चालीसा + पक्षियों को पानी देना (Hanuman Chalisa + water for birds)',
+   trait:'स्वतंत्र प्रेम, कूटनीति, राजनयिक (Freedom-loving, excellent diplomat)'},
+  // 15:Vishakha
+  {type:'mishra',typeH:'मिश्र',mukha:'adho',locha:'andhlochan',gana:'rakshasa',
+   deity:'Indra & Agni',deityH:'इंद्र व अग्नि',symbol:'⚡🔥',
+   goodFor:'Goal-setting, determination, competitive work',
+   goodEv:['business','exam'],
+   typeDesc:'Mixed — strong determination, use selectively',
+   remedy:'श्री कृष्ण को पीले फूलों से सजाना (Decorate Krishna with yellow flowers)',
+   trait:'लक्ष्य केंद्रित, दृढ़ निश्चय (Laser-focused, fiercely goal-oriented)'},
+  // 16:Anuradha
+  {type:'mridu',typeH:'मृदु',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Mitra',deityH:'मित्र',symbol:'🤝',
+   goodFor:'Friendship, partnerships, cooperation, reconciliation, travel',
+   goodEv:['business','travel','marriage'],
+   typeDesc:'Soft & Cooperative — excellent for alliances and partnerships',
+   remedy:'मित्रों से अच्छे संबंध + कमल का अर्पण (Good friend relations + lotus offering)',
+   trait:'मित्रता, सहकार्य, सहयोग (Friendship-builder, cooperative, loyal ally)'},
+  // 17:Jyeshtha
+  {type:'tikshna',typeH:'तीक्ष्ण',mukha:'tiryak',locha:'andhlochan',gana:'rakshasa',
+   deity:'Indra',deityH:'इंद्र',symbol:'⚔️',
+   goodFor:'Authority assertion, seniority, battle, leadership',
+   goodEv:['legal'],
+   typeDesc:'Sharp — fierce assertion of authority; avoid auspicious works',
+   remedy:'विष्णु सहस्त्रनाम का पाठ + छाते का दान (Vishnu Sahasranama + donate umbrella)',
+   trait:'वरिष्ठता, अधिकार, नेतृत्व (Seniority, authority, natural leader)'},
+  // 18:Mula
+  {type:'tikshna',typeH:'तीक्ष्ण',mukha:'adho',locha:'andhlochan',gana:'rakshasa',
+   deity:'Nirriti',deityH:'निर्ऋति',symbol:'🌀',
+   goodFor:'Uprooting, destruction, clearing the ground',
+   goodEv:[],
+   typeDesc:'Sharp & Destructive — ganda moola; avoid ALL auspicious starts',
+   remedy:'गणेश पूजा + चींटियों को आटा (Ganesh puja + flour for ants)',
+   trait:'जड़ तक खोदना, सत्यान्वेषण, जासूस (Gets to the root, truth-seeker, investigator)'},
+  // 19:Purva Ashadha
+  {type:'ugra',typeH:'उग्र',mukha:'adho',locha:'madhya',gana:'manav',
+   deity:'Apas (Waters)',deityH:'अपः (जल)',symbol:'🌊',
+   goodFor:'Water work, cleansing, purification rituals',
+   goodEv:[],
+   typeDesc:'Fierce — avoid new ventures; cleansing work only',
+   remedy:'जल की बर्बादी न करें + दही का दान (No water waste + donate curd/dahi)',
+   trait:'शुद्धता, अदम्य साहस (Purification instinct, indomitable courage)'},
+  // 20:Uttara Ashadha
+  {type:'sthira',typeH:'स्थिर',mukha:'urdhva',locha:'madhya',gana:'manav',
+   deity:'Vishwadevas',deityH:'विश्वेदेव',symbol:'🏔️',
+   goodFor:'Long-term planning, construction, property, foundation laying',
+   goodEv:['property','business','finance'],
+   typeDesc:'Fixed & Permanent — ideal for lasting foundations and structures',
+   remedy:'सूर्य नमस्कार + समाज सेवा (Surya namaskar + social service)',
+   trait:'स्थायी विजय, धैर्य, दीर्घकालीन दृष्टि (Permanent victory, immense patience, long-game thinker)'},
+  // 21:Shravana
+  {type:'chara',typeH:'चर',mukha:'urdhva',locha:'sulochan',gana:'deva',
+   deity:'Vishnu',deityH:'विष्णु',symbol:'👂',
+   goodFor:'Learning, education, study, travel, listening',
+   goodEv:['exam','travel','business','medical'],
+   typeDesc:'Movable — excellent for learning, education and travel',
+   remedy:'विष्णु चालीसा + सत्संग (Vishnu Chalisa + attend satsang)',
+   trait:'उत्कृष्ट श्रोता, ज्ञान ग्रहण करना (Exceptional listener, knowledge-absorber)'},
+  // 22:Dhanishtha
+  {type:'chara',typeH:'चर',mukha:'tiryak',locha:'sulochan',gana:'rakshasa',
+   deity:'Eight Vasus',deityH:'अष्ट वसु',symbol:'🎵',
+   goodFor:'Vehicle purchase, music, wealth accumulation, travel',
+   goodEv:['travel','finance','business'],
+   typeDesc:'Movable & Prosperous — good for wealth and vehicles',
+   remedy:'संगीत सुनो + वाद्य यंत्र का दान (Listen to music + donate instruments)',
+   trait:'संगीत, धन, ख्याति, फेम (Music, wealth, fame — natural performer)'},
+  // 23:Shatabhisha
+  {type:'chara',typeH:'चर',mukha:'tiryak',locha:'andhlochan',gana:'rakshasa',
+   deity:'Varuna',deityH:'वरुण',symbol:'💊',
+   goodFor:'Medical research, secret remedies, Ayurveda, occult healing',
+   goodEv:['medical'],
+   typeDesc:'Movable & Mystical — for hidden/esoteric medical work',
+   remedy:'शिव जलाभिषेक + नशे से दूरी (Shiva jalaabhishek + avoid all intoxicants)',
+   trait:'गूढ़ ज्ञान, भ्रम से दूर रहें (Mystical knowledge — must avoid illusions/intoxicants)'},
+  // 24:Purva Bhadrapada
+  {type:'ugra',typeH:'उग्र',mukha:'adho',locha:'madhya',gana:'manav',
+   deity:'Aja Ekapad',deityH:'अजैकपाद',symbol:'🔱',
+   goodFor:'Intense focused work, fire rituals, courage',
+   goodEv:['legal'],
+   typeDesc:'Fierce — intense energy; avoid auspicious starts',
+   remedy:'ध्यान, मेडिटेशन + धार्मिक पुस्तकों का दान (Meditation + donate religious books)',
+   trait:'आध्यात्मिक उन्नति, धर्म प्रसार (Spiritual elevation, dharmic upliftment)'},
+  // 25:Uttara Bhadrapada
+  {type:'sthira',typeH:'स्थिर',mukha:'urdhva',locha:'madhya',gana:'manav',
+   deity:'Ahir Budhnya',deityH:'अहिर्बुध्न्य',symbol:'🌊🏔️',
+   goodFor:'Meditation, depth work, long-term projects, property',
+   goodEv:['property','finance'],
+   typeDesc:'Fixed & Deep — excellent for permanent, long-term endeavors',
+   remedy:'शिव मंदिर में सेवा + मछलियों को आटा (Serve Shiva temple + flour for fish)',
+   trait:'समुद्र-गहराई जैसा ज्ञान, अगाध धैर्य (Ocean-deep knowledge, immense patience)'},
+  // 26:Revati
+  {type:'mridu',typeH:'मृदु',mukha:'tiryak',locha:'sulochan',gana:'deva',
+   deity:'Pusha',deityH:'पूषन',symbol:'🐟',
+   goodFor:'Travel, completion, nourishment, journeys, healing',
+   goodEv:['travel','medical','marriage','business'],
+   typeDesc:'Soft & Nurturing — ideal for completing journeys and auspicious work',
+   remedy:'गाय की सेवा + शिक्षा सामग्री का दान (Serve cows + donate educational materials)',
+   trait:'पशु प्रेम, पोषण, यात्रा का समापन (Animal lover, nurturer, completes journeys)'}
+];
 const TARA={
   1:{name:'Janma',hi:'जन्म',q:'neutral',meaning:'Self / स्वयं — नए आरंभ',guidance:'Personal matters OK. Avoid major decisions.',score:0,
      ev:{business:'⚠️',finance:'⚠️',travel:'⚠️',marriage:'❌',property:'⚠️',medical:'✅',exam:'⚠️',legal:'❌'},
@@ -762,6 +995,84 @@ function kpPlanets(dow,hora,mRashi,mNak){
   const ps=[{p:dl,r:'Day Lord'},{p:hora,r:'Hora Lord'},{p:sl,r:'Moon Sign Lord'},{p:nl,r:'Moon Nak Lord'}];
   const u=new Set([dl,hora,sl,nl]),ag=4-u.size+1;
   return{ps,score:ag*2.5,ag}
+}
+
+// ══════════════════════════════════════════════════════════
+// NAK TYPE SCORE (8th Layer)
+// Sources: Muhurta Chintamani, Jataka Parijata
+// type→event scoring: laghu/mridu/sthira/chara/mishra/ugra/tikshna × event categories
+// Range: -10 to +10
+// ══════════════════════════════════════════════════════════
+function nakTypeScore(nakIdx,eventCat){
+  const nd=NAK_DATA[nakIdx];
+  if(!nd)return 0;
+  const tp=nd.type;
+  // goodEv match: direct bonus
+  const directMatch=nd.goodEv&&nd.goodEv.includes(eventCat);
+  // Type × Event matrix
+  const TM={
+    laghu:  {medical:10,exam:8,travel:7,business:6,finance:5,property:3,marriage:5,legal:2},
+    mridu:  {marriage:10,business:8,travel:7,medical:6,exam:5,finance:6,property:4,legal:2},
+    sthira: {property:10,finance:9,business:8,marriage:7,medical:5,exam:4,travel:2,legal:3},
+    chara:  {travel:10,business:8,finance:7,medical:6,marriage:5,exam:4,property:2,legal:3},
+    mishra: {business:6,exam:6,travel:5,marriage:5,medical:4,finance:4,property:4,legal:4},
+    ugra:   {legal:10,medical:-2,marriage:-5,property:-4,finance:-3,business:-3,travel:-2,exam:-2},
+    tikshna:{legal:8,medical:-5,marriage:-8,property:-6,finance:-5,business:-6,travel:-3,exam:-4}
+  };
+  const base=(TM[tp]&&TM[tp][eventCat]!=null)?TM[tp][eventCat]:0;
+  // directMatch from goodEv gives +2 bonus (confirmed classical source)
+  const bonus=directMatch?2:0;
+  return Math.max(-10,Math.min(10,base+bonus));
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER NAK NATURE CARD
+// ══════════════════════════════════════════════════════════
+function renderNakNature(){
+  const R=STATE.result;
+  const nd=NAK_DATA[R.cNak];
+  if(!nd)return;
+  const sc=R.l4n;
+  const col=sc>=6?'var(--go)':sc>=2?'var(--caution)':sc>=-2?'#888':'var(--nogo)';
+  const verdict=sc>=6?'✅ शुभ':sc>=2?'⚠️ मध्यम':sc>=-2?'〰️ तटस्थ':'❌ अशुभ';
+  const html=`
+  <div class="card" id="nakNatureCard">
+    <div class="card-head">🌟 Nakshatra Nature Intelligence</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div>
+        <span style="font-size:1.5rem">${nd.symbol}</span>
+        <strong style="margin-left:6px">${NAK[R.cNak]}</strong>
+        <span style="color:#888;font-size:0.85rem"> (#${R.cNak+1})</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:1.2rem;font-weight:700;color:${col}">${verdict}</div>
+        <div style="font-size:0.8rem;color:#888">${sc>=0?'+':''}${sc}/10 for ${R.eventCat}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      <div class="info-row"><span class="info-label">Type</span><span class="info-val">${nd.typeH} (${nd.type})</span></div>
+      <div class="info-row"><span class="info-label">Mukha</span><span class="info-val">${nd.mukha==='urdhva'?'↑ Urdhva':nd.mukha==='adho'?'↓ Adho':'↔ Tiryak'}</span></div>
+      <div class="info-row"><span class="info-label">Locha</span><span class="info-val">${nd.locha==='sulochan'?'👁 Sulochan':nd.locha==='andhlochan'?'🙈 Andhlochan':'〰 Madhya'}</span></div>
+      <div class="info-row"><span class="info-label">Gana</span><span class="info-val">${nd.gana==='deva'?'😇 Deva':nd.gana==='manav'?'🧑 Manav':'👹 Rakshasa'}</span></div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:8px;margin-bottom:8px">
+      <div style="font-size:0.75rem;color:#888;margin-bottom:2px">देवता / Deity</div>
+      <div style="font-weight:600">${nd.deityH} (${nd.deity})</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:8px;margin-bottom:8px">
+      <div style="font-size:0.75rem;color:#888;margin-bottom:2px">🧠 Personality Trait</div>
+      <div style="font-size:0.85rem">${nd.trait}</div>
+    </div>
+    <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:8px;padding:8px;margin-bottom:8px">
+      <div style="font-size:0.75rem;color:#888;margin-bottom:2px">🙏 Classical Upay (Remedy)</div>
+      <div style="font-size:0.85rem">${nd.remedy}</div>
+    </div>
+    <div style="font-size:0.8rem;color:#888;border-top:1px solid var(--border);padding-top:6px">
+      <strong>Why this score:</strong> ${nd.typeDesc}${nd.goodEv&&nd.goodEv.includes(R.eventCat)?' · Classical goodEv match (+2 bonus)':''}
+    </div>
+  </div>`;
+  const container=document.getElementById('nakNatureCard');
+  if(container){container.outerHTML=html}
 }
 
 // ══════════════════════════════════════════════════════════
@@ -950,15 +1261,16 @@ function calculate(){
   if(tb.t===7&&cb.ok)tes=-20;
   // Hora score
   const hs=(HORA_GOOD[STATE.eventCat]||[]).includes(hora)?8:4;
-  // Composite
+  // Composite (8-layer)
   const l0=mb.total,l2t=Math.max(0,25+tes),l2c=cb.score,l1=ps,l3h=hs,l3b=Math.round(kp.score),l3d=pp.sc;
-  const raw=l0+l2t+l2c+l1+l3h+l3b+l3d;
+  const l4n=nakTypeScore(cNak,STATE.eventCat);
+  const raw=l0+l2t+l2c+l1+l3h+l3b+l3d+l4n;
   const hardBlock=tb.t===7&&!cb.ok||tb.t===3||tb.t===5;
-  let comp=Math.min(100,Math.round(raw/1.1));
+  let comp=Math.min(100,Math.round(raw/1.2));
   if(tb.t===7&&!cb.ok)comp=Math.min(comp,38);
   if(tb.t===3)comp=Math.min(comp,45);
   if(tb.t===5)comp=Math.min(comp,48);
-  STATE.result={qJD,qIST,qLat,qLon,dow,cNak,cRashi,tith,yog,kar,sr,hrs,hora,mb,tb,cb,kp,pp,ps,tes,hs,l0,l2t,l2c,l1,l3h,l3b,l3d,comp,raw,hardBlock,eventCat:STATE.eventCat};
+  STATE.result={qJD,qIST,qLat,qLon,dow,cNak,cRashi,tith,yog,kar,sr,hrs,hora,mb,tb,cb,kp,pp,ps,tes,hs,l0,l2t,l2c,l1,l3h,l3b,l3d,l4n,comp,raw,hardBlock,eventCat:STATE.eventCat};
   renderPanchang();renderTara();renderKP();renderVerdict();
   document.getElementById('pangResults').style.display='block';
   // Scroll to results
@@ -990,6 +1302,8 @@ function renderPanchang(){
   const pb=document.getElementById('r-pangBadge');
   pb.textContent='Panchang '+R.ps+'/15';
   pb.className='score-badge '+(R.ps>=10?'go':R.ps>=6?'caution':'nogo');
+  // Render Nak Nature card (8th layer)
+  renderNakNature();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1119,8 +1433,10 @@ function renderVerdict(){
   const bar=document.getElementById('v-bar');
   bar.style.width=R.comp+'%';
   bar.style.background=R.comp>=75&&!R.hardBlock?'var(--go)':R.comp>=50?'var(--caution)':'var(--nogo)';
-  // Breakdown
+  // Breakdown (8 layers)
   const bk=document.getElementById('v-breakdown');
+  const nd=NAK_DATA[R.cNak];
+  const l4col=R.l4n>=6?'var(--go)':R.l4n>=0?'var(--caution)':'var(--nogo)';
   const items=[
     {l:'Tarabala',s:R.l2t,m:35,c:R.tes>=0?'var(--go)':'var(--nogo)'},
     {l:'Chandrabala',s:R.l2c,m:20,c:R.cb.ok?'var(--go)':'var(--nogo)'},
@@ -1128,9 +1444,14 @@ function renderVerdict(){
     {l:'Panchang',s:R.l1,m:15,c:'var(--prithvi)'},
     {l:'Hora',s:R.l3h,m:10,c:'var(--agni)'},
     {l:'KP Signal',s:R.l3b,m:10,c:'var(--akash)'},
-    {l:'Panchapakshi',s:R.l3d,m:10,c:'var(--vayu)'}
+    {l:'Panchapakshi',s:R.l3d,m:10,c:'var(--vayu)'},
+    {l:'Nak Nature '+(nd?nd.symbol:'🌟'),s:R.l4n,m:10,c:l4col,signed:true}
   ];
-  bk.innerHTML=items.map(i=>`<div class="breakdown-row"><div class="bk-label">${i.l}</div><div class="bk-bar-bg"><div class="bk-bar-fill" style="width:${(i.s/i.m)*100}%;background:${i.c}"></div></div><div class="bk-score" style="color:${i.c}">${i.s}<span style="font-size:10px;color:var(--muted)">/${i.m}</span></div></div>`).join('');
+  bk.innerHTML=items.map(i=>{
+    const pct=Math.max(0,((i.signed?i.s+10:i.s)/((i.signed?20:i.m)))*100);
+    const sc=i.signed?(i.s>=0?'+'+i.s:i.s):i.s;
+    return`<div class="breakdown-row"><div class="bk-label">${i.l}</div><div class="bk-bar-bg"><div class="bk-bar-fill" style="width:${pct}%;background:${i.c}"></div></div><div class="bk-score" style="color:${i.c}">${sc}<span style="font-size:10px;color:var(--muted)">/${i.signed?'±10':i.m}</span></div></div>`;
+  }).join('');
   // Upcoming windows
   const wins=getWindows(R.qJD,R.eventCat,P.janmaNakIdx,P.janmaRashi);
   const wEl=document.getElementById('v-windows');
@@ -1174,6 +1495,7 @@ function shareWhatsApp(){
   const P=STATE.profile,R=STATE.result;
   if(!P||!R)return;
   const t=R.tb.tara;
+  const nd=NAK_DATA[R.cNak];
   const msg=`🔮 *OCCULTVIISION Muhurta Report*\n\n`+
     `👤 *${P.name}*\n`+
     `🌙 Janma Nakshatra: *${NAK[P.janmaNakIdx]}* (#${P.janmaNakIdx+1})\n\n`+
@@ -1182,9 +1504,13 @@ function shareWhatsApp(){
     `⭐ *Tara ${R.tb.t}: ${t.name} (${t.hi})*\n`+
     `${t.guidance}\n\n`+
     `🌕 Chandrabala: ${R.cb.ok?'✅ Shubha (pos '+R.cb.p+')':'❌ Absent'}\n`+
-    `📊 Composite Score: *${R.comp}/100*\n\n`+
+    `🌟 *Nak Nature (${nd?nd.symbol:''} ${NAK[R.cNak]}):* ${nd?nd.typeH:''} · ${nd?nd.type:''}\n`+
+    `   Mukha: ${nd?nd.mukha:''} · Gana: ${nd?nd.gana:''} · Locha: ${nd?nd.locha:''}\n`+
+    `   देवता: ${nd?nd.deityH:''} (${nd?nd.deity:''})\n`+
+    `   🙏 Upay: ${nd?nd.remedy:''}\n\n`+
+    `📊 Composite Score: *${R.comp}/100* (8-Layer Analysis)\n\n`+
     `${R.comp>=75?'✅ *GO — Proceed*':R.comp>=50?'⚠️ *CAUTION — Review needed*':'❌ *NO-GO — Postpone*'}\n\n`+
-    `_Powered by OCCULTVIISION · occultviision.com_`;
+    `_Powered by OCCULTVIISION Kaalchakra Pro_`;
   const url=`https://api.whatsapp.com/send?phone=${P.wa.replace('+','')}&text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
 }
