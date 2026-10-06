@@ -182,6 +182,40 @@ Claude Haiku 4.5 (this session: Task 76 complete, Task 75 complete, Task 74 COMP
     - **Next:** Apply to all screens (/kundali, /muhurta, /numerology, /recommendations, /wallet, /dashboard, /admin)
     - **Ownership:** Development team ready to start Phase 3 frontend build (Week 1-2)
 
+14. 🟢 **TARANIDHI v5: DUAL MUHURTA SYSTEM — PHASE 1 STARTED (Oct 7, 2026):**
+    - **Strategic Insight:** Bollywood, political campaigns, major brands ALL use Muhurta timing for launches
+    - **Architecture:** TWO separate pages (Traditional + Modern) with different scoring algorithms
+    - **Timeline:** 7 weeks total (Phase 1: 1w | Phase 2: 3w | Phase 3: 2w | Phase 4: 1w)
+    - **Phase 1 Complete:**
+      - Defined all 27 classical Yogas (Auspicious + Inauspicious) with sources
+      - Defined 5 Reach/Publicity Yogas (for campaigns)
+      - Defined 4 Financial/Growth Yogas (for business)
+      - Integrated Numerological Muhurta (Pythagorean + Chaldean)
+      - Documented Tithi+Vara combinations + Chandrabala rules + Tarabala (verified)
+      - Documented Dagdha Tithi blocks + Rahu Kaal/Gulika timing
+      - Created TARANIDHI_V5_DUAL_MUHURTA_SPEC.md (comprehensive 300+ line specification)
+    - **Page 1: Traditional Muhurta**
+      - For: Marriage, property, surgery, health, education, travel, business (personal events)
+      - Scoring: Tarabala + Chandrabala + Paksha + 27 Yogas + Tithi+Vara + Nakshatra
+      - UI: Simple date picker → score + warnings + classical sources
+    - **Page 2: Modern Muhurta**
+      - For: Film releases, election campaigns, product launches, IPO, real estate, brand rebranding
+      - Scoring: Tarabala + Reach Yogas + Financial Yogas + Numerology + campaign bonus
+      - UI: Campaign type → date range scanner → Top 5 dates ranked with breakdowns
+    - **Market Opportunity:**
+      - Bollywood consults astrologers for release dates (₹100Cr+ box office dependent)
+      - Political campaigns time launches by Muhurta (national outcomes)
+      - Major brands time product launches (market entry, sales trajectory)
+      - Only product combining Traditional + Modern with classical source citations
+    - **Approval Gates (Pending Naveen confirmation):**
+      - ✅ 27 Yogas definition approved
+      - ❓ 5 Reach Yogas (Pushkara, Vyatipata, Guru, Saraswati, Chandra) — CONFIRM?
+      - ❓ 4 Financial Yogas (Lakshmi, Subha, Amrita, Dhana) — CONFIRM?
+      - ❓ Numerology: Both Pythagorean + Chaldean? Or preference?
+      - ❓ Campaign rules per category (Film/Politics/Product/IPO)? Any specific?
+    - **Next Step:** Phase 2 backend coding begins once gates approved (2026-10-14)
+    - **File:** `TARANIDHI_V5_DUAL_MUHURTA_SPEC.md` (complete specification)
+
 ---
 
 ## Current Blockers
