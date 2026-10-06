@@ -2,20 +2,20 @@
 
 Source: deep-research pass against classical texts (Muhurta Chintamani via Sharma's English
 translation + Sanskrit quotations, Brihat Samhita ch. 98-99 via Iyer, Narada Purana, Sanskrit
-Wikipedia, scholarly blogs). **Verse numbers marked "secondary" have NOT been checked against
-the Sanskrit edition. Sign-off needed from Naveen against his own books.**
+Wikipedia, scholarly blogs). **Rows marked PRIMARY were checked on 2026-10-07 against the scanned Hindi edition of
+Muhurta Chintamani (Naveen's upload, 207 pp.; book page = PDF page - 9). Other rows are still secondary.**
 Not reached in primary form: Muhurta Martanda/Deepika/Darpana, Narada Samhita, Vasishtha Samhita,
 Jyotirnibandha, Kalaprakashika, Karma Vipak Samhita. "Not found" there means "not checked".
 
 | Rule | Verified rule | Status | Code |
 |---|---|---|---|
-| Chandrabala | Always good 1,3,6,7,10,11; 2,5,9 good ONLY in Shukla Paksha; 4,8,12 bad (8 worst, traditional) | CONFIRMED (translation); verse no. not located | `horaScoring.getChandrabalaGate`, `professionalMuhurta` layer 5 |
-| Tarabala | Count from birth star, ÷9; good = 2,4,6,8,9; 3rd cycle all good; remedies gold/jaggery/vegetables/salt | CONFIRMED | `muhurta.calculateNavtara` |
-| Janma tara | MC lists it bad; exceptions: upanayana, second-born marriage. Authorities DISAGREE | DISPUTED — code keeps "neutral" (project decision); Karma Vipak attribution unverified | `muhurta.computeTara` |
+| Chandrabala | Always good 1,3,6,7,10,11; 2,5,9 good ONLY in Shukla Paksha; 4,8,12 bad (8 worst, traditional) | **PRIMARY**: MC Gocharaprakarana v.1-4 (book pp.64-67, PDF 73-76). Moon good from Janma Rashi in 1,3,6,7,10,11; v.4 "sité abjah dvikone shubhah": 2,5,9 good only in Shukla; 2,4,5,8,9,12 otherwise ashubha. 8-worst NOT stated there (tradition). NEW: MC adds *vedha* (a planet in the obstructing house cancels a good Moon) - not implemented | `horaScoring.getChandrabalaGate`, `professionalMuhurta` layer 5 |
+| Tarabala | Count from birth star, ÷9; good = 2,4,6,8,9; 3rd cycle all good; remedies gold/jaggery/vegetables/salt | **PRIMARY**: MC Gochara v.10-13 (book pp.70-71, PDF 79-80): names 1 Janma,2 Sampat,3 Vipat,4 Kshema,5 Pratyari,6 Sadhaka,7 Vadha,8 Maitra,9 Atimaitra; remedies gold-sesame (Vadha), jaggery (Vipat), vegetables (Janma), salt (Pratyari); cycle 1 (1-27th star) Vipat/Pratyari/Vadha fully bad; cycle 2 (to 18th): Vipat first 1/3 bad, Pratyari middle 1/3 bad, Vadha last 1/3 bad; cycle 3 (to 9th) all good | `muhurta.calculateNavtara` |
+| Janma tara | MC lists it bad; exceptions: upanayana, second-born marriage. Authorities DISAGREE | **PRIMARY CONFLICT**: MC Shubhashubha v.34 lists *janma-nakshatra, janma-masa, janma-tithi* as varjya for all auspicious work, and v.12/13 give Janma a remedy (vegetables) - so MC does NOT support "neutral". Code still "neutral" pending Naveen's decision; Karma Vipak attribution still unverified | `muhurta.computeTara` |
 | Nitya Yoga names/order | 27, standard order, (Sun+Moon)/13°20' | CONFIRMED; Surya Siddhanta verse not located | `muhurta.getNityaYoga` |
-| Nitya Yoga rejection | Whole yoga: Vyatipata, Vaidhriti. Opening ghatis only: Vishkambha 3, Vajra 3, Parigha half, Shula 5, Ganda 6, Atiganda 6, Vyaghata 9 | CONFIRMED (secondary cite "MC 1.34-35"); proportional-by-arc reading is an implementation choice | `muhurta.getNityaYoga`, convergence + professional scoring |
-| Dagdha/Visha/Hutashana tithi | Dagdha: Sun 12, Mon 11, Tue 5, Wed 3, Thu 6, Fri 8, Sat 9 | CONFIRMED | frontend `taranidhi-v4.html` only; not in worker |
-| Amavasya | Rejected for auspicious work (MC 1.34, secondary) | CONFIRMED | `convergenceIndex.calculateTithiScore` (fixed) |
+| Nitya Yoga rejection | Whole yoga: Vyatipata, Vaidhriti. Opening ghatis only: Vishkambha 3, Vajra 3, Parigha half, Shula 5, Ganda 6, Atiganda 6, Vyaghata 9 | **PRIMARY**: MC Shubhashubha v.34-35 (book pp.16-17, PDF 25-26) matches exactly; also Bhadra, Amavasya, kshaya/vriddhi tithi, kshaya/adhika masa, kulika, ardhayama, mahapata. `verified` flag now true. Proportional-by-arc reading is an implementation choice | `muhurta.getNityaYoga`, convergence + professional scoring |
+| Dagdha/Visha/Hutashana *yogas* | Dagdha: Sun 12, Mon 11, Tue 5, Wed 3, Thu 6, Fri 8, Sat 9 | Table confirmed earlier (secondary). PRIMARY: MC v.41 (PDF 28) says Mrityu/Krakacha/Dagdha/Visha/Hutashana yogas turn shubha when Moon is favourable (some: after one prahara; some: bad only for travel) | frontend `taranidhi-v4.html` only; not in worker |
+| Amavasya | Rejected for auspicious work (MC 1.34, secondary) | **PRIMARY**: MC v.34-35 lists Amavasya, kshaya & vriddhi tithi, kshaya/adhika masa as varjya | `convergenceIndex.calculateTithiScore` (fixed; kshaya/vriddhi/masa not coded) |
 | Abhijit | 8th of 15 day-muhurtas, ~midday; only exception: travel to the south | CONFIRMED; Wednesday and Monday-eastward claims NOT FOUND (removed); "MC 2.1-3" wrong | `muhurta.getAbhijitMuhurta` |
 | Surgery in Krishna Paksha | No classical verse found; "MC 5.2" is the Samskara prakarana | NOT FOUND — claim withdrawn. Closest: MC Bhaishajya verse (Laghu/Mridu/Chara or Mula nakshatra, dual-sign lagna, 12/7/8 clear, never the birth nakshatra) | not in code |
 | Rahu Kala / Yamaganda / Gulika | Absent from MC/BS rejection lists; later, mainly South Indian tradition | LATER TRADITION — keep, label | `muhurta.getRahuKaal` (comment) |
@@ -25,8 +25,14 @@ Jyotirnibandha, Kalaprakashika, Karma Vipak Samhita. "Not found" there means "no
 | Lakshmi/Saraswati/Dhana/Guru/Chandrama yogas | Natal-chart yogas, not Muhurta criteria | NOT valid as Muhurta criteria | — |
 | Amrita/Siddha yoga, Sarvartha-siddhi | Weekday+tithi / weekday+nakshatra yogas — valid | CONFIRMED in kind | `muhurta` AMRIT_SIDDHI table (verse cite unverified) |
 
+## New from primary text (2026-10-07), not yet in code
+- Pakshrandhra tithis (4,6,8,9,12,14): avoid first 8,9,14,24,10,5 dandas respectively (MC v.36, PDF 26).
+- Kulika/Kalavela/Yamaghanta/Kantaka day-muhurtas per weekday + table (MC v.37-39, PDF 26-27) - classical, unlike Rahu Kala.
+- Holashtaka: 8 days before Holika barred for marriage in Vipasha/Airavati/Shatadru/Tripushkara regions only (v.40).
+- Gochar vedha (v.1-5, PDF 73-76), Shunya Nakshatra/Rashi/Tithi (PDF 16-17).
+
 ## Still open (needs Naveen's books / decisions)
-1. Verify Chandrabala, tara, Nitya Yoga rejection against the Sanskrit edition; then flip `verified` flags.
+1. ~~Verify Chandrabala, tara, Nitya Yoga~~ DONE against Hindi MC. Still unchecked: Abhijit exception, Amrit-Siddhi table, Dagdha weekday table, Surgery/Bhaishajya, purpose-specific hora. The GitHub books repo is not reachable from this session (see chat note); upload specific PDFs if needed.
 2. Janma tara default: keep neutral, or follow MC (bad)? Public blog copy (`frontend/src/screens/public-blog.ts`) claims Karma Vipak Samhita as the source — unverified.
 3. Tithi scoring tiers in `convergenceIndex` are proprietary and not derived from Nanda/Bhadra/Jaya/Rikta/Purna + paksha grading; Masa-shunya tithis, kshaya/vriddhi rejection, Krakacha/Samvartaka are missing.
 4. Dagdha tithi exists only in the v4 HTML; port to worker with a test.

@@ -76,8 +76,8 @@ describe("Nitya Yoga rejection (Muhurta Chintamani rule)", () => {
     }
   });
 
-  it("is flagged unverified until FACT_CHECK sign-off against the Sanskrit edition", () => {
-    expect(getNityaYoga(0, 0).verified).toBe(false);
+  it("is marked verified (MC 34-35 checked against the Hindi edition)", () => {
+    expect(getNityaYoga(0, 0).verified).toBe(true);
   });
 });
 

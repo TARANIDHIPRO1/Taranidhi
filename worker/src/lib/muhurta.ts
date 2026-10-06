@@ -587,8 +587,11 @@ export const NITYA_YOGA_NAMES = [
 // for the WHOLE yoga. The other seven "bad" yogas are rejected only for their
 // OPENING ghatis:
 //   Vishkambha 3, Vajra 3, Parigha half (= 30), Shula 5, Ganda 6, Atiganda 6, Vyaghata 9.
-// Verse reference: "MC Shubhashubha 1.34-35" comes from a secondary citation
-// and is NOT yet checked against the Sanskrit edition (verified=false).
+// Source CHECKED 2026-10-07 against the Hindi edition of Muhurta Chintamani
+// (Shubhabhaprakarana verses 34-35, book pp.16-17 / PDF pp.25-26): Vyatipata and
+// Vaidhriti whole; Vishkambha 3, Vajra 3, Parigha purvardha, Shula 5, Ganda 6,
+// Atiganda 6, Vyaghata 9 dandas. Verse 41 adds: Mrityu/Krakacha/Dagdha/Visha/Hutashana
+// yogas are shubha when the Moon is favourable (not implemented).
 //
 // A ghati is 1/60 of a day; a Nitya Yoga lasts ~56 ghatis, so the rule is applied
 // proportionally by ARC: one ghati = (360/27)/60 degrees of the yoga. This
@@ -619,7 +622,7 @@ export interface NityaYogaResult {
   /** For "opening" yogas: arc (deg) of the rejected opening portion. */
   rejectedUptoDeg: number | null;
   note: string;
-  verified: false; // flips only after FACT_CHECK sign-off against the Sanskrit edition
+  verified: true; // MC Shubhashubha-prakarana 34-35 checked against Hindi edition 2026-10-07 (ghati-by-arc split is an implementation choice)
 }
 
 export function getNityaYoga(sunLon: number, moonLon: number): NityaYogaResult {
@@ -648,7 +651,7 @@ export function getNityaYoga(sunLon: number, moonLon: number): NityaYogaResult {
 
   let note: string;
   if (rejection === "full") {
-    note = `${name} Yoga is rejected for the whole yoga for auspicious work (Muhurta Chintamani rule; verse unverified).`;
+    note = `${name} Yoga is rejected for the whole yoga for auspicious work (Muhurta Chintamani, Shubhashubha-prakarana 34-35).`;
   } else if (rejection === "opening") {
     note = rejectedNow
       ? `${name} Yoga: inside its rejected opening portion (first ${NITYA_YOGA_OPENING_GHATIS[index]} ghatis) — avoid new auspicious work now.`
@@ -658,7 +661,7 @@ export function getNityaYoga(sunLon: number, moonLon: number): NityaYogaResult {
   } else {
     note = `${name} Yoga — neutral quality, no specific prohibition or promotion.`;
   }
-  return { index, name, quality, rejection, rejectedNow, degreesIntoYoga, rejectedUptoDeg, note, verified: false };
+  return { index, name, quality, rejection, rejectedNow, degreesIntoYoga, rejectedUptoDeg, note, verified: true };
 }
 
 // ── Full 11 Karanas (7 Movable + 4 Fixed) ──
