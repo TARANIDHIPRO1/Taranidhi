@@ -38,3 +38,6 @@ Jyotirnibandha, Kalaprakashika, Karma Vipak Samhita. "Not found" there means "no
 4. Dagdha tithi exists only in the v4 HTML; port to worker with a test.
 5. Campaign (film/election/product) Muhurta: only classical analogues exist (Rajyabhisheka, Yatra, trade); any "campaign" scoring is contemporary practice and must be labelled so.
 6. Pre-existing failing test: `upahora.test.ts` "each uphora duration = horaDuration / 7".
+
+## Upaya (remedies) — premium package
+Saved in `worker/src/lib/upaya.ts` (+ test). Only book-cited remedies: Tara dosha (Janma: vegetables; Vipat: jaggery; Pratyari: salt; Vadha: sesame with gold) and planet substitutes (MC Gochara v.10-13, pp.70-71). Other upaya (Ganda Moola, Dishashool, Bhadra) were read in an earlier chat from the same book but that report is not in this repo — re-extract with page cites before adding. Not yet exposed in any API route or paywalled in the UI.
