@@ -15,3 +15,18 @@ describe("upaya (Muhurta Chintamani Gochara v.10-13)", () => {
     for (const u of Object.values(PLANET_SUBSTITUTE)) { expect(u.tier).toBe("premium"); expect(u.source).toMatch(/MC/); }
   });
 });
+
+import { getUpayaForTara } from "../upaya";
+describe("getUpayaForTara", () => {
+  it("cycle 1 Vadha (7th star) -> sesame with gold", () => {
+    const r = getUpayaForTara(0, 6);
+    expect(r.tara.position).toBe(7);
+    expect(r.upaya?.action).toMatch(/sesame/i);
+  });
+  it("cycle 3 Vadha -> no remedy; Janma always has one", () => {
+    expect(getUpayaForTara(0, 24).tara.cycle).toBe(3);
+    expect(getUpayaForTara(0, 24).upaya).toBeNull();
+    expect(getUpayaForTara(0, 0).upaya?.action).toMatch(/vegetables/i);
+  });
+  it("good tara (Sampat) -> none", () => { expect(getUpayaForTara(0, 1).upaya).toBeNull(); });
+});

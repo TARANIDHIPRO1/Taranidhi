@@ -39,3 +39,46 @@ export const PLANET_SUBSTITUTE: Record<string, Upaya> = {
 export function getTaraUpaya(taraNumber: number): Upaya | null {
   return TARA_DOSHA_UPAYA[taraNumber] ?? null;
 }
+
+import { calculateNavtara } from "./muhurta";
+
+export interface TaraUpayaResult {
+  tara: { position: number; name: string; cycle: number; effectiveQuality: string };
+  upaya: Upaya | null;
+  note: string;
+}
+
+/**
+ * Remedy for the tara between a birth nakshatra and a day's nakshatra (0..26 each).
+ * Book: Vipat/Pratyari/Vadha are wholly bad only in cycle 1; cycle 2 is partly bad; cycle 3 wholly good
+ * (v.13), so cycle-3 gets no remedy. Janma carries its remedy in every cycle (v.13).
+ */
+export function getUpayaForTara(birthNakIdx: number, queryNakIdx: number): TaraUpayaResult {
+  const t = calculateNavtara(birthNakIdx, queryNakIdx);
+  const tara = { position: t.position, name: t.name, cycle: t.cycle, effectiveQuality: t.effectiveQuality };
+  let upaya = getTaraUpaya(t.position);
+  let note = upaya ? "Traditional remedy per Muhurta Chintamani." : "This tara needs no remedy.";
+  if (upaya && t.cycle === 3 && t.position !== 1) {
+    upaya = null;
+    note = "Third cycle: this tara is wholly favourable (MC Gochara v.13); no remedy needed.";
+  } else if (upaya && t.cycle === 2 && t.position !== 1) {
+    note += " Second cycle: only part of the nakshatra is adverse; remedy advised if the Moon is in the adverse part.";
+  }
+  return { tara, upaya, note };
+}
+
+// PARIHARA (exemptions) from MC Shubhashubha v.42 (book p.20, PDF p.29) -- not remedies to perform.
+export const PARIHARA_AFTER_MIDDAY = {
+  items: ["Bhadra (Vishti)", "Mangalvara", "Vyatipata", "Vaidhriti", "Pratyari tara", "Janma nakshatra"],
+  rule: "These become shubha after madhyahna (midday).",
+  source: "MC Shubhashubha v.42, p.20",
+  tier: "premium" as UpayaTier,
+};
+
+// Mula/Ashlesha births: MC prescribes shanti (propitiatory rite) without naming materials (v.52-54, pp.49-50).
+export const MULA_SHANTI = {
+  appliesTo: "Birth in Mula / Jyeshtha-end (abhuktamula) and Ashlesha",
+  action: "Perform shanti; with shanti all four padas turn shubha",
+  source: "MC Nakshatraprakarana v.54, p.50",
+  tier: "premium" as UpayaTier,
+};

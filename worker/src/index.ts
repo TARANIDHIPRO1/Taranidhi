@@ -29,6 +29,7 @@ import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
+import { handleMuhurtaUpaya } from "./routes/muhurtaUpaya";
 import { handleGetKundaliChart } from "./routes/kundaliChart";
 import { handleGetNumerology } from "./routes/numerology";
 import {
@@ -140,6 +141,9 @@ export default {
     }
     if (request.method === "GET" && pathname === "/muhurta/professional") {
       return handleMuhurtaProfessional(request, env);
+    }
+    if (request.method === "GET" && pathname === "/muhurta/upaya") {
+      return handleMuhurtaUpaya(request, env);
     }
 
     if (request.method === "GET" && pathname === "/numerology") {
