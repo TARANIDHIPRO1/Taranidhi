@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TaraNidhi — Panchang Pro</title>
+<style>
+:root {
+  /* Five Elements Color Tokens */
+  --akash: #8B5CF6;    /* Purple — Birth Charts */
+  --agni:  #F97316;    /* Orange — Muhurta */
+  --jal:   #0EA5E9;    /* Cyan  — Numerology */
+  --vayu:  #06B6D4;    /* Teal  — Recommendations */
+  --prithvi:#10B981;   /* Green — Wallet/Account */
+
+  /* Dark Theme (default) */
+  --bg:       #0A0A0F;
+  --bg2:      #12121A;
+  --bg3:      #1A1A26;
+  --border:   #2A2A3E;
+  --text:     #E8E8F0;
+  --text2:    #9898B0;
+  --text3:    #5A5A78;
+  --card:     #16162A;
+  --card2:    #1E1E32;
+  --overlay:  rgba(0,0,0,0.85);
+
+  /* Typography */
+  --font-display: 'Poppins', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  /* Spacing (8px base) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px;
+  --s8:32px; --s10:40px; --s12:48px;
+
+  /* Radii */
+  --r1:4px; --r2:8px; --r3:12px; --r4:16px; --r5:20px;
+
+  /* Shadows */
+  --shadow: 0 4px 24px rgba(0,0,0,0.6);
+  --glow-akash: 0 0 20px rgba(139,92,246,0.3);
+  --glow-agni:  0 0 20px rgba(249,115,22,0.3);
+}
+
+[data-theme="light"] {
+  --bg:     #F5F5FA;
+  --bg2:    #EEEEFC;
+  --bg3:    #FFFFFF;
+  --border: #D0D0E8;
+  --text:   #1A1A2E;
+  --text2:  #5A5A78;
+  --text3:  #9898B0;
+  --card:   #FFFFFF;
+  --card2:  #F0F0FA;
+  --overlay: rgba(0,0,0,0.6);
+  --shadow: 0 4px 24px rgba(0,0,40,0.1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  height:100%; width:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.5;
+  overflow:hidden;
+}
+
+/* ── APP SHELL ─────────────────────────────── */
+#app{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  max-width:480px;
+  margin:0 auto;
+  background:var(--bg);
+  position:relative;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+#header{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:var(--s2) var(--s4);
+  display:flex;
+  flex-direction:column;
+  gap:var(--s1);
+  flex-shrink:0;
+  z-index:10;
+}
+
+.header-row1{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-family:var(--font-display);
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(135deg, var(--akash), var(--agni));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-0.5px;
+}
+
+.logo span{
+  font-size:11px;
+  font-weight:400;
+  opacity:0.7;
+  display:block;
+  letter-spacing:1.5px;
+  background:none;
+  -webkit-text-fill-color:var(--text2);
+  margin-top:-4px;
+}
+
+.header-controls{
+  display:flex;
+  align-items:center;
+  gap:var(--s2);
+}
+
+.icon-btn{
+  width:32px;height:32px;
+  border-radius:var(--r2);
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-size:16px;
+  transition:all .2s;
+}
+.icon-btn:active{transform:scale(0.93);}
+
+.lang-btn{
+  font-size:12px;
+  font-weight:600;
+  padding:0 var(--s2);
+  min-width:36px;
+  letter-spacing:0.5px;
+}
+
+#license-badge{
+  font-size:10px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:20px;
+  letter-spacing:1px;
+}
+.badge-demo  {background:rgba(249,115,22,.15);color:#F97316;border:1px solid rgba(249,115,22,.4);}
+.badge-basic {background:rgba(14,165,233,.15);color:#0EA5E9;border:1px solid rgba(14,165,233,.4);}
+.badge-pro   {background:rgba(139,92,246,.15);color:#8B5CF6;border:1px solid rgba(139,92,246,.4);}
+.badge-ultra {background:rgba(251,191,36,.15);color:#FBbf24;border:1px solid rgba(251,191,36,.4);}
+
+.header-row2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+#live-clock{
+  font-family:var(--font-mono);
+  font-size:18px;
+  font-weight:600;
+  color:var(--agni);
+  letter-spacing:1px;
+}
+
+#gps-loc{
+  font-size:12px;
+  color:var(--text2);
+  display:flex;align-items:center;gap:4px;
+}
+#gps-loc .dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--prithvi);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── CONTENT AREA ────────────────────────────── */
+#content{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+}
+
+.tab-page{
+  display:none;
+  padding:var(--s4);
+  min-height:100%;
+  animation:fadeIn .2s ease;
+}
+.tab-page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ──────────────────────────────── */
+#bottom-nav{
+  display:flex;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+  z-index:10;
+}
+
+.nav-tab{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  padding:var(--s2) 0 calc(var(--s2) + env(safe-area-inset-bottom, 0px));
+  cursor:pointer;
+  transition:all .2s;
+  border:none;
+  background:none;
+  color:var(--text3);
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-tab.active{color:var(--agni);}
+.nav-tab:active{opacity:.7;}
+.nav-tab .icon{font-size:22px;}
+.nav-tab .label{font-size:10px;font-weight:500;letter-spacing:0.3px;}
+
+/* ── CARDS ───────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s3);
+}
+.card-header{
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  color:var(--text2);
+  text-transform:uppercase;
+  margin-bottom:var(--s3);
+  display:flex;
+  align-items:center;
+  gap:var(--s2);
+}
+.card-header::before{
+  content:'';
+  width:3px;height:14px;
+  border-radius:2px;
+  background:var(--agni);
+  display:block;
+}
+
+/* ── PANCHANG GRID ───────────────────────────── */
+.panch-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:var(--s2);
+}
+.panch-item{
+  background:var(--card2);
+  border-radius:var(--r2);
+  padding:var(--s3);
+}
+.panch-label{
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  margin-bottom:2px;
+}
+.panch-value{
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+}
+.panch-sub{
+  font-size:10px;
+  color:var(--text2);
+  margin-top:1px;
+}
+
+/* ── MUHURTA QUERY ───────────────────────────── */
+.query-section{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s3);
+}
+
+.query-label{
+  font-size:12px;
+  font-weight:600;
+  color:var(--text2);
+  letter-spacing:0.5px;
+  margin-bottom:4px;
+}
+
+.select-wrap{
+  position:relative;
+}
+.select-wrap select,.select-wrap input{
+  width:100%;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:12px var(--s4);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:14px;
+  appearance:none;
+  outline:none;
+  transition:border-color .2s;
+}
+.select-wrap select:focus,.select-wrap input:focus{border-color:var(--agni);}
+.select-wrap::after{
+  content:'▾';
+  position:absolute;
+  right:var(--s4);
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--text2);
+  pointer-events:none;
+}
+.select-wrap input + ::after{display:none;}
+
+.event-categories{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:var(--s2);
+}
+.cat-btn{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:var(--s2) var(--s1);
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cat-btn:active{transform:scale(0.95);}
+.cat-btn.selected{
+  border-color:var(--agni);
+  background:rgba(249,115,22,.1);
+}
+.cat-btn .cat-icon{font-size:20px;margin-bottom:2px;}
+.cat-btn .cat-name{font-size:10px;color:var(--text2);font-weight:500;}
+
+.query-btn{
+  width:100%;
+  background:linear-gradient(135deg,var(--agni),#E8630A);
+  border:none;
+  border-radius:var(--r3);
+  padding:14px;
+  color:#fff;
+  font-family:var(--font-body);
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:var(--s2);
+  letter-spacing:0.5px;
+  transition:all .2s;
+  box-shadow:0 4px 16px rgba(249,115,22,0.35);
+}
+.query-btn:active{transform:scale(0.98);box-shadow:none;}
+
+/* ── RESULT OVERLAY ──────────────────────────── */
+#result-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:var(--overlay);
+  z-index:100;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#result-overlay.show{display:block;}
+
+#result-panel{
+  background:var(--bg2);
+  min-height:100%;
+  padding:var(--s4);
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.result-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:var(--s5);
+}
+.result-title{
+  font-family:var(--font-display);
+  font-size:18px;
+  font-weight:700;
+}
+.close-btn{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* VERDICT BANNER */
+.verdict-banner{
+  border-radius:var(--r3);
+  padding:var(--s5) var(--s4);
+  text-align:center;
+  margin-bottom:var(--s4);
+  border:1px solid;
+}
+.verdict-banner.go    {background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4);}
+.verdict-banner.caution{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);}
+.verdict-banner.stop  {background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4);}
+
+.verdict-emoji{font-size:40px;margin-bottom:var(--s2);}
+.verdict-label{
+  font-family:var(--font-display);
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+.verdict-banner.go     .verdict-label{color:#10B981;}
+.verdict-banner.caution .verdict-label{color:#FBbf24;}
+.verdict-banner.stop   .verdict-label{color:#EF4444;}
+.verdict-sub{font-size:13px;color:var(--text2);margin-top:var(--s1);}
+
+/* PRABHAAV METER */
+.prabhaav-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s4);
+}
+.prabhaav-label{
+  font-size:12px;
+  color:var(--text2);
+  letter-spacing:0.5px;
+  margin-bottom:var(--s3);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.prabhaav-score{
+  font-family:var(--font-display);
+  font-size:28px;
+  font-weight:800;
+  color:var(--agni);
+}
+.prabhaav-bar{
+  height:10px;
+  background:var(--bg3);
+  border-radius:5px;
+  overflow:hidden;
+  margin-bottom:var(--s2);
+}
+.prabhaav-fill{
+  height:100%;
+  border-radius:5px;
+  background:linear-gradient(90deg,#EF4444,#FBbf24,#10B981);
+  transition:width .8s cubic-bezier(0.34,1.56,0.64,1);
+}
+.prabhaav-dots{
+  display:flex;
+  justify-content:space-between;
+}
+.prabhaav-dot{
+  width:20px;height:20px;
+  border-radius:50%;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;
+  font-weight:700;
+  color:var(--text3);
+  transition:all .3s;
+}
+.prabhaav-dot.active{
+  border-color:var(--agni);
+  background:var(--agni);
+  color:#fff;
+}
+
+/* 6W FRAMEWORK */
+.sixw-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:var(--s2);
+  margin-bottom:var(--s4);
+}
+.sixw-item{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:var(--s3);
+}
+.sixw-key{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--agni);
+  margin-bottom:4px;
+}
+.sixw-val{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.3;
+}
+.sixw-item:nth-child(1){border-left:3px solid var(--akash);}
+.sixw-item:nth-child(2){border-left:3px solid var(--agni);}
+.sixw-item:nth-child(3){border-left:3px solid var(--jal);}
+.sixw-item:nth-child(4){border-left:3px solid var(--vayu);}
+.sixw-item:nth-child(5){border-left:3px solid var(--prithvi);}
+.sixw-item:nth-child(6){border-left:3px solid var(--akash);}
+.sixw-item:nth-child(7){
+  grid-column:1/-1;
+  border-left:3px solid var(--agni);
+}
+
+/* TIMING WINDOW */
+.timing-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s4);
+}
+.timing-header{
+  font-size:12px;
+  color:var(--text2);
+  letter-spacing:0.5px;
+  margin-bottom:var(--s3);
+  display:flex;align-items:center;gap:var(--s2);
+}
+.timing-main{
+  display:flex;
+  align-items:center;
+  gap:var(--s3);
+}
+.timing-time{
+  font-family:var(--font-mono);
+  font-size:22px;
+  font-weight:700;
+  color:var(--text);
+}
+.timing-arrow{
+  color:var(--text3);
+  font-size:18px;
+}
+.timing-dur{
+  font-size:11px;
+  color:var(--text2);
+  margin-top:4px;
+}
+.timing-live{
+  margin-top:var(--s3);
+  display:flex;align-items:center;gap:var(--s2);
+  font-size:12px;
+  color:var(--prithvi);
+  font-weight:500;
+}
+
+/* SCORE BREAKDOWN */
+.score-breakdown{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s4);
+}
+.score-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:var(--s2) 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.score-row:last-child{border-bottom:none;}
+.score-name{color:var(--text2);}
+.score-val{
+  font-weight:700;
+  font-family:var(--font-mono);
+}
+.score-val.pos{color:var(--prithvi);}
+.score-val.neg{color:#EF4444;}
+.score-val.neu{color:var(--text2);}
+.score-total{
+  padding-top:var(--s2);
+  font-size:15px;
+  font-weight:800;
+  color:var(--text);
+}
+
+/* ── HORA TABLE ──────────────────────────────── */
+.hora-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.hora-table th{
+  background:var(--card2);
+  padding:var(--s2) var(--s3);
+  text-align:left;
+  color:var(--text2);
+  font-size:10px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.hora-table td{
+  padding:var(--s2) var(--s3);
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  vertical-align:middle;
+}
+.hora-table tr.current-hora{background:rgba(249,115,22,.08);}
+.hora-table tr.current-hora td:first-child{
+  border-left:3px solid var(--agni);
+}
+.hora-lord-sym{
+  display:inline-flex;
+  width:24px;height:24px;
+  border-radius:50%;
+  align-items:center;justify-content:center;
+  font-size:14px;
+  margin-right:4px;
+}
+
+/* ── CALENDAR ────────────────────────────────── */
+.cal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:var(--s4);
+}
+.cal-title{
+  font-family:var(--font-display);
+  font-size:16px;
+  font-weight:700;
+}
+.cal-nav-btn{
+  width:32px;height:32px;
+  border-radius:var(--r2);
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;
+}
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:2px;
+}
+.cal-dow{
+  text-align:center;
+  font-size:10px;
+  color:var(--text3);
+  padding:var(--s1) 0;
+  font-weight:600;
+  letter-spacing:0.5px;
+}
+.cal-day{
+  aspect-ratio:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:var(--r1);
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+  font-size:13px;
+}
+.cal-day:active{transform:scale(0.9);}
+.cal-day.today{background:var(--agni);color:#fff;font-weight:700;border-radius:50%;}
+.cal-day.selected{border:1px solid var(--agni);color:var(--agni);}
+.cal-day.other-month{color:var(--text3);}
+.cal-day.shubh::after{
+  content:'';
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--prithvi);
+  position:absolute;bottom:2px;
+}
+.cal-day.ashubh::after{
+  content:'';
+  width:5px;height:5px;
+  border-radius:50%;
+  background:#EF4444;
+  position:absolute;bottom:2px;
+}
+.cal-day.dagdha::after{
+  background:#FBbf24;
+}
+
+/* ── ABHIJEET CARD ───────────────────────────── */
+.abhijeet-card{
+  background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(139,92,246,.08));
+  border:1px solid rgba(249,115,22,.3);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s3);
+}
+.abhijeet-title{
+  font-family:var(--font-display);
+  font-size:15px;
+  font-weight:700;
+  color:var(--agni);
+  margin-bottom:var(--s2);
+  display:flex;align-items:center;gap:var(--s2);
+}
+.abhijeet-window{
+  display:flex;align-items:center;gap:var(--s3);
+  margin-bottom:var(--s2);
+}
+.abhijeet-time{
+  font-family:var(--font-mono);
+  font-size:18px;
+  font-weight:700;
+}
+.abhijeet-dur{
+  font-size:12px;
+  color:var(--text2);
+}
+.abhijeet-live{
+  display:inline-flex;
+  align-items:center;gap:4px;
+  background:rgba(249,115,22,.15);
+  color:var(--agni);
+  border-radius:20px;
+  padding:2px 10px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.5px;
+}
+
+/* ── GOLDEN WINDOW ───────────────────────────── */
+.golden-card{
+  background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(249,115,22,.08));
+  border:1px solid rgba(251,191,36,.4);
+  border-radius:var(--r3);
+  padding:var(--s4);
+  margin-bottom:var(--s3);
+}
+.golden-title{
+  font-size:12px;
+  font-weight:700;
+  color:#FBbf24;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:var(--s2);
+}
+.golden-time{
+  font-family:var(--font-mono);
+  font-size:20px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.golden-lord{
+  font-size:12px;
+  color:var(--text2);
+}
+
+/* ── MORE TAB ────────────────────────────────── */
+.astrologer-card{
+  background:linear-gradient(135deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:var(--r4);
+  padding:var(--s5) var(--s4);
+  text-align:center;
+  margin-bottom:var(--s4);
+}
+.astrologer-avatar{
+  width:80px;height:80px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--akash),var(--agni));
+  margin:0 auto var(--s3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;
+}
+.astrologer-name{
+  font-family:var(--font-display);
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:2px;
+}
+.astrologer-tagline{
+  font-size:12px;
+  color:var(--text2);
+  margin-bottom:var(--s4);
+}
+.social-row{
+  display:flex;
+  gap:var(--s2);
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.social-btn{
+  display:flex;align-items:center;gap:var(--s1);
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:var(--s2) var(--s3);
+  color:var(--text);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s;
+}
+.social-btn:active{opacity:.7;}
+
+.settings-list{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  overflow:hidden;
+}
+.settings-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--s4);
+  border-bottom:1px solid var(--border);
+}
+.settings-item:last-child{border-bottom:none;}
+.settings-label{font-size:14px;font-weight:500;}
+.settings-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+
+.toggle{
+  width:44px;height:24px;
+  border-radius:12px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  position:relative;
+  cursor:pointer;
+  transition:background .2s;
+}
+.toggle.on{background:var(--agni);}
+.toggle::after{
+  content:'';
+  width:18px;height:18px;
+  border-radius:50%;
+  background:#fff;
+  position:absolute;
+  top:2px;left:2px;
+  transition:transform .2s;
+}
+.toggle.on::after{transform:translateX(20px);}
+
+/* ── TOASTS ─────────────────────────────────── */
+#toast{
+  position:fixed;
+  bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  padding:10px 20px;
+  font-size:13px;
+  white-space:nowrap;
+  box-shadow:var(--shadow);
+  opacity:0;
+  transition:all .3s;
+  z-index:200;
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── LOADER ──────────────────────────────────── */
+.spinner{
+  width:32px;height:32px;
+  border:3px solid var(--border);
+  border-top-color:var(--agni);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  margin:var(--s8) auto;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SCROLLBAR ───────────────────────────────── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── DAGDHA WARNING ──────────────────────────── */
+.dagdha-warning{
+  background:rgba(251,191,36,.1);
+  border:1px solid rgba(251,191,36,.4);
+  border-radius:var(--r2);
+  padding:var(--s3) var(--s4);
+  font-size:12px;
+  color:#FBbf24;
+  display:flex;align-items:flex-start;gap:var(--s2);
+  margin-bottom:var(--s3);
+}
+.dagdha-warning .dw-icon{font-size:18px;flex-shrink:0;}
+
+/* ── NAKSHATRA SYMBOL ────────────────────────── */
+.nak-symbol{
+  display:inline-block;
+  font-size:20px;
+  margin-right:var(--s2);
+}
+
+/* ── AYANAMSA SELECTOR ───────────────────────── */
+.ayanamsa-bar{
+  display:flex;
+  gap:var(--s2);
+  margin-bottom:var(--s3);
+}
+.ayanamsa-btn{
+  flex:1;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:var(--s2);
+  text-align:center;
+  font-size:11px;
+  font-weight:600;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all .2s;
+}
+.ayanamsa-btn.active{
+  background:rgba(249,115,22,.15);
+  border-color:var(--agni);
+  color:var(--agni);
+}
+
+/* ── SECTION DIVIDER ─────────────────────────── */
+.section-divider{
+  display:flex;align-items:center;gap:var(--s3);
+  margin:var(--s4) 0;
+}
+.section-divider::before,.section-divider::after{
+  content:'';flex:1;
+  height:1px;background:var(--border);
+}
+.section-divider span{
+  font-size:11px;
+  color:var(--text3);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* ── UPHORA TABLE ────────────────────────────── */
+.uphora-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+}
+.uphora-table th{
+  background:var(--card2);
+  padding:var(--s1) var(--s2);
+  text-align:left;
+  color:var(--text3);
+  font-size:10px;
+  letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);
+}
+.uphora-table td{
+  padding:5px var(--s2);
+  border-bottom:1px solid var(--border);
+  color:var(--text2);
+}
+.uphora-table tr.current-uphora{background:rgba(251,191,36,.08);}
+.uphora-table tr.current-uphora td{color:var(--text);}
+.uphora-table tr.golden-uphora td:first-child{
+  border-left:2px solid #FBbf24;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="header-row1">
+      <div class="logo">TaraNidhi<span>PANCHANG PRO</span></div>
+      <div class="header-controls">
+        <span id="license-badge" class="badge-demo">DEMO</span>
+        <button class="icon-btn lang-btn" id="lang-toggle" onclick="toggleLang()" title="भाषा / Language">EN</button>
+        <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Dark/Light">🌙</button>
+      </div>
+    </div>
+    <div class="header-row2">
+      <div id="live-clock">--:--:--</div>
+      <div id="gps-loc"><div class="dot"></div><span id="loc-text">Locating...</span></div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- TAB: MUHURTA -->
+    <div class="tab-page active" id="tab-muhurta">
+      <div class="query-section">
+        <div class="card-header">🔮 <span data-i18n="muhurta.query">Muhurta Query</span></div>
+
+        <!-- Event Category Grid -->
+        <div>
+          <div class="query-label" data-i18n="muhurta.selectEvent">Select Event Type</div>
+          <div class="event-categories" id="cat-grid"></div>
+        </div>
+
+        <!-- Date Selector -->
+        <div class="select-wrap">
+          <input type="date" id="query-date" />
+        </div>
+
+        <!-- Ayanamsa Selector -->
+        <div>
+          <div class="query-label">Ayanamsa System</div>
+          <div class="ayanamsa-bar">
+            <div class="ayanamsa-btn active" onclick="setAyanamsa('lahiri',this)">Lahiri</div>
+            <div class="ayanamsa-btn" onclick="setAyanamsa('kp',this)">KP</div>
+            <div class="ayanamsa-btn" onclick="setAyanamsa('raman',this)">Raman</div>
+            <div class="ayanamsa-btn" onclick="setAyanamsa('fagan',this)">Fagan</div>
+          </div>
+        </div>
+
+        <!-- Query Button -->
+        <button class="query-btn" onclick="runQuery()">
+          🔮 <span data-i18n="muhurta.calculate">Calculate Muhurta</span>
+        </button>
+
+        <!-- Abhijeet Card -->
+        <div class="abhijeet-card" id="abhijeet-card">
+          <div class="abhijeet-title">☀️ Abhijeet Muhurta</div>
+          <div class="abhijeet-window">
+            <div class="abhijeet-time" id="abhi-time">-- : --</div>
+            <div class="abhijeet-dur" id="abhi-dur">~48 min</div>
+          </div>
+          <div id="abhi-live-badge" style="display:none">
+            <span class="abhijeet-live">🟢 LIVE NOW</span>
+          </div>
+          <div id="abhi-cats" style="font-size:11px;color:var(--text2);margin-top:8px"></div>
+        </div>
+
+        <!-- Golden Window -->
+        <div class="golden-card" id="golden-card">
+          <div class="golden-title">⭐ Golden Time Window</div>
+          <div class="golden-time" id="golden-time">-- : --</div>
+          <div class="golden-lord" id="golden-lord">Best 5-min slot in current Hora</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PANCHANG -->
+    <div class="tab-page" id="tab-panchang">
+      <div id="panch-date-display" style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:12px;color:var(--agni)"></div>
+      <div id="dagdha-warning-container"></div>
+      <div class="panch-grid" id="panch-grid"></div>
+      <div class="section-divider"><span>Nakshatra Detail</span></div>
+      <div class="card" id="nak-detail-card"></div>
+      <div class="section-divider"><span>Rahu Kaal &amp; Gulika</span></div>
+      <div class="card" id="rahu-gulika-card"></div>
+    </div>
+
+    <!-- TAB: HORA -->
+    <div class="tab-page" id="tab-hora">
+      <div id="hora-current-card" class="card" style="margin-bottom:12px"></div>
+      <div class="card-header">📋 <span>24-Hour Hora &amp; Uphora</span></div>
+      <div style="overflow-x:auto">
+        <table class="hora-table" id="hora-full-table">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Lord</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Uphora</th>
+            </tr>
+          </thead>
+          <tbody id="hora-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: CALENDAR -->
+    <div class="tab-page" id="tab-calendar">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="calNav(-1)">◀</button>
+        <div class="cal-title" id="cal-title"></div>
+        <button class="cal-nav-btn" onclick="calNav(1)">▶</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="section-divider"><span>Selected Day Detail</span></div>
+      <div class="card" id="cal-day-detail">
+        <div style="color:var(--text2);font-size:13px">Select a date to see Panchang</div>
+      </div>
+    </div>
+
+    <!-- TAB: MORE -->
+    <div class="tab-page" id="tab-more">
+      <div class="astrologer-card">
+        <div class="astrologer-avatar">🌟</div>
+        <div class="astrologer-name">Naveen K. Rai</div>
+        <div class="astrologer-tagline">Astronumerologist &amp; Vastu Consultant · Bhopal</div>
+        <div class="social-row">
+          <a href="https://wa.me/919669756111" class="social-btn" target="_blank">📱 WhatsApp</a>
+          <a href="https://instagram.com/occultviision" class="social-btn" target="_blank">📷 Instagram</a>
+          <a href="tel:+919669756111" class="social-btn">📞 Call</a>
+        </div>
+      </div>
+
+      <div class="card-header">⚙️ Settings</div>
+      <div class="settings-list">
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Sidereal / Tropical</div>
+            <div class="settings-desc">Default: Sidereal (Vedic)</div>
+          </div>
+          <div class="toggle on" id="sidereal-toggle" onclick="this.classList.toggle('on');showToast('Calculation mode changed')"></div>
+        </div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Ayanamsa</div>
+            <div class="settings-desc" id="ayanamsa-display">Lahiri (Default)</div>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Query History</div>
+            <div class="settings-desc" id="history-count">0 queries</div>
+          </div>
+          <button class="icon-btn" onclick="showHistory()" style="font-size:12px;width:auto;padding:0 10px">View</button>
+        </div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">GPS Location</div>
+            <div class="settings-desc" id="gps-detail">Fetching...</div>
+          </div>
+          <button class="icon-btn" onclick="reloadGPS()" style="font-size:12px">🔄</button>
+        </div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">License</div>
+            <div class="settings-desc" id="license-detail">DEMO — 5 queries remaining</div>
+          </div>
+          <button class="icon-btn" onclick="showUpgrade()" style="font-size:11px;width:auto;padding:0 8px;color:var(--agni)">⬆ Upgrade</button>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>Support</span></div>
+      <div class="settings-list">
+        <div class="settings-item" onclick="showToast('Opening support...')">
+          <div class="settings-label">📧 Email Support</div>
+          <span style="color:var(--text3)">›</span>
+        </div>
+        <div class="settings-item" onclick="window.open('https://wa.me/919669756111','_blank')">
+          <div class="settings-label">💬 WhatsApp Chat</div>
+          <span style="color:var(--text3)">›</span>
+        </div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Version</div>
+            <div class="settings-desc">TaraNidhi v4.0 · Oct 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav">
+    <button class="nav-tab active" id="nav-muhurta" onclick="switchTab('muhurta')">
+      <span class="icon">🔮</span>
+      <span class="label" data-i18n="nav.muhurta">Muhurta</span>
+    </button>
+    <button class="nav-tab" id="nav-panchang" onclick="switchTab('panchang')">
+      <span class="icon">📅</span>
+      <span class="label" data-i18n="nav.panchang">Panchang</span>
+    </button>
+    <button class="nav-tab" id="nav-hora" onclick="switchTab('hora')">
+      <span class="icon">🕐</span>
+      <span class="label" data-i18n="nav.hora">Hora</span>
+    </button>
+    <button class="nav-tab" id="nav-calendar" onclick="switchTab('calendar')">
+      <span class="icon">📆</span>
+      <span class="label" data-i18n="nav.calendar">Calendar</span>
+    </button>
+    <button class="nav-tab" id="nav-more" onclick="switchTab('more')">
+      <span class="icon">👤</span>
+      <span class="label" data-i18n="nav.more">More</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- RESULT OVERLAY -->
+<div id="result-overlay">
+  <div id="result-panel">
+    <div class="result-header">
+      <div class="result-title" id="result-title">Muhurta Result</div>
+      <div class="close-btn" onclick="closeResult()">✕</div>
+    </div>
+    <div id="result-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const STATE = {
+  lat: 23.2505, lon: 77.4065, tz: 5.5,
+  city: 'Bhopal',
+  lang: localStorage.getItem('lang') || 'en',
+  theme: localStorage.getItem('theme') || 'dark',
+  ayanamsa: 'lahiri',
+  selectedCat: null,
+  queryDate: null,
+  queries: JSON.parse(localStorage.getItem('queries')||'[]'),
+  license: { tier: 'demo', remaining: 5 },
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+};
+
+// ═══════════════════════════════════════════════
+// i18n STRINGS
+// ═══════════════════════════════════════════════
+const I18N = {
+  en: {
+    'nav.muhurta':'Muhurta','nav.panchang':'Panchang','nav.hora':'Hora',
+    'nav.calendar':'Calendar','nav.more':'More',
+    'muhurta.query':'Muhurta Query','muhurta.selectEvent':'Select Event Type',
+    'muhurta.calculate':'Calculate Muhurta',
+    'verdict.go':'SHUBH — GO','verdict.caution':'SOCHKAR — CAUTION','verdict.stop':'ASHUBH — WAIT',
+  },
+  hi: {
+    'nav.muhurta':'मुहूर्त','nav.panchang':'पंचांग','nav.hora':'होरा',
+    'nav.calendar':'कैलेंडर','nav.more':'अधिक',
+    'muhurta.query':'मुहूर्त प्रश्न','muhurta.selectEvent':'कार्य चुनें',
+    'muhurta.calculate':'मुहूर्त निकालें',
+    'verdict.go':'शुभ — प्रारंभ करें','verdict.caution':'सोचकर करें — सावधानी','verdict.stop':'अशुभ — प्रतीक्षा करें',
+  }
+};
+
+function t(key){ return (I18N[STATE.lang]||I18N.en)[key]||key; }
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    el.textContent=t(k);
+  });
+  document.getElementById('lang-toggle').textContent = STATE.lang==='en'?'EN':'हि';
+}
+
+function toggleLang(){
+  STATE.lang = STATE.lang==='en'?'hi':'en';
+  localStorage.setItem('lang',STATE.lang);
+  applyI18n();
+}
+
+// ═══════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════
+function initTheme(){
+  document.documentElement.setAttribute('data-theme', STATE.theme);
+  document.getElementById('theme-toggle').textContent = STATE.theme==='dark'?'🌙':'☀️';
+}
+function toggleTheme(){
+  STATE.theme = STATE.theme==='dark'?'light':'dark';
+  localStorage.setItem('theme', STATE.theme);
+  initTheme();
+}
+
+// ═══════════════════════════════════════════════
+// ASTRONOMY CORE (verified functions)
+// ═══════════════════════════════════════════════
+function norm(x){return((x%360)+360)%360}
+
+function toJD(y,m,d,h){
+  if(m<=2){y--;m+=12}
+  const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+h/24+B-1524.5;
+}
+
+function lahiriAyanamsa(jd){
+  const T=(jd-2451545)/36525;
+  return(85885.53192+5028.796195*T+1.1054348*T*T+0.00007964*T*T*T)/3600;
+}
+
+function ramanAyanamsa(jd){
+  const T=(jd-2451545)/36525;
+  return (22.4602222+50.2564*(jd-2415020)/36525)/1;  // simplified
+}
+
+function faganAyanamsa(jd){
+  const T=(jd-2451545)/36525;
+  return 24.04231889+T*50.29/3600*100;  // approx
+}
+
+function getAyanamsa(jd){
+  switch(STATE.ayanamsa){
+    case 'kp': return lahiriAyanamsa(jd)-0.7; // KP offset
+    case 'raman': return 22.460+(jd-2415020)/(36525)*50.29/3600;
+    case 'fagan': return 24.042+(jd-2451545)/36525*50.29/3600;
+    default: return lahiriAyanamsa(jd);
+  }
+}
+
+function moonSid(jd){
+  const d=jd-2451545;
+  const L1=norm(218.316+13.176396*d),M1=norm(134.963+13.064993*d);
+  const M=norm(357.529+0.98560028*d),D=norm(297.850+12.190749*d),F=norm(93.272+13.229350*d);
+  const DEG=Math.PI/180;
+  const dL=6.289*Math.sin(M1*DEG)-1.274*Math.sin((2*D-M1)*DEG)+0.658*Math.sin(2*D*DEG)
+    -0.186*Math.sin(M*DEG)-0.059*Math.sin((2*M1-2*D)*DEG)-0.057*Math.sin((2*D-M-M1)*DEG)
+    +0.053*Math.sin((2*D+M1)*DEG)+0.046*Math.sin((2*D-M)*DEG)+0.041*Math.sin((M1-M)*DEG)
+    -0.035*Math.sin(D*DEG)-0.031*Math.sin((M1+M)*DEG)-0.015*Math.sin((2*F-2*D)*DEG)
+    +0.011*Math.sin((M1-4*D)*DEG);
+  const trop=norm(L1+dL),ayn=getAyanamsa(jd);
+  return{trop,sid:norm(trop-ayn),ayn};
+}
+
+function sunSid(jd){
+  const d=jd-2451545,DEG=Math.PI/180;
+  const M=norm(357.529+0.98560028*d),L=norm(280.459+0.98564736*d);
+  const t=norm(L+1.915*Math.sin(M*DEG)+0.02*Math.sin(2*M*DEG));
+  return{trop:t,sid:norm(t-getAyanamsa(jd))};
+}
+
+function sunriseIST(jd,lat,lon){
+  const d=jd-2451545,DEG=Math.PI/180;
+  const M=norm(357.529+0.98560028*d),L=norm(280.459+0.98564736*d);
+  const eL=norm(L+1.915*Math.sin(M*DEG)+0.02*Math.sin(2*M*DEG));
+  const obliq=23.439-0.0000004*d;
+  const sinDec=Math.sin(obliq*DEG)*Math.sin(eL*DEG);
+  const dec=Math.asin(sinDec)/DEG;
+  const cosH=(Math.sin(-0.833*DEG)-Math.sin(lat*DEG)*Math.sin(dec*DEG))/(Math.cos(lat*DEG)*Math.cos(dec*DEG));
+  if(Math.abs(cosH)>1)return 6;
+  const H=Math.acos(cosH)/DEG;
+  const B=2*Math.PI*(d-81)/364;
+  const eot=(9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B))/60;
+  return(12-H/15)+eot+(lon-82.5)*4/60+STATE.tz;
+}
+
+function sunsetIST(jd,lat,lon){
+  const d=jd-2451545,DEG=Math.PI/180;
+  const M=norm(357.529+0.98560028*d),L=norm(280.459+0.98564736*d);
+  const eL=norm(L+1.915*Math.sin(M*DEG)+0.02*Math.sin(2*M*DEG));
+  const obliq=23.439-0.0000004*d;
+  const sinDec=Math.sin(obliq*DEG)*Math.sin(eL*DEG);
+  const dec=Math.asin(sinDec)/DEG;
+  const cosH=(Math.sin(-0.833*DEG)-Math.sin(lat*DEG)*Math.sin(dec*DEG))/(Math.cos(lat*DEG)*Math.cos(dec*DEG));
+  if(Math.abs(cosH)>1)return 18;
+  const H=Math.acos(cosH)/DEG;
+  const B=2*Math.PI*(d-81)/364;
+  const eot=(9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B))/60;
+  return(12+H/15)+eot+(lon-82.5)*4/60+STATE.tz;
+}
+
+function tithiNum(mSid,sSid){return Math.floor(norm(mSid-sSid)/12)+1;}
+function yogaNum(mSid,sSid){return Math.floor(norm(mSid+sSid)/(360/27))+1;}
+function nakIdx(sid){return Math.floor(sid/13.333333);}
+function nakPada(sid){return Math.floor((sid%13.333333)/3.333333)+1;}
+
+// ═══════════════════════════════════════════════
+// DAGDHA TITHI
+// ═══════════════════════════════════════════════
+// Source: Muhurta Chintamani Shloka 1.45-47
+const DAGDHA_MAP={0:12,1:11,2:5,3:3,4:6,5:8,6:9};
+function isDagdhaTithi(vara,tithi){return DAGDHA_MAP[vara]===tithi;}
+
+// ═══════════════════════════════════════════════
+// ABHIJEET MUHURTA
+// ═══════════════════════════════════════════════
+// Source: Muhurta Chintamani 2.1-3
+// Lord: Sun | Deity: Vishnu | 8th Muhurta of day
+function abhijeetWindow(jd,lat,lon){
+  const sr=sunriseIST(jd,lat,lon);
+  const ss=sunsetIST(jd,lat,lon);
+  const dayLen=ss-sr;
+  const muDur=dayLen/15;
+  const start=sr+7*muDur;
+  const end=start+muDur;
+  return{start,end,durationMin:Math.round(muDur*60),sr,ss,dayLen};
+}
+
+const ABHIJEET_CATS={
+  property:{score:9,note:'Excellent for property registration & purchase'},
+  business:{score:10,note:'Supreme for new business, signing contracts'},
+  exam:{score:9,note:'Best for exams, interviews, government work'},
+  finance:{score:8,note:'Good for investments & financial decisions'},
+  travel:{score:7,note:'Favorable for auspicious journeys'},
+  medical:{score:6,note:'Acceptable for elective procedures'},
+  legal:{score:9,note:'Excellent for legal filings & court matters'},
+  marriage:{score:-1,note:'⚠️ NOT recommended — Lord is Sun (authoritative, not relational)'},
+};
+
+// ═══════════════════════════════════════════════
+// PLANETARY DATA
+// ═══════════════════════════════════════════════
+const CHALDEAN=['Sat','Sun','Mon','Tue','Ven','Mer','Jup'];
+const DAY_LORDS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const PLANET_SYM={Sun:'☀️',Mon:'🌙',Tue:'🔴',Wed:'💚',Thu:'🟡',Fri:'🔵',Sat:'⚫'};
+const PLANET_HI={Sun:'रवि',Mon:'चन्द्र',Tue:'मंगल',Wed:'बुध',Thu:'गुरु',Fri:'शुक्र',Sat:'शनि'};
+
+function horaLord(dow,hrsSunrise){
+  const idx=(CHALDEAN.indexOf(DAY_LORDS[dow])+Math.max(0,Math.floor(hrsSunrise)))%7;
+  return CHALDEAN[idx];
+}
+
+function getHoraForTime(now,sunrise){
+  const elapsed=(now.getHours()+now.getMinutes()/60+now.getSeconds()/3600)-sunrise;
+  if(elapsed<0)return{hora:-1,min:0};
+  return{hora:Math.floor(elapsed),min:Math.floor((elapsed%1)*60)};
+}
+
+// ═══════════════════════════════════════════════
+// NAKSHATRA DATA
+// ═══════════════════════════════════════════════
+const NAK_NAMES=[
+  'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu',
+  'Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta',
+  'Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha',
+  'Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada',
+  'Uttara Bhadrapada','Revati'
+];
+const NAK_HI=[
+  'अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशिरा','आर्द्रा','पुनर्वसु',
+  'पुष्य','अश्लेषा','मघा','पूर्वाफाल्गुनी','उत्तराफाल्गुनी','हस्त',
+  'चित्रा','स्वाति','विशाखा','अनुराधा','ज्येष्ठा','मूल','पूर्वाषाढ़ा',
+  'उत्तराषाढ़ा','श्रवण','धनिष्ठा','शतभिषा','पूर्वभाद्रपद',
+  'उत्तरभाद्रपद','रेवती'
+];
+const NAK_SYMBOLS=[
+  '♈','🔴','⭐','🌙','🦌','💧','⬛','🌸','🐍','👑',
+  '🛋️','⚡','✋','🔶','🌿','⚖️','⭐','☂️','🌿','🌊',
+  '⭐','👂','🥁','💫','⚔️','🐟','🐘'
+];
+const NAK_TYPE=[
+  'laghu','ugra','mishra','mridu','mridu','tikshna','chara',
+  'mridu','tikshna','ugra','mridu','sthira','laghu',
+  'mridu','chara','mishra','mridu','tikshna','tikshna','ugra',
+  'sthira','chara','chara','chara','ugra','mridu','mridu'
+];
+const NAK_LORDS=['Ket','Ven','Sun','Mon','Mar','Rah','Jup','Sat','Mer','Ket',
+  'Ven','Sun','Mon','Mar','Rah','Jup','Sat','Mer','Ket','Ven','Sun',
+  'Mon','Mar','Rah','Jup','Sat','Mer'];
+const NAK_DEITY=[
+  'Ashwini Kumars','Yama','Agni','Brahma','Soma','Rudra','Aditi',
+  'Brihaspati','Sarpa','Pitrs','Bhaga','Aryama','Savita',
+  'Tvastr','Vayu','Indra-Agni','Mitra','Indra','Nirriti','Apah',
+  'Vishvedeva','Vishnu','Asta Vasus','Varuna','Aja Ekapada',
+  'Ahir Budhnya','Pushan'
+];
+const NAK_GOODFOR=[
+  ['medical','travel','exam'],['legal'],['business','exam'],['property','marriage','finance'],
+  ['travel','business'],['legal'],['travel','medical','business'],
+  ['marriage','property','finance'],['legal'],['legal'],
+  ['marriage','property'],['property','finance'],['medical','exam','travel'],
+  ['marriage','business'],['business','travel'],['business','finance'],
+  ['marriage','business'],['legal'],['legal'],['legal','finance'],
+  ['property','exam'],['travel','business'],['business','finance'],
+  ['property','finance'],['legal'],['property','marriage'],['marriage','travel']
+];
+
+const NAK_TYPE_MATRIX={
+  laghu:  {medical:10,exam:8,travel:7,business:6,finance:5,property:3,marriage:5,legal:2},
+  mridu:  {marriage:10,business:8,travel:7,medical:6,exam:5,finance:6,property:4,legal:2},
+  sthira: {property:10,finance:9,business:8,marriage:7,medical:5,exam:4,travel:2,legal:3},
+  chara:  {travel:10,business:8,finance:7,medical:6,marriage:5,exam:4,property:2,legal:3},
+  mishra: {business:6,exam:6,travel:5,marriage:5,medical:4,finance:4,property:4,legal:4},
+  ugra:   {legal:10,medical:-2,marriage:-5,property:-4,finance:-3,business:-3,travel:-2,exam:-2},
+  tikshna:{legal:8,medical:-5,marriage:-8,property:-6,finance:-5,business:-6,travel:-3,exam:-4}
+};
+
+function nakTypeScore(nakI,cat){
+  const tp=NAK_TYPE[nakI];
+  const base=(NAK_TYPE_MATRIX[tp]&&NAK_TYPE_MATRIX[tp][cat]!=null)?NAK_TYPE_MATRIX[tp][cat]:0;
+  const bonus=(NAK_GOODFOR[nakI]||[]).includes(cat)?2:0;
+  return Math.max(-10,Math.min(10,base+bonus));
+}
+
+// ═══════════════════════════════════════════════
+// TITHI/YOGA/VARA NAMES
+// ═══════════════════════════════════════════════
+const TITHI_NAMES=[,'Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami',
+  'Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi',
+  'Trayodashi','Chaturdashi','Purnima/Amavasya'];
+const YOGA_NAMES=['Vishkambha','Preeti','Ayushman','Saubhagya','Shobhana',
+  'Atiganda','Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva',
+  'Vyaghata','Harshana','Vajra','Siddhi','Vyatipata','Variyan','Parigha',
+  'Shiva','Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti'];
+const VARA_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const VARA_HI=['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि'];
+const KARANA_NAMES=['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti',
+  'Shakuni','Chatushpada','Naga','Kimstughna'];
+
+// Auspicious yoga check (basic)
+const BAD_YOGA=[1,6,9,13,17,19,27]; // Vishkambha,Atiganda,Shula,Vyaghata,Vyatipata,Parigha,Vaidhriti
+const GOOD_YOGA=[2,3,4,5,7,8,10,11,12,14,15,16,18,20,21,22,23,24,25,26];
+
+// ═══════════════════════════════════════════════
+// EVENT CATEGORIES
+// ═══════════════════════════════════════════════
+const CATEGORIES=[
+  {id:'property',icon:'🏠',name:'Property',hi:'संपत्ति'},
+  {id:'marriage',icon:'💍',name:'Marriage',hi:'विवाह'},
+  {id:'business',icon:'💼',name:'Business',hi:'व्यापार'},
+  {id:'medical',icon:'🏥',name:'Medical',hi:'चिकित्सा'},
+  {id:'travel',icon:'✈️',name:'Travel',hi:'यात्रा'},
+  {id:'exam',icon:'📝',name:'Exam',hi:'परीक्षा'},
+  {id:'finance',icon:'💰',name:'Finance',hi:'वित्त'},
+  {id:'legal',icon:'⚖️',name:'Legal',hi:'कानूनी'},
+  {id:'naming',icon:'👶',name:'Naming',hi:'नामकरण'},
+  {id:'vehicle',icon:'🚗',name:'Vehicle',hi:'वाहन'},
+  {id:'griha',icon:'🏗️',name:'Griha Prav.',hi:'गृह प्रवेश'},
+  {id:'udyapan',icon:'🙏',name:'Puja/Havan',hi:'पूजा/हवन'},
+  {id:'education',icon:'📚',name:'Education',hi:'शिक्षा'},
+  {id:'surgery',icon:'🔬',name:'Surgery',hi:'शल्य'},
+  {id:'loan',icon:'🏦',name:'Loan',hi:'ऋण'},
+  {id:'interview',icon:'🤝',name:'Interview',hi:'साक्षात्कार'},
+  {id:'agriculture',icon:'🌾',name:'Agriculture',hi:'कृषि'},
+  {id:'art',icon:'🎨',name:'Art/Creative',hi:'कला'},
+];
+
+function buildCatGrid(){
+  const grid=document.getElementById('cat-grid');
+  grid.innerHTML=CATEGORIES.map(c=>`
+    <div class="cat-btn" onclick="selectCat('${c.id}',this)" id="cat-${c.id}">
+      <div class="cat-icon">${c.icon}</div>
+      <div class="cat-name">${STATE.lang==='hi'?c.hi:c.name}</div>
+    </div>`).join('');
+}
+
+function selectCat(id,el){
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.selectedCat=id;
+}
+
+// ═══════════════════════════════════════════════
+// GPS SYSTEM
+// ═══════════════════════════════════════════════
+function initGPS(){
+  if(!navigator.geolocation){setLocationFallback();return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      STATE.lat=pos.coords.latitude;
+      STATE.lon=pos.coords.longitude;
+      reverseGeocode(STATE.lat,STATE.lon);
+    },
+    _=>{setLocationFallback();},
+    {timeout:8000,maximumAge:300000}
+  );
+}
+
+function reverseGeocode(lat,lon){
+  // Use nominatim (free, no key)
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+    .then(r=>r.json())
+    .then(d=>{
+      const city=d.address.city||d.address.town||d.address.village||'Unknown';
+      const state=d.address.state||'';
+      STATE.city=city;
+      document.getElementById('loc-text').textContent=`${city}, ${state}`;
+      document.getElementById('gps-detail').textContent=`${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E · ${city}`;
+      refreshAllCalculations();
+    })
+    .catch(_=>{
+      document.getElementById('loc-text').textContent=`${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`;
+      refreshAllCalculations();
+    });
+}
+
+function setLocationFallback(){
+  // Bhopal fallback
+  STATE.lat=23.2505;STATE.lon=77.4065;STATE.city='Bhopal';
+  document.getElementById('loc-text').textContent='Bhopal, MP (fallback)';
+  document.getElementById('gps-detail').textContent='23.2505°N, 77.4065°E · Bhopal (GPS unavailable)';
+  refreshAllCalculations();
+  showToast('GPS unavailable — using Bhopal');
+}
+
+function reloadGPS(){
+  document.getElementById('loc-text').textContent='Locating...';
+  initGPS();
+}
+
+// ═══════════════════════════════════════════════
+// LIVE CLOCK
+// ═══════════════════════════════════════════════
+function startClock(){
+  function tick(){
+    const now=new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    const s=String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('live-clock').textContent=`${h}:${m}:${s}`;
+  }
+  tick();
+  setInterval(tick,1000);
+}
+
+// ═══════════════════════════════════════════════
+// TAB NAVIGATION
+// ═══════════════════════════════════════════════
+function switchTab(tab){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  if(tab==='panchang')renderPanchang();
+  if(tab==='hora')renderHora();
+  if(tab==='calendar')renderCalendar();
+}
+
+// ═══════════════════════════════════════════════
+// HELPER: decimal hours → HH:MM string
+// ═══════════════════════════════════════════════
+function fmtH(h){
+  if(h===undefined||h===null||isNaN(h))return '--:--';
+  const hh=Math.floor(h)%24;
+  const mm=Math.round((h-Math.floor(h))*60);
+  return String(hh).padStart(2,'0')+':'+String(mm%60).padStart(2,'0');
+}
+
+function fmtHr(h){
+  // decimal hours → decimal with 1dp
+  return h.toFixed(1)+'h';
+}
+
+// ═══════════════════════════════════════════════
+// RAHU KAAL / GULIKA
+// ═══════════════════════════════════════════════
+// Rahu Kaal order by weekday (Sun=8th, Mon=2nd, ...)
+const RAHU_ORD=[8,2,7,5,6,3,4]; // fraction of 8 day segments
+const GULIKA_ORD=[6,5,4,3,2,1,0];
+
+function rahuKaal(dow,sr,ss){
+  const dayLen=(ss-sr);
+  const seg=dayLen/8;
+  const start=sr+(RAHU_ORD[dow]-1)*seg;
+  return{start,end:start+seg};
+}
+function gulikaKaal(dow,sr,ss){
+  const dayLen=(ss-sr);
+  const seg=dayLen/8;
+  const start=sr+GULIKA_ORD[dow]*seg;
+  return{start,end:start+seg};
+}
+
+// ═══════════════════════════════════════════════
+// TARABALA & CHANDRABALA
+// ═══════════════════════════════════════════════
+const TARA_NAMES=['Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Parama-Mitra'];
+const TARA_SCORE=[5,10,-10,10,-5,8,-8,10,10];
+
+function tarabala(birthNakIdx,currNakIdx){
+  const c=(currNakIdx-birthNakIdx+27)%27;
+  const t=c%9;
+  return{tara:TARA_NAMES[t],score:TARA_SCORE[t],c:c+1};
+}
+
+const CHANDRA_SHUBH=[1,3,6,7,10,11]; // Chandrabala good positions
+function chandrabala(birthRashiIdx,currRashiIdx){
+  const p=((currRashiIdx-birthRashiIdx+12)%12)+1;
+  return{position:p,ok:CHANDRA_SHUBH.includes(p),score:CHANDRA_SHUBH.includes(p)?15:0};
+}
+
+// ═══════════════════════════════════════════════
+// 8-LAYER COMPOSITE SCORE ENGINE
+// ═══════════════════════════════════════════════
+function calcScore(jd,lat,lon,cat,dateObj){
+  const sr=sunriseIST(jd,lat,lon);
+  const ss=sunsetIST(jd,lat,lon);
+  const now=dateObj||new Date();
+  const moon=moonSid(jd);
+  const sun=sunSid(jd);
+  const dow=new Date(now).getDay();
+
+  const tithi=tithiNum(moon.sid,sun.sid);
+  const yoga=yogaNum(moon.sid,sun.sid);
+  const nakI=nakIdx(moon.sid);
+  const nakPd=nakPada(moon.sid);
+
+  // Layer 1: Vara (weekday) score
+  const VARA_SCORES={property:{0:-2,1:8,2:-3,3:6,4:10,5:7,6:-5},
+    marriage:{0:-3,1:10,2:-5,3:8,4:7,5:10,6:-8},
+    business:{0:6,1:5,2:-2,3:10,4:8,5:7,6:-3},
+    medical:{0:5,1:6,2:-4,3:8,4:7,5:6,6:-6},
+    travel:{0:8,1:5,2:5,3:8,4:6,5:8,6:-5},
+    exam:{0:6,1:7,2:5,3:10,4:8,5:5,6:-3},
+    finance:{0:5,1:6,2:-3,3:8,4:10,5:7,6:-5},
+    legal:{0:5,1:3,2:10,3:5,4:6,5:3,6:8},
+    default:{0:5,1:5,2:4,3:7,4:8,5:7,6:3}};
+  const varaS=(VARA_SCORES[cat]||VARA_SCORES.default)[dow]||5;
+
+  // Layer 2: Tithi score (basic)
+  const GOOD_TITHIS=[2,3,5,7,10,11,12,13];
+  const BAD_TITHIS=[4,8,9,14,15,30];
+  const tithiS=GOOD_TITHIS.includes(tithi)?8:BAD_TITHIS.includes(tithi)?-5:3;
+
+  // Layer 3: Nakshatra type × category
+  const nakS=nakTypeScore(nakI,cat);
+
+  // Layer 4: Yoga
+  const yogaS=BAD_YOGA.includes(yoga)?-8:(GOOD_YOGA.includes(yoga)?5:2);
+
+  // Layer 5: Hora lord bonus
+  const elapsed=(now.getHours()+now.getMinutes()/60)-sr;
+  const horaIdx=Math.max(0,Math.floor(elapsed));
+  const lord=horaLord(dow,horaIdx);
+  const HORA_BONUS={
+    property:{Mon:5,Jup:8,Ven:6,Mer:4,Sun:3,Sat:-3,Mar:-2},
+    marriage:{Ven:10,Mon:8,Jup:7,Mer:4,Sun:-2,Sat:-5,Mar:-3},
+    business:{Mer:10,Jup:8,Sun:5,Ven:6,Mon:4,Sat:-2,Mar:-1},
+    medical:{Mon:8,Jup:7,Sun:6,Ven:5,Mer:5,Mar:-5,Sat:-3},
+    travel:{Mon:7,Jup:6,Mer:8,Ven:5,Sun:5,Sat:-4,Mar:-2},
+    exam:{Jup:10,Mer:9,Sun:7,Mon:6,Ven:5,Sat:-2,Mar:-2},
+    finance:{Jup:10,Mer:8,Sun:6,Ven:7,Mon:5,Sat:-3,Mar:-2},
+    legal:{Mar:8,Sat:6,Sun:7,Jup:5,Mer:4,Mon:-2,Ven:-1},
+    default:{Jup:5,Ven:5,Mer:4,Mon:3,Sun:2,Sat:-2,Mar:-1}
+  };
+  const hb=(HORA_BONUS[cat]||HORA_BONUS.default)[lord]||0;
+  const horaS=hb;
+
+  // Layer 6: Dagdha Tithi
+  const dagdha=isDagdhaTithi(dow,tithi);
+  const dagdhaS=dagdha?-20:0;
+
+  // Layer 7: Rahu Kaal
+  const rk=rahuKaal(dow,sr,ss);
+  const nowH=now.getHours()+now.getMinutes()/60;
+  const inRahu=nowH>=rk.start&&nowH<=rk.end;
+  const rahuS=inRahu?-15:0;
+
+  // Layer 8: Nakshatra good events match
+  const goodMatch=(NAK_GOODFOR[nakI]||[]).includes(cat)?5:0;
+
+  // Composite
+  const rawSum=varaS+tithiS+nakS+yogaS+horaS+dagdhaS+rahuS+goodMatch;
+  let score=Math.round(rawSum/1.2);
+
+  // Hard cap on Dagdha Tithi
+  if(dagdha)score=Math.min(score,35);
+
+  // Prabhaav 1-10
+  const prabhaav=Math.max(1,Math.min(10,Math.round((score/100)*10)));
+
+  const layers={varaS,tithiS,nakS,yogaS,horaS,dagdhaS,rahuS,goodMatch,rawSum};
+  return{score,prabhaav,tithi,yoga,nakI,nakPd,lord,dagdha,inRahu,sr,ss,layers,dow};
+}
+
+// ═══════════════════════════════════════════════
+// VERDICT
+// ═══════════════════════════════════════════════
+function getVerdict(score,dagdha){
+  if(dagdha||score<25)return{v:'stop',label:t('verdict.stop'),emoji:'🛑'};
+  if(score<55)return{v:'caution',label:t('verdict.caution'),emoji:'⚠️'};
+  return{v:'go',label:t('verdict.go'),emoji:'✅'};
+}
+
+// ═══════════════════════════════════════════════
+// GOLDEN TIME WINDOW (best 5-min Uphora)
+// ═══════════════════════════════════════════════
+function goldenWindow(cat,dow,sr,ss,now){
+  const UPHORA_SEQ=CHALDEAN; // 7 Chaldean order cycles through 12 slots
+  const horaLen=1.0; // 1 hour per Hora
+  const elapsed=(now.getHours()+now.getMinutes()/60+now.getSeconds()/3600)-sr;
+  if(elapsed<0)return null;
+  const horaNum=Math.floor(elapsed);
+  const lord=horaLord(dow,horaNum);
+
+  // 12 Uphora within current Hora (each 5 min)
+  let bestScore=-999, bestSlot=0;
+  for(let u=0;u<12;u++){
+    const uLordIdx=(CHALDEAN.indexOf(lord)+u)%7;
+    const uLord=CHALDEAN[uLordIdx];
+    const HORA_BONUS={
+      property:{Mon:5,Jup:8,Ven:6,Mer:4,Sun:3,Sat:-3,Mar:-2},
+      marriage:{Ven:10,Mon:8,Jup:7,Mer:4,Sun:-2,Sat:-5,Mar:-3},
+      business:{Mer:10,Jup:8,Sun:5,Ven:6,Mon:4,Sat:-2,Mar:-1},
+      exam:{Jup:10,Mer:9,Sun:7,Mon:6,Ven:5,Sat:-2,Mar:-2},
+      finance:{Jup:10,Mer:8,Sun:6,Ven:7,Mon:5,Sat:-3,Mar:-2},
+      legal:{Mar:8,Sat:6,Sun:7,Jup:5,Mer:4,Mon:-2,Ven:-1},
+      default:{Jup:5,Ven:5,Mer:4,Mon:3,Sun:2,Sat:-2,Mar:-1}
+    };
+    const sc=(HORA_BONUS[cat]||HORA_BONUS.default)[uLord]||0;
+    if(sc>bestScore){bestScore=sc;bestSlot=u;}
+  }
+  const horaStart=sr+horaNum;
+  const bestStart=horaStart+bestSlot*(5/60);
+  const bestEnd=bestStart+5/60;
+  const uLordIdx=(CHALDEAN.indexOf(lord)+bestSlot)%7;
+  return{start:bestStart,end:bestEnd,lord:CHALDEAN[uLordIdx],score:bestScore};
+}
+
+// ═══════════════════════════════════════════════
+// MAIN QUERY
+// ═══════════════════════════════════════════════
+function runQuery(){
+  if(!STATE.selectedCat){showToast('Please select an event type');return;}
+
+  // License check
+  if(STATE.license.tier==='demo'){
+    if(STATE.license.remaining<=0){
+      showToast('Demo limit reached — upgrade to continue');
+      return;
+    }
+    STATE.license.remaining--;
+    document.getElementById('license-detail').textContent=
+      `DEMO — ${STATE.license.remaining} queries remaining`;
+  }
+
+  const now=new Date();
+  const dateInput=document.getElementById('query-date').value;
+  const useDate=dateInput?new Date(dateInput+'T12:00:00'):now;
+
+  const jd=toJD(useDate.getFullYear(),useDate.getMonth()+1,useDate.getDate(),12);
+  const result=calcScore(jd,STATE.lat,STATE.lon,STATE.selectedCat,useDate);
+  const verdict=getVerdict(result.score,result.dagdha);
+  const cat=CATEGORIES.find(c=>c.id===STATE.selectedCat);
+  const abhi=abhijeetWindow(jd,STATE.lat,STATE.lon);
+
+  // Log query
+  const qEntry={cat:STATE.selectedCat,date:useDate.toISOString(),score:result.score,verdict:verdict.v};
+  STATE.queries.unshift(qEntry);
+  if(STATE.queries.length>50)STATE.queries.pop();
+  localStorage.setItem('queries',JSON.stringify(STATE.queries));
+  document.getElementById('history-count').textContent=`${STATE.queries.length} queries`;
+
+  // Golden window
+  const gw=goldenWindow(STATE.selectedCat,result.dow,result.sr,result.ss,now);
+
+  // Build timing window (today → 24h)
+  const windowStart=result.sr;
+  const windowEnd=result.ss;
+
+  // Build result HTML
+  const is6WMarriage=STATE.selectedCat==='marriage';
+  const who6W=`${NAK_LORDS[result.nakI]} (Nak lord) · ${result.lord} (Hora) · ${VARA_NAMES[result.dow]} (Vara)`;
+  const howW=`${NAK_TYPE[result.nakI].toUpperCase()} Nakshatra — ${NAK_NAMES[result.nakI]} (Pada ${result.nakPd})`;
+  const whyW=`Vara+Tithi+Yoga alignment. Dagdha: ${result.dagdha?'YES ⚠️':'No'}. Yoga: ${YOGA_NAMES[result.yoga-1]||result.yoga}.`;
+
+  let html=`
+  <div class="verdict-banner ${verdict.v}">
+    <div class="verdict-emoji">${verdict.emoji}</div>
+    <div class="verdict-label">${verdict.label}</div>
+    <div class="verdict-sub">${cat?cat.icon+' '+cat.name:STATE.selectedCat} · Score: ${result.score}/100</div>
+  </div>
+
+  <!-- Prabhaav Meter -->
+  <div class="prabhaav-wrap">
+    <div class="prabhaav-label">
+      <span>PRABHAAV INTENSITY</span>
+      <span class="prabhaav-score">${result.prabhaav}/10</span>
+    </div>
+    <div class="prabhaav-bar"><div class="prabhaav-fill" style="width:${result.prabhaav*10}%"></div></div>
+    <div class="prabhaav-dots">
+      ${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div class="prabhaav-dot ${i<=result.prabhaav?'active':''}">${i}</div>`).join('')}
+    </div>
+  </div>
+
+  ${result.dagdha?`<div class="dagdha-warning"><span class="dw-icon">⚠️</span><div><strong>Dagdha Tithi Alert!</strong><br>Today is ${VARA_NAMES[result.dow]}+Tithi ${result.tithi} — a Dagdha combination. Score capped at 35. Avoid major events. Source: Muhurta Chintamani 1.45-47.</div></div>`:''}
+
+  <!-- Timing Window -->
+  <div class="timing-card">
+    <div class="timing-header">🕐 Event Timing Window (KAB)</div>
+    <div class="timing-main">
+      <div class="timing-time">${fmtH(windowStart)}</div>
+      <div class="timing-arrow">→</div>
+      <div class="timing-time">${fmtH(windowEnd)}</div>
+    </div>
+    <div class="timing-dur">Day duration: ${fmtHr(result.ss-result.sr)} · Sunrise: ${fmtH(result.sr)} · Sunset: ${fmtH(result.ss)}</div>
+    ${gw?`<div class="timing-live">⭐ Golden 5-min slot: ${fmtH(gw.start)}–${fmtH(gw.end)} (${gw.lord})</div>`:''}
+  </div>
+
+  <!-- 6W Framework -->
+  <div class="card-header">🔯 6W SIDDHANT</div>
+  <div class="sixw-grid">
+    <div class="sixw-item"><div class="sixw-key">KYA — WHAT</div><div class="sixw-val">${cat?cat.name:''} Event</div></div>
+    <div class="sixw-item"><div class="sixw-key">KAB — WHEN</div><div class="sixw-val">${fmtH(windowStart)}–${fmtH(windowEnd)}</div></div>
+    <div class="sixw-item"><div class="sixw-key">KAISE — HOW</div><div class="sixw-val">${howW}</div></div>
+    <div class="sixw-item"><div class="sixw-key">KYOUN — WHY</div><div class="sixw-val">${whyW}</div></div>
+    <div class="sixw-item"><div class="sixw-key">KAHA — WHERE</div><div class="sixw-val">${STATE.city} (${STATE.lat.toFixed(2)}°N)</div></div>
+    <div class="sixw-item"><div class="sixw-key">KITNA — HOW MUCH</div><div class="sixw-val">Prabhaav ${result.prabhaav}/10</div></div>
+    <div class="sixw-item"><div class="sixw-key">KAUN — WHO</div><div class="sixw-val">${who6W}</div></div>
+  </div>
+
+  <!-- Score Breakdown -->
+  <div class="score-breakdown">
+    <div class="card-header">📊 Score Breakdown</div>
+    ${renderScoreRow('Vara (Weekday)',result.layers.varaS)}
+    ${renderScoreRow('Tithi',result.layers.tithiS)}
+    ${renderScoreRow('Nakshatra Type',result.layers.nakS)}
+    ${renderScoreRow('Yoga',result.layers.yogaS)}
+    ${renderScoreRow('Hora Lord',result.layers.horaS)}
+    ${result.layers.dagdhaS?renderScoreRow('Dagdha Tithi ⚠️',result.layers.dagdhaS):''}
+    ${result.layers.rahuS?renderScoreRow('Rahu Kaal ⚠️',result.layers.rahuS):''}
+    ${result.layers.goodMatch?renderScoreRow('Nakshatra Affinity',result.layers.goodMatch):''}
+    <div class="score-row score-total">
+      <span>FINAL SCORE</span>
+      <span class="score-val ${result.score>=55?'pos':result.score>=25?'neu':'neg'}">${result.score}/100</span>
+    </div>
+  </div>
+
+  <!-- Panchang of the Day -->
+  <div class="card">
+    <div class="card-header">📅 Panchang</div>
+    <div class="panch-grid">
+      <div class="panch-item"><div class="panch-label">Tithi</div><div class="panch-value">${TITHI_NAMES[result.tithi]||result.tithi}</div><div class="panch-sub">#${result.tithi}</div></div>
+      <div class="panch-item"><div class="panch-label">Nakshatra</div><div class="panch-value">${NAK_SYMBOLS[result.nakI]} ${NAK_NAMES[result.nakI]}</div><div class="panch-sub">Pada ${result.nakPd} · ${NAK_TYPE[result.nakI]}</div></div>
+      <div class="panch-item"><div class="panch-label">Yoga</div><div class="panch-value">${YOGA_NAMES[result.yoga-1]||result.yoga}</div><div class="panch-sub">${BAD_YOGA.includes(result.yoga)?'⚠️ Inauspicious':'✓ Auspicious'}</div></div>
+      <div class="panch-item"><div class="panch-label">Hora Lord</div><div class="panch-value">${PLANET_SYM[result.lord]||''} ${result.lord}</div><div class="panch-sub">Current Hora</div></div>
+    </div>
+  </div>
+
+  <!-- Nakshatra Detail -->
+  <div class="card">
+    <div class="card-header">⭐ Nakshatra · ${NAK_NAMES[result.nakI]}</div>
+    <p style="font-size:12px;color:var(--text2);line-height:1.6">
+      <strong>Symbol:</strong> ${NAK_SYMBOLS[result.nakI]} &nbsp;
+      <strong>Lord:</strong> ${NAK_LORDS[result.nakI]} &nbsp;
+      <strong>Deity:</strong> ${NAK_DEITY[result.nakI]}<br>
+      <strong>Type:</strong> ${NAK_TYPE[result.nakI].toUpperCase()}<br>
+      <strong>Good for:</strong> ${(NAK_GOODFOR[result.nakI]||[]).join(', ')}
+    </p>
+  </div>
+
+  <!-- Abhijeet window -->
+  <div class="abhijeet-card">
+    <div class="abhijeet-title">☀️ Abhijeet Muhurta — Today</div>
+    <div class="abhijeet-window">
+      <div class="abhijeet-time">${fmtH(abhi.start)} – ${fmtH(abhi.end)}</div>
+      <div class="abhijeet-dur">~${abhi.durationMin} min</div>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-top:6px">
+      Lord: ☀️ Sun · Deity: Vishnu · Source: Muhurta Chintamani 2.1-3<br>
+      ${STATE.selectedCat==='marriage'?'<span style="color:#EF4444">⚠️ NOT for marriage (Sun is authoritative)</span>':''}
+      Best for: Business, Legal, Exam, Property, Government work
+    </div>
+  </div>
+  `;
+
+  document.getElementById('result-body').innerHTML=html;
+  document.getElementById('result-title').textContent=`${cat?cat.icon:''} ${cat?cat.name:''} Muhurta`;
+  document.getElementById('result-overlay').classList.add('show');
+}
+
+function renderScoreRow(label,val){
+  const cls=val>0?'pos':val<0?'neg':'neu';
+  const sign=val>0?'+':'';
+  return `<div class="score-row"><span class="score-name">${label}</span><span class="score-val ${cls}">${sign}${val}</span></div>`;
+}
+
+function closeResult(){
+  document.getElementById('result-overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+// PANCHANG TAB
+// ═══════════════════════════════════════════════
+function renderPanchang(){
+  const now=new Date();
+  const jd=toJD(now.getFullYear(),now.getMonth()+1,now.getDate(),12);
+  const moon=moonSid(jd);
+  const sun=sunSid(jd);
+  const sr=sunriseIST(jd,STATE.lat,STATE.lon);
+  const ss=sunsetIST(jd,STATE.lon,STATE.lon);
+  const dow=now.getDay();
+  const tithi=tithiNum(moon.sid,sun.sid);
+  const yoga=yogaNum(moon.sid,sun.sid);
+  const nakI=nakIdx(moon.sid);
+  const nakPd=nakPada(moon.sid);
+  const rk=rahuKaal(dow,sr,ss);
+  const gk=gulikaKaal(dow,sr,ss);
+  const abhi=abhijeetWindow(jd,STATE.lat,STATE.lon);
+  const nowH=now.getHours()+now.getMinutes()/60;
+  const inAbhi=nowH>=abhi.start&&nowH<=abhi.end;
+  const dagdha=isDagdhaTithi(dow,tithi);
+
+  // Date display
+  document.getElementById('panch-date-display').textContent=
+    now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Dagdha warning
+  document.getElementById('dagdha-warning-container').innerHTML=dagdha?
+    `<div class="dagdha-warning"><span class="dw-icon">⚠️</span><div><strong>Dagdha Tithi Today!</strong><br>${VARA_NAMES[dow]} + Tithi ${tithi} = Dagdha combination. Avoid major auspicious events today. Source: Muhurta Chintamani 1.45-47.</div></div>`:'';
+
+  // Panchang grid
+  const items=[
+    {l:'Tithi',v:TITHI_NAMES[tithi]||tithi,s:'#'+tithi+(dagdha?' ⚠️ DAGDHA':'')},
+    {l:'Nakshatra',v:NAK_SYMBOLS[nakI]+' '+NAK_NAMES[nakI],s:'Pada '+nakPd+' · '+NAK_TYPE[nakI]},
+    {l:'Yoga',v:YOGA_NAMES[yoga-1],s:BAD_YOGA.includes(yoga)?'⚠️ Inauspicious':'✓ Auspicious'},
+    {l:'Karana',v:karanaName(tithi,now),s:'Half-tithi period'},
+    {l:'Vara',v:VARA_HI[dow]+' / '+VARA_NAMES[dow]+'vaar',s:'Weekday lord'},
+    {l:'Sunrise',v:fmtH(sr),s:STATE.city},
+    {l:'Sunset',v:fmtH(ss),s:STATE.city},
+    {l:'Day Duration',v:fmtHr(ss-sr),s:'Solar day length'},
+    {l:'Moon Sign',v:rashiName(moon.sid),s:moon.sid.toFixed(2)+'°'},
+    {l:'Sun Sign',v:rashiName(sun.sid),s:sun.sid.toFixed(2)+'°'},
+    {l:'Ayanamsa',v:getAyanamsa(jd).toFixed(4)+'°',s:STATE.ayanamsa.toUpperCase()},
+    {l:'Abhijeet',v:fmtH(abhi.start)+' – '+fmtH(abhi.end),s:inAbhi?'🟢 LIVE NOW':'~'+abhi.durationMin+' min'},
+  ];
+
+  document.getElementById('panch-grid').innerHTML=items.map(i=>`
+    <div class="panch-item">
+      <div class="panch-label">${i.l}</div>
+      <div class="panch-value">${i.v}</div>
+      <div class="panch-sub">${i.s}</div>
+    </div>`).join('');
+
+  // Nakshatra detail
+  document.getElementById('nak-detail-card').innerHTML=`
+    <div class="card-header">⭐ ${NAK_SYMBOLS[nakI]} ${NAK_NAMES[nakI]}</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7">
+      <strong>Pada:</strong> ${nakPd} &nbsp; <strong>Lord:</strong> ${NAK_LORDS[nakI]} &nbsp;
+      <strong>Deity:</strong> ${NAK_DEITY[nakI]}<br>
+      <strong>Type:</strong> ${NAK_TYPE[nakI].toUpperCase()}<br>
+      <strong>Good for:</strong> ${(NAK_GOODFOR[nakI]||[]).join(', ')}<br>
+      <strong>Ayanamsa:</strong> ${moon.ayn.toFixed(4)}°
+    </p>`;
+
+  // Rahu/Gulika
+  document.getElementById('rahu-gulika-card').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="panch-item" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3)">
+        <div class="panch-label" style="color:#EF4444">Rahu Kaal</div>
+        <div class="panch-value">${fmtH(rk.start)}</div>
+        <div class="panch-sub">to ${fmtH(rk.end)}</div>
+      </div>
+      <div class="panch-item" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3)">
+        <div class="panch-label" style="color:var(--akash)">Gulika Kaal</div>
+        <div class="panch-value">${fmtH(gk.start)}</div>
+        <div class="panch-sub">to ${fmtH(gk.end)}</div>
+      </div>
+    </div>`;
+}
+
+function rashiName(sid){
+  const names=['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
+    'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  return names[Math.floor(sid/30)%12];
+}
+
+function karanaName(tithi,now){
+  // Simplified Karana calculation
+  const k=((tithi-1)*2)%11;
+  return KARANA_NAMES[k]||'Unknown';
+}
+
+// ═══════════════════════════════════════════════
+// HORA TAB
+// ═══════════════════════════════════════════════
+function renderHora(){
+  const now=new Date();
+  const jd=toJD(now.getFullYear(),now.getMonth()+1,now.getDate(),12);
+  const dow=now.getDay();
+  const sr=sunriseIST(jd,STATE.lat,STATE.lon);
+  const ss=sunsetIST(jd,STATE.lat,STATE.lon);
+  const nowH=now.getHours()+now.getMinutes()/60;
+  const horaNum=Math.max(0,Math.floor(nowH-sr));
+  const lord=horaLord(dow,horaNum);
+  const minInHora=Math.floor(((nowH-sr)%1)*60);
+
+  // Current hora card
+  document.getElementById('hora-current-card').innerHTML=`
+    <div class="card-header">🕐 Current Hora</div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="font-size:48px">${PLANET_SYM[lord]||'⭐'}</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:700">${lord} Hora</div>
+        <div style="font-size:13px;color:var(--text2)">${fmtH(sr+horaNum)} – ${fmtH(sr+horaNum+1)}</div>
+        <div style="font-size:11px;color:var(--text3)">${minInHora} min elapsed in this Hora</div>
+      </div>
+    </div>`;
+
+  // Full 24-hora table
+  const tbody=document.getElementById('hora-tbody');
+  let rows='';
+  for(let h=0;h<24;h++){
+    const hLord=horaLord(dow,h);
+    const hStart=sr+h;
+    const hEnd=hStart+1;
+    const isCurrent=h===horaNum;
+
+    // 12 Uphora (5 min each)
+    let uphoras='';
+    for(let u=0;u<12;u++){
+      const uLIdx=(CHALDEAN.indexOf(hLord)+u)%7;
+      const uL=CHALDEAN[uLIdx];
+      const uStart=hStart+u*(5/60);
+      const isCurrU=isCurrent&&Math.floor((nowH-sr-h)*12)===u;
+      uphoras+=`<span style="font-size:9px;color:${isCurrU?'var(--agni)':'var(--text3)'};margin-right:3px">${PLANET_SYM[uL]||uL}${fmtH(uStart).slice(3)}</span>`;
+    }
+
+    rows+=`<tr class="${isCurrent?'current-hora':''}">
+      <td>${h+1}</td>
+      <td>${PLANET_SYM[hLord]||''} ${hLord}</td>
+      <td>${fmtH(hStart)}</td>
+      <td>${fmtH(hEnd)}</td>
+      <td style="max-width:120px;overflow:hidden">${uphoras}</td>
+    </tr>`;
+  }
+  tbody.innerHTML=rows;
+}
+
+// ═══════════════════════════════════════════════
+// CALENDAR TAB
+// ═══════════════════════════════════════════════
+function renderCalendar(){
+  const y=STATE.calYear, mo=STATE.calMonth;
+  const monthNames=['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  document.getElementById('cal-title').textContent=`${monthNames[mo]} ${y}`;
+
+  const grid=document.getElementById('cal-grid');
+  const dows=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const first=new Date(y,mo,1).getDay();
+  const days=new Date(y,mo+1,0).getDate();
+  const today=new Date();
+
+  for(let i=0;i<first;i++)html+=`<div class="cal-day other-month"></div>`;
+
+  for(let d=1;d<=days;d++){
+    const dt=new Date(y,mo,d);
+    const jd=toJD(y,mo+1,d,12);
+    const dow=dt.getDay();
+    const moon=moonSid(jd);
+    const sun=sunSid(jd);
+    const tithi=tithiNum(moon.sid,sun.sid);
+    const dagdha=isDagdhaTithi(dow,tithi);
+    const isToday=dt.toDateString()===today.toDateString();
+
+    // Quick shubh check (no Dagdha, good tithi)
+    const GOOD_T=[2,3,5,7,10,11,12,13];
+    const BAD_T=[4,8,9,14,15,30];
+    let cls='cal-day';
+    if(isToday)cls+=' today';
+    if(dagdha)cls+=' dagdha';
+    else if(GOOD_T.includes(tithi))cls+=' shubh';
+    else if(BAD_T.includes(tithi))cls+=' ashubh';
+
+    html+=`<div class="${cls}" onclick="showCalDay(${y},${mo+1},${d})">${d}</div>`;
+  }
+
+  grid.innerHTML=html;
+}
+
+function calNav(dir){
+  STATE.calMonth+=dir;
+  if(STATE.calMonth>11){STATE.calMonth=0;STATE.calYear++;}
+  if(STATE.calMonth<0){STATE.calMonth=11;STATE.calYear--;}
+  renderCalendar();
+}
+
+function showCalDay(y,mo,d){
+  const jd=toJD(y,mo,d,12);
+  const dt=new Date(y,mo-1,d);
+  const dow=dt.getDay();
+  const moon=moonSid(jd);
+  const sun=sunSid(jd);
+  const sr=sunriseIST(jd,STATE.lat,STATE.lon);
+  const ss=sunsetIST(jd,STATE.lat,STATE.lon);
+  const tithi=tithiNum(moon.sid,sun.sid);
+  const yoga=yogaNum(moon.sid,sun.sid);
+  const nakI=nakIdx(moon.sid);
+  const rk=rahuKaal(dow,sr,ss);
+  const dagdha=isDagdhaTithi(dow,tithi);
+  const abhi=abhijeetWindow(jd,STATE.lat,STATE.lon);
+
+  document.getElementById('cal-day-detail').innerHTML=`
+    <div class="card-header">${d} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]} ${y}</div>
+    ${dagdha?`<div class="dagdha-warning"><span class="dw-icon">⚠️</span><div><strong>Dagdha Tithi!</strong> Avoid major events.</div></div>`:''}
+    <div class="panch-grid">
+      <div class="panch-item"><div class="panch-label">Tithi</div><div class="panch-value">${TITHI_NAMES[tithi]||tithi}</div><div class="panch-sub">#${tithi}</div></div>
+      <div class="panch-item"><div class="panch-label">Nakshatra</div><div class="panch-value">${NAK_SYMBOLS[nakI]} ${NAK_NAMES[nakI]}</div></div>
+      <div class="panch-item"><div class="panch-label">Yoga</div><div class="panch-value">${YOGA_NAMES[yoga-1]}</div><div class="panch-sub">${BAD_YOGA.includes(yoga)?'⚠️':'✓'}</div></div>
+      <div class="panch-item"><div class="panch-label">Sunrise</div><div class="panch-value">${fmtH(sr)}</div></div>
+      <div class="panch-item"><div class="panch-label">Rahu Kaal</div><div class="panch-value">${fmtH(rk.start)}</div><div class="panch-sub">to ${fmtH(rk.end)}</div></div>
+      <div class="panch-item"><div class="panch-label">Abhijeet</div><div class="panch-value">${fmtH(abhi.start)}</div><div class="panch-sub">~${abhi.durationMin} min</div></div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// ABHIJEET LIVE + GOLDEN WINDOW (header updates)
+// ═══════════════════════════════════════════════
+function updateAbhijeetCard(){
+  const now=new Date();
+  const jd=toJD(now.getFullYear(),now.getMonth()+1,now.getDate(),12);
+  const abhi=abhijeetWindow(jd,STATE.lat,STATE.lon);
+  const nowH=now.getHours()+now.getMinutes()/60;
+  const inAbhi=nowH>=abhi.start&&nowH<=abhi.end;
+
+  document.getElementById('abhi-time').textContent=`${fmtH(abhi.start)} – ${fmtH(abhi.end)}`;
+  document.getElementById('abhi-dur').textContent=`~${abhi.durationMin} min`;
+  const liveBadge=document.getElementById('abhi-live-badge');
+  liveBadge.style.display=inAbhi?'block':'none';
+  document.getElementById('abhi-cats').textContent='Best: Business · Legal · Exam · Property';
+
+  // Golden window
+  const dow=now.getDay();
+  const sr=sunriseIST(jd,STATE.lat,STATE.lon);
+  const ss=sunsetIST(jd,STATE.lat,STATE.lon);
+  const gw=goldenWindow(STATE.selectedCat||'business',dow,sr,ss,now);
+  if(gw){
+    document.getElementById('golden-time').textContent=`${fmtH(gw.start)} – ${fmtH(gw.end)}`;
+    document.getElementById('golden-lord').textContent=`${PLANET_SYM[gw.lord]||''} ${gw.lord} Uphora · Best 5-min window`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// MISC
+// ═══════════════════════════════════════════════
+function setAyanamsa(key,el){
+  STATE.ayanamsa=key;
+  document.querySelectorAll('.ayanamsa-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ayanamsa-display').textContent=key.charAt(0).toUpperCase()+key.slice(1);
+  refreshAllCalculations();
+}
+
+function refreshAllCalculations(){
+  const activeTab=document.querySelector('.tab-page.active');
+  if(activeTab){
+    const id=activeTab.id;
+    if(id==='tab-panchang')renderPanchang();
+    if(id==='tab-hora')renderHora();
+    if(id==='tab-calendar')renderCalendar();
+  }
+  updateAbhijeetCard();
+}
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function showHistory(){
+  if(!STATE.queries.length){showToast('No queries yet');return;}
+  showToast(`Last: ${STATE.queries[0].cat} · Score ${STATE.queries[0].score}`);
+}
+
+function showUpgrade(){
+  showToast('Contact Naveen: 9669756111 for Pro license');
+}
+
+// Set default date
+function initDate(){
+  const today=new Date();
+  const yyyy=today.getFullYear();
+  const mm=String(today.getMonth()+1).padStart(2,'0');
+  const dd=String(today.getDate()).padStart(2,'0');
+  document.getElementById('query-date').value=`${yyyy}-${mm}-${dd}`;
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+(function init(){
+  initTheme();
+  applyI18n();
+  buildCatGrid();
+  initDate();
+  startClock();
+  initGPS();
+  updateAbhijeetCard();
+  setInterval(updateAbhijeetCard, 60000);
+  document.getElementById('history-count').textContent=`${STATE.queries.length} queries`;
+})();
+</script>
+</body>
+</html>
