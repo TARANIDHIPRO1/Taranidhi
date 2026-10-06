@@ -646,12 +646,14 @@ html,body{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:var(--s4);
+  margin-bottom:var(--s3);
+  gap:4px;
 }
 .cal-title{
   font-family:var(--font-display);
-  font-size:16px;
+  font-size:14px;
   font-weight:700;
+  text-align:center;
 }
 .cal-nav-btn{
   width:32px;height:32px;
@@ -661,6 +663,73 @@ html,body{
   color:var(--text);
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:14px;
+  flex-shrink:0;
+}
+.cal-year-skip{
+  font-size:16px;font-weight:900;
+  background:var(--card2);
+  border-color:var(--agni);
+}
+.cal-year-input{
+  width:68px;
+  background:var(--card2);
+  border:1px solid var(--agni);
+  color:var(--agni);
+  border-radius:var(--r2);
+  font-size:14px;
+  font-weight:700;
+  text-align:center;
+  padding:4px 2px;
+  font-family:var(--font-mono);
+  -moz-appearance:textfield;
+}
+.cal-year-input::-webkit-outer-spin-button,
+.cal-year-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.cal-view-row{
+  display:flex;gap:6px;margin-bottom:var(--s3);
+}
+.cal-view-btn{
+  flex:1;padding:6px 4px;font-size:11px;font-weight:600;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text2);border-radius:var(--r2);cursor:pointer;
+  transition:all .2s;
+}
+.cal-view-btn.active{
+  background:var(--agni);color:#fff;border-color:var(--agni);
+}
+/* Annual grid: 3 columns on wider, 2 on mobile */
+.cal-annual-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:var(--s4);
+}
+@media(min-width:600px){.cal-annual-grid{grid-template-columns:repeat(3,1fr);}}
+.cal-mini-title{
+  font-size:11px;font-weight:700;
+  text-align:center;margin-bottom:3px;
+  color:var(--agni);letter-spacing:.5px;
+}
+.cal-mini-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:1px;
+}
+.cal-mini-dow{font-size:8px;text-align:center;color:var(--text3);padding:1px 0;}
+.cal-mini-day{
+  font-size:9px;text-align:center;
+  padding:2px 0;border-radius:2px;
+  cursor:pointer;color:var(--text2);
+  min-height:14px;
+}
+.cal-mini-day:hover{background:var(--card2);}
+.cal-mini-day.shubh{color:#10B981;font-weight:600;}
+.cal-mini-day.ashubh{color:#EF4444;opacity:.7;}
+.cal-mini-day.dagdha{background:rgba(239,68,68,.12);color:#EF4444;}
+.cal-mini-day.today{background:var(--agni);color:#fff;border-radius:50%;}
+.cal-range-note{
+  font-size:11px;color:var(--text3);text-align:center;
+  margin-bottom:var(--s3);
 }
 .cal-grid{
   display:grid;
@@ -1097,12 +1166,52 @@ html,body{
 
     <!-- TAB: CALENDAR -->
     <div class="tab-page" id="tab-calendar">
-      <div class="cal-header">
-        <button class="cal-nav-btn" onclick="calNav(-1)">◀</button>
-        <div class="cal-title" id="cal-title"></div>
-        <button class="cal-nav-btn" onclick="calNav(1)">▶</button>
+      <!-- View Toggle -->
+      <div class="cal-view-row">
+        <button class="cal-view-btn active" id="btn-month-view" onclick="setCalView('month')">📅 Month</button>
+        <button class="cal-view-btn" id="btn-annual-view" onclick="setCalView('annual')">📆 Year</button>
+        <button class="cal-view-btn" id="btn-scan-view" onclick="setCalView('scan')">🔍 Best Dates</button>
       </div>
+      <!-- Nav: «year  ‹month  [Month Year]  month›  year» -->
+      <div class="cal-header">
+        <button class="cal-nav-btn cal-year-skip" onclick="calNavYear(-1)" title="Previous year">«</button>
+        <button class="cal-nav-btn" onclick="calNav(-1)" title="Previous month">‹</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+          <div class="cal-title" id="cal-title"></div>
+          <input class="cal-year-input" type="number" id="cal-year-input"
+            onchange="jumpToYear(this.value)" min="1800" max="2400" title="Type any year 1800–2400">
+        </div>
+        <button class="cal-nav-btn" onclick="calNav(1)" title="Next month">›</button>
+        <button class="cal-nav-btn cal-year-skip" onclick="calNavYear(1)" title="Next year">»</button>
+      </div>
+      <div class="cal-range-note">📅 Range: 1800 – 2400 CE · Past · Present · Future</div>
+      <!-- Month view grid -->
       <div class="cal-grid" id="cal-grid"></div>
+      <!-- Annual view -->
+      <div id="cal-annual-wrap" style="display:none"></div>
+      <!-- Best-dates scan -->
+      <div id="cal-scan-wrap" style="display:none">
+        <div class="card" style="margin-bottom:var(--s3)">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:var(--s3)">
+            Find best muhurta dates for selected event category:
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="scan-range" style="flex:1;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:var(--r2);padding:8px;font-size:13px">
+              <option value="3">Next 3 months</option>
+              <option value="6" selected>Next 6 months</option>
+              <option value="12">Next 1 year</option>
+              <option value="24">Next 2 years</option>
+              <option value="60">Next 5 years</option>
+              <option value="120">Next 10 years</option>
+            </select>
+            <button class="query-btn" style="flex:1;padding:10px" onclick="scanBestDates()">🔍 Scan</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">
+            ℹ️ Select an event category in Muhurta tab first
+          </div>
+        </div>
+        <div id="scan-results"></div>
+      </div>
       <div class="section-divider"><span>Selected Day Detail</span></div>
       <div class="card" id="cal-day-detail">
         <div style="color:var(--text2);font-size:13px">Select a date to see Panchang</div>
@@ -2127,11 +2236,141 @@ function renderHora(){
 // ═══════════════════════════════════════════════
 // CALENDAR TAB
 // ═══════════════════════════════════════════════
+let CAL_VIEW='month';
+
+function setCalView(v){
+  CAL_VIEW=v;
+  document.getElementById('btn-month-view').classList.toggle('active',v==='month');
+  document.getElementById('btn-annual-view').classList.toggle('active',v==='annual');
+  document.getElementById('btn-scan-view').classList.toggle('active',v==='scan');
+  document.getElementById('cal-grid').style.display=v==='month'?'grid':'none';
+  document.getElementById('cal-annual-wrap').style.display=v==='annual'?'block':'none';
+  document.getElementById('cal-scan-wrap').style.display=v==='scan'?'block':'none';
+  if(v==='annual')renderAnnualView();
+  else if(v==='month')renderCalendar();
+}
+
+function calNavYear(dir){
+  STATE.calYear+=dir;
+  const inp=document.getElementById('cal-year-input');
+  if(inp)inp.value=STATE.calYear;
+  if(CAL_VIEW==='annual')renderAnnualView();
+  else renderCalendar();
+}
+
+function jumpToYear(val){
+  const y=parseInt(val);
+  if(y>=1800&&y<=2400){
+    STATE.calYear=y;
+    if(CAL_VIEW==='annual')renderAnnualView();
+    else renderCalendar();
+  }
+}
+
+function renderAnnualView(){
+  const y=STATE.calYear;
+  const monthNames=['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  const today=new Date();
+  const GOOD_T=[2,3,5,7,10,11,12,13];
+  const BAD_T=[4,8,9,14,15,30];
+  const dows=['S','M','T','W','T','F','S'];
+  document.getElementById('cal-title').textContent=`Year ${y}`;
+  const inp=document.getElementById('cal-year-input');
+  if(inp)inp.value=y;
+
+  let html='<div class="cal-annual-grid">';
+  for(let mo=0;mo<12;mo++){
+    const first=new Date(y,mo,1).getDay();
+    const days=new Date(y,mo+1,0).getDate();
+    let g=dows.map(d=>`<div class="cal-mini-dow">${d}</div>`).join('');
+    for(let i=0;i<first;i++)g+=`<div class="cal-mini-day"></div>`;
+    for(let d=1;d<=days;d++){
+      const dt=new Date(y,mo,d);
+      const jd=toJD(y,mo+1,d,12);
+      const dow=dt.getDay();
+      const moon=moonSid(jd);
+      const sun=sunSid(jd);
+      const tithi=tithiNum(moon.sid,sun.sid);
+      const dagdha=isDagdhaTithi(dow,tithi);
+      const isToday=dt.toDateString()===today.toDateString();
+      let cls='cal-mini-day';
+      if(isToday)cls+=' today';
+      else if(dagdha)cls+=' dagdha';
+      else if(GOOD_T.includes(tithi))cls+=' shubh';
+      else if(BAD_T.includes(tithi))cls+=' ashubh';
+      g+=`<div class="${cls}" onclick="showCalDay(${y},${mo+1},${d})" title="${d} ${monthNames[mo].substr(0,3)} ${y}">${d}</div>`;
+    }
+    html+=`<div><div class="cal-mini-title">${monthNames[mo]}</div><div class="cal-mini-grid">${g}</div></div>`;
+  }
+  html+='</div>';
+  document.getElementById('cal-annual-wrap').innerHTML=html;
+}
+
+function scanBestDates(){
+  const cat=STATE.selectedCat;
+  const months=parseInt(document.getElementById('scan-range').value)||6;
+  const el=document.getElementById('scan-results');
+
+  if(!cat){
+    el.innerHTML=`<div class="card" style="color:var(--agni);font-size:13px">⚠️ Select an event category in the Muhurta tab first, then come back.</div>`;
+    return;
+  }
+
+  el.innerHTML=`<div class="card" style="color:var(--text2);font-size:13px">⏳ Scanning ${months} months… (${months*30} dates)</div>`;
+
+  // Async scan to avoid blocking UI
+  setTimeout(()=>{
+    const results=[];
+    const start=new Date();
+    const totalDays=months*30;
+    for(let i=0;i<totalDays;i++){
+      const dt=new Date(start);
+      dt.setDate(start.getDate()+i);
+      const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
+      const jd=toJD(y,m,d,12);
+      const r=calcScore(jd,STATE.lat,STATE.lon,cat,dt);
+      if(!r.dagdha&&r.score>=65){
+        results.push({y,m,d,score:r.score,prabhaav:r.prabhaav,tithi:r.tithi,nakI:r.nakI,yoga:r.yoga,dow:r.dow,lord:r.lord,dagdha:r.dagdha});
+      }
+    }
+    results.sort((a,b)=>b.score-a.score);
+    const top=results.slice(0,20);
+    const catObj=CATEGORIES.find(c=>c.id===cat);
+    const MN=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    if(top.length===0){
+      el.innerHTML=`<div class="card" style="color:var(--text2);font-size:13px">No dates with score ≥65 found in next ${months} months for ${catObj?catObj.name:cat}. Try a longer range or different category.</div>`;
+      return;
+    }
+
+    let html=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Top ${top.length} best dates for ${catObj?catObj.icon+' '+catObj.name:cat} in next ${months} months (score ≥65):</div>`;
+    top.forEach((r,i)=>{
+      const v=getVerdict(r.score,r.dagdha);
+      html+=`<div class="card" style="margin-bottom:6px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showCalDay(${r.y},${r.m},${r.d});STATE.calYear=${r.y};STATE.calMonth=${r.m-1};setCalView('month')">
+        <div style="font-size:20px">${v.emoji}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${r.d} ${MN[r.m]} ${r.y} · ${DN[r.dow]}</div>
+          <div style="font-size:11px;color:var(--text2)">${TITHI_NAMES[r.tithi]||'T'+r.tithi} · ${NAK_NAMES[r.nakI]} · ${r.lord} Hora</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:18px;font-weight:900;color:${r.score>=80?'#10B981':r.score>=65?'#F97316':'#EF4444'}">${r.score}</div>
+          <div style="font-size:10px;color:var(--text3)">Prabhaav ${r.prabhaav}/10</div>
+        </div>
+      </div>`;
+    });
+    el.innerHTML=html;
+  },50);
+}
+
 function renderCalendar(){
   const y=STATE.calYear, mo=STATE.calMonth;
   const monthNames=['January','February','March','April','May','June',
     'July','August','September','October','November','December'];
   document.getElementById('cal-title').textContent=`${monthNames[mo]} ${y}`;
+  const inp=document.getElementById('cal-year-input');
+  if(inp)inp.value=y;
 
   const grid=document.getElementById('cal-grid');
   const dows=['Su','Mo','Tu','We','Th','Fr','Sa'];
@@ -2172,7 +2411,8 @@ function calNav(dir){
   STATE.calMonth+=dir;
   if(STATE.calMonth>11){STATE.calMonth=0;STATE.calYear++;}
   if(STATE.calMonth<0){STATE.calMonth=11;STATE.calYear--;}
-  renderCalendar();
+  if(CAL_VIEW==='annual'){renderAnnualView();}
+  else{renderCalendar();}
 }
 
 function showCalDay(y,mo,d){
@@ -2290,6 +2530,9 @@ function initDate(){
   updateAbhijeetCard();
   setInterval(updateAbhijeetCard, 60000);
   document.getElementById('history-count').textContent=`${STATE.queries.length} queries`;
+  // Sync year input on load
+  const yInp=document.getElementById('cal-year-input');
+  if(yInp)yInp.value=STATE.calYear;
 })();
 </script>
 </body>
