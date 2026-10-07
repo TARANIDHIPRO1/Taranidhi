@@ -27,6 +27,7 @@ import {
 } from "./routes/admin";
 import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
+import { handleNaturalQuery } from "./routes/naturalQuery";
 import { handleMuhurtaScan } from "./routes/muhurtaScanner";
 import { handleMuhurtaProfessional } from "./routes/muhurtaProfessional";
 import { handleMuhurtaUpaya } from "./routes/muhurtaUpaya";
@@ -216,6 +217,9 @@ export default {
     }
     if (request.method === "GET" && pathname === "/kp/activities") {
       return handleListActivities(request, env);
+    }
+    if (request.method === "POST" && pathname === "/kp/query-natural") {
+      return handleNaturalQuery(request, env);
     }
 
     // ── Knowledge Search routes ──────────────────────────────────────────────

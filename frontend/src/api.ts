@@ -127,6 +127,11 @@ export const kpQuery = (kundaliId: number, activitySlug: string) =>
     body: JSON.stringify({ kundali_id: kundaliId, activity_slug: activitySlug }),
   });
 export const kpActivities = () => apiFetch("/kp/activities");
+export const kpQueryNatural = (kundaliId: number, question: string) =>
+  apiFetch("/kp/query-natural", {
+    method: "POST",
+    body: JSON.stringify({ kundali_id: kundaliId, question }),
+  });
 
 // ── Wallet ──
 export const walletBalance = () => apiFetch("/wallet/balance");
