@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TaraNidhi — Feature Test Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ── Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --bg:         #0f0f14;
+  --bg-card:    #16161f;
+  --bg-elevated:#1e1e2a;
+  --border:     rgba(255,255,255,0.08);
+  --text:       #e8e8f0;
+  --text-muted: #8888aa;
+  --text-dim:   #555570;
+
+  --akash:  #8B5CF6;  /* Birth Chart / KP */
+  --agni:   #F97316;  /* Muhurta */
+  --jal:    #0EA5E9;  /* Numerology */
+  --vayu:   #06B6D4;  /* Natural Query */
+  --prithvi:#10B981;  /* Wallet / Health */
+
+  --pass:   #10B981;
+  --fail:   #EF4444;
+  --warn:   #F59E0B;
+  --skip:   #6B7280;
+
+  --font-display: 'Poppins', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100vh; background: var(--bg); color: var(--text); }
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 0 0 80px 0;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,15,20,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 24px;
+}
+.topbar-logo {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  background: linear-gradient(135deg, var(--akash), var(--vayu));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.topbar-sub { color: var(--text-muted); font-size: 12px; margin-left: auto; }
+.topbar-time { color: var(--agni); font-family: var(--font-mono); font-size: 12px; }
+
+.page { max-width: 980px; margin: 0 auto; padding: 24px 20px; }
+
+/* ── Config panel ─────────────────────────────────────────────────────── */
+.config-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.config-card h2 {
+  font-family: var(--font-display); font-size: 16px; font-weight: 600;
+  color: var(--vayu); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.config-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+}
+@media (max-width: 600px) { .config-grid { grid-template-columns: 1fr; } }
+.field label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 9px 12px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius-md); color: var(--text);
+  font-family: var(--font-mono); font-size: 12px;
+  outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--vayu); }
+
+.run-btn {
+  margin-top: 16px; padding: 12px 28px;
+  background: linear-gradient(135deg, var(--akash), var(--vayu));
+  border: none; border-radius: var(--radius-md);
+  color: #fff; font-family: var(--font-display);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.run-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.run-btn:active { transform: translateY(0); }
+.run-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── Summary bar ─────────────────────────────────────────────────────── */
+.summary {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.summary-tile {
+  flex: 1; min-width: 100px; padding: 14px 16px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); text-align: center;
+}
+.summary-tile .num {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  line-height: 1;
+}
+.summary-tile .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+.summary-tile.pass .num { color: var(--pass); }
+.summary-tile.fail .num { color: var(--fail); }
+.summary-tile.warn .num { color: var(--warn); }
+.summary-tile.total .num { color: var(--text); }
+
+/* ── Progress bar ─────────────────────────────────────────────────────── */
+.progress-wrap {
+  background: var(--bg-elevated); border-radius: 99px;
+  height: 6px; margin-bottom: 24px; overflow: hidden;
+}
+.progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--akash), var(--vayu), var(--prithvi));
+  border-radius: 99px; transition: width 0.3s ease;
+}
+
+/* ── Section ──────────────────────────────────────────────────────────── */
+.section { margin-bottom: 20px; }
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: 1px solid var(--border); border-bottom: none;
+  cursor: pointer; user-select: none;
+}
+.section-header .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--text-dim); flex-shrink: 0;
+}
+.section-header .dot.pass { background: var(--pass); box-shadow: 0 0 6px var(--pass); }
+.section-header .dot.fail { background: var(--fail); box-shadow: 0 0 6px var(--fail); }
+.section-header .dot.running { background: var(--warn); animation: pulse 0.8s infinite; }
+.section-header h3 {
+  font-family: var(--font-display); font-size: 14px; font-weight: 600;
+  flex: 1;
+}
+.section-header .badge {
+  font-size: 11px; padding: 2px 8px; border-radius: 99px;
+  font-family: var(--font-mono); font-weight: 500;
+}
+.badge.pass { background: rgba(16,185,129,0.15); color: var(--pass); }
+.badge.fail { background: rgba(239,68,68,0.15); color: var(--fail); }
+.badge.running { background: rgba(245,158,11,0.15); color: var(--warn); }
+.badge.idle { background: rgba(107,114,128,0.15); color: var(--skip); }
+.section-body {
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  overflow: hidden;
+}
+
+/* ── Test row ─────────────────────────────────────────────────────────── */
+.test-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: background 0.15s;
+}
+.test-row:last-child { border-bottom: none; }
+.test-row:hover { background: var(--bg-elevated); }
+
+.test-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; width: 20px; text-align: center; }
+.test-main { flex: 1; min-width: 0; }
+.test-name { font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+.test-desc { font-size: 12px; color: var(--text-muted); }
+.test-duration { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); flex-shrink: 0; align-self: center; }
+
+/* ── Detail expand ─────────────────────────────────────────────────────── */
+.test-detail {
+  margin: 6px 0 0 32px;
+  padding: 10px 12px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); line-height: 1.7;
+  max-height: 200px; overflow-y: auto;
+  display: none;
+}
+.test-detail.visible { display: block; }
+.detail-key { color: var(--vayu); }
+.detail-val { color: var(--text); }
+.detail-err { color: var(--fail); }
+
+/* ── Animations ───────────────────────────────────────────────────────── */
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; animation: spin 0.7s linear infinite; }
+
+/* ── Log panel ──────────────────────────────────────────────────────────  */
+.log-panel {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  margin-top: 20px;
+}
+.log-panel h3 {
+  font-family: var(--font-display); font-size: 13px; font-weight: 600;
+  color: var(--text-muted); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.log-scroll {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px; max-height: 220px; overflow-y: auto;
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.8;
+}
+.log-line { border-bottom: 1px solid rgba(255,255,255,0.03); padding: 1px 0; }
+.log-time { color: var(--text-dim); margin-right: 10px; }
+.log-ok { color: var(--pass); }
+.log-err { color: var(--fail); }
+.log-info { color: var(--vayu); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">✦ TaraNidhi</div>
+  <div style="color:var(--text-muted);font-size:12px;">Feature Test Dashboard</div>
+  <div class="topbar-sub">v1.0 · All Systems</div>
+  <div class="topbar-time" id="clock">—</div>
+</div>
+
+<div class="page">
+
+  <!-- Config ──────────────────────────────────────────────────── -->
+  <div class="config-card">
+    <h2>⚙️ Configuration</h2>
+    <div class="config-grid">
+      <div class="field">
+        <label>API Base URL</label>
+        <input id="cfg-base" type="text" value="https://occultviision.workers.dev" placeholder="https://...workers.dev">
+      </div>
+      <div class="field">
+        <label>Session Token (Bearer)</label>
+        <input id="cfg-token" type="password" placeholder="ov_session from localStorage">
+      </div>
+      <div class="field">
+        <label>Kundali ID</label>
+        <input id="cfg-kundali" type="number" value="1" min="1">
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:16px;flex-wrap:wrap;">
+      <button class="run-btn" id="btn-run" onclick="runAll()">
+        <span>▶</span> Run All Tests
+      </button>
+      <button class="run-btn" style="background:var(--bg-elevated);color:var(--text);" onclick="clearResults()">
+        ✕ Clear
+      </button>
+      <label style="display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px;cursor:pointer;">
+        <input type="checkbox" id="cfg-auto" style="accent-color:var(--vayu);">
+        Auto-run every 30 min
+      </label>
+    </div>
+  </div>
+
+  <!-- Summary ─────────────────────────────────────────────────── -->
+  <div class="summary" id="summary" style="display:none;">
+    <div class="summary-tile total"><div class="num" id="sum-total">0</div><div class="lbl">Total</div></div>
+    <div class="summary-tile pass"><div class="num" id="sum-pass">0</div><div class="lbl">Passed</div></div>
+    <div class="summary-tile fail"><div class="num" id="sum-fail">0</div><div class="lbl">Failed</div></div>
+    <div class="summary-tile warn"><div class="num" id="sum-skip">0</div><div class="lbl">Skipped</div></div>
+    <div class="summary-tile" style="flex:2;"><div class="num" id="sum-dur" style="font-size:20px;color:var(--vayu);">—</div><div class="lbl">Total Time</div></div>
+  </div>
+  <div class="progress-wrap" id="progress-wrap" style="display:none;">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Test sections ──────────────────────────────────────────── -->
+  <div id="sections"></div>
+
+  <!-- Log ─────────────────────────────────────────────────────── -->
+  <div class="log-panel">
+    <h3>📋 Run Log <span style="color:var(--text-dim);font-size:11px;font-family:var(--font-mono);" id="log-count"></span></h3>
+    <div class="log-scroll" id="log"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Clock ─────────────────────────────────────────────────────────────────
+function updateClock() {
+  const t = new Date().toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata', hour12: false,
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+  document.getElementById('clock').textContent = t + ' IST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Config helpers ─────────────────────────────────────────────────────────
+function base() { return document.getElementById('cfg-base').value.replace(/\/$/, ''); }
+function token() { return document.getElementById('cfg-token').value.trim(); }
+function kundaliId() { return parseInt(document.getElementById('cfg-kundali').value) || 1; }
+
+// ── Log ───────────────────────────────────────────────────────────────────
+const logs = [];
+function log(type, msg) {
+  const t = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+  logs.push({ t, type, msg });
+  const el = document.getElementById('log');
+  const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
+  el.innerHTML += `<div class="log-line"><span class="log-time">${t}</span><span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('log-count').textContent = `(${logs.length} lines)`;
+}
+
+// ── API call ──────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token()) headers['Authorization'] = 'Bearer ' + token();
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const t0 = Date.now();
+  let res, data;
+  try {
+    res = await fetch(base() + path, opts);
+    try { data = await res.json(); } catch { data = null; }
+    return { ok: res.ok, status: res.status, data, ms: Date.now() - t0 };
+  } catch (e) {
+    return { ok: false, status: 0, data: null, ms: Date.now() - t0, error: e.message };
+  }
+}
+
+// ── Test definitions ──────────────────────────────────────────────────────
+//  Each test: { id, name, desc, category, color, fn: async () => { ok, detail } }
+
+const SUITES = [
+  {
+    id: 'health',
+    label: 'System Health',
+    color: 'var(--prithvi)',
+    tests: [
+      {
+        id: 'health-check',
+        name: 'Health Endpoint',
+        desc: 'GET /health → "ok"',
+        fn: async () => {
+          const r = await fetch(base() + '/health');
+          const txt = await r.text();
+          const ok = r.status === 200 && txt.trim() === 'ok';
+          return { ok, detail: { status: r.status, body: txt.trim() } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'auth',
+    label: 'Authentication',
+    color: 'var(--warn)',
+    tests: [
+      {
+        id: 'auth-no-token',
+        name: 'Reject Unauthenticated',
+        desc: 'GET /kundali without token → 401',
+        fn: async () => {
+          const r = await fetch(base() + '/kundali');
+          const ok = r.status === 401;
+          return { ok, detail: { expectedStatus: 401, got: r.status } };
+        }
+      },
+      {
+        id: 'auth-token',
+        name: 'Token Accepted',
+        desc: 'GET /kundali with valid Bearer token → 200',
+        skip: !token(),
+        skipReason: 'No session token set',
+        fn: async () => {
+          const r = await api('GET', '/kundali');
+          const ok = r.ok;
+          return { ok, detail: { status: r.status, kundalis: r.data?.kundalis?.length ?? '?' } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'kundali',
+    label: 'Kundali CRUD',
+    color: 'var(--akash)',
+    tests: [
+      {
+        id: 'kundali-list',
+        name: 'List Kundalis',
+        desc: 'GET /kundali → array of kundalis',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', '/kundali');
+          const ok = r.ok && Array.isArray(r.data?.kundalis);
+          return { ok, detail: { count: r.data?.kundalis?.length, first: r.data?.kundalis?.[0]?.label } };
+        }
+      },
+      {
+        id: 'kundali-get',
+        name: 'Get Kundali by ID',
+        desc: `GET /kundali/${kundaliId()} → kundali object`,
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const id = kundaliId();
+          const r = await api('GET', `/kundali/${id}`);
+          const ok = r.ok && r.data?.id === id;
+          return { ok, detail: { id: r.data?.id, label: r.data?.label, birthDate: r.data?.birth_date } };
+        }
+      },
+      {
+        id: 'kundali-chart',
+        name: 'Kundali Chart (Full)',
+        desc: `GET /kundali/${kundaliId()}/chart → computed chart`,
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', `/kundali/${kundaliId()}/chart`);
+          const ok = r.ok && r.data;
+          return { ok, detail: { lagna: r.data?.lagna, moonNakshatra: r.data?.moonNakshatra } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'kp',
+    label: 'KP Horary System',
+    color: 'var(--akash)',
+    tests: [
+      {
+        id: 'kp-chart',
+        name: 'KP Chart',
+        desc: `GET /kp/chart/${kundaliId()} → KP cusps & sub-lords`,
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', `/kp/chart/${kundaliId()}`);
+          const ok = r.ok && r.data;
+          const cusps = r.data?.cusps;
+          return { ok, detail: { cuspsCount: cusps?.length, house1SubLord: cusps?.[0]?.subLord } };
+        }
+      },
+      {
+        id: 'kp-activities',
+        name: 'Activity List',
+        desc: 'GET /kp/activities → categories with activities',
+        fn: async () => {
+          const r = await api('GET', '/kp/activities');
+          const ok = r.ok && Array.isArray(r.data?.categories);
+          const total = r.data?.categories?.reduce((a, c) => a + (c.activities?.length ?? 0), 0);
+          return { ok, detail: { categories: r.data?.categories?.length, totalActivities: total } };
+        }
+      },
+      {
+        id: 'kp-query-browse',
+        name: 'KP Query (Browse)',
+        desc: 'POST /kp/query → house verdicts for job-interview',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query', { kundali_id: kundaliId(), activity_slug: 'job-interview' });
+          const ok = r.ok && Array.isArray(r.data?.houseVerdicts);
+          return { ok, detail: {
+            houseVerdicts: r.data?.houseVerdicts?.length,
+            sample: r.data?.houseVerdicts?.[0],
+          }};
+        }
+      },
+    ]
+  },
+  {
+    id: 'natural-query',
+    label: 'Natural Language Query',
+    color: 'var(--vayu)',
+    tests: [
+      {
+        id: 'nlq-hindi',
+        name: 'Hindi Query — Interview',
+        desc: '"kya mein aaj interview ke liye ja sakta hoon?" → job-interview → PROCEED/WAIT/AVOID',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'kya mein aaj interview ke liye ja sakta hoon?'
+          });
+          const ok = r.ok && ['PROCEED','WAIT','AVOID'].includes(r.data?.combinedVerdict);
+          return { ok, detail: {
+            detectedSlug: r.data?.intent?.slug,
+            confidence: r.data?.intent?.confidence,
+            combinedVerdict: r.data?.combinedVerdict,
+            horaLord: r.data?.panchang?.hora?.lord,
+          }};
+        }
+      },
+      {
+        id: 'nlq-english',
+        name: 'English Query — Client Meeting',
+        desc: '"Can I go meet my client today?" → business-partner-meeting',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'Can I go meet my client today?'
+          });
+          const ok = r.ok && r.data?.intent?.slug === 'business-partner-meeting';
+          return { ok, detail: {
+            detectedSlug: r.data?.intent?.slug,
+            confidence: r.data?.intent?.confidence,
+            combinedVerdict: r.data?.combinedVerdict,
+          }};
+        }
+      },
+      {
+        id: 'nlq-hindi-contract',
+        name: 'Hindi Query — Contract',
+        desc: '"aaj contract sign karna chahta hoon" → business-contract',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'aaj contract sign karna chahta hoon'
+          });
+          const ok = r.ok && r.data?.intent?.slug === 'business-contract';
+          return { ok, detail: {
+            detectedSlug: r.data?.intent?.slug,
+            combinedVerdict: r.data?.combinedVerdict,
+          }};
+        }
+      },
+      {
+        id: 'nlq-unrecognized',
+        name: 'Unrecognized Query → Error Code',
+        desc: '"aaj mausam kaisa hai" → INTENT_UNRECOGNIZED',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'aaj mausam kaisa hai'
+          });
+          const ok = !r.ok && r.data?.code === 'INTENT_UNRECOGNIZED';
+          return { ok, detail: { status: r.status, code: r.data?.code, error: r.data?.error } };
+        }
+      },
+      {
+        id: 'nlq-bilingual-reasoning',
+        name: 'Bilingual Reasoning Present',
+        desc: 'Response contains both reasoningHindi and reasoningEnglish',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'kya aaj shaadi ka muhurta dekhein?'
+          });
+          const hasHi = typeof r.data?.reasoningHindi === 'string' && r.data.reasoningHindi.length > 10;
+          const hasEn = typeof r.data?.reasoningEnglish === 'string' && r.data.reasoningEnglish.length > 10;
+          const ok = r.ok && hasHi && hasEn;
+          return { ok, detail: {
+            hasHindi: hasHi,
+            hasEnglish: hasEn,
+            hindiPreview: r.data?.reasoningHindi?.slice(0, 60),
+          }};
+        }
+      },
+      {
+        id: 'nlq-panchang',
+        name: 'Panchang Data in Response',
+        desc: 'Response contains vara, hora, rahuKaal, tarabala',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/kp/query-natural', {
+            kundali_id: kundaliId(),
+            question: 'court jaana hai aaj'
+          });
+          const p = r.data?.panchang ?? {};
+          const ok = r.ok && p.vara && p.hora && p.rahuKaal && p.tarabala;
+          return { ok, detail: {
+            vara: p.vara,
+            horaLord: p.hora?.lord,
+            rahuActive: p.rahuKaal?.active,
+            taraName: p.tarabala?.taraName,
+            taraScore: p.tarabala?.taraScore,
+          }};
+        }
+      },
+    ]
+  },
+  {
+    id: 'muhurta',
+    label: 'Muhurta Engine',
+    color: 'var(--agni)',
+    tests: [
+      {
+        id: 'muhurta-now',
+        name: 'Muhurta Now',
+        desc: 'GET /muhurta/now → current hora, vara, quality',
+        fn: async () => {
+          const r = await api('GET', `/muhurta/now?lat=23.2505&lon=77.4065`);
+          const ok = r.ok && r.data;
+          return { ok, detail: {
+            vara: r.data?.vara,
+            hora: r.data?.hora?.lord,
+            quality: r.data?.hora?.quality,
+          }};
+        }
+      },
+      {
+        id: 'muhurta-scan',
+        name: 'Muhurta Scan',
+        desc: 'GET /muhurta/scan → top N auspicious slots',
+        fn: async () => {
+          const r = await api('GET', `/muhurta/scan?lat=23.2505&lon=77.4065&top_n=3`);
+          const ok = r.ok && Array.isArray(r.data?.slots ?? r.data?.results ?? r.data);
+          const arr = r.data?.slots ?? r.data?.results ?? (Array.isArray(r.data) ? r.data : []);
+          return { ok, detail: { slotsFound: arr.length, first: arr[0] } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'numerology',
+    label: 'Numerology',
+    color: 'var(--jal)',
+    tests: [
+      {
+        id: 'numerology-report',
+        name: 'Numerology Report',
+        desc: `GET /numerology?kundali_id=${kundaliId()} → numbers`,
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', `/numerology?kundali_id=${kundaliId()}`);
+          const ok = r.ok && r.data;
+          return { ok, detail: {
+            lifePathNumber: r.data?.lifePathNumber ?? r.data?.life_path,
+            destinyNumber: r.data?.destinyNumber ?? r.data?.destiny,
+          }};
+        }
+      },
+    ]
+  },
+  {
+    id: 'wallet',
+    label: 'Wallet & Billing',
+    color: 'var(--prithvi)',
+    tests: [
+      {
+        id: 'wallet-balance',
+        name: 'Wallet Balance',
+        desc: 'GET /wallet/balance → points, tier, transactions',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', '/wallet/balance');
+          const ok = r.ok && typeof r.data?.balance !== 'undefined';
+          return { ok, detail: {
+            balance: r.data?.balance,
+            tier: r.data?.tier,
+            txCount: r.data?.transactions?.length,
+          }};
+        }
+      },
+      {
+        id: 'wallet-recharge-no-creds',
+        name: 'Recharge → 503 Without Razorpay',
+        desc: 'POST /wallet/recharge → 503 gracefully (no creds configured)',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('POST', '/wallet/recharge', { amount_paise: 10000 });
+          // Either 503 (not configured) or 200 (configured)
+          const ok = [200, 503].includes(r.status);
+          return { ok, detail: { status: r.status, message: r.data?.message ?? r.data?.error } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'admin',
+    label: 'Admin Panel',
+    color: 'var(--warn)',
+    tests: [
+      {
+        id: 'admin-stats',
+        name: 'Admin Stats',
+        desc: 'GET /admin/stats → queries 24h, active users, revenue',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', '/admin/stats');
+          const ok = r.ok && r.data;
+          return { ok, detail: {
+            queries24h: r.data?.queries24h ?? r.data?.total_queries,
+            activeUsers: r.data?.activeUsers ?? r.data?.active_users,
+          }};
+        }
+      },
+      {
+        id: 'admin-users',
+        name: 'Admin User List',
+        desc: 'GET /admin/users → user list (admin only)',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', '/admin/users');
+          // 200 if admin token, 403 if regular user — both are valid responses
+          const ok = [200, 403].includes(r.status);
+          return { ok, detail: { status: r.status, userCount: r.data?.users?.length } };
+        }
+      },
+    ]
+  },
+  {
+    id: 'referral',
+    label: 'Referral System',
+    color: 'var(--jal)',
+    tests: [
+      {
+        id: 'referral-code',
+        name: 'Get Referral Code',
+        desc: 'GET /referral/code → unique referral code',
+        skip: !token(), skipReason: 'Needs token',
+        fn: async () => {
+          const r = await api('GET', '/referral/code');
+          const ok = r.ok && typeof r.data?.code === 'string';
+          return { ok, detail: { code: r.data?.code } };
+        }
+      },
+    ]
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────
+let results = {};
+let running = false;
+
+// ── Render sections ────────────────────────────────────────────────────────
+function renderSections() {
+  const container = document.getElementById('sections');
+  container.innerHTML = SUITES.map(suite => `
+    <div class="section" id="suite-${suite.id}">
+      <div class="section-header" onclick="toggleSuite('${suite.id}')">
+        <div class="dot" id="dot-${suite.id}" style="background:${suite.color};box-shadow:0 0 6px ${suite.color};"></div>
+        <h3 style="color:${suite.color};">${suite.label}</h3>
+        <span class="badge idle" id="badge-${suite.id}">${suite.tests.length} tests</span>
+        <span style="color:var(--text-dim);font-size:12px;">▾</span>
+      </div>
+      <div class="section-body" id="body-${suite.id}">
+        ${suite.tests.map(t => renderTestRow(t)).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTestRow(t) {
+  return `
+    <div class="test-row" id="row-${t.id}">
+      <div class="test-icon" id="icon-${t.id}">○</div>
+      <div class="test-main">
+        <div class="test-name">${t.name}${t.skip ? ' <span style="color:var(--skip);font-size:11px;font-weight:400;">[SKIP]</span>' : ''}</div>
+        <div class="test-desc">${t.desc}</div>
+        <div class="test-detail" id="detail-${t.id}"></div>
+      </div>
+      <div class="test-duration" id="dur-${t.id}"></div>
+    </div>
+  `;
+}
+
+function toggleSuite(id) {
+  const body = document.getElementById('body-' + id);
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+
+// ── Run tests ──────────────────────────────────────────────────────────────
+async function runAll() {
+  if (running) return;
+  running = true;
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner">⟳</span> Running…';
+
+  results = {};
+  document.getElementById('summary').style.display = 'flex';
+  document.getElementById('progress-wrap').style.display = 'block';
+
+  // Reset icons
+  document.querySelectorAll('[id^="icon-"]').forEach(el => el.textContent = '○');
+  document.querySelectorAll('[id^="dur-"]').forEach(el => el.textContent = '');
+  document.querySelectorAll('[id^="detail-"]').forEach(el => { el.innerHTML = ''; el.classList.remove('visible'); });
+
+  const allTests = SUITES.flatMap(s => s.tests.map(t => ({ ...t, suiteId: s.id })));
+  let done = 0, pass = 0, fail = 0, skip = 0;
+  const t0 = Date.now();
+
+  updateSummary(0, 0, 0, 0, 0);
+
+  for (const t of allTests) {
+    setIcon(t.id, 'running');
+    if (t.skip) {
+      setIcon(t.id, 'skip');
+      setDur(t.id, 'SKIP');
+      setDetail(t.id, { reason: t.skipReason });
+      log('info', `SKIP  ${t.name} — ${t.skipReason}`);
+      skip++;
+      done++;
+      updateProgress(done, allTests.length);
+      updateSummary(done + skip, pass, fail, skip, Date.now() - t0);
+      continue;
+    }
+    try {
+      const ts = Date.now();
+      const { ok, detail } = await t.fn();
+      const ms = Date.now() - ts;
+      results[t.id] = { ok, ms, detail };
+      setIcon(t.id, ok ? 'pass' : 'fail');
+      setDur(t.id, ms + 'ms');
+      setDetail(t.id, detail, !ok);
+      if (ok) { pass++; log('ok', `PASS  ${t.name}  (${ms}ms)`); }
+      else { fail++; log('err', `FAIL  ${t.name}  (${ms}ms)`); }
+    } catch (e) {
+      results[t.id] = { ok: false, error: e.message };
+      setIcon(t.id, 'fail');
+      setDur(t.id, 'ERR');
+      setDetail(t.id, { error: e.message }, true);
+      fail++;
+      log('err', `ERROR ${t.name}  — ${e.message}`);
+    }
+    done++;
+    updateProgress(done, allTests.length);
+    updateSummary(done + skip, pass, fail, skip, Date.now() - t0);
+
+    // Small delay so the UI doesn't freeze
+    await new Promise(r => setTimeout(r, 80));
+  }
+
+  updateSuiteDots();
+  running = false;
+  btn.disabled = false;
+  btn.innerHTML = '<span>▶</span> Run All Tests';
+  log('info', `── Done: ${pass} passed, ${fail} failed, ${skip} skipped — ${Date.now() - t0}ms total`);
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
+function setIcon(id, state) {
+  const el = document.getElementById('icon-' + id);
+  if (!el) return;
+  const icons = { running: '<span class="spinner" style="color:var(--warn);">⟳</span>', pass: '✅', fail: '❌', skip: '⏭' };
+  el.innerHTML = icons[state] ?? '○';
+}
+
+function setDur(id, text) {
+  const el = document.getElementById('dur-' + id);
+  if (el) el.textContent = text;
+}
+
+function setDetail(id, obj, isError) {
+  const el = document.getElementById('detail-' + id);
+  if (!el || !obj) return;
+  const lines = Object.entries(obj).map(([k, v]) => {
+    const val = typeof v === 'object' ? JSON.stringify(v) : String(v ?? '—');
+    const cls = isError && (k === 'error' || k === 'reason') ? 'detail-err' : 'detail-val';
+    return `<div><span class="detail-key">${k}:</span> <span class="${cls}">${val}</span></div>`;
+  }).join('');
+  el.innerHTML = lines;
+  el.classList.add('visible');
+}
+
+function updateProgress(done, total) {
+  document.getElementById('progress-bar').style.width = (done / total * 100) + '%';
+}
+
+function updateSummary(total, pass, fail, skip, ms) {
+  document.getElementById('sum-total').textContent = total;
+  document.getElementById('sum-pass').textContent = pass;
+  document.getElementById('sum-fail').textContent = fail;
+  document.getElementById('sum-skip').textContent = skip;
+  document.getElementById('sum-dur').textContent = ms < 1000 ? ms + 'ms' : (ms / 1000).toFixed(1) + 's';
+}
+
+function updateSuiteDots() {
+  for (const suite of SUITES) {
+    const suiteResults = suite.tests.map(t => results[t.id]);
+    const anyFail = suiteResults.some(r => r && !r.ok);
+    const anyRun = suiteResults.some(r => r);
+    const dot = document.getElementById('dot-' + suite.id);
+    const badge = document.getElementById('badge-' + suite.id);
+    if (!anyRun) return;
+    if (anyFail) {
+      dot.className = 'dot fail';
+      badge.className = 'badge fail';
+      badge.textContent = 'FAIL';
+    } else {
+      dot.className = 'dot pass';
+      badge.className = 'badge pass';
+      badge.textContent = 'PASS';
+    }
+  }
+}
+
+function clearResults() {
+  results = {};
+  document.getElementById('log').innerHTML = '';
+  logs.length = 0;
+  document.getElementById('log-count').textContent = '';
+  document.getElementById('summary').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  renderSections();
+}
+
+// ── Auto-run ──────────────────────────────────────────────────────────────
+let autoTimer = null;
+document.getElementById('cfg-auto').addEventListener('change', function() {
+  if (this.checked) {
+    autoTimer = setInterval(() => { if (!running) runAll(); }, 30 * 60 * 1000);
+    log('info', 'Auto-run enabled — every 30 minutes');
+  } else {
+    clearInterval(autoTimer);
+    log('info', 'Auto-run disabled');
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderSections();
+
+// Auto-load token from localStorage if on same origin
+try {
+  const saved = localStorage.getItem('ov_session');
+  if (saved) {
+    document.getElementById('cfg-token').value = saved;
+    log('info', 'Session token auto-loaded from localStorage');
+  }
+} catch {}
+</script>
+</body>
+</html>
