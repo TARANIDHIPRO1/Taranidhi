@@ -634,6 +634,77 @@ function muhurtaWindows(pn,actKey){
   out.sort(function(x,y){return y.score-x.score;});
   return out;
 }
+/* ── PANCHA PAKSHI SHASTRA ──────────────────────────────────────────────────
+   Source: Agathiyar Pancha Pakshi Shastra (Tamil Siddha school)
+   School: Tamil — asymmetric groups (5,6,5,6,5); Crow fixed in both pakshas;
+           4 independent sub-period tables (paksha×day/night).
+   Night table: VedAstro Part 6 (Krishna nights). Sunday Shukla night should
+   be Crow=2 per Agathiyar text — single table used pending further verification.
+   ────────────────────────────────────────────────────────────────────────── */
+/* Bird index: 0=Vulture, 1=Owl, 2=Crow, 3=Cock, 4=Peacock */
+/* Shukla: Ash-Mri(0-4)=Vulture(5), Ard-PurPha(5-10)=Owl(6),
+   UttPha-Vis(11-15)=Crow(5)[FIXED], Anu-Sra(16-21)=Cock(6), Dha-Rev(22-26)=Peacock(5) */
+var PP_SHUKLA=[0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4];
+/* Krishna: Ash-Mri(0-4)=Peacock(5), Ard-PurPha(5-10)=Cock(6),
+   UttPha-Vis(11-15)=Crow(5)[FIXED], Anu-UttAsh(16-20)=Owl(5), Sra-Rev(21-26)=Vulture(6) */
+var PP_KRISHNA=[4,4,4,4,4,3,3,3,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0,0];
+var PP_BIRDS=['Vulture','Owl','Crow','Cock','Peacock'];
+var PP_BIRDS_HI=['गिद्ध','उल्लू','कौआ','मुर्गा','मोर'];
+var PP_BIRDS_EM=['🦅','🦉','🐦','🐓','🦚'];
+/* Rotation order within a yama: pos 0=Eating(start), 1=Walking, 2=Ruling(peak), 3=Sleeping, 4=Dying */
+var PP_ROTATION=[0,1,3,2,4]; /* Vulture→Owl→Cock→Crow→Peacock */
+var PP_ACTIVITY=['Eating','Walking','Ruling','Sleeping','Dying'];
+var PP_ACTIVITY_HI=['भोजन','चलन','शासन','निद्रा','मृत्यु'];
+var PP_ACT_SCORE=[0.75,0.5,1.0,0.25,0.0];
+var PP_ACT_CLS=['warn','muted','good','muted','bad'];
+/* Sub-period durations per yama [Eat,Walk,Rule,Sleep,Die] in minutes; each sums to 144 */
+var PP_SUB={
+  shukla_day:   [36,30,48,18,12],
+  shukla_night: [30,30,24,24,36],
+  krishna_day:  [48,36,18,12,30],
+  krishna_night:[42,42,18,18,24]
+};
+/* Yama-1 eating bird by weekday [0=Sun..6=Sat] — day */
+var PP_DAY_START=[0,1,0,1,2,3,1]; /* Sun=Vulture,Mon=Owl,Tue=Vulture,Wed=Owl,Thu=Crow,Fri=Cock,Sat=Owl */
+/* Yama-1 eating bird — night (VedAstro Part 6) */
+var PP_NIGHT_START=[4,0,4,3,1,3,0]; /* Sun=Peacock,Mon=Vulture,Tue=Peacock,Wed=Cock,Thu=Owl,Fri=Cock,Sat=Vulture */
+function calcPanchaPakshi(birthNak,isBirthShukla,pn){
+  var ev=pn.ev;
+  if(!ev||!ev.sr||!ev.ss||!ev.nsr)return null;
+  var t=pn.date.getTime(),sr=ev.sr.getTime(),ss=ev.ss.getTime(),nsr=ev.nsr.getTime();
+  if(t<sr||t>=nsr)return null;
+  var birthBird=isBirthShukla?PP_SHUKLA[birthNak]:PP_KRISHNA[birthNak];
+  var isDay=t>=sr&&t<ss;
+  var isTodayShukla=pn.tithi.n<=15;
+  var wd=pn.vara;
+  var yamaMs=144*60000; /* 2h 24m */
+  var periodStart=isDay?sr:ss;
+  var yamaNum=Math.min(4,Math.floor((t-periodStart)/yamaMs)); /* 0-based */
+  var yamaStart=periodStart+yamaNum*yamaMs;
+  /* Eating bird for this yama: base start bird rotated by yama index */
+  var baseBird=isDay?PP_DAY_START[wd]:PP_NIGHT_START[wd];
+  var baseRotIdx=PP_ROTATION.indexOf(baseBird);
+  var yamaEatBird=PP_ROTATION[(baseRotIdx+yamaNum)%5];
+  var yamaEatIdx=PP_ROTATION.indexOf(yamaEatBird);
+  /* Birth bird rotation offset → its activity this yama */
+  var bRotIdx=PP_ROTATION.indexOf(birthBird);
+  var actOff=(bRotIdx-yamaEatIdx+5)%5; /* 0=Eat,1=Walk,2=Rule,3=Sleep,4=Die */
+  /* Sub-period within the yama */
+  var subKey=isTodayShukla?(isDay?'shukla_day':'shukla_night'):(isDay?'krishna_day':'krishna_night');
+  var durs=PP_SUB[subKey];
+  var elMin=(t-yamaStart)/60000;
+  var sub=4,cumul=0;
+  for(var i=0;i<5;i++){cumul+=durs[i];if(elMin<cumul){sub=i;break;}}
+  var subStart=0;for(var j=0;j<sub;j++)subStart+=durs[j];
+  var subMinsLeft=Math.round(Math.max(0,subStart+durs[sub]-elMin));
+  /* Yama ruler = bird at rotation position 2 from eating bird (the one whose activity is Ruling) */
+  var yamaRuler=PP_ROTATION[(yamaEatIdx+2)%5];
+  return{birthBird:birthBird,yamaNum:yamaNum+1,isDay:isDay,
+    yamaRuler:yamaRuler,actOff:actOff,
+    activity:PP_ACTIVITY[actOff],activityHi:PP_ACTIVITY_HI[actOff],
+    score:PP_ACT_SCORE[actOff],cls:PP_ACT_CLS[actOff],
+    sub:sub,subName:PP_ACTIVITY[sub],subMinsLeft:subMinsLeft};
+}
 /* ===== end core ===== */
 
 </script>
@@ -745,6 +816,37 @@ function renderPan(){
       ['Brahma muhurta · ब्रह्म मुहूर्त','<span class="good">'+trng(p.brahma.start,p.brahma.end,pn)+'</span>'],
       ['Bhadra (Vishti)',pn.karana.name[0].indexOf('Vishti')===0?'<span class="bad">Running now</span>':'Not running now']])+'</div></div>'+
       '<p class="note">Rahu, Yama and Gulika are eighths of the day from sunrise to sunset. Abhijit is the 8th of 15 daytime muhurtas. Durmuhurta, Varjyam and Amrit Kalam are not shown.</p></div>';}
+  /* ── Pancha Pakshi card ── */
+  html+='<div class="card"><h2>Pancha Pakshi <span class="hi">पंच पक्षी</span></h2>';
+  if(!S.K||!S.K.planets||S.K.planets.Moon==null){
+    html+='<p class="note">Load your birth chart in the Kundli tab to see your Pancha Pakshi activity.</p>';
+  }else{
+    var ppMoon=S.K.planets.Moon;
+    var ppPak=S.K.panchang&&S.K.panchang.tithi?S.K.panchang.tithi.paksha:'Shukla';
+    var ppIsSh=ppPak.indexOf('Shukla')>=0;
+    var ppR=calcPanchaPakshi(ppMoon.nak,ppIsSh,pn);
+    if(!ppR){
+      html+='<p class="note">Pancha Pakshi requires a time between sunrise and next sunrise.</p>';
+    }else{
+      html+='<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">';
+      html+='<div style="flex:1;min-width:180px">'+kv([
+        ['Birth bird · जन्म पक्षी',PP_BIRDS_EM[ppR.birthBird]+' <b>'+esc(PP_BIRDS[ppR.birthBird])+'</b> <span class="hi">'+esc(PP_BIRDS_HI[ppR.birthBird])+'</span>'],
+        ['Birth nakshatra',bi(NAKS[ppMoon.nak])+(ppIsSh?' · <span class="good">Shukla</span>':' · <span class="warn">Krishna</span>')],
+        ['Yama · याम',(ppR.isDay?'☀ Day':'☽ Night')+' yama <b>'+ppR.yamaNum+'</b> of 5'],
+        ['Yama ruler · शासक',PP_BIRDS_EM[ppR.yamaRuler]+' '+esc(PP_BIRDS[ppR.yamaRuler])]
+      ])+'</div>';
+      html+='<div style="flex:0 0 auto;text-align:center;padding:10px 16px;background:rgba(255,255,255,.05);border-radius:8px;border:1px solid var(--line);min-width:140px">';
+      html+='<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">अभी · Right now</div>';
+      html+='<div style="font-size:1.8rem;margin-bottom:4px">'+PP_BIRDS_EM[ppR.birthBird]+'</div>';
+      html+='<span class="badge '+ppR.cls+'" style="font-size:.95rem;padding:3px 12px;display:inline-block">'+esc(ppR.activity)+'</span>';
+      html+='<div class="hi" style="margin-top:3px;font-size:.9rem">'+esc(ppR.activityHi)+'</div>';
+      html+='<div class="muted" style="font-size:.75rem;margin-top:6px">Sub: '+esc(ppR.subName)+' · '+ppR.subMinsLeft+'m left</div>';
+      html+='<div class="muted" style="font-size:.7rem;margin-top:2px">Score '+(ppR.score*10).toFixed(0)+'/10</div>';
+      html+='</div></div>';
+      html+='<p class="note" style="margin-top:8px">Agathiyar Pancha Pakshi Shastra (Tamil school). Rule=best · Eat=good · Walk=neutral · Sleep=avoid · Die=worst. Sub-period shows minutes to next shift.</p>';
+    }
+  }
+  html+='</div>';
   $('pan-out').innerHTML=html;
 }
 
