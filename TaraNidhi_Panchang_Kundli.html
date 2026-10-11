@@ -846,34 +846,115 @@ var PRO_ACT={
 var GOOD_YOGA=[1,2,3,4,6,7,10,11,13,15,19,20,21,22,23,24,25]; /* Priti, Ayushman, Saubhagya, Shobhana, Sukarma, Dhriti, Vriddhi, Dhruva, Harshana, Siddhi, Shiva, Siddha, Sadhya, Shubha, Shukla, Brahma, Indra */
 var GANDA_MOOLA=[0,8,9,17,18,26];
 
-function proScore(pn,actKey){
-  var a=PRO_ACT[actKey],pts=0,flags=[],warn=[],blocked=false;
-  /* VARA (25) */
-  var v=pn.vara;
-  if(a.vara.A.indexOf(v)>=0){pts+=25;flags.push(VARA[v][0]+' day ✓');}
-  else if(a.vara.B&&a.vara.B.indexOf(v)>=0){pts+=16;flags.push(VARA[v][0]+' day (good)');}
-  else if(a.vara.bad&&a.vara.bad.indexOf(v)>=0){pts+=2;warn.push(VARA[v][0]+' — avoid');}
-  else pts+=10;
-  /* TITHI (25) */
-  var t=pn.tithi.n; /* 1–30 */
-  if(a.tithi.A.indexOf(t)>=0){pts+=25;flags.push('Tithi '+t+' '+pn.tithi.name[0]);}
-  else if(a.tithi.bad.indexOf(t)>=0){pts+=0;warn.push('Tithi '+t+' '+pn.tithi.name[0]+' — avoid');}
-  else pts+=12;
-  if(t===30){blocked=true;warn.push('Amāvasyā — absolute block');}
-  /* NAKSHATRA (25) */
-  var n=pn.nak.idx;
-  if(a.nak.g.indexOf(n)>=0){pts+=25;flags.push(NAKS[n][0]+' nakshatra ✓');}
-  else if(a.nak.b.indexOf(n)>=0){pts+=0;warn.push(NAKS[n][0]+' nakshatra — unfavourable');}
-  else pts+=12;
-  if(GANDA_MOOLA.indexOf(n)>=0)warn.push(NAKS[n][0]+' — Ganda Moola');
-  /* YOGA (25) */
-  var y=pn.yoga.idx;
-  if(a.yoga.bad.indexOf(y)>=0){pts+=0;warn.push(YOGA[y][0]+' yoga — inauspicious');}
-  else if(GOOD_YOGA.indexOf(y)>=0){pts+=25;flags.push(YOGA[y][0]+' yoga ✓');}
-  else pts+=13;
-  if(y===16||y===26){blocked=true;warn.push((y===16?'Vyatīpāta':'Vaidhriti')+' yoga — strong block');}
-  pts=Math.max(0,Math.min(100,pts));
-  return{score:Math.round(pts),flags:flags,warn:warn,blocked:blocked};
+/* ── BIRTH-CHART MUHURTA ENGINE ──────────────────────────────────────────
+   Classical weights: Phalita Navaratna Samgraha (221-pt scale)
+   Chandra:100  Tara:60  Yoga:32  Karana:16  Vara:8  Nakshatra:4  Tithi:1
+   Paksha rule: शुक्लपक्षे चन्द्र-बल, कृष्ण पक्ष में तारा-बल
+   All Muhurta matched against client birth chart — TaraNidhi's core niche.
+   ──────────────────────────────────────────────────────────────────────── */
+var TARA_NAME=['','Janma','Sampat','Vipat','Kshema','Pratyak','Sadhana','Naidhana','Mitra','Atimitra'];
+var TARA_HI  =['','जन्म','सम्पत्','विपत्','क्षेम','प्रत्यक','साधन','नैधन','मित्र','अतिमित्र'];
+var TARA_NAT =['','neutral','good','bad','good','bad','good','bad','good','good'];
+/* fractional scores 0–1 (Janma = 0.5 as "madhyama" — disputed, configurable) */
+var TARA_SCR =[0, 0.5, 1, 0, 1, 0, 0.75, 0, 1, 1];
+
+function calcTarabala(birthNak,transitNak){
+  var count=((transitNak-birthNak+27)%27)+1; /* 1..27 inclusive */
+  var tara=((count-1)%9)+1;                  /* 1..9 */
+  return{count:count,tara:tara,name:TARA_NAME[tara],hi:TARA_HI[tara],
+         nature:TARA_NAT[tara],score:TARA_SCR[tara]};
+}
+
+function calcChandrabala(birthRashi,transitMoonRashi,isShukla){
+  var pos=((transitMoonRashi-birthRashi+12)%12)+1; /* 1-12 from birth rashi */
+  var ALWAYS_GOOD=[1,3,6,7,10,11];
+  var SHUKLA_ADD =[2,5,9];   /* good in Shukla only */
+  var BAD        =[4,8,12];
+  var good=ALWAYS_GOOD.indexOf(pos)>=0||(isShukla&&SHUKLA_ADD.indexOf(pos)>=0);
+  var bad=BAD.indexOf(pos)>=0;
+  return{pos:pos,good:good,bad:bad,score:good?1:bad?0:0.5};
+}
+
+function proScore(pn,actKey,birthK){
+  var a=PRO_ACT[actKey],flags=[],warn=[],blocked=false;
+  var isShukla=pn.tithi.n<=15; /* 1-15 Shukla, 16-30 Krishna */
+
+  /* ── CHANDRABALA (classical weight 100) ── */
+  var chPts=0.5,chLabel='Chandra bala';
+  if(birthK&&birthK.planets&&birthK.planets.Moon&&pn.moonSign){
+    var cb=calcChandrabala(birthK.planets.Moon.sign,pn.moonSign.idx,isShukla);
+    chPts=cb.score;
+    var chPos=isShukla?'Shukla':'Krishna';
+    chLabel='Chandra bala: '+cb.pos+' from '+RASHI[birthK.planets.Moon.sign][0]+' ('+chPos+')';
+    if(cb.good)flags.push('🌙 '+chLabel+' ✓');
+    else if(cb.bad)warn.push('🌙 '+chLabel+' — adverse house');
+    else flags.push('🌙 '+chLabel+' (neutral)');
+  } else {
+    warn.push('🌙 Chandra bala: load Kundali for birth-chart matching');
+  }
+
+  /* ── TARABALA (classical weight 60) ── */
+  var taPts=0.5,taLabel='Tara bala';
+  if(birthK&&birthK.planets&&birthK.planets.Moon){
+    var tb=calcTarabala(birthK.planets.Moon.nak,pn.nak.idx);
+    taPts=tb.score;
+    taLabel='Tara bala: '+tb.name+' / '+tb.hi+' (count '+tb.count+')';
+    if(tb.nature==='good')flags.push('⭐ '+taLabel+' ✓');
+    else if(tb.nature==='bad')warn.push('⭐ '+taLabel+' — adverse Tara');
+    else flags.push('⭐ '+taLabel+' (Janma — neutral)');
+  } else {
+    warn.push('⭐ Tara bala: load Kundali for birth-chart matching');
+  }
+
+  /* Paksha-aware weight swap: Shukla→Chandra primary; Krishna→Tara primary */
+  var W_CH=isShukla?100:60, W_TA=isShukla?60:100;
+  var W_YO=32, W_KA=16, W_VA=8, W_NA=4, W_TI=1;
+  var W_TOT=W_CH+W_TA+W_YO+W_KA+W_VA+W_NA+W_TI; /* = 221 */
+
+  /* ── YOGA (weight 32) ── */
+  var y=pn.yoga.idx,yoPts=0.5;
+  if((a.yoga&&a.yoga.bad||[]).indexOf(y)>=0){yoPts=0;warn.push(YOGA[y][0]+' yoga — inauspicious for this activity');}
+  else if(y===16||y===26){blocked=true;yoPts=0;warn.push((y===16?'Vyatīpāta':'Vaidhriti')+' yoga — absolute block');}
+  else if(GOOD_YOGA.indexOf(y)>=0){yoPts=1;flags.push(YOGA[y][0]+' yoga ✓');}
+
+  /* ── KARANA (weight 16) ── */
+  var kaPts=0.5;
+  if(pn.karana){
+    var kn=Array.isArray(pn.karana.name)?pn.karana.name[0]:pn.karana.name||'';
+    if(/vishti|bhadra/i.test(kn)){kaPts=0;blocked=true;warn.push(kn+' (Vishti/Bhadra Karana) — block');}
+    else if(/shakuni|chatushpada|naga|kimstughna/i.test(kn)){kaPts=0.1;warn.push(kn+' Karana — inauspicious');}
+    else{kaPts=1;flags.push(kn+' Karana ✓');}
+  }
+
+  /* ── VARA (weight 8) ── */
+  var v=pn.vara,vaPts=0.5;
+  if(a.vara.A.indexOf(v)>=0){vaPts=1;flags.push(VARA[v][0]+' Vara ✓');}
+  else if(a.vara.bad&&a.vara.bad.indexOf(v)>=0){vaPts=0;warn.push(VARA[v][0]+' Vara — avoid');}
+  else if(a.vara.B&&a.vara.B.indexOf(v)>=0)vaPts=0.75;
+
+  /* ── NAKSHATRA (weight 4) ── */
+  var n=pn.nak.idx,naPts=0.5;
+  if(a.nak.g.indexOf(n)>=0){naPts=1;flags.push(NAKS[n][0]+' Nakshatra ✓');}
+  else if(a.nak.b.indexOf(n)>=0){naPts=0;warn.push(NAKS[n][0]+' Nakshatra — unfavourable');}
+  if(GANDA_MOOLA.indexOf(n)>=0)warn.push(NAKS[n][0]+' — Ganda Moola (verify before proceeding)');
+
+  /* ── TITHI (weight 1) ── */
+  var t=pn.tithi.n,tiPts=0.5;
+  if(t===30){blocked=true;tiPts=0;warn.push('Amāvasyā — absolute block for most Muhurta');}
+  else if(a.tithi.A.indexOf(t)>=0)tiPts=1;
+  else if(a.tithi.bad.indexOf(t)>=0){tiPts=0;warn.push('Tithi '+t+' '+pn.tithi.name[0]+' — unfavourable');}
+
+  /* ── COMBINED SCORE (classical 221-pt, normalized to 100) ── */
+  var raw=chPts*W_CH + taPts*W_TA + yoPts*W_YO + kaPts*W_KA + vaPts*W_VA + naPts*W_NA + tiPts*W_TI;
+  var score=Math.round((raw/W_TOT)*100);
+
+  /* Soft advisory: if both Chandra+Tara weak, flag it even if not hard-blocked */
+  var ctAvg=(chPts*W_CH+taPts*W_TA)/(W_CH+W_TA);
+  if(!blocked&&ctAvg<0.2)warn.push('Chandra-Tara combined very weak — consider postponing');
+
+  return{score:Math.max(0,Math.min(100,score)),flags:flags,warn:warn,blocked:blocked,
+    paksha:isShukla?'Shukla':'Krishna',
+    chandra:{score:chPts,primary:isShukla},tara:{score:taPts,primary:!isShukla}};
 }
 
 function bestHoraForDay(pn,horaPrefs){
@@ -913,11 +994,12 @@ function scanProMuhurta(){
     var dt=new Date(fromDate.getTime()+d*86400000);
     try{
       var pn=panchang(dt,lat,lon,tz);
-      var r=proScore(pn,actKey);
+      var r=proScore(pn,actKey,S.K); /* pass birth chart for Chandra+Tara matching */
       if(r.blocked)continue;
       var bh=bestHoraForDay(pn,a.hora);
       results.push({date:dt,vara:pn.vara,tithi:pn.tithi,nak:pn.nak,yoga:pn.yoga,
-        score:r.score,flags:r.flags,warn:r.warn,bestHora:bh,tz:tz});
+        score:r.score,flags:r.flags,warn:r.warn,bestHora:bh,tz:tz,
+        paksha:r.paksha,chandra:r.chandra,tara:r.tara});
     }catch(e){}
   }
   results.sort(function(x,y){return y.score-x.score;});
@@ -940,7 +1022,8 @@ function renderProResults(results,actKey,days){
     el.innerHTML='<div class="card"><p class="msg warn">No auspicious dates found in '+days+' days. Try extending the scan range or a different activity.</p></div>';
     return;
   }
-  var html='<div class="card"><p class="eyebrow">Top Muhurta Windows · श्रेष्ठ मुहूर्त</p><p class="note" style="margin:0 0 4px">For: <strong>'+a.en+'</strong> &mdash; <em>'+a.hi+'</em> &nbsp;·&nbsp; Source: '+a.src+'</p>';
+  var kundaliNote=S.K?'<span style="color:var(--good);font-size:11px">✓ Birth chart loaded — Chandra-Tara matched</span>':'<span style="color:var(--warn);font-size:11px">⚠ Load Kundali (birth chart tab) for personalised Chandra-Tara scoring — ★ marks the primary indicator per Paksha</span>';
+  var html='<div class="card"><p class="eyebrow">Top Muhurta Windows · श्रेष्ठ मुहूर्त</p><p class="note" style="margin:0 0 4px">For: <strong>'+a.en+'</strong> &mdash; <em>'+a.hi+'</em> &nbsp;·&nbsp; Source: '+a.src+'</p>'+kundaliNote+'<br>';
   results.forEach(function(r,i){
     var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
     var bgcol=scoreColor(r.score);
@@ -952,6 +1035,15 @@ function renderProResults(results,actKey,days){
     html+='</div>';
     html+='<div class="pro-meta">';
     html+='<span style="color:var(--muted)">Nakshatra:</span> '+NAKS[r.nak.idx][0]+' &nbsp;·&nbsp; <span style="color:var(--muted)">Yoga:</span> '+YOGA[r.yoga.idx][0];
+    /* Chandra-Tara birth-chart indicators */
+    if(r.chandra&&r.tara){
+      var chCol=r.chandra.score>=0.75?'var(--good)':r.chandra.score<=0.25?'var(--bad)':'var(--warn)';
+      var taCol=r.tara.score>=0.75?'var(--good)':r.tara.score<=0.25?'var(--bad)':'var(--warn)';
+      var chPri=r.chandra.primary?' ★':''; var taPri=r.tara.primary?' ★':'';
+      html+=' &nbsp;·&nbsp; <span style="color:'+chCol+'">🌙'+(Math.round(r.chandra.score*100))+'%'+chPri+'</span>';
+      html+=' <span style="color:'+taCol+'">⭐'+(Math.round(r.tara.score*100))+'%'+taPri+'</span>';
+      html+=' <span style="color:var(--muted);font-size:10px">(★=primary for '+esc(r.paksha||'')+')</span>';
+    }
     html+='</div>';
     if(r.flags.length){
       html+='<div style="margin-top:5px">';
