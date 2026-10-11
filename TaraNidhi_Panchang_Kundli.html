@@ -42,10 +42,28 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .brand small{display:block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
 .sync{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:var(--muted)}
 
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px}
 .tab{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 6px;cursor:pointer;font-weight:600;text-align:center;line-height:1.2}
 .tab small{display:block;font-size:11px;color:var(--muted);font-weight:400}
 .tab[aria-selected="true"]{border-color:var(--gold);background:var(--surface2);color:var(--gold)}
+@media(max-width:480px){.tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.tab[data-tab="pro"]{grid-column:1/-1}}
+/* Pro Muhurta */
+.pro-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:4px 0}
+.pro-cat{background:var(--surface2);border:1.5px solid var(--line);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;line-height:1.35;transition:border-color .15s,background .15s;user-select:none}
+.pro-cat:hover{border-color:var(--gold);background:rgba(214,169,63,.07)}
+.pro-cat.sel{border-color:var(--gold);background:rgba(214,169,63,.14);color:var(--gold)}
+.pro-cat .icon{font-size:20px;display:block;margin-bottom:5px}
+.pro-res{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:6px 0;position:relative}
+.pro-res.s-hi{border-color:rgba(80,200,120,.35);background:rgba(80,200,120,.04)}
+.pro-res.s-mid{border-color:rgba(214,169,63,.35)}
+.pro-res.s-lo{border-color:rgba(200,90,60,.3)}
+.score-pill{display:inline-block;border-radius:99px;padding:2px 11px;font-weight:700;font-size:12px;color:#fff;vertical-align:middle;margin-left:6px}
+.pro-meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.pro-tag{display:inline-block;margin:2px 3px 2px 0;border-radius:4px;padding:1px 7px;font-size:11px}
+.pro-tag.g{background:rgba(80,200,120,.18);color:#3aaa6a}
+.pro-tag.w{background:rgba(214,169,63,.18);color:var(--gold)}
+.pro-tag.b{background:rgba(200,90,60,.18);color:#c84a3a}
+.pro-best-hora{margin-top:6px;font-size:12px;border-top:1px solid var(--line);padding-top:6px;color:var(--muted)}
 
 .panel{display:none;flex-direction:column;gap:14px}
 .panel.on{display:flex}
@@ -136,6 +154,7 @@ ul.find{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
     <button class="tab" role="tab" data-tab="hora" aria-selected="false">Hora &amp; Lagna<small>होरा · लग्न</small></button>
     <button class="tab" role="tab" data-tab="kun" aria-selected="false">Kundli<small>कुंडली</small></button>
     <button class="tab" role="tab" data-tab="qry" aria-selected="false">Query<small>प्रश्न</small></button>
+    <button class="tab" role="tab" data-tab="pro" aria-selected="false">Pro Muhurta<small>व्यावसायिक</small></button>
   </div>
 
   <section class="card" id="placebar">
@@ -194,6 +213,25 @@ ul.find{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
       <div class="row"><button class="btn" id="a-go" type="button">Ask</button><span class="note" id="a-state"></span></div>
       <div class="answer" id="a-out" aria-live="polite">The answer appears here.</div>
     </div>
+  </section>
+
+  <!-- PRO MUHURTA -->
+  <section class="panel" id="pro">
+    <div class="card">
+      <h2>Professional Muhurta <span class="hi">व्यावसायिक मुहूर्त</span></h2>
+      <p class="note">Scans the next 30 days for the best Vedic muhurta windows for your professional activity. Scored on Vara (25) + Tithi (25) + Nakshatra (25) + Yoga (25). Sources: Muhurta Chintamani, Brihat Samhita.</p>
+      <p class="eyebrow" style="margin-top:4px">Select Activity &middot; गतिविधि चुनें</p>
+      <div class="pro-cats" id="pro-cats"></div>
+      <div class="grid" style="margin-top:10px">
+        <label class="f">Scan from<input type="date" id="pro-from"></label>
+        <label class="f">Days to scan<select id="pro-days"><option value="14">14 days</option><option value="21">21 days</option><option value="30" selected>30 days</option><option value="45">45 days</option></select></label>
+      </div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn" id="pro-scan" type="button">🔍 Scan Muhurtas &middot; मुहूर्त खोजें</button>
+        <span class="note" id="pro-status"></span>
+      </div>
+    </div>
+    <div id="pro-out"></div>
   </section>
 
   <p class="foot">Calculated in your browser with astronomy-engine. Lahiri (Chitrapaksha) ayanamsha, Whole Sign houses unless you pick Sripati, mean node unless you pick true. Sunrise and sunset use the upper limb with standard refraction. Tithi, nakshatra, yoga and karana end times come from the Moon and Sun positions, not from a table. Two charts you verified earlier (Bhopal 1973 and Delhi 2006) match this engine on lagna, nakshatra, pada, tithi, vara and yoga. Not included yet: Durmuhurta, Varjyam, Amrit Kalam, Sarvartha Siddhi, divisional charts other than Navamsha, and Tribhagi Dasha, because their tables could not be checked here.</p>
@@ -643,8 +681,8 @@ function recompute(){
   renderTab();
 }
 function renderTab(){
-  if(!S.pn&&S.tab!=='kun'){return;}
-  if(S.tab==='pan')renderPan();else if(S.tab==='hora')renderHora();else if(S.tab==='qry')renderMuhurta();
+  if(!S.pn&&S.tab!=='kun'&&S.tab!=='pro'){return;}
+  if(S.tab==='pan')renderPan();else if(S.tab==='hora')renderHora();else if(S.tab==='qry')renderMuhurta();else if(S.tab==='pro')renderPro();
 }
 $('p-city').addEventListener('change',function(){if(this.value!=='x'){setCity('p',+this.value);recompute();}});
 ['p-date','p-time','p-lat','p-lon','p-tz'].forEach(function(id){$(id).addEventListener('change',function(){if(id==='p-lat'||id==='p-lon'||id==='p-tz')$('p-city').value='x';recompute();});});
@@ -740,6 +778,224 @@ function renderMuhurta(){
     '<p class="note">Scoring is a rule of thumb: +hora fit, +choghadiya, −30 for each of Rahu, Yama and Gulika overlap, +10 for Abhijit. It does not check tithi, nakshatra, Bhadra or the client\'s chart. Treat it as a first filter.</p>';
 }
 $('q-act').addEventListener('change',renderMuhurta);
+
+/* ===== PRO MUHURTA ENGINE ===== */
+var PRO_ACT={
+  company:  {en:'Company / Business Launch',hi:'कंपनी / व्यापार लॉन्च',icon:'🏢',
+    vara:{A:[4,5],B:[3,1],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,22,25,26,28],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[0,3,4,6,7,12,13,14,16,21,22,23,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.3'},
+  website:  {en:'Website / App Launch',hi:'वेबसाइट / ऐप लॉन्च',icon:'🌐',
+    vara:{A:[3,4],B:[1,5],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,22,25,26,28],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[0,3,4,6,7,12,13,14,16,21,22,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[3,4],src:'Muhurta Chintamani 14.2'},
+  contract: {en:'Contract / Agreement Signing',hi:'अनुबंध / एग्रीमेंट',icon:'📋',
+    vara:{A:[3,4],B:[5,1],bad:[2,6]},tithi:{A:[2,5,10,11,13,15,17,20,25,26,28],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[3,4],src:'Muhurta Chintamani 14.5'},
+  legal:    {en:'Legal Case Filing / Court',hi:'कानूनी केस / न्यायालय',icon:'⚖️',
+    vara:{A:[2,4],B:[6,0],bad:[5]},tithi:{A:[10,11,13,2,7,15,17,20],bad:[4,8,9,12,14,29,30]},
+    nak:{g:[5,8,13,16,17,21],b:[3,6,7,14,26]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[2,4],src:'Muhurta Chintamani 17.1'},
+  money:    {en:'Large Investment / Money Transfer',hi:'बड़ा निवेश / धन हस्तांतरण',icon:'💰',
+    vara:{A:[4,5],B:[3,1],bad:[2,6]},tithi:{A:[2,5,10,11,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,23,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.8'},
+  property: {en:'Property Registration / Deed',hi:'संपत्ति पंजीकरण',icon:'🏠',
+    vara:{A:[4,3],B:[5,1],bad:[2,6]},tithi:{A:[2,5,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,11,12,13,14,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.9'},
+  movie:    {en:'Movie / OTT / Content Release',hi:'फिल्म / OTT रिलीज',icon:'🎬',
+    vara:{A:[5],B:[3,4,1],bad:[2,6]},tithi:{A:[5,10,11,13,15,17,20,22,25,26,28],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,4,6,7,12,13,14,16,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[5,3],src:'Brihat Samhita 103.5'},
+  brand:    {en:'Brand Launch / Rebranding',hi:'ब्रांड लॉन्च / रीब्रांडिंग',icon:'✨',
+    vara:{A:[5,4],B:[3,1],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,22,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[0,3,4,6,7,12,13,14,16,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[5,4],src:'Muhurta Chintamani 14.1'},
+  product:  {en:'Product Launch',hi:'प्रोडक्ट लॉन्च',icon:'📦',
+    vara:{A:[4,3],B:[5,1],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[0,3,6,7,12,13,14,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.3'},
+  press:    {en:'Press Conference / Announcement',hi:'प्रेस कॉन्फ्रेंस / घोषणा',icon:'📢',
+    vara:{A:[3,4],B:[1,5],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,4,6,7,12,13,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[3,4],src:'Brihat Samhita 104.2'},
+  political:{en:'Political Campaign / Rally Launch',hi:'राजनीतिक अभियान / रैली',icon:'🗳️',
+    vara:{A:[4,0],B:[3,1],bad:[6]},tithi:{A:[2,5,7,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[0,4],src:'Muhurta Chintamani 15.2'},
+  ipo:      {en:'IPO / Stock Market Listing',hi:'आईपीओ / शेयर लिस्टिंग',icon:'📈',
+    vara:{A:[4,3],B:[5,1],bad:[2,6]},tithi:{A:[2,5,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,23,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.8'},
+  partner:  {en:'Partnership / JV Agreement',hi:'साझेदारी / JV एग्रीमेंट',icon:'🤝',
+    vara:{A:[3,4],B:[5,1],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[3,4],src:'Muhurta Chintamani 14.5'},
+  loan:     {en:'Loan / Credit Taking',hi:'लोन / क्रेडिट लेना',icon:'🏦',
+    vara:{A:[4,5],B:[3,1],bad:[2,6]},tithi:{A:[2,5,10,11,15,17,20,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[3,6,7,12,13,14,16,21,23,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[4,5],src:'Muhurta Chintamani 14.10'},
+  social:   {en:'Social Media / Digital Campaign',hi:'सोशल मीडिया / डिजिटल कैंपेन',icon:'📱',
+    vara:{A:[3,5],B:[4,1],bad:[2,6]},tithi:{A:[2,5,7,10,11,13,15,17,20,22,25,26],bad:[4,8,9,12,14,19,23,29,30]},
+    nak:{g:[0,3,4,6,7,12,13,14,21,26],b:[1,5,8,9,18,19,24]},yoga:{bad:[5,8,9,16,18,26]},
+    hora:[3,5],src:'Brihat Samhita 104.1'}
+};
+
+var GOOD_YOGA=[1,2,3,4,6,7,10,11,13,15,19,20,21,22,23,24,25]; /* Priti, Ayushman, Saubhagya, Shobhana, Sukarma, Dhriti, Vriddhi, Dhruva, Harshana, Siddhi, Shiva, Siddha, Sadhya, Shubha, Shukla, Brahma, Indra */
+var GANDA_MOOLA=[0,8,9,17,18,26];
+
+function proScore(pn,actKey){
+  var a=PRO_ACT[actKey],pts=0,flags=[],warn=[],blocked=false;
+  /* VARA (25) */
+  var v=pn.vara;
+  if(a.vara.A.indexOf(v)>=0){pts+=25;flags.push(VARA[v][0]+' day ✓');}
+  else if(a.vara.B&&a.vara.B.indexOf(v)>=0){pts+=16;flags.push(VARA[v][0]+' day (good)');}
+  else if(a.vara.bad&&a.vara.bad.indexOf(v)>=0){pts+=2;warn.push(VARA[v][0]+' — avoid');}
+  else pts+=10;
+  /* TITHI (25) */
+  var t=pn.tithi.n; /* 1–30 */
+  if(a.tithi.A.indexOf(t)>=0){pts+=25;flags.push('Tithi '+t+' '+pn.tithi.name[0]);}
+  else if(a.tithi.bad.indexOf(t)>=0){pts+=0;warn.push('Tithi '+t+' '+pn.tithi.name[0]+' — avoid');}
+  else pts+=12;
+  if(t===30){blocked=true;warn.push('Amāvasyā — absolute block');}
+  /* NAKSHATRA (25) */
+  var n=pn.nak.idx;
+  if(a.nak.g.indexOf(n)>=0){pts+=25;flags.push(NAKS[n][0]+' nakshatra ✓');}
+  else if(a.nak.b.indexOf(n)>=0){pts+=0;warn.push(NAKS[n][0]+' nakshatra — unfavourable');}
+  else pts+=12;
+  if(GANDA_MOOLA.indexOf(n)>=0)warn.push(NAKS[n][0]+' — Ganda Moola');
+  /* YOGA (25) */
+  var y=pn.yoga.idx;
+  if(a.yoga.bad.indexOf(y)>=0){pts+=0;warn.push(YOGA[y][0]+' yoga — inauspicious');}
+  else if(GOOD_YOGA.indexOf(y)>=0){pts+=25;flags.push(YOGA[y][0]+' yoga ✓');}
+  else pts+=13;
+  if(y===16||y===26){blocked=true;warn.push((y===16?'Vyatīpāta':'Vaidhriti')+' yoga — strong block');}
+  pts=Math.max(0,Math.min(100,pts));
+  return{score:Math.round(pts),flags:flags,warn:warn,blocked:blocked};
+}
+
+function bestHoraForDay(pn,horaPrefs){
+  if(!pn.hora||!pn.hora.length)return null;
+  var LORDS=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+  var best=null,bestPts=-1;
+  pn.hora.forEach(function(h){
+    var li=LORDS.indexOf(h.lord);
+    var pts=horaPrefs.indexOf(li)===0?15:horaPrefs.indexOf(li)===1?10:0;
+    /* penalise Rahu Kaal overlap */
+    if(pn.parts&&pn.parts.rahu&&pn.parts.rahu.start){
+      var rs=pn.parts.rahu.start.getTime(),re=pn.parts.rahu.end.getTime();
+      var hs=h.start.getTime(),he=h.end.getTime();
+      if(hs<re&&he>rs)return; /* skip */
+    }
+    if(pts>bestPts){bestPts=pts;best={lord:h.lord,start:h.start,end:h.end,bonus:pts};}
+  });
+  return best;
+}
+
+var PRO_SEL=null; /* currently selected activity key */
+
+function scanProMuhurta(){
+  var actKey=PRO_SEL;
+  if(!actKey){$('pro-status').textContent='⚠ Select an activity first';return;}
+  var fromVal=$('pro-from').value;
+  var fromDate=fromVal?new Date(fromVal+'T00:00:00'):new Date();
+  fromDate.setHours(0,0,0,0);
+  var days=parseInt($('pro-days').value)||30;
+  var lat=parseFloat($('p-lat').value)||23.2599;
+  var lon=parseFloat($('p-lon').value)||77.4126;
+  var tz=parseFloat($('p-tz').value)||5.5;
+  var results=[];
+  $('pro-status').textContent='Scanning '+days+' days…';
+  var a=PRO_ACT[actKey];
+  for(var d=0;d<days;d++){
+    var dt=new Date(fromDate.getTime()+d*86400000);
+    try{
+      var pn=panchang(dt,lat,lon,tz);
+      var r=proScore(pn,actKey);
+      if(r.blocked)continue;
+      var bh=bestHoraForDay(pn,a.hora);
+      results.push({date:dt,vara:pn.vara,tithi:pn.tithi,nak:pn.nak,yoga:pn.yoga,
+        score:r.score,flags:r.flags,warn:r.warn,bestHora:bh,tz:tz});
+    }catch(e){}
+  }
+  results.sort(function(x,y){return y.score-x.score;});
+  renderProResults(results.slice(0,7),actKey,days);
+  $('pro-status').textContent='Done — top '+(Math.min(results.length,7))+' of '+results.length+' auspicious dates';
+}
+
+function fmtDate(dt){
+  var d=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
+  var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
+  return d+', '+dt.getDate()+' '+m+' '+dt.getFullYear();
+}
+
+function scoreColor(s){return s>=80?'#2a9a52':s>=60?'#b87c18':'#c84040';}
+function scoreClass(s){return s>=80?'s-hi':s>=60?'s-mid':'s-lo';}
+
+function renderProResults(results,actKey,days){
+  var el=$('pro-out'),a=PRO_ACT[actKey];
+  if(!results.length){
+    el.innerHTML='<div class="card"><p class="msg warn">No auspicious dates found in '+days+' days. Try extending the scan range or a different activity.</p></div>';
+    return;
+  }
+  var html='<div class="card"><p class="eyebrow">Top Muhurta Windows · श्रेष्ठ मुहूर्त</p><p class="note" style="margin:0 0 4px">For: <strong>'+a.en+'</strong> &mdash; <em>'+a.hi+'</em> &nbsp;·&nbsp; Source: '+a.src+'</p>';
+  results.forEach(function(r,i){
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    var bgcol=scoreColor(r.score);
+    html+='<div class="pro-res '+scoreClass(r.score)+'">';
+    html+='<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">';
+    html+='<strong style="font-size:15px">'+medal+' '+fmtDate(r.date)+'</strong>';
+    html+='<span class="score-pill" style="background:'+bgcol+'">'+r.score+'/100</span>';
+    html+='<span style="font-size:12px;color:var(--muted)">'+VARA[r.vara][0]+' · Tithi '+r.tithi.n+' '+r.tithi.paksha+'</span>';
+    html+='</div>';
+    html+='<div class="pro-meta">';
+    html+='<span style="color:var(--muted)">Nakshatra:</span> '+NAKS[r.nak.idx][0]+' &nbsp;·&nbsp; <span style="color:var(--muted)">Yoga:</span> '+YOGA[r.yoga.idx][0];
+    html+='</div>';
+    if(r.flags.length){
+      html+='<div style="margin-top:5px">';
+      r.flags.forEach(function(f){html+='<span class="pro-tag g">✓ '+esc(f)+'</span>';});
+      html+='</div>';
+    }
+    if(r.warn.length){
+      html+='<div>';
+      r.warn.forEach(function(w){html+='<span class="pro-tag w">⚠ '+esc(w)+'</span>';});
+      html+='</div>';
+    }
+    if(r.bestHora){
+      var h=r.bestHora,tz=r.tz;
+      var hs=fmtT(h.start,tz,r.date),he=fmtT(h.end,tz,r.date);
+      html+='<div class="pro-best-hora">⏰ Best hora: <strong>'+esc(h.lord)+' hora</strong> &nbsp;'+hs+' → '+he+(h.bonus?'&nbsp;(preferred lord ✓)':'')+'</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function initPro(){
+  var cats=$('pro-cats'),keys=Object.keys(PRO_ACT);
+  keys.forEach(function(k){
+    var a=PRO_ACT[k];
+    var btn=document.createElement('div');
+    btn.className='pro-cat';btn.dataset.key=k;
+    btn.innerHTML='<span class="icon">'+a.icon+'</span>'+a.en+'<small style="display:block;font-weight:400;font-size:10px;margin-top:2px">'+a.hi+'</small>';
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.pro-cat').forEach(function(c){c.classList.remove('sel');});
+      btn.classList.add('sel');PRO_SEL=k;
+      $('pro-status').textContent='Activity: '+a.en;
+    });
+    cats.appendChild(btn);
+  });
+  /* default from date = today */
+  var today=new Date();
+  $('pro-from').value=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  $('pro-scan').addEventListener('click',scanProMuhurta);
+}
+function renderPro(){
+  if(!$('pro-cats').children.length)initPro();
+}
 
 /* ---------- KUNDLI ---------- */
 var SOUTH={11:[0,0],0:[1,0],1:[2,0],2:[3,0],10:[0,1],3:[3,1],9:[0,2],4:[3,2],8:[0,3],7:[1,3],6:[2,3],5:[3,3]};
