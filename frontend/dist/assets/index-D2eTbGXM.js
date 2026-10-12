@@ -1,4 +1,4 @@
-(function(){const a=document.createElement("link").relList;if(a&&a.supports&&a.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))i(n);new MutationObserver(n=>{for(const s of n)if(s.type==="childList")for(const r of s.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function t(n){const s={};return n.integrity&&(s.integrity=n.integrity),n.referrerPolicy&&(s.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?s.credentials="include":n.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function i(n){if(n.ep)return;n.ep=!0;const s=t(n);fetch(n.href,s)}})();const Ta=["en","hi"],Ie="en",je="language";async function La(){if(!window.i18next){console.error("[i18n] i18next library not loaded");return}const e=localStorage.getItem(je)||Ie;try{await window.i18next.use(window.i18nextHttpBackend).use(window.i18nextBrowserLanguageDetector).init({fallbackLng:Ie,lng:e,supportedLngs:Ta,ns:["common"],defaultNS:"common",backend:{loadPath:"/docs/{{lng}}-{{ns}}.json",addPath:"/docs/{{lng}}-{{ns}}.json"},detection:{order:["localStorage","navigator"],caches:["localStorage"]},interpolation:{escapeValue:!1}}),console.log(`[i18n] Initialized with language: ${window.i18next.language}`),window.i18next.on("languageChanged",a=>{localStorage.setItem(je,a),document.documentElement.lang=a,window.dispatchEvent(new CustomEvent("i18n-language-changed",{detail:{language:a}}))})}catch(a){console.error("[i18n] Initialization failed:",a),window.i18next.changeLanguage(Ie)}}function Pa(){if(!window.i18next){console.error("[i18n] i18next not initialized");return}const e=window.i18next.language,a=e==="en"?"hi":"en";window.i18next.changeLanguage(a),console.log(`[i18n] Language toggled: ${e} → ${a}`)}function Te(){if(!window.i18next){console.warn("[i18n] i18next not initialized, skipping DOM translation");return}const e=document.querySelectorAll("[data-i18n]");e.forEach(a=>{const t=a.getAttribute("data-i18n");if(t){const i=window.i18next.t(t);a.tagName==="INPUT"||a.tagName==="TEXTAREA"?a.placeholder=i:a.textContent=i}}),console.log(`[i18n] Translated ${e.length} DOM elements`)}function N(){return document.getElementById("app")}function B(e){e.innerHTML=""}function k(e){return String(e??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function x(e,a=!1){let t=document.getElementById("ov-toast");t||(t=document.createElement("div"),t.id="ov-toast",document.body.appendChild(t)),t.textContent=e,t.className=`ov-toast show ${a?"error":"ok"}`,setTimeout(()=>t.classList.remove("show"),3e3)}function Ca(){const e=document.documentElement,a=localStorage.getItem("theme");a==="dark"||a==="light"?e.setAttribute("data-theme",a):window.matchMedia("(prefers-color-scheme: dark)").matches?e.setAttribute("data-theme","dark"):e.setAttribute("data-theme","light")}function Aa(){const e=document.documentElement,t=(e.getAttribute("data-theme")||"light")==="dark"?"light":"dark";e.setAttribute("data-theme",t),localStorage.setItem("theme",t);const i=document.getElementById("btn-theme-toggle");if(i){const n=i.querySelector("span");n&&(n.textContent=t==="dark"?"☀️":"🌙")}}const za={},Ma=za?.VITE_API_BASE??"";let Ae=localStorage.getItem("ov_session");function aa(e){Ae=e,e?localStorage.setItem("ov_session",e):localStorage.removeItem("ov_session")}async function P(e,a={}){const t={...a.headers??{}};Ae&&(t.Authorization=`Bearer ${Ae}`),a.body&&typeof a.body=="string"&&(t["Content-Type"]="application/json");const i=await fetch(`${Ma}${e}`,{...a,headers:t});let n;try{n=await i.json()}catch{n=null}return i.status===401&&(aa(null),E("/login")),{ok:i.ok,status:i.status,data:n}}const Na=e=>P("/auth/request-otp",{method:"POST",body:JSON.stringify({phone_number:e})}),Ba=(e,a,t)=>P("/auth/verify-otp",{method:"POST",body:JSON.stringify({phone_number:e,code:a,fingerprint_hash:t})}),ce=()=>P("/kundali"),Da=e=>P("/kundali",{method:"POST",body:JSON.stringify(e)}),ta=e=>P(`/kundali/${e}`,{method:"DELETE"}),qe=(e,a,t,i)=>{const n=new URLSearchParams({lat:String(e),lon:String(a)});return t&&n.set("purpose",t),i!==void 0&&n.set("kundali_id",String(i)),P(`/muhurta/now?${n}`)},na=e=>{const a=new URLSearchParams({lat:String(e.lat),lon:String(e.lon)});return e.purpose&&a.set("purpose",e.purpose),e.kundali_id!==void 0&&a.set("kundali_id",String(e.kundali_id)),e.from&&a.set("from",e.from),e.to&&a.set("to",e.to),e.top_n!==void 0&&a.set("top_n",String(e.top_n)),P(`/muhurta/scan?${a}`)},Ee=e=>P(`/kundali/${e}/chart`),_a=e=>P(`/kp/chart/${e}`),qa=(e,a)=>P("/kp/query",{method:"POST",body:JSON.stringify({kundali_id:e,activity_slug:a})}),Ha=()=>P("/kp/activities"),Ra=(e,a)=>P("/kp/query-natural",{method:"POST",body:JSON.stringify({kundali_id:e,question:a})}),Oa=()=>P("/wallet/balance"),Ka=e=>P("/wallet/recharge",{method:"POST",body:JSON.stringify({amount_paise:e})}),Fa=()=>P("/referral/code"),ja=()=>P("/public/config"),Va=e=>P("/public/contact",{method:"POST",body:JSON.stringify(e)}),Ua=e=>P("/public/testimonials",{method:"POST",body:JSON.stringify(e)}),ia=()=>P("/public/testimonials"),Wa=(e="new")=>P(`/admin/contact-messages?status=${encodeURIComponent(e)}`),Ga=(e,a)=>P(`/admin/contact-messages/${e}/status`,{method:"POST",body:JSON.stringify({status:a})}),Ya=(e="pending")=>P(`/admin/testimonials?status=${encodeURIComponent(e)}`),Ja=(e,a)=>P(`/admin/testimonials/${e}/review`,{method:"POST",body:JSON.stringify({status:a})}),Qa=()=>P("/admin/app-settings"),Za=e=>P("/admin/app-settings",{method:"POST",body:JSON.stringify(e)}),Xa=e=>P(`/admin/users/lookup?phone=${encodeURIComponent(e)}`),et=e=>P("/admin/users/activate",{method:"POST",body:JSON.stringify(e)}),at=()=>P("/admin/stats"),Ve=qe,ne={whatsapp_number:"919669756111",contact_phone:"919669756111",contact_email:"info@occultviision.com"};let G=null,le=null;function tt(){return G??ne}function ze(){return G?Promise.resolve(G):(le||(le=ja().then(e=>{const a=e.ok&&e.data?e.data:{};return G={whatsapp_number:/^91[6-9]\d{9}$/.test(a.whatsapp_number)?a.whatsapp_number:ne.whatsapp_number,contact_phone:/^91[6-9]\d{9}$/.test(a.contact_phone)?a.contact_phone:ne.contact_phone,contact_email:typeof a.contact_email=="string"&&a.contact_email.includes("@")?a.contact_email:ne.contact_email},G}).catch(()=>ne).finally(()=>{le=null})),le)}function nt(){G=null}function sa(e){const a=e.replace(/^91/,"");return`+91 ${a.slice(0,5)} ${a.slice(5)}`}function ra(e,a=tt()){return`https://wa.me/${a.whatsapp_number}${e?`?text=${encodeURIComponent(e)}`:""}`}function it(e,a){e.querySelectorAll("[data-cfg]").forEach(t=>{const i=t.dataset.cfg;i==="phone"?(t.textContent=sa(a.contact_phone),t instanceof HTMLAnchorElement&&(t.href=`tel:+${a.contact_phone}`)):i==="email"?(t.textContent=a.contact_email,t instanceof HTMLAnchorElement&&(t.href=`mailto:${a.contact_email}`)):i==="whatsapp"&&t instanceof HTMLAnchorElement&&(t.href=ra(void 0,a))})}function st(e){const a=[{label:"Features",route:"#/features"},{label:"Pricing",route:"#/pricing"},{label:"Blog",route:"#/blog"},{label:"Reviews",route:"#/testimonials"},{label:"Contact",route:"#/contact"}];return`
+(function(){const a=document.createElement("link").relList;if(a&&a.supports&&a.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))i(n);new MutationObserver(n=>{for(const s of n)if(s.type==="childList")for(const r of s.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function t(n){const s={};return n.integrity&&(s.integrity=n.integrity),n.referrerPolicy&&(s.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?s.credentials="include":n.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function i(n){if(n.ep)return;n.ep=!0;const s=t(n);fetch(n.href,s)}})();const ka=["en","hi"],Se="en",Re="language";async function xa(){if(!window.i18next){console.error("[i18n] i18next library not loaded");return}const e=localStorage.getItem(Re)||Se;try{await window.i18next.use(window.i18nextHttpBackend).use(window.i18nextBrowserLanguageDetector).init({fallbackLng:Se,lng:e,supportedLngs:ka,ns:["common"],defaultNS:"common",backend:{loadPath:"/docs/{{lng}}-{{ns}}.json",addPath:"/docs/{{lng}}-{{ns}}.json"},detection:{order:["localStorage","navigator"],caches:["localStorage"]},interpolation:{escapeValue:!1}}),console.log(`[i18n] Initialized with language: ${window.i18next.language}`),window.i18next.on("languageChanged",a=>{localStorage.setItem(Re,a),document.documentElement.lang=a,window.dispatchEvent(new CustomEvent("i18n-language-changed",{detail:{language:a}}))})}catch(a){console.error("[i18n] Initialization failed:",a),window.i18next.changeLanguage(Se)}}function $a(){if(!window.i18next){console.error("[i18n] i18next not initialized");return}const e=window.i18next.language,a=e==="en"?"hi":"en";window.i18next.changeLanguage(a),console.log(`[i18n] Language toggled: ${e} → ${a}`)}function Ee(){if(!window.i18next){console.warn("[i18n] i18next not initialized, skipping DOM translation");return}const e=document.querySelectorAll("[data-i18n]");e.forEach(a=>{const t=a.getAttribute("data-i18n");if(t){if(typeof window.i18next.exists=="function"&&!window.i18next.exists(t))return;const i=window.i18next.t(t);if(!i||i===t)return;a.tagName==="INPUT"||a.tagName==="TEXTAREA"?a.placeholder=i:a.textContent=i}}),console.log(`[i18n] Translated ${e.length} DOM elements`)}function N(){return document.getElementById("app")}function B(e){e.innerHTML=""}function k(e){return String(e??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function x(e,a=!1){let t=document.getElementById("ov-toast");t||(t=document.createElement("div"),t.id="ov-toast",document.body.appendChild(t)),t.textContent=e,t.className=`ov-toast show ${a?"error":"ok"}`,setTimeout(()=>t.classList.remove("show"),3e3)}function Sa(){const e=document.documentElement,a=localStorage.getItem("theme");a==="dark"||a==="light"?e.setAttribute("data-theme",a):window.matchMedia("(prefers-color-scheme: dark)").matches?e.setAttribute("data-theme","dark"):e.setAttribute("data-theme","light")}function Ea(){const e=document.documentElement,t=(e.getAttribute("data-theme")||"light")==="dark"?"light":"dark";e.setAttribute("data-theme",t),localStorage.setItem("theme",t);const i=document.getElementById("btn-theme-toggle");if(i){const n=i.querySelector("span");n&&(n.textContent=t==="dark"?"☀️":"🌙")}}const Ia={},Ta=Ia?.VITE_API_BASE??"";let Ce=localStorage.getItem("ov_session");function Ze(e){Ce=e,e?localStorage.setItem("ov_session",e):localStorage.removeItem("ov_session")}async function C(e,a={}){const t={...a.headers??{}};Ce&&(t.Authorization=`Bearer ${Ce}`),a.body&&typeof a.body=="string"&&(t["Content-Type"]="application/json");const i=await fetch(`${Ta}${e}`,{...a,headers:t});let n;try{n=await i.json()}catch{n=null}return i.status===401&&(Ze(null),E("/login")),{ok:i.ok,status:i.status,data:n}}const La=e=>C("/auth/request-otp",{method:"POST",body:JSON.stringify({phone_number:e})}),Ca=(e,a,t)=>C("/auth/verify-otp",{method:"POST",body:JSON.stringify({phone_number:e,code:a,fingerprint_hash:t})}),se=()=>C("/kundali"),Pa=e=>C("/kundali",{method:"POST",body:JSON.stringify(e)}),Xe=e=>C(`/kundali/${e}`,{method:"DELETE"}),De=(e,a,t,i)=>{const n=new URLSearchParams({lat:String(e),lon:String(a)});return t&&n.set("purpose",t),i!==void 0&&n.set("kundali_id",String(i)),C(`/muhurta/now?${n}`)},ea=e=>{const a=new URLSearchParams({lat:String(e.lat),lon:String(e.lon)});return e.purpose&&a.set("purpose",e.purpose),e.kundali_id!==void 0&&a.set("kundali_id",String(e.kundali_id)),e.from&&a.set("from",e.from),e.to&&a.set("to",e.to),e.top_n!==void 0&&a.set("top_n",String(e.top_n)),C(`/muhurta/scan?${a}`)},$e=e=>C(`/kundali/${e}/chart`),Aa=e=>C(`/kp/chart/${e}`),za=(e,a)=>C("/kp/query",{method:"POST",body:JSON.stringify({kundali_id:e,activity_slug:a})}),Ma=()=>C("/kp/activities"),Na=(e,a)=>C("/kp/query-natural",{method:"POST",body:JSON.stringify({kundali_id:e,question:a})}),Ba=()=>C("/wallet/balance"),Da=e=>C("/wallet/recharge",{method:"POST",body:JSON.stringify({amount_paise:e})}),_a=()=>C("/referral/code"),qa=()=>C("/public/config"),Ha=e=>C("/public/contact",{method:"POST",body:JSON.stringify(e)}),Ra=e=>C("/public/testimonials",{method:"POST",body:JSON.stringify(e)}),aa=()=>C("/public/testimonials"),Oa=(e="new")=>C(`/admin/contact-messages?status=${encodeURIComponent(e)}`),Ka=(e,a)=>C(`/admin/contact-messages/${e}/status`,{method:"POST",body:JSON.stringify({status:a})}),Fa=(e="pending")=>C(`/admin/testimonials?status=${encodeURIComponent(e)}`),ja=(e,a)=>C(`/admin/testimonials/${e}/review`,{method:"POST",body:JSON.stringify({status:a})}),Va=()=>C("/admin/app-settings"),Ua=e=>C("/admin/app-settings",{method:"POST",body:JSON.stringify(e)}),Wa=e=>C(`/admin/users/lookup?phone=${encodeURIComponent(e)}`),Ga=e=>C("/admin/users/activate",{method:"POST",body:JSON.stringify(e)}),Ya=()=>C("/admin/stats"),Oe=De,ee={whatsapp_number:"919669756111",contact_phone:"919669756111",contact_email:"info@occultviision.com"};let V=null,oe=null;function Ja(){return V??ee}function Pe(){return V?Promise.resolve(V):(oe||(oe=qa().then(e=>{const a=e.ok&&e.data?e.data:{};return V={whatsapp_number:/^91[6-9]\d{9}$/.test(a.whatsapp_number)?a.whatsapp_number:ee.whatsapp_number,contact_phone:/^91[6-9]\d{9}$/.test(a.contact_phone)?a.contact_phone:ee.contact_phone,contact_email:typeof a.contact_email=="string"&&a.contact_email.includes("@")?a.contact_email:ee.contact_email},V}).catch(()=>ee).finally(()=>{oe=null})),oe)}function Qa(){V=null}function ta(e){const a=e.replace(/^91/,"");return`+91 ${a.slice(0,5)} ${a.slice(5)}`}function na(e,a=Ja()){return`https://wa.me/${a.whatsapp_number}${e?`?text=${encodeURIComponent(e)}`:""}`}function Za(e,a){e.querySelectorAll("[data-cfg]").forEach(t=>{const i=t.dataset.cfg;i==="phone"?(t.textContent=ta(a.contact_phone),t instanceof HTMLAnchorElement&&(t.href=`tel:+${a.contact_phone}`)):i==="email"?(t.textContent=a.contact_email,t instanceof HTMLAnchorElement&&(t.href=`mailto:${a.contact_email}`)):i==="whatsapp"&&t instanceof HTMLAnchorElement&&(t.href=na(void 0,a))})}function Xa(e){const a=[{label:"Features",route:"#/features"},{label:"Pricing",route:"#/pricing"},{label:"Blog",route:"#/blog"},{label:"Reviews",route:"#/testimonials"},{label:"Contact",route:"#/contact"}];return`
     <nav class="pub-nav">
       <a href="#/home" class="pub-nav-brand">
         <span class="pub-nav-logo">☉</span>
@@ -16,7 +16,7 @@
       ${a.map(i=>`<a href="${i.route}" class="pub-nav-mobile-link">${i.label}</a>`).join("")}
       <a href="#/login" class="pub-nav-mobile-link pub-nav-mobile-cta">Enter App →</a>
     </div>
-  `}function rt(){return`
+  `}function et(){return`
     <footer class="pub-footer">
       <div class="pub-footer-inner">
         <div class="pub-footer-brand">
@@ -57,13 +57,13 @@
         <span>Bhopal, Madhya Pradesh, India</span>
       </div>
     </footer>
-  `}function ae(e,a){const t=N();B(t),t.innerHTML=`
+  `}function Z(e,a){const t=N();B(t),t.innerHTML=`
     <div class="pub-page">
-      ${st(e)}
+      ${Xa(e)}
       <main class="pub-main">${a}</main>
-      ${rt()}
+      ${et()}
     </div>
-  `;const i=document.getElementById("pub-nav-hamburger"),n=document.getElementById("pub-nav-mobile-menu");i?.addEventListener("click",()=>{n?.classList.toggle("pub-nav-mobile-menu--open")});const s=t.querySelector(".pub-page");s&&ze().then(r=>it(s,r)),n?.querySelectorAll("a").forEach(r=>{r.addEventListener("click",()=>n.classList.remove("pub-nav-mobile-menu--open"))})}const oa={muhurta:"Muhurta",kundali:"Birth Chart / KP",numerology:"Numerology",vastu:"Vastu",app:"TaraNidhi App",other:"Consultation"};function ca(e){return e.map(a=>{const t=a.rating?`<div class="pub-testi-stars" aria-label="${a.rating} out of 5 stars">${"★".repeat(a.rating)}${"☆".repeat(5-a.rating)}</div>`:"",i=[oa[a.service]??"Consultation",a.city].filter(Boolean).map(k).join(" · ");return`
+  `;const i=document.getElementById("pub-nav-hamburger"),n=document.getElementById("pub-nav-mobile-menu");i?.addEventListener("click",()=>{n?.classList.toggle("pub-nav-mobile-menu--open")});const s=t.querySelector(".pub-page");s&&Pe().then(r=>Za(s,r)),n?.querySelectorAll("a").forEach(r=>{r.addEventListener("click",()=>n.classList.remove("pub-nav-mobile-menu--open"))})}const ia={muhurta:"Muhurta",kundali:"Birth Chart / KP",numerology:"Numerology",vastu:"Vastu",app:"TaraNidhi App",other:"Consultation"};function sa(e){return e.map(a=>{const t=a.rating?`<div class="pub-testi-stars" aria-label="${a.rating} out of 5 stars">${"★".repeat(a.rating)}${"☆".repeat(5-a.rating)}</div>`:"",i=[ia[a.service]??"Consultation",a.city].filter(Boolean).map(k).join(" · ");return`
         <figure class="pub-testi">
           ${t}
           <blockquote class="pub-testi-quote">${k(a.quote)}</blockquote>
@@ -71,7 +71,7 @@
             <span class="pub-testi-name">${k(a.name)}</span>
             <span class="pub-testi-role">${i}</span>
           </figcaption>
-        </figure>`}).join("")}function ot(){const e=`
+        </figure>`}).join("")}function at(){const e=`
     <section class="pub-section">
       <div class="pub-container">
         <h1 class="pub-section-title">Client Reviews</h1>
@@ -158,12 +158,12 @@
         </div>
       </div>
     </section>
-  `;ae("#/testimonials",e),ct(),lt()}async function ct(){const e=document.getElementById("testi-list");if(e)try{const a=await ia(),t=a.ok?a.data?.testimonials??[]:[];e.innerHTML=t.length?ca(t):`<p class="pub-testi-empty">No reviews published yet. Be the first to
-           <a href="#/testimonials" id="testi-jump">share your experience</a>.</p>`,document.getElementById("testi-jump")?.addEventListener("click",i=>{i.preventDefault(),document.getElementById("share")?.scrollIntoView({behavior:"smooth"}),document.getElementById("tf-name")?.focus({preventScroll:!0})})}catch{e.innerHTML='<p class="pub-testi-empty">Reviews could not be loaded right now.</p>'}finally{e.setAttribute("aria-busy","false")}}function lt(){const e=document.getElementById("testi-form");if(!e)return;const a=s=>document.getElementById(s).value,t=(s,r)=>{const o=document.getElementById(`${s}-err`);o&&(o.textContent=r,o.hidden=!r),document.getElementById(s)?.setAttribute("aria-invalid",r?"true":"false")},i=document.getElementById("tf-quote"),n=document.getElementById("tf-quote-count");i.addEventListener("input",()=>{n.textContent=`${i.value.trim().length} / 600`}),e.addEventListener("submit",async s=>{s.preventDefault();const r=a("tf-name").trim(),o=a("tf-phone").replace(/\D/g,""),d=i.value.trim(),l=document.getElementById("tf-consent").checked,b=e.querySelector('input[name="tf-rating"]:checked'),u=[["tf-name",r.length<2?"Please enter your name.":""],["tf-phone",/^[6-9]\d{9}$/.test(o)?"":"Enter a valid 10-digit mobile number."],["tf-quote",d.length<20?"Please write at least 20 characters.":""],["tf-consent",l?"":"Please tick the box so we can publish your review."]];u.forEach(([f,g])=>t(f,g));const v=u.find(([,f])=>f);if(v){document.getElementById(v[0])?.focus();return}const c=document.getElementById("tf-submit"),p=document.getElementById("tf-status");c.disabled=!0,c.textContent="Submitting…",p.textContent="";try{const f=await Ua({name:r,phone:o,city:a("tf-city").trim(),service:a("tf-service"),rating:b?Number(b.value):null,quote:d,consent:!0,website:a("tf-website")});if(f.ok){document.getElementById("testi-form-wrap").innerHTML=`
+  `;Z("#/testimonials",e),tt(),nt()}async function tt(){const e=document.getElementById("testi-list");if(e)try{const a=await aa(),t=a.ok?a.data?.testimonials??[]:[];e.innerHTML=t.length?sa(t):`<p class="pub-testi-empty">No reviews published yet. Be the first to
+           <a href="#/testimonials" id="testi-jump">share your experience</a>.</p>`,document.getElementById("testi-jump")?.addEventListener("click",i=>{i.preventDefault(),document.getElementById("share")?.scrollIntoView({behavior:"smooth"}),document.getElementById("tf-name")?.focus({preventScroll:!0})})}catch{e.innerHTML='<p class="pub-testi-empty">Reviews could not be loaded right now.</p>'}finally{e.setAttribute("aria-busy","false")}}function nt(){const e=document.getElementById("testi-form");if(!e)return;const a=s=>document.getElementById(s).value,t=(s,r)=>{const o=document.getElementById(`${s}-err`);o&&(o.textContent=r,o.hidden=!r),document.getElementById(s)?.setAttribute("aria-invalid",r?"true":"false")},i=document.getElementById("tf-quote"),n=document.getElementById("tf-quote-count");i.addEventListener("input",()=>{n.textContent=`${i.value.trim().length} / 600`}),e.addEventListener("submit",async s=>{s.preventDefault();const r=a("tf-name").trim(),o=a("tf-phone").replace(/\D/g,""),d=i.value.trim(),l=document.getElementById("tf-consent").checked,m=e.querySelector('input[name="tf-rating"]:checked'),u=[["tf-name",r.length<2?"Please enter your name.":""],["tf-phone",/^[6-9]\d{9}$/.test(o)?"":"Enter a valid 10-digit mobile number."],["tf-quote",d.length<20?"Please write at least 20 characters.":""],["tf-consent",l?"":"Please tick the box so we can publish your review."]];u.forEach(([f,g])=>t(f,g));const v=u.find(([,f])=>f);if(v){document.getElementById(v[0])?.focus();return}const c=document.getElementById("tf-submit"),p=document.getElementById("tf-status");c.disabled=!0,c.textContent="Submitting…",p.textContent="";try{const f=await Ra({name:r,phone:o,city:a("tf-city").trim(),service:a("tf-service"),rating:m?Number(m.value):null,quote:d,consent:!0,website:a("tf-website")});if(f.ok){document.getElementById("testi-form-wrap").innerHTML=`
           <div class="pub-contact-success" role="status">
             <h3 tabindex="-1">Thank you, ${k(r)}.</h3>
             <p>Your review has been received and will appear here once it is approved.</p>
-          </div>`,document.querySelector("#testi-form-wrap h3")?.focus();return}const g=f.data?.field,y={name:"tf-name",phone:"tf-phone",quote:"tf-quote",consent:"tf-consent"};g&&y[g]?t(y[g],f.data.error):p.textContent=f.data?.error??"Could not submit your review. Please try again."}catch{p.textContent="No internet connection, or the server could not be reached."}c.disabled=!1,c.textContent="Submit Review"})}function dt(){ae("#/home",`
+          </div>`,document.querySelector("#testi-form-wrap h3")?.focus();return}const g=f.data?.field,y={name:"tf-name",phone:"tf-phone",quote:"tf-quote",consent:"tf-consent"};g&&y[g]?t(y[g],f.data.error):p.textContent=f.data?.error??"Could not submit your review. Please try again."}catch{p.textContent="No internet connection, or the server could not be reached."}c.disabled=!1,c.textContent="Submit Review"})}function it(){Z("#/home",`
     <!-- ── Hero ── -->
     <section class="pub-hero">
       <div class="pub-hero-inner">
@@ -323,10 +323,10 @@
         <a href="#/pricing" class="pub-btn pub-btn--ghost">View Plans</a>
       </div>
     </section>
-  `),ut()}async function ut(){try{const e=await ia(),a=e.ok?e.data?.testimonials??[]:[];if(!a.length)return;const t=document.getElementById("home-testi-list"),i=document.getElementById("home-reviews"),n=document.getElementById("home-reviews-empty");if(!t||!i||!n)return;t.innerHTML=ca(a.slice(0,3)),i.hidden=!1,n.hidden=!0}catch{}}const ve="₹99",pt="₹TBD",vt="₹TBD",Le=15,la={monthly:{label:"Monthly",price:ve,sub:"per month · introductory price",savings:null},"6month":{label:"6 Months",price:pt,sub:"every 6 months · final price TBD",savings:"Save vs monthly · final price TBD"},yearly:{label:"Yearly",price:vt,sub:"per year · best value · final price TBD",savings:"Save vs monthly · final price TBD"}};function mt(){return`
+  `),st()}async function st(){try{const e=await aa(),a=e.ok?e.data?.testimonials??[]:[];if(!a.length)return;const t=document.getElementById("home-testi-list"),i=document.getElementById("home-reviews"),n=document.getElementById("home-reviews-empty");if(!t||!i||!n)return;t.innerHTML=sa(a.slice(0,3)),i.hidden=!1,n.hidden=!0}catch{}}const ue="₹99",rt="₹TBD",ot="₹TBD",Ie=15,ra={monthly:{label:"Monthly",price:ue,sub:"per month · introductory price",savings:null},"6month":{label:"6 Months",price:rt,sub:"every 6 months · final price TBD",savings:"Save vs monthly · final price TBD"},yearly:{label:"Yearly",price:ot,sub:"per year · best value · final price TBD",savings:"Save vs monthly · final price TBD"}};function ct(){return`
     <div class="price-period-wrap">
       <div class="price-period-toggle" id="period-toggle">
-        ${Object.entries(la).map(([e,a],t)=>`
+        ${Object.entries(ra).map(([e,a],t)=>`
           <button
             class="period-btn${t===0?" active":""}"
             data-period="${e}"
@@ -336,12 +336,12 @@
       </div>
       <div class="price-period-savings" id="period-savings"></div>
     </div>
-  `}function bt(){const e=`
+  `}function lt(){const e=`
     <!-- Intro offer banner -->
     <div class="pricing-intro-banner">
       <span class="pricing-intro-fire">🔥</span>
-      <strong>Early-Bird Offer — First ${Le} Days Only:</strong>
-      TaraNidhi Intelligence at <strong>${ve}/month</strong>, locked in forever at sign-up price.
+      <strong>Early-Bird Offer — First ${Ie} Days Only:</strong>
+      TaraNidhi Intelligence at <strong>${ue}/month</strong>, locked in forever at sign-up price.
     </div>
 
     <section class="pub-section pub-pricing-hero">
@@ -385,7 +385,7 @@
     <section class="pub-section">
       <div class="pub-container">
 
-        ${mt()}
+        ${ct()}
 
         <div class="pub-tiers">
 
@@ -442,10 +442,10 @@
 
           <!-- TaraNidhi Intelligence — highlighted -->
           <div class="pub-tier pub-tier--taranidhi pub-tier--featured">
-            <div class="pub-tier-popular">⭐ Early Bird — First ${Le} Days</div>
+            <div class="pub-tier-popular">⭐ Early Bird — First ${Ie} Days</div>
             <div class="pub-tier-badge">TaraNidhi Intelligence</div>
             <div class="pub-tier-price">
-              <span class="pub-tier-price-main" id="tier-main-price">${ve}</span>
+              <span class="pub-tier-price-main" id="tier-main-price">${ue}</span>
               <span class="pub-tier-price-sub" id="tier-price-sub">per month · introductory price</span>
             </div>
             <div class="intro-badge">
@@ -510,8 +510,8 @@
           <div class="pub-faq-item">
             <h4>What is the early-bird price?</h4>
             <p>
-              For the first ${Le} days after launch, TaraNidhi Intelligence is available at
-              ${ve}/month. This price is <strong>locked in permanently</strong> for
+              For the first ${Ie} days after launch, TaraNidhi Intelligence is available at
+              ${ue}/month. This price is <strong>locked in permanently</strong> for
               everyone who subscribes during this window — your price never increases.
             </p>
           </div>
@@ -556,7 +556,7 @@
 
       </div>
     </section>
-  `;ae("#/pricing",e),window.setPricingPeriod=(a,t)=>{document.querySelectorAll(".period-btn").forEach(o=>o.classList.remove("active")),t.classList.add("active");const i=la[a],n=document.getElementById("tier-main-price"),s=document.getElementById("tier-price-sub"),r=document.getElementById("period-savings");n&&(n.textContent=i.price),s&&(s.textContent=i.sub),r&&(r.textContent=i.savings??"")}}function ht(){ae("#/features",`
+  `;Z("#/pricing",e),window.setPricingPeriod=(a,t)=>{document.querySelectorAll(".period-btn").forEach(o=>o.classList.remove("active")),t.classList.add("active");const i=ra[a],n=document.getElementById("tier-main-price"),s=document.getElementById("tier-price-sub"),r=document.getElementById("period-savings");n&&(n.textContent=i.price),s&&(s.textContent=i.sub),r&&(r.textContent=i.savings??"")}}function dt(){Z("#/features",`
     <section class="pub-section pub-features-hero">
       <div class="pub-container">
         <h1 class="pub-section-title">Every feature. Every system. One place.</h1>
@@ -735,7 +735,7 @@
         <a href="#/pricing" class="pub-btn pub-btn--ghost">See Pricing</a>
       </div>
     </section>
-  `)}const gt=[{id:"kp",tag:"KP System",title:"What is Krishnamurti Paddhati? The 243-fold zodiac explained.",summary:`KP astrology divides each of the 27 Nakshatras into 9 sub-lords,
+  `)}const ut=[{id:"kp",tag:"KP System",title:"What is Krishnamurti Paddhati? The 243-fold zodiac explained.",summary:`KP astrology divides each of the 27 Nakshatras into 9 sub-lords,
       creating 243 micro-zones of the zodiac. This granularity allows timing
       predictions accurate to days — not months. We explain the Star Lord →
       Sub-Lord → Sub-Sub-Lord chain and how OccultViision implements it.`,readTime:"8 min",date:"Oct 2026"},{id:"muhurta",tag:"Muhurta",title:"Why Muhurta matters for property decisions: a practical guide.",summary:`Choosing an auspicious date for a property registration or
@@ -748,7 +748,7 @@
       Tarabala (birth-star compatibility with the query star) and Chandrabala
       (Moon's position from natal Moon) are equally important. Here's how to
       read and interpret them — and why OccultViision weights them at 15% and
-      10% respectively in the confidence index.`,readTime:"6 min",date:"Sep 2026"}],ft=[{q:"What is the difference between Tropical and Sidereal zodiac?",a:`Western astrology uses the Tropical zodiac, fixed to the Sun's position
+      10% respectively in the confidence index.`,readTime:"6 min",date:"Sep 2026"}],pt=[{q:"What is the difference between Tropical and Sidereal zodiac?",a:`Western astrology uses the Tropical zodiac, fixed to the Sun's position
         at the March equinox. Vedic astrology uses the Sidereal zodiac, aligned
         to the actual star constellations. The difference is the Ayanamsa —
         currently about 23.9° (Lahiri). OccultViision uses Lahiri Ayanamsa as
@@ -766,7 +766,7 @@
         the junction of fire-water Rashi pairs: Ashwini, Ashlesha, Magha, Jyeshtha,
         Moola, and Revati. Birth under these Nakshatras is traditionally considered
         inauspicious for certain events. OccultViision flags Ganda Moola with a
-        warning and cites the classical source (Karma Vipak Samhita).`}];function yt(){const e=gt.map(i=>`
+        warning and cites the classical source (Karma Vipak Samhita).`}];function vt(){const e=ut.map(i=>`
     <div class="pub-article-card" id="${i.id}">
       <div class="pub-article-tag">${i.tag}</div>
       <h3 class="pub-article-title">${i.title}</h3>
@@ -776,7 +776,7 @@
         <span>${i.readTime} read</span>
       </div>
     </div>
-  `).join(""),a=ft.map((i,n)=>`
+  `).join(""),a=pt.map((i,n)=>`
     <div class="pub-faq-item pub-faq-accordion" id="faq-${n}">
       <button class="pub-faq-q" aria-expanded="false" aria-controls="faq-a-${n}">
         ${i.q}
@@ -816,7 +816,7 @@
         <a href="#/contact" class="pub-btn pub-btn--primary">Contact Naveen →</a>
       </div>
     </section>
-  `;ae("#/blog",t),requestAnimationFrame(()=>{document.querySelectorAll(".pub-faq-q").forEach(i=>{i.addEventListener("click",()=>{const n=i.getAttribute("aria-expanded")==="true",s=i.getAttribute("aria-controls"),r=s?document.getElementById(s):null,o=i.querySelector(".pub-faq-icon");i.setAttribute("aria-expanded",String(!n)),r&&(n?r.setAttribute("hidden",""):r.removeAttribute("hidden")),o&&(o.textContent=n?"+":"−")})})})}function wt(){ae("#/contact",`
+  `;Z("#/blog",t),requestAnimationFrame(()=>{document.querySelectorAll(".pub-faq-q").forEach(i=>{i.addEventListener("click",()=>{const n=i.getAttribute("aria-expanded")==="true",s=i.getAttribute("aria-controls"),r=s?document.getElementById(s):null,o=i.querySelector(".pub-faq-icon");i.setAttribute("aria-expanded",String(!n)),r&&(n?r.setAttribute("hidden",""):r.removeAttribute("hidden")),o&&(o.textContent=n?"+":"−")})})})}function mt(){Z("#/contact",`
     <section class="pub-section">
       <div class="pub-container pub-contact-container">
 
@@ -937,14 +937,14 @@
 
       </div>
     </section>
-  `),ze().then(n=>{const s=document.getElementById("cm-phone");s&&(s.href=`tel:+${n.contact_phone}`);const r=document.getElementById("cm-email");r&&(r.href=`mailto:${n.contact_email}`)});const a=document.getElementById("contact-form");if(!a)return;const t=n=>document.getElementById(n),i=(n,s)=>{const r=document.getElementById(`${n}-err`),o=document.getElementById(n);!r||!o||(r.textContent=s,r.hidden=!s,o.setAttribute("aria-invalid",s?"true":"false"))};a.addEventListener("submit",async n=>{n.preventDefault();const s=t("cf-name").value.trim(),r=t("cf-phone").value.replace(/\D/g,""),o=document.getElementById("cf-topic"),d=o.value,l=document.getElementById("cf-message").value.trim(),b=t("cf-website").value;if(i("cf-name",s.length<2?"Please enter your name.":""),i("cf-phone",/^[6-9]\d{9}$/.test(r)?"":"Enter a valid 10-digit mobile number."),s.length<2)return t("cf-name").focus();if(!/^[6-9]\d{9}$/.test(r))return t("cf-phone").focus();const u=d?o.selectedOptions[0]?.text??d:"General enquiry",v=`Hello Naveen,
+  `),Pe().then(n=>{const s=document.getElementById("cm-phone");s&&(s.href=`tel:+${n.contact_phone}`);const r=document.getElementById("cm-email");r&&(r.href=`mailto:${n.contact_email}`)});const a=document.getElementById("contact-form");if(!a)return;const t=n=>document.getElementById(n),i=(n,s)=>{const r=document.getElementById(`${n}-err`),o=document.getElementById(n);!r||!o||(r.textContent=s,r.hidden=!s,o.setAttribute("aria-invalid",s?"true":"false"))};a.addEventListener("submit",async n=>{n.preventDefault();const s=t("cf-name").value.trim(),r=t("cf-phone").value.replace(/\D/g,""),o=document.getElementById("cf-topic"),d=o.value,l=document.getElementById("cf-message").value.trim(),m=t("cf-website").value;if(i("cf-name",s.length<2?"Please enter your name.":""),i("cf-phone",/^[6-9]\d{9}$/.test(r)?"":"Enter a valid 10-digit mobile number."),s.length<2)return t("cf-name").focus();if(!/^[6-9]\d{9}$/.test(r))return t("cf-phone").focus();const u=d?o.selectedOptions[0]?.text??d:"General enquiry",v=`Hello Naveen,
 
 I'm ${s} (+91 ${r}).
 Topic: ${u}
 `+(l?`
 ${l}
 `:"")+`
-— Sent from occultviision.com`,c=document.getElementById("btn-send"),p=document.getElementById("cf-status");c.disabled=!0,c.textContent="Sending…",p.textContent="";let f=!1,g="";try{const h=await Va({name:s,phone:r,topic:d,message:l,website:b});f=h.ok,h.ok||((h.data?.field==="name"||h.data?.field==="phone")&&i(h.data.field==="name"?"cf-name":"cf-phone",h.data.error),g=h.data?.error??"Could not save your message.")}catch{g="No internet connection, or the server could not be reached."}const y=await ze(),$=ra(v,y);if(f){const h=document.getElementById("contact-form-wrap");h.innerHTML=`
+— Sent from occultviision.com`,c=document.getElementById("btn-send"),p=document.getElementById("cf-status");c.disabled=!0,c.textContent="Sending…",p.textContent="";let f=!1,g="";try{const h=await Ha({name:s,phone:r,topic:d,message:l,website:m});f=h.ok,h.ok||((h.data?.field==="name"||h.data?.field==="phone")&&i(h.data.field==="name"?"cf-name":"cf-phone",h.data.error),g=h.data?.error??"Could not save your message.")}catch{g="No internet connection, or the server could not be reached."}const y=await Pe(),$=na(v,y);if(f){const h=document.getElementById("contact-form-wrap");h.innerHTML=`
         <div class="pub-contact-success" role="status">
           <h2>Thank you, ${k(s)}.</h2>
           <p>Your message has been received. Naveen will reply on +91 ${k(r)}.</p>
@@ -952,7 +952,7 @@ ${l}
           <a class="pub-btn pub-btn--primary pub-btn--full" href="${k($)}"
              target="_blank" rel="noopener noreferrer">Continue on WhatsApp</a>
         </div>`,h.querySelector("h2")?.setAttribute("tabindex","-1"),h.querySelector("h2")?.focus();return}c.disabled=!1,c.textContent="Send Message",p.innerHTML=`${k(g)} You can still reach us directly:
-      <a href="${k($)}" target="_blank" rel="noopener noreferrer">send this on WhatsApp</a>.`})}function kt(){const e=N();B(e),e.innerHTML=`
+      <a href="${k($)}" target="_blank" rel="noopener noreferrer">send this on WhatsApp</a>.`})}function bt(){const e=N();B(e),e.innerHTML=`
     <div class="screen login-screen">
       <div class="logo">☉</div>
       <h1>OccultViision</h1>
@@ -978,14 +978,14 @@ ${l}
         <div class="spinner"></div>
       </div>
     </div>
-  `;let a="";const t=document.getElementById("phone"),i=document.getElementById("btn-otp"),n=document.getElementById("step-phone"),s=document.getElementById("step-otp"),r=document.getElementById("otp-code"),o=document.getElementById("btn-verify"),d=document.getElementById("btn-back"),l=document.getElementById("login-loading");i.addEventListener("click",async()=>{if(a=t.value.trim(),!/^\d{10}$/.test(a)){x("Enter a valid 10-digit phone number",!0);return}i.setAttribute("disabled",""),l.classList.remove("hidden");const b=await Na(a);l.classList.add("hidden"),i.removeAttribute("disabled"),b.ok?(n.classList.add("hidden"),s.classList.remove("hidden"),r.focus(),x("OTP sent!")):x(b.data?.error??"Failed to send OTP",!0)}),d.addEventListener("click",()=>{s.classList.add("hidden"),n.classList.remove("hidden"),t.focus()}),o.addEventListener("click",async()=>{const b=r.value.trim();if(!/^\d{4,6}$/.test(b)){x("Enter the OTP code",!0);return}o.setAttribute("disabled",""),l.classList.remove("hidden");const u=`pwa-${navigator.userAgent.slice(0,40)}-${screen.width}x${screen.height}`,v=await Ba(a,b,u);l.classList.add("hidden"),o.removeAttribute("disabled"),v.ok&&v.data?.session_token?(aa(v.data.session_token),x("Logged in!"),E("/dashboard")):x(v.data?.error??"Verification failed",!0)})}async function xt(){const e=N();B(e),e.innerHTML=`
+  `;let a="";const t=document.getElementById("phone"),i=document.getElementById("btn-otp"),n=document.getElementById("step-phone"),s=document.getElementById("step-otp"),r=document.getElementById("otp-code"),o=document.getElementById("btn-verify"),d=document.getElementById("btn-back"),l=document.getElementById("login-loading");i.addEventListener("click",async()=>{if(a=t.value.trim(),!/^\d{10}$/.test(a)){x("Enter a valid 10-digit phone number",!0);return}i.setAttribute("disabled",""),l.classList.remove("hidden");const m=await La(a);l.classList.add("hidden"),i.removeAttribute("disabled"),m.ok?(n.classList.add("hidden"),s.classList.remove("hidden"),r.focus(),x("OTP sent!")):x(m.data?.error??"Failed to send OTP",!0)}),d.addEventListener("click",()=>{s.classList.add("hidden"),n.classList.remove("hidden"),t.focus()}),o.addEventListener("click",async()=>{const m=r.value.trim();if(!/^\d{4,6}$/.test(m)){x("Enter the OTP code",!0);return}o.setAttribute("disabled",""),l.classList.remove("hidden");const u=`pwa-${navigator.userAgent.slice(0,40)}-${screen.width}x${screen.height}`,v=await Ca(a,m,u);l.classList.add("hidden"),o.removeAttribute("disabled"),v.ok&&v.data?.session_token?(Ze(v.data.session_token),x("Logged in!"),E("/dashboard")):x(v.data?.error??"Verification failed",!0)})}async function ht(){const e=N();B(e),e.innerHTML=`
     <div class="screen ti-screen">
       <div class="ti-loading">
         <div class="ti-logo">OCCULTVIISION</div>
         <div class="ti-tagline">Loading your time intelligence…</div>
       </div>
     </div>
-  `;const a=await ce(),i=(a.ok?a.data.kundalis??[]:[])[0]??null;i?St(e,i):$t(e)}function $t(e){e.innerHTML=`
+  `;const a=await se(),i=(a.ok?a.data.kundalis??[]:[])[0]??null;i?ft(e,i):gt(e)}function gt(e){e.innerHTML=`
     <div class="screen ti-screen">
       <header class="ti-header">
         <div class="ti-brand">
@@ -1036,7 +1036,7 @@ ${l}
         <span>Powered by KP Astrology · Lahiri Ayanamsa · Placidus Houses</span>
       </footer>
     </div>
-  `,document.getElementById("btn-create-chart").addEventListener("click",()=>E("/kundali-form")),document.getElementById("btn-logout").addEventListener("click",()=>{localStorage.removeItem("ov_session"),window.location.reload()})}async function St(e,a,t){const i=await Ee(a.id),n=i.ok?i.data.chart:null,s=await qe(23.2585,77.402,void 0,a.id),r=s.ok?s.data:null,o=n?.ascendant,d=n?.dasha,l=n?.janmaNakshatra,b=n?.tara,u=d?new Date(d.maha.end).getFullYear():"—",v=d?Et(new Date(d.antar.end)):"—",c=r?.hora?.lord??"—",p=r?.score??"—",f=r?.hora?.end?It(new Date(r.hora.end)):"—",g=b?.beneficence==="benefic"?"#4ade80":b?.beneficence==="malefic"?"#f87171":"#fbbf24";b&&`${b.name}${b.number}`,e.innerHTML=`
+  `,document.getElementById("btn-create-chart").addEventListener("click",()=>E("/kundali-form")),document.getElementById("btn-logout").addEventListener("click",()=>{localStorage.removeItem("ov_session"),window.location.reload()})}async function ft(e,a,t){const i=await $e(a.id),n=i.ok?i.data.chart:null,s=await De(23.2585,77.402,void 0,a.id),r=s.ok?s.data:null,o=n?.ascendant,d=n?.dasha,l=n?.janmaNakshatra,m=n?.tara,u=d?new Date(d.maha.end).getFullYear():"—",v=d?yt(new Date(d.antar.end)):"—",c=r?.hora?.lord??"—",p=r?.score??"—",f=r?.hora?.end?wt(new Date(r.hora.end)):"—",g=m?.beneficence==="benefic"?"var(--tara-benefic)":m?.beneficence==="malefic"?"var(--tara-malefic)":"var(--tara-neutral)";m&&`${m.name}${m.number}`,e.innerHTML=`
     <div class="screen ti-screen">
 
       <!-- Header -->
@@ -1065,7 +1065,7 @@ ${l}
         </div>
         <div class="ti-live-divider"></div>
         <div class="ti-live-item">
-          <div class="ti-live-value" style="color:${g}">${b?.number??"—"}</div>
+          <div class="ti-live-value" style="color:${g}">${m?.number??"—"}</div>
           <div class="ti-live-key">Tara Now</div>
         </div>
         <div class="ti-live-divider"></div>
@@ -1181,7 +1181,7 @@ ${l}
       </footer>
 
     </div>
-  `,document.getElementById("btn-open-chart").addEventListener("click",()=>{E(`/birth-chart?id=${a.id}`)}),e.querySelectorAll("[data-route]").forEach(y=>{y.addEventListener("click",()=>E(y.dataset.route))}),document.getElementById("btn-logout").addEventListener("click",()=>{localStorage.removeItem("ov_session"),window.location.reload()})}function Et(e){return e.toLocaleDateString("en-IN",{month:"short",year:"numeric"})}function It(e){return e.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:!0})}let ie=null;function da(){if(ie)return ie;const e=localStorage.getItem("ov_location");if(e)try{return ie=JSON.parse(e),ie}catch{}return null}function Tt(e){ie=e,localStorage.setItem("ov_location",JSON.stringify(e))}function ua(){return new Promise((e,a)=>{if(!navigator.geolocation){a(new Error("Geolocation not supported"));return}navigator.geolocation.getCurrentPosition(t=>{const i={lat:t.coords.latitude,lon:t.coords.longitude};Tt(i),e(i)},t=>a(t),{enableHighAccuracy:!1,timeout:1e4})})}const Lt=[{value:"general",label:"General"},{value:"travel",label:"Travel"},{value:"finance",label:"Finance"},{value:"health",label:"Health"},{value:"education",label:"Education"},{value:"relationship",label:"Relationship"},{value:"career",label:"Career"},{value:"spiritual",label:"Spiritual"}];function Pt(){const e=N();B(e),e.innerHTML=`
+  `,document.getElementById("btn-open-chart").addEventListener("click",()=>{E(`/birth-chart?id=${a.id}`)}),e.querySelectorAll("[data-route]").forEach(y=>{y.addEventListener("click",()=>E(y.dataset.route))}),document.getElementById("btn-logout").addEventListener("click",()=>{localStorage.removeItem("ov_session"),window.location.reload()})}function yt(e){return e.toLocaleDateString("en-IN",{month:"short",year:"numeric"})}function wt(e){return e.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:!0})}let ae=null;function oa(){if(ae)return ae;const e=localStorage.getItem("ov_location");if(e)try{return ae=JSON.parse(e),ae}catch{}return null}function kt(e){ae=e,localStorage.setItem("ov_location",JSON.stringify(e))}function ca(){return new Promise((e,a)=>{if(!navigator.geolocation){a(new Error("Geolocation not supported"));return}navigator.geolocation.getCurrentPosition(t=>{const i={lat:t.coords.latitude,lon:t.coords.longitude};kt(i),e(i)},t=>a(t),{enableHighAccuracy:!1,timeout:1e4})})}const xt=[{value:"general",label:"General"},{value:"travel",label:"Travel"},{value:"finance",label:"Finance"},{value:"health",label:"Health"},{value:"education",label:"Education"},{value:"relationship",label:"Relationship"},{value:"career",label:"Career"},{value:"spiritual",label:"Spiritual"}];function $t(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1191,7 +1191,7 @@ ${l}
       <div class="form-group">
         <label>Purpose</label>
         <select id="purpose">
-          ${Lt.map(t=>`<option value="${t.value}">${t.label}</option>`).join("")}
+          ${xt.map(t=>`<option value="${t.value}">${t.label}</option>`).join("")}
         </select>
       </div>
 
@@ -1216,7 +1216,7 @@ ${l}
       <div id="muhurta-result" class="result-box hidden"></div>
       <div id="muhurta-loading" class="hidden"><div class="spinner"></div></div>
     </div>
-  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const a=da();a&&(document.getElementById("lat").value=String(a.lat),document.getElementById("lon").value=String(a.lon)),document.getElementById("btn-gps").addEventListener("click",async()=>{try{const t=await ua();document.getElementById("lat").value=String(t.lat),document.getElementById("lon").value=String(t.lon),x("Location updated")}catch{x("Could not get location",!0)}}),ce().then(t=>{if(t.ok&&Array.isArray(t.data?.kundalis)){const i=document.getElementById("kundali-select");for(const n of t.data.kundalis){const s=document.createElement("option");s.value=String(n.id),s.textContent=n.label,i.appendChild(s)}}}),document.getElementById("btn-check").addEventListener("click",async()=>{const t=Number(document.getElementById("lat").value),i=Number(document.getElementById("lon").value);if(!Number.isFinite(t)||!Number.isFinite(i)){x("Set your location first",!0);return}const n=document.getElementById("purpose").value,s=document.getElementById("kundali-select").value,r=s?Number(s):void 0,o=document.getElementById("muhurta-loading"),d=document.getElementById("muhurta-result");o.classList.remove("hidden"),d.classList.add("hidden");const l=await qe(t,i,n,r);if(o.classList.add("hidden"),!l.ok){x(l.data?.error??"Request failed",!0);return}const b=l.data;d.classList.remove("hidden"),d.innerHTML=Ct(b)})}function Ct(e){const a=e.score>=70?"score-good":e.score>=40?"score-mid":"score-bad",t=(e.layers??[]).map(n=>`<div class="layer"><strong>${n.name}</strong>: ${n.detail} (${n.impact})</div>`).join(""),i=[];if(e.panchaka?.active&&i.push(`⚠️ Panchaka Dosha: ${e.panchaka.note}`),e.ganda_moola?.active&&i.push(`⚠️ Ganda Moola: ${e.ganda_moola.note}`),e.combustion?.length)for(const n of e.combustion)i.push(`🔥 ${n.planet} combust (${n.angular_distance.toFixed(1)}°)`);return`
+  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const a=oa();a&&(document.getElementById("lat").value=String(a.lat),document.getElementById("lon").value=String(a.lon)),document.getElementById("btn-gps").addEventListener("click",async()=>{try{const t=await ca();document.getElementById("lat").value=String(t.lat),document.getElementById("lon").value=String(t.lon),x("Location updated")}catch{x("Could not get location",!0)}}),se().then(t=>{if(t.ok&&Array.isArray(t.data?.kundalis)){const i=document.getElementById("kundali-select");for(const n of t.data.kundalis){const s=document.createElement("option");s.value=String(n.id),s.textContent=n.label,i.appendChild(s)}}}),document.getElementById("btn-check").addEventListener("click",async()=>{const t=Number(document.getElementById("lat").value),i=Number(document.getElementById("lon").value);if(!Number.isFinite(t)||!Number.isFinite(i)){x("Set your location first",!0);return}const n=document.getElementById("purpose").value,s=document.getElementById("kundali-select").value,r=s?Number(s):void 0,o=document.getElementById("muhurta-loading"),d=document.getElementById("muhurta-result");o.classList.remove("hidden"),d.classList.add("hidden");const l=await De(t,i,n,r);if(o.classList.add("hidden"),!l.ok){x(l.data?.error??"Request failed",!0);return}const m=l.data;d.classList.remove("hidden"),d.innerHTML=St(m)})}function St(e){const a=e.score>=70?"score-good":e.score>=40?"score-mid":"score-bad",t=(e.layers??[]).map(n=>`<div class="layer"><strong>${n.name}</strong>: ${n.detail} (${n.impact})</div>`).join(""),i=[];if(e.panchaka?.active&&i.push(`⚠️ Panchaka Dosha: ${e.panchaka.note}`),e.ganda_moola?.active&&i.push(`⚠️ Ganda Moola: ${e.ganda_moola.note}`),e.combustion?.length)for(const n of e.combustion)i.push(`🔥 ${n.planet} combust (${n.angular_distance.toFixed(1)}°)`);return`
     <div class="muhurta-card">
       <div class="score-circle ${a}">${e.score}</div>
       <div class="verdict">${e.verdict??""}</div>
@@ -1228,9 +1228,9 @@ ${l}
       ${e.dishashool?`<div class="dishashool">Dishashool: ${e.dishashool.direction}</div>`:""}
       <div class="layers">${t}</div>
       ${i.length?`<div class="warnings">${i.join("<br/>")}</div>`:""}
-      <div class="hora-window">Window: ${Ue(e.hora_start)} – ${Ue(e.hora_end)}</div>
+      <div class="hora-window">Window: ${Ke(e.hora_start)} – ${Ke(e.hora_end)}</div>
     </div>
-  `}function Ue(e){if(!e)return"?";try{return new Date(e).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}catch{return e}}async function At(){const e=N();B(e),e.innerHTML=`
+  `}function Ke(e){if(!e)return"?";try{return new Date(e).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}catch{return e}}async function Et(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1252,7 +1252,7 @@ ${l}
         </div>
       </div>
     </div>
-  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const a=document.getElementById("btn-add"),t=document.getElementById("btn-add-empty");a.addEventListener("click",()=>E("/kundali-form")),t&&t.addEventListener("click",()=>E("/kundali-form"));try{const i=await ce(),n=document.getElementById("loading"),s=document.getElementById("list"),r=document.getElementById("empty"),o=i.ok&&Array.isArray(i.data?.kundalis)?i.data.kundalis:[];n.style.display="none",o.length===0?r.style.display="block":(s.style.display="block",zt(s,o))}catch(i){console.error("Failed to load kundalis:",i),x("Failed to load kundalis",!0)}}function zt(e,a){e.innerHTML=a.map(t=>`
+  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const a=document.getElementById("btn-add"),t=document.getElementById("btn-add-empty");a.addEventListener("click",()=>E("/kundali-form")),t&&t.addEventListener("click",()=>E("/kundali-form"));try{const i=await se(),n=document.getElementById("loading"),s=document.getElementById("list"),r=document.getElementById("empty"),o=i.ok&&Array.isArray(i.data?.kundalis)?i.data.kundalis:[];n.style.display="none",o.length===0?r.style.display="block":(s.style.display="block",It(s,o))}catch(i){console.error("Failed to load kundalis:",i),x("Failed to load kundalis",!0)}}function It(e,a){e.innerHTML=a.map(t=>`
     <div class="kundali-item" data-id="${t.id}">
       <div class="kundali-info">
         <h3>${t.label||"Unnamed Kundali"}</h3>
@@ -1270,7 +1270,7 @@ ${l}
         </button>
       </div>
     </div>
-  `).join(""),e.querySelectorAll(".view-btn").forEach(t=>{t.addEventListener("click",i=>{const n=i.target.dataset.id;n&&E(`/birth-chart?id=${n}`)})}),e.querySelectorAll(".delete-btn").forEach(t=>{t.addEventListener("click",async i=>{i.stopPropagation();const n=i.target.dataset.id,s=e.querySelector(`[data-id="${n}"]`),r=s?.querySelector("h3")?.textContent||"this kundali";if(confirm(`Delete ${r}? This cannot be undone.`))try{const o=await ta(Number(n));o.ok?(x("Kundali deleted"),s?.remove(),e.querySelectorAll(".kundali-item").length===0&&(e.style.display="none",document.getElementById("empty").style.display="block")):x(o.data?.error??"Failed to delete kundali",!0)}catch(o){console.error("Delete error:",o),x("Error deleting kundali",!0)}})})}const Mt=[{value:"Asia/Kolkata",label:"India (IST)"},{value:"Asia/Bangkok",label:"Thailand (ICT)"},{value:"Asia/Singapore",label:"Singapore (SGT)"},{value:"Asia/Hong_Kong",label:"Hong Kong (HKT)"},{value:"Australia/Sydney",label:"Sydney (AEDT)"},{value:"Europe/London",label:"London (GMT/BST)"},{value:"Europe/Paris",label:"Paris (CET/CEST)"},{value:"America/New_York",label:"New York (EST/EDT)"},{value:"America/Los_Angeles",label:"Los Angeles (PST/PDT)"},{value:"America/Chicago",label:"Chicago (CST/CDT)"}];async function Nt(){const e=N();B(e),e.innerHTML=`
+  `).join(""),e.querySelectorAll(".view-btn").forEach(t=>{t.addEventListener("click",i=>{const n=i.target.dataset.id;n&&E(`/birth-chart?id=${n}`)})}),e.querySelectorAll(".delete-btn").forEach(t=>{t.addEventListener("click",async i=>{i.stopPropagation();const n=i.target.dataset.id,s=e.querySelector(`[data-id="${n}"]`),r=s?.querySelector("h3")?.textContent||"this kundali";if(confirm(`Delete ${r}? This cannot be undone.`))try{const o=await Xe(Number(n));o.ok?(x("Kundali deleted"),s?.remove(),e.querySelectorAll(".kundali-item").length===0&&(e.style.display="none",document.getElementById("empty").style.display="block")):x(o.data?.error??"Failed to delete kundali",!0)}catch(o){console.error("Delete error:",o),x("Error deleting kundali",!0)}})})}function Fe(e,a){const t=new Intl.DateTimeFormat("en-US",{timeZone:a,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(new Date(e)),i=n=>Number(t.find(s=>s.type===n)?.value);return Date.UTC(i("year"),i("month")-1,i("day"),i("hour"),i("minute"),i("second"))}function Tt(e,a){const{year:t,month:i,day:n,hour:s,minute:r}=e,o=Date.UTC(t,i-1,n,s,r,0),d=new Date(o);if(!Number.isInteger(t)||!Number.isInteger(i)||!Number.isInteger(n)||!Number.isInteger(s)||!Number.isInteger(r)||d.getUTCFullYear()!==t||d.getUTCMonth()!==i-1||d.getUTCDate()!==n||s<0||s>23||r<0||r>59)throw new RangeError(`Invalid date/time: ${t}-${i}-${n} ${s}:${r}`);new Intl.DateTimeFormat("en-US",{timeZone:a}).format(0);let l=o-(Fe(o,a)-o);const m=Fe(l,a)-l;return l=o-m,new Date(l)}function Lt(e,a){const t=/^(\d{4})-(\d{2})-(\d{2})$/.exec(e.trim()),i=/^(\d{2}):(\d{2})(?::\d{2})?$/.exec(a.trim());return!t||!i?null:{year:+t[1],month:+t[2],day:+t[3],hour:+i[1],minute:+i[2]}}const Ct=[{value:"Asia/Kolkata",label:"India (IST)"},{value:"Asia/Bangkok",label:"Thailand (ICT)"},{value:"Asia/Singapore",label:"Singapore (SGT)"},{value:"Asia/Hong_Kong",label:"Hong Kong (HKT)"},{value:"Australia/Sydney",label:"Sydney (AEDT)"},{value:"Europe/London",label:"London (GMT/BST)"},{value:"Europe/Paris",label:"Paris (CET/CEST)"},{value:"America/New_York",label:"New York (EST/EDT)"},{value:"America/Los_Angeles",label:"Los Angeles (PST/PDT)"},{value:"America/Chicago",label:"Chicago (CST/CDT)"}];async function Pt(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1342,7 +1342,7 @@ ${l}
           <label for="timezone">Timezone</label>
           <select id="timezone" required>
             <option value="">-- Select Timezone --</option>
-            ${Mt.map($=>`<option value="${$.value}">${$.label}</option>`).join("")}
+            ${Ct.map($=>`<option value="${$.value}">${$.label}</option>`).join("")}
           </select>
         </div>
 
@@ -1358,14 +1358,14 @@ ${l}
 
       <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
     </div>
-  `;const a=document.getElementById("form"),t=document.getElementById("name"),i=document.getElementById("birth-date"),n=document.getElementById("birth-time"),s=document.getElementById("lat"),r=document.getElementById("lon"),o=document.getElementById("timezone"),d=document.getElementById("btn-gps"),l=document.getElementById("btn-search-place"),b=document.getElementById("place-search"),u=document.getElementById("place-results"),v=document.getElementById("place-confirmed"),c=document.getElementById("btn-cancel"),p=document.getElementById("error-box"),f=da();f&&(s.value=String(f.lat),r.value=String(f.lon)),o.value="Asia/Kolkata";async function g(){const $=b.value.trim();if($){l.textContent="⏳",l.setAttribute("disabled","true"),u.style.display="none",u.innerHTML="";try{const h=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent($)}&format=json&limit=10&addressdetails=1&countrycodes=in`,T=await(await fetch(h,{headers:{"Accept-Language":"en,hi"}})).json();if(!T.length){const C=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent($+" India")}&format=json&limit=10&addressdetails=1`,m=await(await fetch(C,{headers:{"Accept-Language":"en,hi"}})).json();if(!m.length){u.innerHTML=`<div style="padding:8px;color:var(--accent-agni-text);font-size:0.82rem;">
+  `;const a=document.getElementById("form"),t=document.getElementById("name"),i=document.getElementById("birth-date"),n=document.getElementById("birth-time"),s=document.getElementById("lat"),r=document.getElementById("lon"),o=document.getElementById("timezone"),d=document.getElementById("btn-gps"),l=document.getElementById("btn-search-place"),m=document.getElementById("place-search"),u=document.getElementById("place-results"),v=document.getElementById("place-confirmed"),c=document.getElementById("btn-cancel"),p=document.getElementById("error-box"),f=oa();f&&(s.value=String(f.lat),r.value=String(f.lon)),o.value="Asia/Kolkata";async function g(){const $=m.value.trim();if($){l.textContent="⏳",l.setAttribute("disabled","true"),u.style.display="none",u.innerHTML="";try{const h=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent($)}&format=json&limit=10&addressdetails=1&countrycodes=in`,I=await(await fetch(h,{headers:{"Accept-Language":"en,hi"}})).json();if(!I.length){const P=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent($+" India")}&format=json&limit=10&addressdetails=1`,b=await(await fetch(P,{headers:{"Accept-Language":"en,hi"}})).json();if(!b.length){u.innerHTML=`<div style="padding:8px;color:var(--accent-agni-text);font-size:0.82rem;">
             Jagah nahi mili. Try karein:<br>
             • Poora naam likhein (e.g. "Raghogarh Madhya Pradesh")<br>
             • Tehsil ya district add karein (e.g. "Mendori Raisen")<br>
             • Nearest town ka naam try karein
-          </div>`,u.style.display="block";return}y(m);return}y(T)}catch{u.innerHTML='<div style="padding:8px;color:#cc0000;font-size:0.82rem;">Search failed. Manually latitude/longitude fill karein.</div>',u.style.display="block"}finally{l.textContent="🔍",l.removeAttribute("disabled")}}}function y($){u.innerHTML=$.map((h,L)=>{const T=h.address||{},C=[],M=T.village||T.hamlet||T.suburb||T.town||T.city||T.municipality||h.display_name.split(",")[0],m=T.county||T.district||T.state_district||"",S=T.state||"";M&&C.push(M.trim()),m&&m!==M&&C.push(m.trim()),S&&C.push(S.trim());const w=C.length>=2?C.join(", "):h.display_name.split(",").slice(0,4).join(", ");return`<div class="place-result-item" data-i="${L}" data-lat="${h.lat}" data-lon="${h.lon}" data-name="${w}"
+          </div>`,u.style.display="block";return}y(b);return}y(I)}catch{u.innerHTML='<div style="padding:8px;color:#cc0000;font-size:0.82rem;">Search failed. Manually latitude/longitude fill karein.</div>',u.style.display="block"}finally{l.textContent="🔍",l.removeAttribute("disabled")}}}function y($){u.innerHTML=$.map((h,T)=>{const I=h.address||{},P=[],M=I.village||I.hamlet||I.suburb||I.town||I.city||I.municipality||h.display_name.split(",")[0],b=I.county||I.district||I.state_district||"",S=I.state||"";M&&P.push(M.trim()),b&&b!==M&&P.push(b.trim()),S&&P.push(S.trim());const w=P.length>=2?P.join(", "):h.display_name.split(",").slice(0,4).join(", ");return`<div class="place-result-item" data-i="${T}" data-lat="${h.lat}" data-lon="${h.lon}" data-name="${w}"
         style="padding:8px 12px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid #E8C89A;color:#3a1a00;"
-        onmouseover="this.style.background='#FFF0DC'" onmouseout="this.style.background=''">${w}</div>`}).join(""),u.style.display="block",u.querySelectorAll(".place-result-item").forEach(h=>{h.addEventListener("click",()=>{const L=parseFloat(h.dataset.lat),T=parseFloat(h.dataset.lon),C=h.dataset.name;s.value=L.toFixed(6),r.value=T.toFixed(6),b.value=C,u.style.display="none",v.textContent=`✓ ${C} (${L.toFixed(4)}°N, ${T.toFixed(4)}°E)`,v.style.display="block"})})}l.addEventListener("click",$=>{$.preventDefault(),g()}),b.addEventListener("keydown",$=>{$.key==="Enter"&&($.preventDefault(),g())}),d.addEventListener("click",async $=>{$.preventDefault();try{const h=await ua();s.value=String(h.lat),r.value=String(h.lon),x("Location updated")}catch{x("Could not get location",!0)}}),c.addEventListener("click",$=>{$.preventDefault(),E("/kundali")}),a.addEventListener("submit",async $=>{$.preventDefault(),p.style.display="none";const h=t.value.trim(),L=i.value,T=n.value,C=parseFloat(s.value),M=parseFloat(r.value),m=o.value;if(!h||!L||!T||!m||isNaN(C)||isNaN(M)){p.textContent="Please fill in all fields",p.style.display="block";return}if(C<-90||C>90){p.textContent="Latitude must be between -90 and 90",p.style.display="block";return}if(M<-180||M>180){p.textContent="Longitude must be between -180 and 180",p.style.display="block";return}const S=document.getElementById("btn-submit");S.disabled=!0,S.textContent="Creating...";try{const[w,A,z]=L.split("-"),[D,I]=T.split(":"),V=`${w}-${A}-${z}T${D}:${I}:00`,te=new Intl.DateTimeFormat("en-US",{timeZone:m,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!1}),Ke=new Date(`${w}-${A}-${z}T${D}:${I}:00`),U=new Intl.DateTimeFormat("en-US",{timeZone:m,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!1}).formatToParts(new Date),Sa=new Date(parseInt(U.find(_=>_.type==="year")?.value||"2000"),parseInt(U.find(_=>_.type==="month")?.value||"1")-1,parseInt(U.find(_=>_.type==="day")?.value||"1"),parseInt(U.find(_=>_.type==="hour")?.value||"0"),parseInt(U.find(_=>_.type==="minute")?.value||"0"),parseInt(U.find(_=>_.type==="second")?.value||"0")),Ea=Ke.getTime()-Sa.getTime(),Ia=new Date(Ke.getTime()-Ea).toISOString().split(".")[0],Fe=await Da({label:h,birth_date:Ia,latitude:C,longitude:M,timezone:m});if(Fe.ok)x("Kundali created successfully"),E("/kundali");else{const _=Fe.data?.error||"Failed to create kundali";p.textContent=_,p.style.display="block",S.disabled=!1,S.textContent="Create Kundali"}}catch(w){console.error("Create error:",w),p.textContent="Error creating kundali",p.style.display="block",S.disabled=!1,S.textContent="Create Kundali"}}),document.getElementById("btn-back").addEventListener("click",()=>E("/kundali"))}const de={PROCEED:{bg:"rgba(16, 185, 129, 0.1)",border:"var(--color-success, #10B981)",text:"var(--color-success, #10B981)",emoji:"✅",label:"PROCEED"},WAIT:{bg:"rgba(245, 158, 11, 0.1)",border:"var(--color-warning, #F59E0B)",text:"var(--color-warning, #F59E0B)",emoji:"⏳",label:"WAIT"},AVOID:{bg:"rgba(239, 68, 68, 0.1)",border:"var(--color-danger, #EF4444)",text:"var(--color-danger, #EF4444)",emoji:"🚫",label:"AVOID"}};async function Bt(){const e=N();B(e),e.innerHTML=`
+        onmouseover="this.style.background='#FFF0DC'" onmouseout="this.style.background=''">${w}</div>`}).join(""),u.style.display="block",u.querySelectorAll(".place-result-item").forEach(h=>{h.addEventListener("click",()=>{const T=parseFloat(h.dataset.lat),I=parseFloat(h.dataset.lon),P=h.dataset.name;s.value=T.toFixed(6),r.value=I.toFixed(6),m.value=P,u.style.display="none",v.textContent=`✓ ${P} (${T.toFixed(4)}°N, ${I.toFixed(4)}°E)`,v.style.display="block"})})}l.addEventListener("click",$=>{$.preventDefault(),g()}),m.addEventListener("keydown",$=>{$.key==="Enter"&&($.preventDefault(),g())}),d.addEventListener("click",async $=>{$.preventDefault();try{const h=await ca();s.value=String(h.lat),r.value=String(h.lon),x("Location updated")}catch{x("Could not get location",!0)}}),c.addEventListener("click",$=>{$.preventDefault(),E("/kundali")}),a.addEventListener("submit",async $=>{$.preventDefault(),p.style.display="none";const h=t.value.trim(),T=i.value,I=n.value,P=parseFloat(s.value),M=parseFloat(r.value),b=o.value;if(!h||!T||!I||!b||isNaN(P)||isNaN(M)){p.textContent="Please fill in all fields",p.style.display="block";return}if(P<-90||P>90){p.textContent="Latitude must be between -90 and 90",p.style.display="block";return}if(M<-180||M>180){p.textContent="Longitude must be between -180 and 180",p.style.display="block";return}const S=document.getElementById("btn-submit");S.disabled=!0,S.textContent="Creating...";try{const w=Lt(T,I);if(!w)throw new RangeError("Invalid date or time format");const A=Tt(w,b).toISOString().split(".")[0]+"Z",z=await Pa({label:h,birth_date:A,latitude:P,longitude:M,timezone:b});if(z.ok)x("Kundali created successfully"),E("/kundali");else{const D=z.data?.error||"Failed to create kundali";p.textContent=D,p.style.display="block",S.disabled=!1,S.textContent="Create Kundali"}}catch(w){console.error("Create error:",w),p.textContent="Error creating kundali",p.style.display="block",S.disabled=!1,S.textContent="Create Kundali"}}),document.getElementById("btn-back").addEventListener("click",()=>E("/kundali"))}const ce={PROCEED:{bg:"rgba(16, 185, 129, 0.1)",border:"var(--color-success, #10B981)",text:"var(--color-success, #10B981)",emoji:"✅",label:"PROCEED"},WAIT:{bg:"rgba(245, 158, 11, 0.1)",border:"var(--color-warning, #F59E0B)",text:"var(--color-warning, #F59E0B)",emoji:"⏳",label:"WAIT"},AVOID:{bg:"rgba(239, 68, 68, 0.1)",border:"var(--color-danger, #EF4444)",text:"var(--color-danger, #EF4444)",emoji:"🚫",label:"AVOID"}};async function At(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1486,7 +1486,7 @@ ${l}
 
       </div>
     </div>
-  `;const a=document.getElementById("kundali"),t=document.getElementById("tab-ask"),i=document.getElementById("tab-browse"),n=document.getElementById("panel-ask"),s=document.getElementById("panel-browse"),r=document.getElementById("question"),o=document.getElementById("intent-preview"),d=document.getElementById("intent-label"),l=document.getElementById("intent-confidence"),b=document.getElementById("category"),u=document.getElementById("activity"),v=document.getElementById("query-time"),c=document.getElementById("error-box"),p=document.getElementById("result");let f=[];function g(m){m==="ask"?(n.style.display="",s.style.display="none",t.style.background="var(--color-primary)",t.style.color="#fff",i.style.background="var(--color-bg-secondary)",i.style.color="var(--color-text-secondary)"):(n.style.display="none",s.style.display="",t.style.background="var(--color-bg-secondary)",t.style.color="var(--color-text-secondary)",i.style.background="var(--color-primary)",i.style.color="#fff"),c.style.display="none",p.style.display="none"}t.addEventListener("click",()=>g("ask")),i.addEventListener("click",()=>g("browse"));const y=new Date;v.value=y.toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"});try{const m=await ce(),S=m.ok&&Array.isArray(m.data?.kundalis)?m.data.kundalis:[];if(S.length===0){x("Please create a kundali first",!0),E("/kundali-form");return}a.innerHTML=S.map(w=>`<option value="${w.id}">${w.label||"Unnamed"}</option>`).join("")}catch{x("Failed to load kundalis",!0)}try{const m=await Ha();if(m.ok&&Array.isArray(m.data?.categories)){const S=[];for(const w of m.data.categories){const A=w.category||"Other";if(S.includes(A)||S.push(A),Array.isArray(w.activities))for(const z of w.activities)f.push({category:A,slug:z.slug??z.code??"",label:z.label??z.name??z.slug??"",houses:z.houses??[]})}b.innerHTML='<option value="">— All Categories —</option>'+S.map(w=>`<option value="${w}">${w}</option>`).join(""),$("")}else u.innerHTML='<option value="">— Could not load —</option>'}catch{x("Failed to load activities",!0)}function $(m){const S=m?f.filter(w=>w.category===m):f;u.innerHTML='<option value="">— Select Activity —</option>'+S.map(w=>`<option value="${w.slug}">${w.label} (H${w.houses.join(",")})</option>`).join("")}b.addEventListener("change",()=>$(b.value)),document.getElementById("btn-cancel-ask").addEventListener("click",m=>{m.preventDefault(),E("/dashboard")}),document.getElementById("btn-cancel-browse").addEventListener("click",m=>{m.preventDefault(),E("/dashboard")}),document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));let h=null;r.addEventListener("input",()=>{if(h&&clearTimeout(h),r.value.trim().length<3){o.style.display="none";return}h=setTimeout(async()=>{d.textContent="Analyzing…",l.textContent="",o.style.display="block"},400)});function L(m){const S=m.combinedVerdict??"WAIT",w=de[S]??de.WAIT,A=m.reasoningHindi??"",z=m.reasoningEnglish??"",D=m.intent??{},I=m.panchang??{},V=m.kp??{};p.innerHTML=`
+  `;const a=document.getElementById("kundali"),t=document.getElementById("tab-ask"),i=document.getElementById("tab-browse"),n=document.getElementById("panel-ask"),s=document.getElementById("panel-browse"),r=document.getElementById("question"),o=document.getElementById("intent-preview"),d=document.getElementById("intent-label"),l=document.getElementById("intent-confidence"),m=document.getElementById("category"),u=document.getElementById("activity"),v=document.getElementById("query-time"),c=document.getElementById("error-box"),p=document.getElementById("result");let f=[];function g(b){b==="ask"?(n.style.display="",s.style.display="none",t.style.background="var(--color-primary)",t.style.color="#fff",i.style.background="var(--color-bg-secondary)",i.style.color="var(--color-text-secondary)"):(n.style.display="none",s.style.display="",t.style.background="var(--color-bg-secondary)",t.style.color="var(--color-text-secondary)",i.style.background="var(--color-primary)",i.style.color="#fff"),c.style.display="none",p.style.display="none"}t.addEventListener("click",()=>g("ask")),i.addEventListener("click",()=>g("browse"));const y=new Date;v.value=y.toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Kolkata"});try{const b=await se(),S=b.ok&&Array.isArray(b.data?.kundalis)?b.data.kundalis:[];if(S.length===0){x("Please create a kundali first",!0),E("/kundali-form");return}a.innerHTML=S.map(w=>`<option value="${w.id}">${w.label||"Unnamed"}</option>`).join("")}catch{x("Failed to load kundalis",!0)}try{const b=await Ma();if(b.ok&&Array.isArray(b.data?.categories)){const S=[];for(const w of b.data.categories){const A=w.category||"Other";if(S.includes(A)||S.push(A),Array.isArray(w.activities))for(const z of w.activities)f.push({category:A,slug:z.slug??z.code??"",label:z.label??z.name??z.slug??"",houses:z.houses??[]})}m.innerHTML='<option value="">— All Categories —</option>'+S.map(w=>`<option value="${w}">${w}</option>`).join(""),$("")}else u.innerHTML='<option value="">— Could not load —</option>'}catch{x("Failed to load activities",!0)}function $(b){const S=b?f.filter(w=>w.category===b):f;u.innerHTML='<option value="">— Select Activity —</option>'+S.map(w=>`<option value="${w.slug}">${w.label} (H${w.houses.join(",")})</option>`).join("")}m.addEventListener("change",()=>$(m.value)),document.getElementById("btn-cancel-ask").addEventListener("click",b=>{b.preventDefault(),E("/dashboard")}),document.getElementById("btn-cancel-browse").addEventListener("click",b=>{b.preventDefault(),E("/dashboard")}),document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));let h=null;r.addEventListener("input",()=>{if(h&&clearTimeout(h),r.value.trim().length<3){o.style.display="none";return}h=setTimeout(async()=>{d.textContent="Analyzing…",l.textContent="",o.style.display="block"},400)});function T(b){const S=b.combinedVerdict??"WAIT",w=ce[S]??ce.WAIT,A=b.reasoningHindi??"",z=b.reasoningEnglish??"",D=b.intent??{},L=b.panchang??{},X=b.kp??{};p.innerHTML=`
       <!-- Big verdict box -->
       <div style="border: 2px solid ${w.border}; background: ${w.bg};
            border-radius: var(--radius-lg); padding: var(--space-6); text-align: center;
@@ -1519,38 +1519,38 @@ ${l}
 
       <!-- Panchang summary strip -->
       <div style="display:flex; flex-wrap:wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
-        ${I.hora?`
+        ${L.hora?`
         <div style="flex:1; min-width:140px; padding: var(--space-3); border-radius: var(--radius-md);
              background: var(--color-bg-secondary); text-align:center;">
           <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Current Hora</div>
           <div style="font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm);">
-            ${I.hora.lord}
-            <span style="color: ${I.hora.quality==="GOOD"?"var(--color-success,#10B981)":I.hora.quality==="BAD"?"var(--color-danger,#EF4444)":"var(--color-warning,#F59E0B)"};">
-              (${I.hora.quality})
+            ${L.hora.lord}
+            <span style="color: ${L.hora.quality==="GOOD"?"var(--color-success,#10B981)":L.hora.quality==="BAD"?"var(--color-danger,#EF4444)":"var(--color-warning,#F59E0B)"};">
+              (${L.hora.quality})
             </span>
           </div>
         </div>`:""}
 
-        ${I.rahuKaal?`
+        ${L.rahuKaal?`
         <div style="flex:1; min-width:140px; padding: var(--space-3); border-radius: var(--radius-md);
              background: var(--color-bg-secondary); text-align:center;">
           <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Rahu Kaal</div>
           <div style="font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm);
-               color: ${I.rahuKaal.active?"var(--color-danger,#EF4444)":"var(--color-success,#10B981)"};">
-            ${I.rahuKaal.active?`⚠️ ACTIVE (ends ${I.rahuKaal.endTime??""})`:"✓ Not active"}
+               color: ${L.rahuKaal.active?"var(--color-danger,#EF4444)":"var(--color-success,#10B981)"};">
+            ${L.rahuKaal.active?`⚠️ ACTIVE (ends ${L.rahuKaal.endTime??""})`:"✓ Not active"}
           </div>
         </div>`:""}
 
-        ${I.tarabala?`
+        ${L.tarabala?`
         <div style="flex:1; min-width:140px; padding: var(--space-3); border-radius: var(--radius-md);
              background: var(--color-bg-secondary); text-align:center;">
           <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Tarabala</div>
           <div style="font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm);
-               color: ${I.tarabala.isBenefic?"var(--color-success,#10B981)":"var(--color-danger,#EF4444)"};">
-            ${I.tarabala.taraName} (${I.tarabala.taraScore})
+               color: ${L.tarabala.isBenefic?"var(--color-success,#10B981)":"var(--color-danger,#EF4444)"};">
+            ${L.tarabala.taraName} (${L.tarabala.taraScore})
           </div>
           <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">
-            ${I.tarabala.todayNakshatra}
+            ${L.tarabala.todayNakshatra}
           </div>
         </div>`:""}
       </div>
@@ -1559,24 +1559,24 @@ ${l}
       <details style="border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3);">
         <summary style="cursor:pointer; font-size: var(--font-size-sm);
                   font-weight: var(--font-weight-semibold); padding: var(--space-1) 0;">
-          🔬 KP Analysis Details (${V.verdict??"—"})
+          🔬 KP Analysis Details (${X.verdict??"—"})
         </summary>
         <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); line-height: 1.7;
              color: var(--color-text-secondary);">
-          <div><strong>Houses analyzed:</strong> ${(V.houses??[]).join(", ")}</div>
-          ${(V.houseVerdicts??[]).map(te=>`<div style="margin-top: var(--space-1);">
-              House ${te.house}: <strong>${te.verdict}</strong>
-              ${te.reasoning?`— ${te.reasoning}`:""}
+          <div><strong>Houses analyzed:</strong> ${(X.houses??[]).join(", ")}</div>
+          ${(X.houseVerdicts??[]).map(re=>`<div style="margin-top: var(--space-1);">
+              House ${re.house}: <strong>${re.verdict}</strong>
+              ${re.reasoning?`— ${re.reasoning}`:""}
             </div>`).join("")}
-          ${V.ayanamsaCaveat?`<div style="margin-top: var(--space-2); font-style:italic;">${V.ayanamsaCaveat}</div>`:""}
+          ${X.ayanamsaCaveat?`<div style="margin-top: var(--space-2); font-style:italic;">${X.ayanamsaCaveat}</div>`:""}
         </div>
       </details>
 
       <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);
            text-align:center; margin-top: var(--space-3);">
-        Query: ${new Date(m.queryTime??Date.now()).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})}
+        Query: ${new Date(b.queryTime??Date.now()).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})}
       </div>
-    `,p.style.display="block",p.scrollIntoView({behavior:"smooth",block:"start"})}function T(m){const S=m.houseVerdicts??[],w=S.some(I=>I.verdict==="DENIED"),A=S.every(I=>I.verdict==="PROMISED"),z=w?"AVOID":A?"PROCEED":"WAIT",D=de[z]??de.WAIT;p.innerHTML=`
+    `,p.style.display="block",p.scrollIntoView({behavior:"smooth",block:"start"})}function I(b){const S=b.houseVerdicts??[],w=S.some(L=>L.verdict==="DENIED"),A=S.every(L=>L.verdict==="PROMISED"),z=w?"AVOID":A?"PROCEED":"WAIT",D=ce[z]??ce.WAIT;p.innerHTML=`
       <div style="border: 2px solid ${D.border}; background: ${D.bg};
            border-radius: var(--radius-lg); padding: var(--space-5); text-align:center;
            margin-bottom: var(--space-4);">
@@ -1586,33 +1586,33 @@ ${l}
           KP: ${z}
         </div>
         <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">
-          Activity: <strong>${m.activitySlug??"—"}</strong>
+          Activity: <strong>${b.activitySlug??"—"}</strong>
         </div>
       </div>
 
       <!-- House verdicts -->
       <div style="margin-bottom: var(--space-4);">
-        ${S.map(I=>`
+        ${S.map(L=>`
           <div style="padding: var(--space-3); border-radius: var(--radius-md);
                background: var(--color-bg-secondary); margin-bottom: var(--space-2);
                font-size: var(--font-size-sm);">
-            <strong>House ${I.house}:</strong>
-            <span style="color: ${I.verdict==="PROMISED"?"var(--color-success,#10B981)":I.verdict==="DENIED"?"var(--color-danger,#EF4444)":"var(--color-text-secondary)"};">
-              ${I.verdict}
+            <strong>House ${L.house}:</strong>
+            <span style="color: ${L.verdict==="PROMISED"?"var(--color-success,#10B981)":L.verdict==="DENIED"?"var(--color-danger,#EF4444)":"var(--color-text-secondary)"};">
+              ${L.verdict}
             </span>
-            ${I.reasoning?`<div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px;">${I.reasoning}</div>`:""}
+            ${L.reasoning?`<div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px;">${L.reasoning}</div>`:""}
           </div>
         `).join("")}
       </div>
 
-      ${m.ayanamsaCaveat?`
+      ${b.ayanamsaCaveat?`
       <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);
            font-style: italic; text-align:center; margin-top: var(--space-2);">
-        ${m.ayanamsaCaveat}
+        ${b.ayanamsaCaveat}
       </div>`:""}
-    `,p.style.display="block",p.scrollIntoView({behavior:"smooth",block:"start"})}document.getElementById("form-ask").addEventListener("submit",async m=>{m.preventDefault(),c.style.display="none",p.style.display="none";const S=parseInt(a.value),w=r.value.trim();if(!S){c.textContent="Please select a kundali.",c.style.display="block";return}if(!w||w.length<3){c.textContent="Please enter your question (minimum 3 characters).",c.style.display="block";return}const A=document.getElementById("btn-ask");A.disabled=!0,A.textContent="⏳ Analyzing…",o.style.display="none";try{const z=await Ra(S,w);if(z.ok)L(z.data);else{const D=z.data?.code??"";let I=z.data?.error??"Failed to process your query.";D==="INTENT_UNRECOGNIZED"?I="❓ "+I+`
+    `,p.style.display="block",p.scrollIntoView({behavior:"smooth",block:"start"})}document.getElementById("form-ask").addEventListener("submit",async b=>{b.preventDefault(),c.style.display="none",p.style.display="none";const S=parseInt(a.value),w=r.value.trim();if(!S){c.textContent="Please select a kundali.",c.style.display="block";return}if(!w||w.length<3){c.textContent="Please enter your question (minimum 3 characters).",c.style.display="block";return}const A=document.getElementById("btn-ask");A.disabled=!0,A.textContent="⏳ Analyzing…",o.style.display="none";try{const z=await Na(S,w);if(z.ok)T(z.data);else{const D=z.data?.code??"";let L=z.data?.error??"Failed to process your query.";D==="INTENT_UNRECOGNIZED"?L="❓ "+L+`
 
-Try: interview, client milna, shaadi, doctor, court, property, exam, flight, visa, puja, etc.`:D==="INSUFFICIENT_BALANCE"&&(I="⚠️ Wallet balance insufficient. Please recharge to continue."),c.style.whiteSpace="pre-line",c.textContent=I,c.style.display="block"}}catch{c.textContent="Network error. Please try again.",c.style.display="block"}finally{A.disabled=!1,A.textContent="🔍 Get KP Verdict"}}),document.getElementById("form-browse").addEventListener("submit",async m=>{m.preventDefault(),c.style.display="none",p.style.display="none";const S=parseInt(a.value),w=u.value;if(!S||!w){c.textContent="Please select both kundali and activity.",c.style.display="block";return}const A=document.getElementById("btn-browse");A.disabled=!0,A.textContent="Checking…";try{const z=await qa(S,w);z.ok?T(z.data):(c.textContent=z.data?.error??"Failed to query KP.",c.style.display="block")}catch{c.textContent="Network error. Please try again.",c.style.display="block"}finally{A.disabled=!1,A.textContent="Check Now"}})}const We=[{id:"activate",label:"Activate"},{id:"messages",label:"Messages"},{id:"reviews",label:"Reviews"},{id:"settings",label:"Settings"},{id:"overview",label:"Overview"}],Dt={"muhurta-property":"Muhurta — Property","muhurta-marriage":"Muhurta — Marriage","muhurta-business":"Muhurta — Business","muhurta-medical":"Muhurta — Medical",kundali:"Birth Chart / KP",numerology:"Numerology",vastu:"Vastu",subscription:"Subscription / Billing",b2b:"B2B / Corporate",other:"Other"};function ye(e){if(!e)return"—";const a=new Date(e.includes("T")?e:e.replace(" ","T")+"Z");return isNaN(a.getTime())?k(e):a.toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"})}async function _t(){const e=N();B(e);const a=new URLSearchParams(window.location.hash.split("?")[1]??"").get("tab")||"activate",t=We.some(i=>i.id===a)?a:"activate";e.innerHTML=`
+Try: interview, client milna, shaadi, doctor, court, property, exam, flight, visa, puja, etc.`:D==="INSUFFICIENT_BALANCE"&&(L="⚠️ Wallet balance insufficient. Please recharge to continue."),c.style.whiteSpace="pre-line",c.textContent=L,c.style.display="block"}}catch{c.textContent="Network error. Please try again.",c.style.display="block"}finally{A.disabled=!1,A.textContent="🔍 Get KP Verdict"}}),document.getElementById("form-browse").addEventListener("submit",async b=>{b.preventDefault(),c.style.display="none",p.style.display="none";const S=parseInt(a.value),w=u.value;if(!S||!w){c.textContent="Please select both kundali and activity.",c.style.display="block";return}const A=document.getElementById("btn-browse");A.disabled=!0,A.textContent="Checking…";try{const z=await za(S,w);z.ok?I(z.data):(c.textContent=z.data?.error??"Failed to query KP.",c.style.display="block")}catch{c.textContent="Network error. Please try again.",c.style.display="block"}finally{A.disabled=!1,A.textContent="Check Now"}})}const je=[{id:"activate",label:"Activate"},{id:"messages",label:"Messages"},{id:"reviews",label:"Reviews"},{id:"settings",label:"Settings"},{id:"overview",label:"Overview"}],zt={"muhurta-property":"Muhurta — Property","muhurta-marriage":"Muhurta — Marriage","muhurta-business":"Muhurta — Business","muhurta-medical":"Muhurta — Medical",kundali:"Birth Chart / KP",numerology:"Numerology",vastu:"Vastu",subscription:"Subscription / Billing",b2b:"B2B / Corporate",other:"Other"};function ge(e){if(!e)return"—";const a=new Date(e.includes("T")?e:e.replace(" ","T")+"Z");return isNaN(a.getTime())?k(e):a.toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"})}async function Mt(){const e=N();B(e);const a=new URLSearchParams(window.location.hash.split("?")[1]??"").get("tab")||"activate",t=je.some(i=>i.id===a)?a:"activate";e.innerHTML=`
     <div class="screen admin-screen">
       <div class="admin-sticky">
         <header class="screen-header">
@@ -1620,14 +1620,14 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
           <h2>Admin Panel</h2>
         </header>
         <nav class="admin-tabs" role="tablist" aria-label="Admin sections">
-          ${We.map(i=>`
+          ${je.map(i=>`
             <button class="admin-tab" role="tab" id="tab-${i.id}" data-tab="${i.id}"
                     aria-selected="${i.id===t}" aria-controls="admin-body">${i.label}</button>`).join("")}
         </nav>
       </div>
       <div class="admin-body" id="admin-body" role="tabpanel"></div>
     </div>
-  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard")),document.querySelectorAll(".admin-tab").forEach(i=>i.addEventListener("click",()=>Ge(i.dataset.tab))),Ge(t)}function Ge(e){document.querySelectorAll(".admin-tab").forEach(i=>i.setAttribute("aria-selected",String(i.dataset.tab===e)));const a=document.getElementById("admin-body");a.setAttribute("aria-labelledby",`tab-${e}`),a.innerHTML='<p class="admin-muted">Loading…</p>',window.scrollTo({top:0});const t={activate:qt,messages:Me,reviews:Ne,settings:Ht,overview:Rt}[e];t(a)}function R(e){return e.status===403?"This account does not have admin access.":e.data?.error??`Request failed (${e.status}).`}async function qt(e){e.innerHTML=`
+  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard")),document.querySelectorAll(".admin-tab").forEach(i=>i.addEventListener("click",()=>Ve(i.dataset.tab))),Ve(t)}function Ve(e){document.querySelectorAll(".admin-tab").forEach(i=>i.setAttribute("aria-selected",String(i.dataset.tab===e)));const a=document.getElementById("admin-body");a.setAttribute("aria-labelledby",`tab-${e}`),a.innerHTML='<p class="admin-muted">Loading…</p>',window.scrollTo({top:0});const t={activate:Nt,messages:Ae,reviews:ze,settings:Bt,overview:Dt}[e];t(a)}function H(e){return e.status===403?"This account does not have admin access.":e.data?.error??`Request failed (${e.status}).`}async function Nt(e){e.innerHTML=`
     <section class="card admin-card">
       <h3>Find client</h3>
       <form id="lookup-form" class="admin-row" novalidate>
@@ -1673,28 +1673,28 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
         <button class="btn-primary" type="submit" id="act-submit">Review &amp; activate</button>
       </form>
     </section>
-  `,document.getElementById("lookup-form").addEventListener("submit",async r=>{r.preventDefault();const o=document.getElementById("lk-phone").value.replace(/\D/g,""),d=document.getElementById("lookup-result");if(!/^[6-9]\d{9}$/.test(o)){d.innerHTML='<p class="admin-error">Enter a valid 10-digit number.</p>';return}d.innerHTML='<p class="admin-muted">Searching…</p>';const l=await Xa(o);if(!l.ok){d.innerHTML=`<p class="admin-error">${k(R(l))}</p>`;return}d.innerHTML=l.data.found?Ye(l.data):`<p>No account for +91 ${k(o)} yet. Use the form below to create and activate it.</p>`,document.getElementById("act-phone").value=o});const t=document.getElementById("act-form"),i=document.getElementById("act-confirm"),n=document.getElementById("act-submit");let s=null;t.addEventListener("input",()=>{s=null,i.hidden=!0,n.textContent="Review & activate"}),t.addEventListener("submit",async r=>{r.preventDefault();const o=y=>document.getElementById(y).value.trim(),d=o("act-phone").replace(/\D/g,""),l=o("act-tier"),b=o("act-points"),u=o("act-days"),v=b?Number(b):0,c=u?Number(u):365,p=[];if(/^[6-9]\d{9}$/.test(d)||p.push("Enter a valid 10-digit mobile number."),b&&(!Number.isInteger(v)||v<1||v>1e5)&&p.push("Points must be a whole number from 1 to 100000."),v&&(!Number.isInteger(c)||c<1||c>730)&&p.push("Validity must be 1–730 days."),!l&&!v&&p.push("Choose a plan, points, or both."),p.length){i.hidden=!1,i.innerHTML=p.map(y=>`<p class="admin-error">${k(y)}</p>`).join("");return}const f={phone:d,tier:l||void 0,points:v||void 0,validity_days:v?c:void 0,source:o("act-source"),note:o("act-note")};if(!s){s=f;const y=new Date(Date.now()+c*864e5).toLocaleDateString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric"});i.hidden=!1,i.innerHTML=`
+  `,document.getElementById("lookup-form").addEventListener("submit",async r=>{r.preventDefault();const o=document.getElementById("lk-phone").value.replace(/\D/g,""),d=document.getElementById("lookup-result");if(!/^[6-9]\d{9}$/.test(o)){d.innerHTML='<p class="admin-error">Enter a valid 10-digit number.</p>';return}d.innerHTML='<p class="admin-muted">Searching…</p>';const l=await Wa(o);if(!l.ok){d.innerHTML=`<p class="admin-error">${k(H(l))}</p>`;return}d.innerHTML=l.data.found?Ue(l.data):`<p>No account for +91 ${k(o)} yet. Use the form below to create and activate it.</p>`,document.getElementById("act-phone").value=o});const t=document.getElementById("act-form"),i=document.getElementById("act-confirm"),n=document.getElementById("act-submit");let s=null;t.addEventListener("input",()=>{s=null,i.hidden=!0,n.textContent="Review & activate"}),t.addEventListener("submit",async r=>{r.preventDefault();const o=y=>document.getElementById(y).value.trim(),d=o("act-phone").replace(/\D/g,""),l=o("act-tier"),m=o("act-points"),u=o("act-days"),v=m?Number(m):0,c=u?Number(u):365,p=[];if(/^[6-9]\d{9}$/.test(d)||p.push("Enter a valid 10-digit mobile number."),m&&(!Number.isInteger(v)||v<1||v>1e5)&&p.push("Points must be a whole number from 1 to 100000."),v&&(!Number.isInteger(c)||c<1||c>730)&&p.push("Validity must be 1–730 days."),!l&&!v&&p.push("Choose a plan, points, or both."),p.length){i.hidden=!1,i.innerHTML=p.map(y=>`<p class="admin-error">${k(y)}</p>`).join("");return}const f={phone:d,tier:l||void 0,points:v||void 0,validity_days:v?c:void 0,source:o("act-source"),note:o("act-note")};if(!s){s=f;const y=new Date(Date.now()+c*864e5).toLocaleDateString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric"});i.hidden=!1,i.innerHTML=`
         <p><strong>Please confirm:</strong> +91 ${k(d)}</p>
         <ul>
           ${l?`<li>Plan → <strong>${k(l)}</strong></li>`:""}
           ${v?`<li>Credit <strong>${v}</strong> points, valid until about <strong>${k(y)}</strong></li>`:""}
-        </ul>`,n.textContent="Confirm activation";return}n.disabled=!0,n.textContent="Activating…";const g=await et(s);if(n.disabled=!1,s=null,n.textContent="Review & activate",!g.ok){i.innerHTML=`<p class="admin-error">${k(R(g))}</p>`;return}i.innerHTML=`<p class="admin-ok">Done.</p>${Ye(g.data)}`,x("Activation saved"),document.getElementById("act-points").value="",document.getElementById("act-note").value=""})}function Ye(e){const a=e.user??{},t=e.batches??[];return`
+        </ul>`,n.textContent="Confirm activation";return}n.disabled=!0,n.textContent="Activating…";const g=await Ga(s);if(n.disabled=!1,s=null,n.textContent="Review & activate",!g.ok){i.innerHTML=`<p class="admin-error">${k(H(g))}</p>`;return}i.innerHTML=`<p class="admin-ok">Done.</p>${Ue(g.data)}`,x("Activation saved"),document.getElementById("act-points").value="",document.getElementById("act-note").value=""})}function Ue(e){const a=e.user??{},t=e.batches??[];return`
     <div class="admin-user">
       <p><strong>${k(a.phone_number)}</strong> · Plan: <strong>${k(a.tier)}</strong>
          ${a.is_admin?" · admin":""}${a.is_active===0?' · <span class="admin-error">deactivated</span>':""}</p>
       <p>Spendable balance: <strong>${Number(e.balance??0)}</strong> points</p>
-      <p class="admin-muted">Account created ${ye(a.created_at)}</p>
+      <p class="admin-muted">Account created ${ge(a.created_at)}</p>
       ${t.length?`
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead><tr><th>Source</th><th>Granted</th><th>Left</th><th>Expires</th><th>Status</th></tr></thead>
             <tbody>${t.map(i=>`
               <tr><td>${k(i.source)}</td><td>${Number(i.amount_granted)}</td><td>${Number(i.amount_remaining)}</td>
-                  <td>${ye(i.expires_at)}</td><td>${k(i.status)}</td></tr>`).join("")}
+                  <td>${ge(i.expires_at)}</td><td>${k(i.status)}</td></tr>`).join("")}
             </tbody>
           </table>
         </div>`:'<p class="admin-muted">No points credited yet.</p>'}
-    </div>`}async function Me(e,a="new"){const t=await Wa(a);if(!t.ok){e.innerHTML=`<p class="admin-error">${k(R(t))}</p>`;return}const i=t.data.messages??[];e.innerHTML=`
+    </div>`}async function Ae(e,a="new"){const t=await Oa(a);if(!t.ok){e.innerHTML=`<p class="admin-error">${k(H(t))}</p>`;return}const i=t.data.messages??[];e.innerHTML=`
     <div class="admin-row">
       <label for="msg-filter">Show</label>
       <select id="msg-filter">
@@ -1705,13 +1705,13 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
       <article class="card admin-card" data-id="${Number(n.id)}">
         <p><strong>${k(n.name)}</strong> · <a href="tel:+91${k(n.phone)}">+91 ${k(n.phone)}</a>
            · <a href="https://wa.me/91${k(n.phone)}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p>
-        <p class="admin-muted">${k(Dt[n.topic]??n.topic)} · ${ye(n.created_at)} · ${k(n.status)}</p>
+        <p class="admin-muted">${k(zt[n.topic]??n.topic)} · ${ge(n.created_at)} · ${k(n.status)}</p>
         ${n.message?`<p class="admin-message">${k(n.message)}</p>`:""}
         <div class="admin-actions">
           ${["contacted","closed","spam"].filter(s=>s!==n.status).map(s=>`<button class="btn-secondary" data-act="${s}">Mark ${s}</button>`).join("")}
         </div>
       </article>`).join(""):`<p class="admin-muted">No ${k(a)} messages.</p>`}
-  `,document.getElementById("msg-filter").addEventListener("change",n=>Me(e,n.target.value)),e.querySelectorAll("[data-act]").forEach(n=>n.addEventListener("click",async()=>{const s=Number(n.closest("[data-id]").dataset.id);n.disabled=!0;const r=await Ga(s,n.dataset.act);if(!r.ok){x(R(r),!0),n.disabled=!1;return}x(`Marked ${n.dataset.act}`),Me(e,a)}))}async function Ne(e,a="pending"){const t=await Ya(a);if(!t.ok){e.innerHTML=`<p class="admin-error">${k(R(t))}</p>`;return}const i=t.data.testimonials??[];e.innerHTML=`
+  `,document.getElementById("msg-filter").addEventListener("change",n=>Ae(e,n.target.value)),e.querySelectorAll("[data-act]").forEach(n=>n.addEventListener("click",async()=>{const s=Number(n.closest("[data-id]").dataset.id);n.disabled=!0;const r=await Ka(s,n.dataset.act);if(!r.ok){x(H(r),!0),n.disabled=!1;return}x(`Marked ${n.dataset.act}`),Ae(e,a)}))}async function ze(e,a="pending"){const t=await Fa(a);if(!t.ok){e.innerHTML=`<p class="admin-error">${k(H(t))}</p>`;return}const i=t.data.testimonials??[];e.innerHTML=`
     <div class="admin-row">
       <label for="rev-filter">Show</label>
       <select id="rev-filter">
@@ -1721,16 +1721,16 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
     <p class="admin-muted">Approved reviews appear on the website as first name + surname initial and city. Phone numbers are never shown publicly.</p>
     ${i.length?i.map(n=>`
       <article class="card admin-card" data-id="${Number(n.id)}">
-        <p><strong>${k(n.name)}</strong>${n.city?` · ${k(n.city)}`:""} · ${k(oa[n.service]??n.service)}
+        <p><strong>${k(n.name)}</strong>${n.city?` · ${k(n.city)}`:""} · ${k(ia[n.service]??n.service)}
            ${n.rating?` · ${"★".repeat(Number(n.rating))}`:""}</p>
-        <p class="admin-muted">+91 ${k(n.phone)} · submitted ${ye(n.created_at)} · ${k(n.status)}</p>
+        <p class="admin-muted">+91 ${k(n.phone)} · submitted ${ge(n.created_at)} · ${k(n.status)}</p>
         <blockquote class="admin-message">${k(n.quote)}</blockquote>
         <div class="admin-actions">
           ${n.status!=="approved"?'<button class="btn-primary" data-act="approved">Approve</button>':""}
           ${n.status!=="rejected"?'<button class="btn-secondary" data-act="rejected">Reject</button>':""}
         </div>
       </article>`).join(""):`<p class="admin-muted">No ${k(a)} reviews.</p>`}
-  `,document.getElementById("rev-filter").addEventListener("change",n=>Ne(e,n.target.value)),e.querySelectorAll("[data-act]").forEach(n=>n.addEventListener("click",async()=>{const s=Number(n.closest("[data-id]").dataset.id);n.disabled=!0;const r=await Ja(s,n.dataset.act);if(!r.ok){x(R(r),!0),n.disabled=!1;return}x(n.dataset.act==="approved"?"Review published":"Review rejected"),Ne(e,a)}))}async function Ht(e){const a=await Qa();if(!a.ok){e.innerHTML=`<p class="admin-error">${k(R(a))}</p>`;return}const t=a.data.settings??{},i=n=>String(n??"").replace(/^91/,"");e.innerHTML=`
+  `,document.getElementById("rev-filter").addEventListener("change",n=>ze(e,n.target.value)),e.querySelectorAll("[data-act]").forEach(n=>n.addEventListener("click",async()=>{const s=Number(n.closest("[data-id]").dataset.id);n.disabled=!0;const r=await ja(s,n.dataset.act);if(!r.ok){x(H(r),!0),n.disabled=!1;return}x(n.dataset.act==="approved"?"Review published":"Review rejected"),ze(e,a)}))}async function Bt(e){const a=await Va();if(!a.ok){e.innerHTML=`<p class="admin-error">${k(H(a))}</p>`;return}const t=a.data.settings??{},i=n=>String(n??"").replace(/^91/,"");e.innerHTML=`
     <section class="card admin-card">
       <h3>Website contact details</h3>
       <p class="admin-muted">Changes apply to the website immediately. Use this to switch to the business WhatsApp number later.</p>
@@ -1746,7 +1746,7 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
         <p id="st-status" role="status" aria-live="polite"></p>
         <button class="btn-primary" type="submit">Save</button>
       </form>
-    </section>`,document.getElementById("settings-form").addEventListener("submit",async n=>{n.preventDefault();const s=document.getElementById("st-status"),r={},o=document.getElementById("st-wa").value.replace(/\D/g,""),d=document.getElementById("st-phone").value.replace(/\D/g,""),l=document.getElementById("st-email").value.trim();if(o!==i(t.whatsapp_number)&&(r.whatsapp_number=o),d!==i(t.contact_phone)&&(r.contact_phone=d),l!==t.contact_email&&(r.contact_email=l),!Object.keys(r).length){s.textContent="Nothing changed.";return}const b=await Za(r);if(!b.ok){s.innerHTML=`<span class="admin-error">${k(R(b))}</span>`;return}nt(),s.innerHTML=`<span class="admin-ok">Saved. WhatsApp: ${k(sa(b.data.settings.whatsapp_number))}</span>`,Object.assign(t,b.data.settings)})}async function Rt(e){const a=await at();if(!a.ok){e.innerHTML=`<p class="admin-error">${k(R(a))}</p>`;return}const t=a.data??{};e.innerHTML=`
+    </section>`,document.getElementById("settings-form").addEventListener("submit",async n=>{n.preventDefault();const s=document.getElementById("st-status"),r={},o=document.getElementById("st-wa").value.replace(/\D/g,""),d=document.getElementById("st-phone").value.replace(/\D/g,""),l=document.getElementById("st-email").value.trim();if(o!==i(t.whatsapp_number)&&(r.whatsapp_number=o),d!==i(t.contact_phone)&&(r.contact_phone=d),l!==t.contact_email&&(r.contact_email=l),!Object.keys(r).length){s.textContent="Nothing changed.";return}const m=await Ua(r);if(!m.ok){s.innerHTML=`<span class="admin-error">${k(H(m))}</span>`;return}Qa(),s.innerHTML=`<span class="admin-ok">Saved. WhatsApp: ${k(ta(m.data.settings.whatsapp_number))}</span>`,Object.assign(t,m.data.settings)})}async function Dt(e){const a=await Ya();if(!a.ok){e.innerHTML=`<p class="admin-error">${k(H(a))}</p>`;return}const t=a.data??{};e.innerHTML=`
     <div class="result-grid">
       <div class="result-item"><div class="result-item-label">Queries (24h)</div><div class="result-item-value">${Number(t.queries_24h||0)}</div></div>
       <div class="result-item"><div class="result-item-label">Active users</div><div class="result-item-value">${Number(t.active_users||0)}</div></div>
@@ -1756,7 +1756,7 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
     <section class="card admin-card">
       <h3>Top activities (24h)</h3>
       ${(t.top_activities??[]).length?t.top_activities.map(i=>`<p><strong>${k(i.name)}</strong>: ${Number(i.count)} queries</p>`).join(""):'<p class="admin-muted">No queries in the last 24 hours.</p>'}
-    </section>`}const Ot=[{value:"travel",label:"Travel"},{value:"marriage",label:"Marriage"},{value:"business",label:"Business"},{value:"health",label:"Health"},{value:"education",label:"Education"},{value:"general",label:"General"}];async function Kt(){const e=N();B(e),e.innerHTML=`
+    </section>`}const _t=[{value:"travel",label:"Travel"},{value:"marriage",label:"Marriage"},{value:"business",label:"Business"},{value:"health",label:"Health"},{value:"education",label:"Education"},{value:"general",label:"General"}];async function qt(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1780,7 +1780,7 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
             <label for="category">Activity Category *</label>
             <select id="category" required>
               <option value="">-- Select category --</option>
-              ${Ot.map(c=>`<option value="${c.value}">${c.label}</option>`).join("")}
+              ${_t.map(c=>`<option value="${c.value}">${c.label}</option>`).join("")}
             </select>
           </div>
 
@@ -1819,13 +1819,13 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
         <div id="results" style="display: none; margin-top: var(--space-6);"></div>
       </div>
     </div>
-  `;const a=document.getElementById("form"),t=document.getElementById("kundali"),i=document.getElementById("category"),n=document.getElementById("from-date"),s=document.getElementById("to-date"),r=document.getElementById("top-n"),o=document.getElementById("location"),d=document.getElementById("btn-cancel"),l=document.getElementById("error-box"),b=document.getElementById("results"),u=new Date,v=new Date(u);v.setDate(v.getDate()+30),n.value=u.toISOString().split("T")[0],s.value=v.toISOString().split("T")[0];try{const c=await ce(),p=c.ok&&Array.isArray(c.data?.kundalis)?c.data.kundalis:[];if(p.length===0){x("Please create a kundali first",!0),E("/kundali-form");return}t.innerHTML=p.map(f=>`<option value="${f.id}" data-lat="${f.latitude}" data-lon="${f.longitude}">${f.label||"Unnamed"}</option>`).join(""),t.addEventListener("change",()=>{const f=t.options[t.selectedIndex],g=f.getAttribute("data-lat"),y=f.getAttribute("data-lon");o.value=g&&y?`${g}, ${y}`:""}),t.dispatchEvent(new Event("change"))}catch(c){console.error("Failed to load kundalis:",c),x("Failed to load kundalis",!0)}d.addEventListener("click",c=>{c.preventDefault(),E("/dashboard")}),a.addEventListener("submit",async c=>{c.preventDefault(),l.style.display="none",b.style.display="none";const p=parseInt(t.value),f=i.value,g=n.value,y=s.value,$=parseInt(r.value)||5;if(!p||!f||!g||!y){l.textContent="Please fill all required fields",l.style.display="block";return}if(new Date(g)>new Date(y)){l.textContent="Start date must be before end date",l.style.display="block";return}const h=document.getElementById("btn-submit");h.disabled=!0,h.textContent="Scanning...";try{const L=t.options[t.selectedIndex],T=parseFloat(L.getAttribute("data-lat")||"0"),C=parseFloat(L.getAttribute("data-lon")||"0"),M=await na({lat:T,lon:C,purpose:f,kundali_id:p,from:g,to:y,top_n:$});if(M.ok){const S=M.data.results||[];S.length===0?b.innerHTML=`
+  `;const a=document.getElementById("form"),t=document.getElementById("kundali"),i=document.getElementById("category"),n=document.getElementById("from-date"),s=document.getElementById("to-date"),r=document.getElementById("top-n"),o=document.getElementById("location"),d=document.getElementById("btn-cancel"),l=document.getElementById("error-box"),m=document.getElementById("results"),u=new Date,v=new Date(u);v.setDate(v.getDate()+30),n.value=u.toISOString().split("T")[0],s.value=v.toISOString().split("T")[0];try{const c=await se(),p=c.ok&&Array.isArray(c.data?.kundalis)?c.data.kundalis:[];if(p.length===0){x("Please create a kundali first",!0),E("/kundali-form");return}t.innerHTML=p.map(f=>`<option value="${f.id}" data-lat="${f.latitude}" data-lon="${f.longitude}">${f.label||"Unnamed"}</option>`).join(""),t.addEventListener("change",()=>{const f=t.options[t.selectedIndex],g=f.getAttribute("data-lat"),y=f.getAttribute("data-lon");o.value=g&&y?`${g}, ${y}`:""}),t.dispatchEvent(new Event("change"))}catch(c){console.error("Failed to load kundalis:",c),x("Failed to load kundalis",!0)}d.addEventListener("click",c=>{c.preventDefault(),E("/dashboard")}),a.addEventListener("submit",async c=>{c.preventDefault(),l.style.display="none",m.style.display="none";const p=parseInt(t.value),f=i.value,g=n.value,y=s.value,$=parseInt(r.value)||5;if(!p||!f||!g||!y){l.textContent="Please fill all required fields",l.style.display="block";return}if(new Date(g)>new Date(y)){l.textContent="Start date must be before end date",l.style.display="block";return}const h=document.getElementById("btn-submit");h.disabled=!0,h.textContent="Scanning...";try{const T=t.options[t.selectedIndex],I=parseFloat(T.getAttribute("data-lat")||"0"),P=parseFloat(T.getAttribute("data-lon")||"0"),M=await ea({lat:I,lon:P,purpose:f,kundali_id:p,from:g,to:y,top_n:$});if(M.ok){const S=M.data.results||[];S.length===0?m.innerHTML=`
             <div class="result-box">
               <p style="text-align: center; color: var(--color-text-secondary);">
                 No highly auspicious dates found in this range. Try expanding the date range or changing the category.
               </p>
             </div>
-          `:b.innerHTML=`
+          `:m.innerHTML=`
             <div class="result-box">
               <h3 style="margin-bottom: var(--space-4);">Top ${S.length} Auspicious Dates</h3>
               ${S.map((w,A)=>`
@@ -1845,7 +1845,7 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
                 Scores based on Muhurta analysis (100% = perfectly auspicious)
               </p>
             </div>
-          `,b.style.display="block"}else{const m=M.data?.error||"Failed to scan dates";l.textContent=m,l.style.display="block"}}catch(L){console.error("Scan error:",L),l.textContent="Error scanning dates",l.style.display="block"}finally{h.disabled=!1,h.textContent="Scan Dates"}}),document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"))}async function Ft(){const e=N();B(e),e.innerHTML=`
+          `,m.style.display="block"}else{const b=M.data?.error||"Failed to scan dates";l.textContent=b,l.style.display="block"}}catch(T){console.error("Scan error:",T),l.textContent="Error scanning dates",l.style.display="block"}finally{h.disabled=!1,h.textContent="Scan Dates"}}),document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"))}async function Ht(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -1895,26 +1895,26 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
         <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
       </div>
     </div>
-  `;const a=document.getElementById("btn-back"),t=document.getElementById("btn-refresh"),i=document.getElementById("btn-topup"),n=document.getElementById("balance-amount"),s=document.getElementById("batches-section"),r=document.getElementById("batches-list"),o=document.getElementById("transactions-list"),d=document.getElementById("no-transactions"),l=document.getElementById("error-box");async function b(){l.style.display="none",n.textContent="Loading...",t.disabled=!0,i.disabled=!0;try{const v=await Oa();if(v.ok){const c=v.data;n.textContent=String(c.total_points??0);const p=Array.isArray(c.batches)?c.batches:[];p.length>0?(s.style.display="block",r.innerHTML=p.map(g=>{const y=new Date(g.expires_at),$=new Date,h=Math.ceil((y.getTime()-$.getTime())/(24*60*60*1e3)),L=h<=7,T=g.status==="active"?"Active":g.status==="held"?"Held":"Expired";return`
-                <div style="background-color: var(--color-bg); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid ${L?"#ef4444":"#10b981"};">
+  `;const a=document.getElementById("btn-back"),t=document.getElementById("btn-refresh"),i=document.getElementById("btn-topup"),n=document.getElementById("balance-amount"),s=document.getElementById("batches-section"),r=document.getElementById("batches-list"),o=document.getElementById("transactions-list"),d=document.getElementById("no-transactions"),l=document.getElementById("error-box");async function m(){l.style.display="none",n.textContent="Loading...",t.disabled=!0,i.disabled=!0;try{const v=await Ba();if(v.ok){const c=v.data;n.textContent=String(c.total_points??0);const p=Array.isArray(c.batches)?c.batches:[];p.length>0?(s.style.display="block",r.innerHTML=p.map(g=>{const y=new Date(g.expires_at),$=new Date,h=Math.ceil((y.getTime()-$.getTime())/(24*60*60*1e3)),T=h<=7,I=g.status==="active"?"Active":g.status==="held"?"Held":"Expired";return`
+                <div style="background-color: var(--color-bg); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid ${T?"#ef4444":"#10b981"};">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
                     <strong>${g.source==="free_trial"?"Free Trial":g.source==="subscription"?"Subscription":g.source==="referral"?"Referral":"Top-up"}</strong>
-                    <span style="background: ${g.status==="active"?"#d1fae5":g.status==="held"?"#fef3c7":"#f3f4f6"}; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${g.status==="active"?"#047857":g.status==="held"?"#92400e":"#6b7280"}; font-weight: bold;">
-                      ${T}
+                    <span style="background: ${g.status==="active"?"#d1fae5":g.status==="held"?"#fef3c7":"#f3f4f6"}; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${g.status==="active"?"#064E3B":g.status==="held"?"#78350F":"#374151"}; font-weight: bold;">
+                      ${I}
                     </span>
                   </div>
                   <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
                     <span style="font-size: var(--font-size-sm);">${g.points_available} pts available</span>
                     <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">
                       Expires: ${y.toLocaleDateString("en-IN")}
-                      ${L&&g.status==="active"?` (${h}d left)`:""}
+                      ${T&&g.status==="active"?` (${h}d left)`:""}
                     </span>
                   </div>
                 </div>
-              `}).join("")):s.style.display="none";const f=Array.isArray(c.transactions)?c.transactions:[];f.length>0?(d.style.display="none",o.innerHTML=f.slice(0,10).map(g=>{const y=new Date(g.created_at),$=g.type==="debit"?"-":"+",h=g.type==="debit"?"#dc2626":"#10b981",L=g.description||(g.type==="debit"?"Query":"Credit");return`
+              `}).join("")):s.style.display="none";const f=Array.isArray(c.transactions)?c.transactions:[];f.length>0?(d.style.display="none",o.innerHTML=f.slice(0,10).map(g=>{const y=new Date(g.created_at),$=g.type==="debit"?"-":"+",h=g.type==="debit"?"#dc2626":"#10b981",T=g.description||(g.type==="debit"?"Query":"Credit");return`
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background-color: var(--color-bg); border-radius: var(--radius-md); border-left: 3px solid ${h};">
                   <div>
-                    <div style="font-size: var(--font-size-sm); font-weight: 500;">${L}</div>
+                    <div style="font-size: var(--font-size-sm); font-weight: 500;">${T}</div>
                     <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px;">
                       ${y.toLocaleDateString("en-IN")} ${y.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}
                     </div>
@@ -1925,11 +1925,11 @@ Try: interview, client milna, shaadi, doctor, court, property, exam, flight, vis
                     </div>
                   </div>
                 </div>
-              `}).join("")):(d.style.display="block",o.innerHTML="")}else{const c=v.data?.error||"Failed to load wallet";l.textContent=c,l.style.display="block",n.textContent="Error"}}catch(v){console.error("Wallet load error:",v),l.textContent="Error loading wallet",l.style.display="block",n.textContent="Error"}finally{t.disabled=!1,i.disabled=!1}}a.addEventListener("click",()=>E("/dashboard")),t.addEventListener("click",b),i.addEventListener("click",async()=>{const v=await u();if(v){i.disabled=!0,x("Initiating payment...",!1);try{const c=await Ka(v);if(c.ok&&c.data){const{razorpay_order_id:p,key_id:f,points_on_success:g,amount_paise:y}=c.data;typeof window.Razorpay>"u"&&(x("Loading payment gateway...",!1),await new Promise(T=>{const C=document.createElement("script");C.src="https://checkout.razorpay.com/v1/checkout.js",C.onload=T,document.head.appendChild(C)}));const $=window.Razorpay,h={key:f,order_id:p,amount:y,currency:"INR",name:"OccultViision Kaalchakra Pro",description:`Top up wallet with ${g} points`,handler:async T=>{x("Payment successful! Points will be credited shortly.",!0),b()},prefill:{},theme:{color:"#3399cc"}};new $(h).open()}else{const p=c.data?.error||"Failed to initiate payment";x(p,!1)}}catch(c){console.error("Topup error:",c),x("Error initiating payment. Please try again.",!1)}finally{i.disabled=!1}}});async function u(){const v=prompt(`Enter amount to top up (₹):
+              `}).join("")):(d.style.display="block",o.innerHTML="")}else{const c=v.data?.error||"Failed to load wallet";l.textContent=c,l.style.display="block",n.textContent="Error"}}catch(v){console.error("Wallet load error:",v),l.textContent="Error loading wallet",l.style.display="block",n.textContent="Error"}finally{t.disabled=!1,i.disabled=!1}}a.addEventListener("click",()=>E("/dashboard")),t.addEventListener("click",m),i.addEventListener("click",async()=>{const v=await u();if(v){i.disabled=!0,x("Initiating payment...",!1);try{const c=await Da(v);if(c.ok&&c.data){const{razorpay_order_id:p,key_id:f,points_on_success:g,amount_paise:y}=c.data;typeof window.Razorpay>"u"&&(x("Loading payment gateway...",!1),await new Promise(I=>{const P=document.createElement("script");P.src="https://checkout.razorpay.com/v1/checkout.js",P.onload=I,document.head.appendChild(P)}));const $=window.Razorpay,h={key:f,order_id:p,amount:y,currency:"INR",name:"OccultViision Kaalchakra Pro",description:`Top up wallet with ${g} points`,handler:async I=>{x("Payment successful! Points will be credited shortly.",!0),m()},prefill:{},theme:{color:"#3399cc"}};new $(h).open()}else{const p=c.data?.error||"Failed to initiate payment";x(p,!1)}}catch(c){console.error("Topup error:",c),x("Error initiating payment. Please try again.",!1)}finally{i.disabled=!1}}});async function u(){const v=prompt(`Enter amount to top up (₹):
 
 Min: ₹1, Max: ₹5000
 
-Popular amounts: 100, 500, 1000, 2000, 5000`,"500");if(!v)return null;const c=Number(v);return isNaN(c)||c<1||c>5e3?(x("Invalid amount. Please enter ₹1 to ₹5000.",!1),null):c*100}b()}async function jt(){const e=N();B(e),e.innerHTML=`
+Popular amounts: 100, 500, 1000, 2000, 5000`,"500");if(!v)return null;const c=Number(v);return isNaN(c)||c<1||c>5e3?(x("Invalid amount. Please enter ₹1 to ₹5000.",!1),null):c*100}m()}async function Rt(){const e=N();B(e),e.innerHTML=`
     <div class="screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2004,11 +2004,11 @@ Popular amounts: 100, 500, 1000, 2000, 5000`,"500");if(!v)return null;const c=Nu
         <div id="error-box" style="display: none; margin-top: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
       </div>
     </div>
-  `;const a=document.getElementById("btn-back"),t=document.getElementById("btn-copy"),i=document.getElementById("btn-share"),n=document.getElementById("btn-copy-message"),s=document.getElementById("referral-code"),r=document.getElementById("total-earned"),o=document.getElementById("referral-count"),d=document.getElementById("referred-users"),l=document.getElementById("no-referrals"),b=document.getElementById("error-box");let u="";async function v(){b.style.display="none";try{const c=await Fa();if(c.ok){const p=c.data;u=p.code||"";const f=p.stats||{},g=Array.isArray(p.referred_users)?p.referred_users:[];s.textContent=u||"LOADING...",r.textContent=`₹${f.total_earned??0}`,o.textContent=String(f.referral_count??0),g.length>0?(l.style.display="none",d.innerHTML=g.map(y=>{const $=y.commission_activated_at?new Date(y.commission_activated_at):null,h=y.commission_status==="active"?"Activated":y.commission_status==="held"?"Held":"Pending",L=y.commission_status==="active"?"#10b981":y.commission_status==="held"?"#f59e0b":"#6b7280";return`
-                <div style="background-color: var(--color-bg); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid ${L};">
+  `;const a=document.getElementById("btn-back"),t=document.getElementById("btn-copy"),i=document.getElementById("btn-share"),n=document.getElementById("btn-copy-message"),s=document.getElementById("referral-code"),r=document.getElementById("total-earned"),o=document.getElementById("referral-count"),d=document.getElementById("referred-users"),l=document.getElementById("no-referrals"),m=document.getElementById("error-box");let u="";async function v(){m.style.display="none";try{const c=await _a();if(c.ok){const p=c.data;u=p.code||"";const f=p.stats||{},g=Array.isArray(p.referred_users)?p.referred_users:[];s.textContent=u||"LOADING...",r.textContent=`₹${f.total_earned??0}`,o.textContent=String(f.referral_count??0),g.length>0?(l.style.display="none",d.innerHTML=g.map(y=>{const $=y.commission_activated_at?new Date(y.commission_activated_at):null,h=y.commission_status==="active"?"Activated":y.commission_status==="held"?"Held":"Pending",T=y.commission_status==="active"?"#10b981":y.commission_status==="held"?"#f59e0b":"#6b7280";return`
+                <div style="background-color: var(--color-bg); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid ${T};">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
                     <strong>${y.phone||"Anonymous"}</strong>
-                    <span style="background: ${L}20; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${L}; font-weight: bold;">
+                    <span style="background: ${T}20; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${T}; font-weight: bold;">
                       ${h}
                     </span>
                   </div>
@@ -2022,11 +2022,11 @@ Popular amounts: 100, 500, 1000, 2000, 5000`,"500");if(!v)return null;const c=Nu
                     </div>
                   `:""}
                 </div>
-              `}).join("")):(l.style.display="block",d.innerHTML="")}else{const p=c.data?.error||"Failed to load referral data";b.textContent=p,b.style.display="block"}}catch(c){console.error("Referral load error:",c),b.textContent="Error loading referral data",b.style.display="block"}}a.addEventListener("click",()=>E("/dashboard")),t.addEventListener("click",async()=>{if(!u){x("Code not available",!0);return}try{await navigator.clipboard.writeText(u),x("Referral code copied!",!1)}catch{x("Failed to copy code",!0)}}),n.addEventListener("click",async()=>{const c=`Join me on OccultViision! Use my referral code: ${u}
+              `}).join("")):(l.style.display="block",d.innerHTML="")}else{const p=c.data?.error||"Failed to load referral data";m.textContent=p,m.style.display="block"}}catch(c){console.error("Referral load error:",c),m.textContent="Error loading referral data",m.style.display="block"}}a.addEventListener("click",()=>E("/dashboard")),t.addEventListener("click",async()=>{if(!u){x("Code not available",!0);return}try{await navigator.clipboard.writeText(u),x("Referral code copied!",!1)}catch{x("Failed to copy code",!0)}}),n.addEventListener("click",async()=>{const c=`Join me on OccultViision! Use my referral code: ${u}
 
 https://www.occultviision.com`;try{await navigator.clipboard.writeText(c),x("Share message copied!",!1)}catch{x("Failed to copy message",!0)}}),i.addEventListener("click",()=>{const c=`Join me on OccultViision! Use my referral code: ${u}
 
-https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;window.open(p,"_blank")}),v()}const Vt=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"],pa=["Ar","Ta","Ge","Ca","Le","Vi","Li","Sc","Sa","Cp","Aq","Pi"],He={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"},we={Sun:"#fbbf24",Moon:"#e2e8f0",Mars:"#f87171",Mercury:"#4ade80",Jupiter:"#fb923c",Venus:"#f472b6",Saturn:"#94a3b8",Rahu:"#a78bfa",Ketu:"#a78bfa"},Ut=["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima","Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Amavasya"],Wt=["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarman","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"],Gt=["Ravivar","Somavar","Mangalvar","Budhavar","Guruvar","Shukravar","Shanivar"],Yt=["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn"];function ue(e){const a=Math.floor(e),t=(e-a)*60,i=Math.floor(t),n=Math.round((t-i)*60);return`${a}°${i.toString().padStart(2,"0")}'${n.toString().padStart(2,"0")}"`}function pe(e){try{return new Date(e).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}catch{return e}}function Je(e){try{return new Date(e).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:!0})}catch{return e}}function Pe(e){return`${e.starLord} → ${e.subLord} → ${e.subSubLord}`}function Jt(e,a,t,i){const s=new Date(e).getUTCDay(),r=Gt[s],o=Yt[s],d=(t-a+360)%360,l=Math.floor(d/12)+1,b=l<=15?"Shukla Paksha":"Krishna Paksha",u=Ut[l-1]??`Tithi ${l}`,v=(a+t)%360,c=Math.floor(v/(360/27)),p=Wt[c]??`Yoga ${c+1}`;return{vara:r,varaLord:o,tithi:u,paksha:b,tithiNum:l,yoga:p,yogaNum:c+1,nakshatra:i.name,nakshatraLord:i.lord}}function Qt(e,a){const t=Array.from({length:13},()=>[]);a.forEach(s=>{const r=s.house;if(r>=1&&r<=12){const o=we[s.planet]??"#e2e8f0";t[r].push(`<span style="color:${o}">${He[s.planet]??s.planet}</span>`)}});const i=s=>{const r=(e+s-1)%12;return pa[r]},n=(s,r="")=>{const o=i(s),d=t[s];return`<div class="ni-cell ni-h${s} ${r}">
+https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;window.open(p,"_blank")}),v()}const Ot=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"],la=["Ar","Ta","Ge","Ca","Le","Vi","Li","Sc","Sa","Cp","Aq","Pi"],_e={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"},fe=e=>`var(--pc-${String(e).toLowerCase()}, var(--pc-moon))`,Kt=["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima","Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Amavasya"],Ft=["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarman","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"],jt=["Ravivar","Somavar","Mangalvar","Budhavar","Guruvar","Shukravar","Shanivar"],Vt=["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn"];function le(e){const a=Math.floor(e),t=(e-a)*60,i=Math.floor(t),n=Math.round((t-i)*60);return`${a}°${i.toString().padStart(2,"0")}'${n.toString().padStart(2,"0")}"`}function de(e){try{return new Date(e).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}catch{return e}}function We(e){try{return new Date(e).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:!0})}catch{return e}}function Te(e){return`${e.starLord} → ${e.subLord} → ${e.subSubLord}`}function Ut(e,a,t,i){const s=new Date(e).getUTCDay(),r=jt[s],o=Vt[s],d=(t-a+360)%360,l=Math.floor(d/12)+1,m=l<=15?"Shukla Paksha":"Krishna Paksha",u=Kt[l-1]??`Tithi ${l}`,v=(a+t)%360,c=Math.floor(v/(360/27)),p=Ft[c]??`Yoga ${c+1}`;return{vara:r,varaLord:o,tithi:u,paksha:m,tithiNum:l,yoga:p,yogaNum:c+1,nakshatra:i.name,nakshatraLord:i.lord}}function Wt(e,a){const t=Array.from({length:13},()=>[]);a.forEach(s=>{const r=s.house;if(r>=1&&r<=12){const o=fe(s.planet);t[r].push(`<span style="color:${o}">${_e[s.planet]??s.planet}</span>`)}});const i=s=>{const r=(e+s-1)%12;return la[r]},n=(s,r="")=>{const o=i(s),d=t[s];return`<div class="ni-cell ni-h${s} ${r}">
       <div class="ni-house-num">${s}</div>
       <div class="ni-rashi">${o}${s===1?' <span class="ni-asc">La</span>':""}</div>
       <div class="ni-planets">${d.join(" ")}</div>
@@ -2036,7 +2036,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       ${n(11)}
       <div class="ni-center">
         <div class="ni-center-text">KUNDALI</div>
-        <div class="ni-center-sub">${Vt[e]} Lagna</div>
+        <div class="ni-center-sub">${Ot[e]} Lagna</div>
       </div>
       ${n(4)}
       ${n(10)}
@@ -2044,8 +2044,8 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <div class="ni-center-spacer"></div>
       ${n(5)}
       ${n(9)}${n(8)}${n(7)}${n(6)}
-    </div>`}function Zt(e,a){const t=Array.from({length:12},()=>[]);a.forEach(s=>{const r=s.rashi??0;if(r>=0&&r<12){const o=we[s.planet]??"#e2e8f0";t[r].push(`<span style="color:${o}">${He[s.planet]??s.planet}</span>`)}});const i=s=>(s-e+12)%12+1,n=s=>{const r=s===e,o=i(s),d=t[s];return`<div class="si-cell si-r${s} ${r?"si-asc":""}">
-      <div class="si-rashi-name">${pa[s]}${r?' <span class="si-la">La</span>':""}</div>
+    </div>`}function Gt(e,a){const t=Array.from({length:12},()=>[]);a.forEach(s=>{const r=s.rashi??0;if(r>=0&&r<12){const o=fe(s.planet);t[r].push(`<span style="color:${o}">${_e[s.planet]??s.planet}</span>`)}});const i=s=>(s-e+12)%12+1,n=s=>{const r=s===e,o=i(s),d=t[s];return`<div class="si-cell si-r${s} ${r?"si-asc":""}">
+      <div class="si-rashi-name">${la[s]}${r?' <span class="si-la">La</span>':""}</div>
       <div class="si-house-num">${o}</div>
       <div class="si-planets">${d.join(" ")}</div>
     </div>`};return`
@@ -2058,7 +2058,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <div class="si-center-sp"></div><div class="si-center-sp"></div>
       ${n(4)}
       ${n(8)}${n(7)}${n(6)}${n(5)}
-    </div>`}async function Xt(e){const a=N();B(a);let t=e;if(!t){const m=window.location.hash,S=m.includes("?")?m.split("?")[1]:"",A=new URLSearchParams(S).get("id");t=A?parseInt(A,10):void 0}if(!t||isNaN(t)){a.innerHTML=`<div class="screen"><header class="screen-header">
+    </div>`}async function Yt(e){const a=N();B(a);let t=e;if(!t){const b=window.location.hash,S=b.includes("?")?b.split("?")[1]:"",A=new URLSearchParams(S).get("id");t=A?parseInt(A,10):void 0}if(!t||isNaN(t)){a.innerHTML=`<div class="screen"><header class="screen-header">
       <button class="btn-back" id="btn-back">←</button><h2>Birth Chart</h2></header>
       <div style="padding:2rem;text-align:center;color:var(--error-text)">
         No kundali selected.<br><br>
@@ -2068,7 +2068,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
     <button class="ti-logout" id="btn-back">← Back</button>
   </header>
   <div style="padding:2rem;text-align:center"><div class="spinner"></div>
-  <p style="margin-top:1rem;color:var(--accent-akash-text)">Computing birth chart…</p></div></div>`,document.getElementById("btn-back").addEventListener("click",()=>E("/kundali"));const i=await Ee(t);if(!i.ok){a.innerHTML+=`<div style="padding:2rem;color:#f87171">Failed to load chart (${i.status}).<br>${i.data?.error??""}</div>`;return}const{kundali:n,chart:s,meta:r}=i.data,o=new Date(n.birth_date).getUTCFullYear(),d=new Date().getUTCFullYear(),l=o>=d-1,b=s.planets.find(m=>m.planet==="Sun"),u=s.planets.find(m=>m.planet==="Moon"),v=b&&u?Jt(n.birth_date,b.deg,u.deg,s.janmaNakshatra):null,c=s.ascendant,{dasha:p,tara:f,janmaNakshatra:g}=s,y=Qt(c.rashi,s.planets),$=Zt(c.rashi,s.planets);a.innerHTML=`
+  <p style="margin-top:1rem;color:var(--accent-akash-text)">Computing birth chart…</p></div></div>`,document.getElementById("btn-back").addEventListener("click",()=>E("/kundali"));const i=await $e(t);if(!i.ok){a.innerHTML+=`<div style="padding:2rem;color:#f87171">Failed to load chart (${i.status}).<br>${i.data?.error??""}</div>`;return}const{kundali:n,chart:s,meta:r}=i.data,o=new Date(n.birth_date).getUTCFullYear(),d=new Date().getUTCFullYear(),l=o>=d-1,m=s.planets.find(b=>b.planet==="Sun"),u=s.planets.find(b=>b.planet==="Moon"),v=m&&u?Ut(n.birth_date,m.deg,u.deg,s.janmaNakshatra):null,c=s.ascendant,{dasha:p,tara:f,janmaNakshatra:g}=s,y=Wt(c.rashi,s.planets),$=Gt(c.rashi,s.planets);a.innerHTML=`
     <div class="screen kc-screen">
 
       <!-- Header -->
@@ -2091,7 +2091,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <div class="kc-birth-banner">
         <div class="kc-birth-row">
           <span class="kc-birth-label">Birth</span>
-          <span class="kc-birth-val">${Je(n.birth_date)}</span>
+          <span class="kc-birth-val">${We(n.birth_date)}</span>
         </div>
         <div class="kc-birth-row">
           <span class="kc-birth-label">Place</span>
@@ -2099,7 +2099,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         </div>
         <div class="kc-birth-row">
           <span class="kc-birth-label">Ayanamsa</span>
-          <span class="kc-birth-val">${s.ayanamsa} ${ue(s.ayanamsaDeg)}</span>
+          <span class="kc-birth-val">${s.ayanamsa} ${le(s.ayanamsaDeg)}</span>
         </div>
       </div>
 
@@ -2121,7 +2121,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
 
       <!-- Chart Legend -->
       <div class="kc-legend">
-        ${Object.entries(He).map(([m,S])=>`<span class="kc-leg-item" style="color:${we[m]}">${S}=${m}</span>`).join("")}
+        ${Object.entries(_e).map(([b,S])=>`<span class="kc-leg-item" style="color:${fe(b)}">${S}=${b}</span>`).join("")}
       </div>
 
       <!-- Panchang at Birth -->
@@ -2157,9 +2157,9 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="kc-section-title">ASCENDANT (LAGNA)</div>
         <div class="kc-asc-card">
           <div class="kc-asc-sign">${c.rashiName}</div>
-          <div class="kc-asc-deg">${ue(c.deg)}</div>
+          <div class="kc-asc-deg">${le(c.deg)}</div>
           <div class="kc-asc-nak">${c.nakName} Pada ${c.nakPada} · Lord ${c.nakLord}</div>
-          <div class="kc-kp">KP: ${Pe(c.kp)}</div>
+          <div class="kc-kp">KP: ${Te(c.kp)}</div>
         </div>
       </section>
 
@@ -2171,13 +2171,13 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           <div class="kc-dasha-item kc-maha">
             <div class="kc-dasha-planet">${p.maha.lord}</div>
             <div class="kc-dasha-type">Maha Dasha</div>
-            <div class="kc-dasha-dates">${pe(p.maha.start)} – ${pe(p.maha.end)}</div>
+            <div class="kc-dasha-dates">${de(p.maha.start)} – ${de(p.maha.end)}</div>
           </div>
           <div class="kc-dasha-arrow">›</div>
           <div class="kc-dasha-item kc-antar">
             <div class="kc-dasha-planet">${p.antar.lord}</div>
             <div class="kc-dasha-type">Antar Dasha</div>
-            <div class="kc-dasha-dates">${pe(p.antar.start)} – ${pe(p.antar.end)}</div>
+            <div class="kc-dasha-dates">${de(p.antar.start)} – ${de(p.antar.end)}</div>
           </div>
         </div>
       </section>`:""}
@@ -2208,13 +2208,13 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
               <th>°in Sign</th><th>Nakshatra</th><th>KP Chain</th>
             </tr></thead>
             <tbody>
-              ${s.planets.map(m=>`<tr>
-                <td style="color:${we[m.planet]}">${m.planet}</td>
-                <td class="tc">${m.house}</td>
-                <td>${m.rashiName}</td>
-                <td class="mono">${ue(m.degInRashi)}</td>
-                <td>${m.nakName} P${m.nakPada}</td>
-                <td class="kp-cell">${Pe(m.kp)}</td>
+              ${s.planets.map(b=>`<tr>
+                <td style="color:${fe(b.planet)}">${b.planet}</td>
+                <td class="tc">${b.house}</td>
+                <td>${b.rashiName}</td>
+                <td class="mono">${le(b.degInRashi)}</td>
+                <td>${b.nakName} P${b.nakPada}</td>
+                <td class="kp-cell">${Te(b.kp)}</td>
               </tr>`).join("")}
             </tbody>
           </table>
@@ -2230,19 +2230,19 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
               <th>H</th><th>Sign</th><th>°in Sign</th><th>Nakshatra</th><th>KP Chain</th>
             </tr></thead>
             <tbody>
-              ${s.cusps.map(m=>`<tr class="${m.house%2===0?"row-alt":""}">
-                <td class="tc"><strong>${m.house}</strong></td>
-                <td>${m.rashiName}</td>
-                <td class="mono">${ue(m.degInRashi)}</td>
-                <td>${m.nakName} P${m.nakPada}</td>
-                <td class="kp-cell">${Pe(m.kp)}</td>
+              ${s.cusps.map(b=>`<tr class="${b.house%2===0?"row-alt":""}">
+                <td class="tc"><strong>${b.house}</strong></td>
+                <td>${b.rashiName}</td>
+                <td class="mono">${le(b.degInRashi)}</td>
+                <td>${b.nakName} P${b.nakPada}</td>
+                <td class="kp-cell">${Te(b.kp)}</td>
               </tr>`).join("")}
             </tbody>
           </table>
         </div>
       </section>
 
-      <div class="kc-engine-note">Engine: ${r.engine} · Computed: ${Je(r.computed_at)}</div>
+      <div class="kc-engine-note">Engine: ${r.engine} · Computed: ${We(r.computed_at)}</div>
 
       <!-- Bottom Nav -->
       <div class="kc-bottom-nav">
@@ -2253,7 +2253,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       </div>
 
     </div>
-  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const h=document.getElementById("ni-wrap"),L=document.getElementById("si-wrap"),T=document.getElementById("btn-ni"),C=document.getElementById("btn-si");T.addEventListener("click",()=>{h.style.display="",L.style.display="none",T.classList.add("active"),C.classList.remove("active")}),C.addEventListener("click",()=>{L.style.display="",h.style.display="none",C.classList.add("active"),T.classList.remove("active")});const M=async()=>{if(!confirm(`Delete "${n.label??"this kundali"}"? This cannot be undone.`))return;const m=await ta(n.id);m.ok?(x("Kundali deleted"),E("/kundali")):x(m.data?.error??"Delete failed",!0)};document.getElementById("btn-delete").addEventListener("click",M),document.getElementById("btn-delete-warn")?.addEventListener("click",M),document.getElementById("btn-kp").addEventListener("click",()=>E("/kp-query")),document.getElementById("btn-muhurta").addEventListener("click",()=>E("/muhurta")),document.getElementById("btn-dasha").addEventListener("click",()=>E(`/dasha-timeline?kundali_id=${n.id}`)),document.getElementById("btn-sublords").addEventListener("click",()=>E(`/kp-sublords?kundali_id=${n.id}`))}const en=23.2505,an=77.4065,Y=60,va=[{slug:"property",label:"Property",icon:"🏠",priority:"P0"},{slug:"marriage",label:"Marriage",icon:"💍",priority:"P1"},{slug:"business",label:"Business",icon:"📈",priority:"P2"},{slug:"medical",label:"Medical",icon:"🏥",priority:"P3"}],tn={Sun:"hora-sun",Moon:"hora-moon",Mars:"hora-mars",Mercury:"hora-mercury",Jupiter:"hora-jupiter",Venus:"hora-venus",Saturn:"hora-saturn"},nn=["","Janma","Sampat","Vipat","Kshema","Pratyak","Sadhana","Naidhana","Mitra","Param Mitra"];function q(e){try{return new Date(e).toLocaleTimeString("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:!0})}catch{return e}}function sn(e){try{return new Date(e).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!0})}catch{return e}}function ke(e){return e>=80?{cls:"grade-a",label:"Excellent"}:e>=65?{cls:"grade-b",label:"Good"}:e>=50?{cls:"grade-c",label:"Moderate"}:e>=35?{cls:"grade-d",label:"Weak"}:{cls:"grade-f",label:"Avoid"}}function rn(e){return e==="benefic"?"tara-good":e==="malefic"?"tara-bad":"tara-neutral"}let j,xe=en,$e=an,me="Bhopal (default)",be=null,he=null,W=Y;async function on(){const e=N();B(e);const a=window.location.hash,t=a.includes("?")?a.split("?")[1]:"",n=new URLSearchParams(t).get("kundali_id");j=n?parseInt(n,10):void 0,e.innerHTML=cn(j),ln(e);try{await dn()}catch{}await ma(e),yn(e)}function cn(e){return`
+  `,document.getElementById("btn-back").addEventListener("click",()=>E("/dashboard"));const h=document.getElementById("ni-wrap"),T=document.getElementById("si-wrap"),I=document.getElementById("btn-ni"),P=document.getElementById("btn-si");I.addEventListener("click",()=>{h.style.display="",T.style.display="none",I.classList.add("active"),P.classList.remove("active")}),P.addEventListener("click",()=>{T.style.display="",h.style.display="none",P.classList.add("active"),I.classList.remove("active")});const M=async()=>{if(!confirm(`Delete "${n.label??"this kundali"}"? This cannot be undone.`))return;const b=await Xe(n.id);b.ok?(x("Kundali deleted"),E("/kundali")):x(b.data?.error??"Delete failed",!0)};document.getElementById("btn-delete").addEventListener("click",M),document.getElementById("btn-delete-warn")?.addEventListener("click",M),document.getElementById("btn-kp").addEventListener("click",()=>E("/kp-query")),document.getElementById("btn-muhurta").addEventListener("click",()=>E("/muhurta")),document.getElementById("btn-dasha").addEventListener("click",()=>E(`/dasha-timeline?kundali_id=${n.id}`)),document.getElementById("btn-sublords").addEventListener("click",()=>E(`/kp-sublords?kundali_id=${n.id}`))}const Jt=23.2505,Qt=77.4065,U=60,da=[{slug:"property",label:"Property",icon:"🏠",priority:"P0"},{slug:"marriage",label:"Marriage",icon:"💍",priority:"P1"},{slug:"business",label:"Business",icon:"📈",priority:"P2"},{slug:"medical",label:"Medical",icon:"🏥",priority:"P3"}],Zt={Sun:"hora-sun",Moon:"hora-moon",Mars:"hora-mars",Mercury:"hora-mercury",Jupiter:"hora-jupiter",Venus:"hora-venus",Saturn:"hora-saturn"},Xt=["","Janma","Sampat","Vipat","Kshema","Pratyak","Sadhana","Naidhana","Mitra","Param Mitra"];function _(e){try{return new Date(e).toLocaleTimeString("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:!0})}catch{return e}}function en(e){try{return new Date(e).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!0})}catch{return e}}function ye(e){return e>=80?{cls:"grade-a",label:"Excellent"}:e>=65?{cls:"grade-b",label:"Good"}:e>=50?{cls:"grade-c",label:"Moderate"}:e>=35?{cls:"grade-d",label:"Weak"}:{cls:"grade-f",label:"Avoid"}}function an(e){return e==="benefic"?"tara-good":e==="malefic"?"tara-bad":"tara-neutral"}let F,we=Jt,ke=Qt,pe="Bhopal (default)",ve=null,me=null,j=U;async function tn(){const e=N();B(e);const a=window.location.hash,t=a.includes("?")?a.split("?")[1]:"",n=new URLSearchParams(t).get("kundali_id");F=n?parseInt(n,10):void 0,e.innerHTML=nn(F),sn(e);try{await rn()}catch{}await ua(e),bn(e)}function nn(e){return`
     <div class="screen muhurta-dashboard">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2262,7 +2262,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           <span class="subtitle" id="location-label">Detecting location…</span>
         </div>
         <div class="header-right">
-          <span class="refresh-badge" id="refresh-badge">⏱ ${Y}s</span>
+          <span class="refresh-badge" id="refresh-badge">⏱ ${U}s</span>
           ${e?'<button class="btn btn-small btn-ghost" id="btn-chart">Chart</button>':""}
         </div>
       </header>
@@ -2270,24 +2270,24 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="spinner" style="margin: 40px auto;"></div>
       </div>
     </div>
-  `}function ln(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{Be(),E(j?`/birth-chart?id=${j}`:"/dashboard")}),e.querySelector("#btn-chart")?.addEventListener("click",()=>{Be(),E(`/birth-chart?id=${j}`)})}async function dn(){return new Promise(e=>{if(!navigator.geolocation){me="Bhopal (geoloc unavailable)",e();return}navigator.geolocation.getCurrentPosition(a=>{xe=a.coords.latitude,$e=a.coords.longitude,me=`${xe.toFixed(4)}°N, ${$e.toFixed(4)}°E`,e()},()=>{me="Bhopal (location denied)",e()},{timeout:5e3})})}async function ma(e){const a=e.querySelector("#dashboard-body"),t=e.querySelector("#location-label");if(t&&(t.textContent=me),!!a)try{const i=await Ve(xe,$e,"general",j);if(!i.ok||!i.data){a.innerHTML=Qe(i.data?.error??"Failed to load muhurta data");return}const n=i.data;let s={};try{const r=await Promise.allSettled(va.map(o=>Ve(xe,$e,o.slug,j).then(d=>({slug:o.slug,score:d.data?.score?.score??null}))));for(const o of r)o.status==="fulfilled"&&(s[o.value.slug]=o.value.score)}catch{}a.innerHTML=un(n,s),W=Y}catch(i){console.error("[muhurta-dashboard] load error:",i),a.innerHTML=Qe("Connection error. Will retry automatically.")}}function un(e,a){const t=[];return t.push(`
+  `}function sn(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{Me(),E(F?`/birth-chart?id=${F}`:"/dashboard")}),e.querySelector("#btn-chart")?.addEventListener("click",()=>{Me(),E(`/birth-chart?id=${F}`)})}async function rn(){return new Promise(e=>{if(!navigator.geolocation){pe="Bhopal (geoloc unavailable)",e();return}navigator.geolocation.getCurrentPosition(a=>{we=a.coords.latitude,ke=a.coords.longitude,pe=`${we.toFixed(4)}°N, ${ke.toFixed(4)}°E`,e()},()=>{pe="Bhopal (location denied)",e()},{timeout:5e3})})}async function ua(e){const a=e.querySelector("#dashboard-body"),t=e.querySelector("#location-label");if(t&&(t.textContent=pe),!!a)try{const i=await Oe(we,ke,"general",F);if(!i.ok||!i.data){a.innerHTML=Ge(i.data?.error??"Failed to load muhurta data");return}const n=i.data;let s={};try{const r=await Promise.allSettled(da.map(o=>Oe(we,ke,o.slug,F).then(d=>({slug:o.slug,score:d.data?.score?.score??null}))));for(const o of r)o.status==="fulfilled"&&(s[o.value.slug]=o.value.score)}catch{}a.innerHTML=on(n,s),j=U}catch(i){console.error("[muhurta-dashboard] load error:",i),a.innerHTML=Ge("Connection error. Will retry automatically.")}}function on(e,a){const t=[];return t.push(`
     <div class="md-timestamp">
-      <span>As of <strong>${sn(e.as_of)}</strong> IST</span>
+      <span>As of <strong>${en(e.as_of)}</strong> IST</span>
       <span class="md-personalized-badge">${e.personalized?"🔮 Personalized":"🌐 Generic"}</span>
     </div>
-  `),t.push(pn(e)),e.pancha_pakshi&&t.push(vn(e.pancha_pakshi)),t.push(mn(e)),t.push(bn(e)),t.push(hn(e)),e.score&&t.push(gn(e.score)),t.push(fn(a,e.score)),t.join(`
-`)}function pn(e){const a=e.active_hora,t=e.active_uphora,i=a?`
-      <div class="md-hora-card ${tn[a.lord]??""}">
+  `),t.push(cn(e)),e.pancha_pakshi&&t.push(ln(e.pancha_pakshi)),t.push(dn(e)),t.push(un(e)),t.push(pn(e)),e.score&&t.push(vn(e.score)),t.push(mn(a,e.score)),t.join(`
+`)}function cn(e){const a=e.active_hora,t=e.active_uphora,i=a?`
+      <div class="md-hora-card ${Zt[a.lord]??""}">
         <div class="hora-lord">${a.lord}</div>
         <div class="hora-meta">
           <span class="hora-badge">${a.is_daytime?"☀️ Day":"🌙 Night"}</span>
-          <span class="hora-window">${q(a.start)} → ${q(a.end)}</span>
+          <span class="hora-window">${_(a.start)} → ${_(a.end)}</span>
         </div>
       </div>`:'<div class="md-hora-card hora-unknown"><div class="hora-lord">—</div><div class="hora-meta">No hora data</div></div>',n=t?`
       <div class="md-uphora-card">
         <div class="uphora-label">Uphora (1/7 Hora)</div>
         <div class="uphora-lord">${t.sub}</div>
-        <div class="uphora-window">${q(t.start)} → ${q(t.end)}</div>
+        <div class="uphora-window">${_(t.start)} → ${_(t.end)}</div>
       </div>`:"";return`
     <section class="md-section">
       <h3 class="md-section-title">⏰ Current Hora</h3>
@@ -2296,11 +2296,11 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         ${n}
       </div>
       <div class="md-sun-row">
-        <span>🌅 Sunrise ${q(e.sunrise)}</span>
-        <span>🌇 Sunset ${q(e.sunset)}</span>
+        <span>🌅 Sunrise ${_(e.sunrise)}</span>
+        <span>🌇 Sunset ${_(e.sunset)}</span>
       </div>
     </section>
-  `}function vn(e){const a=e.favorability_score,{cls:t,label:i}=ke(a),n=Math.round(e.confidence*100);return`
+  `}function ln(e){const a=e.favorability_score,{cls:t,label:i}=ye(a),n=Math.round(e.confidence*100);return`
     <section class="md-section">
       <h3 class="md-section-title">🦅 Pancha Pakshi</h3>
       <div class="md-pakshi-card">
@@ -2308,7 +2308,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="pakshi-meta">
           <span class="pakshi-confidence">Confidence: ${n}%</span>
           <span class="pakshi-precision">Precision: ±${e.precision_minutes}m</span>
-          <span class="pakshi-window">${q(e.cycle_start)} → ${q(e.cycle_end)}</span>
+          <span class="pakshi-window">${_(e.cycle_start)} → ${_(e.cycle_end)}</span>
         </div>
         <div class="md-score-bar-wrap">
           <div class="md-score-bar ${t}" style="width:${a}%"></div>
@@ -2316,16 +2316,16 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="pakshi-grade ${t}">${i} (${a}/100)</div>
       </div>
     </section>
-  `}function mn(e){const a=e.rahu_kaal,t=a.active_now?"rk-active":"rk-inactive",i=a.active_now?'<span class="badge badge-danger">⚠ ACTIVE NOW</span>':'<span class="badge badge-ok">✓ Not active</span>';return`
+  `}function dn(e){const a=e.rahu_kaal,t=a.active_now?"rk-active":"rk-inactive",i=a.active_now?'<span class="badge badge-danger">⚠ ACTIVE NOW</span>':'<span class="badge badge-ok">✓ Not active</span>';return`
     <section class="md-section">
       <h3 class="md-section-title">🐍 Rahu Kaal</h3>
       <div class="md-rk-card ${t}">
         ${i}
-        <span class="rk-window">${q(a.start)} – ${q(a.end)}</span>
+        <span class="rk-window">${_(a.start)} – ${_(a.end)}</span>
         ${a.active_now?'<p class="rk-warning">Avoid new ventures during Rahu Kaal.</p>':""}
       </div>
     </section>
-  `}function bn(e){const a=e.current_nakshatra,t=e.tara;let i='<div class="tara-unavailable">Add a kundali to see personalized Tara</div>';if(t){const r=rn(t.beneficence),o=nn[t.number]??t.name,d=t.beneficence==="benefic"?"✅":t.beneficence==="malefic"?"❌":"⚪";i=`
+  `}function un(e){const a=e.current_nakshatra,t=e.tara;let i='<div class="tara-unavailable">Add a kundali to see personalized Tara</div>';if(t){const r=an(t.beneficence),o=Xt[t.number]??t.name,d=t.beneficence==="benefic"?"✅":t.beneficence==="malefic"?"❌":"⚪";i=`
       <div class="md-tara-card ${r}">
         <div class="tara-number">Tara ${t.number}</div>
         <div class="tara-name">${d} ${o}</div>
@@ -2336,7 +2336,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <div class="navtara-unavail-icon">🌟</div>
       <div>Navatara requires your Janma Nakshatra</div>
       <a href="#/kundali" class="navtara-add-link">Add Kundali →</a>
-    </div>`;if(n){const r=n.cycle===1?"1st":n.cycle===2?"2nd":"3rd",o={most_benefic:"navtara-most-benefic",benefic:"navtara-benefic",neutral:"navtara-neutral",mixed:"navtara-mixed",malefic:"navtara-malefic",most_malefic:"navtara-most-malefic"},d={most_benefic:"✅✅ Most Auspicious",benefic:"✅ Auspicious",neutral:"⚪ Neutral",mixed:"🟡 Mixed",malefic:"❌ Inauspicious",most_malefic:"❌❌ Most Inauspicious"},l=o[n.effectiveQuality]??"navtara-neutral",b=d[n.effectiveQuality]??n.effectiveQuality,u=n.rawScore,v=u>=80?"navtara-bar-high":u>=50?"navtara-bar-mid":"navtara-bar-low";s=`
+    </div>`;if(n){const r=n.cycle===1?"1st":n.cycle===2?"2nd":"3rd",o={most_benefic:"navtara-most-benefic",benefic:"navtara-benefic",neutral:"navtara-neutral",mixed:"navtara-mixed",malefic:"navtara-malefic",most_malefic:"navtara-most-malefic"},d={most_benefic:"✅✅ Most Auspicious",benefic:"✅ Auspicious",neutral:"⚪ Neutral",mixed:"🟡 Mixed",malefic:"❌ Inauspicious",most_malefic:"❌❌ Most Inauspicious"},l=o[n.effectiveQuality]??"navtara-neutral",m=d[n.effectiveQuality]??n.effectiveQuality,u=n.rawScore,v=u>=80?"navtara-bar-high":u>=50?"navtara-bar-mid":"navtara-bar-low";s=`
       <div class="md-navtara-card ${l}">
         <div class="navtara-header">
           <div class="navtara-position">
@@ -2345,7 +2345,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           </div>
           <div class="navtara-cycle">${r} Avritti</div>
         </div>
-        <div class="navtara-quality">${b}</div>
+        <div class="navtara-quality">${m}</div>
         <div class="navtara-bar-wrap">
           <div class="navtara-bar ${v}" style="width:${u}%"></div>
           <span class="navtara-bar-pct">${u}%</span>
@@ -2369,7 +2369,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         ${s}
       </div>
     </section>
-  `}function hn(e){const a=[];if(e.panchaka_dosha?.active&&a.push(`⚠️ <strong>Panchaka Dosha</strong>${e.panchaka_dosha.dosha?` — ${e.panchaka_dosha.dosha}`:""}: Avoid cremation, travel south, construction.`),e.ganda_moola?.active&&a.push(`⚠️ <strong>Ganda Moola</strong>${e.ganda_moola.nakshatra?` (${e.ganda_moola.nakshatra})`:""}: Inauspicious nakshatra — avoid ceremonies.`),e.dishashool?.active&&a.push(`⚠️ <strong>Dishashool</strong>${e.dishashool.direction?` — ${e.dishashool.direction}`:""}: Travel in this direction is inauspicious today.`),e.combustion?.venus?.combust){const t=e.combustion.venus.orb?` (${e.combustion.venus.orb.toFixed(1)}°)`:"";a.push(`🔥 <strong>Venus Combust</strong>${t}: Marriage muhurtas affected.`)}if(e.combustion?.jupiter?.combust){const t=e.combustion.jupiter.orb?` (${e.combustion.jupiter.orb.toFixed(1)}°)`:"";a.push(`🔥 <strong>Jupiter Combust</strong>${t}: Upanayana, marriage, ceremonies affected.`)}return a.length===0?`
+  `}function pn(e){const a=[];if(e.panchaka_dosha?.active&&a.push(`⚠️ <strong>Panchaka Dosha</strong>${e.panchaka_dosha.dosha?` — ${e.panchaka_dosha.dosha}`:""}: Avoid cremation, travel south, construction.`),e.ganda_moola?.active&&a.push(`⚠️ <strong>Ganda Moola</strong>${e.ganda_moola.nakshatra?` (${e.ganda_moola.nakshatra})`:""}: Inauspicious nakshatra — avoid ceremonies.`),e.dishashool?.active&&a.push(`⚠️ <strong>Dishashool</strong>${e.dishashool.direction?` — ${e.dishashool.direction}`:""}: Travel in this direction is inauspicious today.`),e.combustion?.venus?.combust){const t=e.combustion.venus.orb?` (${e.combustion.venus.orb.toFixed(1)}°)`:"";a.push(`🔥 <strong>Venus Combust</strong>${t}: Marriage muhurtas affected.`)}if(e.combustion?.jupiter?.combust){const t=e.combustion.jupiter.orb?` (${e.combustion.jupiter.orb.toFixed(1)}°)`:"";a.push(`🔥 <strong>Jupiter Combust</strong>${t}: Upanayana, marriage, ceremonies affected.`)}return a.length===0?`
       <section class="md-section">
         <h3 class="md-section-title">🛡 Dosha Status</h3>
         <div class="md-clear-card">✓ No active doshas or combustion warnings</div>
@@ -2381,7 +2381,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         ${a.map(t=>`<li class="md-warning-item">${t}</li>`).join("")}
       </ul>
     </section>
-  `}function gn(e){const{cls:a,label:t}=ke(e.score),i=Math.round(e.score),n=(e.layers??[]).map(r=>{const o=Math.round(r.score),{cls:d}=ke(r.score);return`
+  `}function vn(e){const{cls:a,label:t}=ye(e.score),i=Math.round(e.score),n=(e.layers??[]).map(r=>{const o=Math.round(r.score),{cls:d}=ye(r.score);return`
       <div class="score-layer">
         <span class="layer-name">${r.name}</span>
         <div class="layer-bar-wrap">
@@ -2404,10 +2404,10 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         ${n?`<div class="score-layers">${n}</div>`:""}
       </div>
     </section>
-  `}function fn(e,a){return`
+  `}function mn(e,a){return`
     <section class="md-section">
       <h3 class="md-section-title">🎯 Event Suitability</h3>
-      <div class="md-event-grid">${va.map(i=>{const n=e[i.slug]??null,s=n!==null?Math.round(n):a?Math.round(a.score):null,{cls:r,label:o}=s!==null?ke(s):{cls:"grade-na",label:"—"};return`
+      <div class="md-event-grid">${da.map(i=>{const n=e[i.slug]??null,s=n!==null?Math.round(n):a?Math.round(a.score):null,{cls:r,label:o}=s!==null?ye(s):{cls:"grade-na",label:"—"};return`
       <div class="md-event-card ${r}">
         <div class="event-icon">${i.icon}</div>
         <div class="event-label">${i.label}</div>
@@ -2418,7 +2418,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
     `}).join("")}</div>
       ${Object.keys(e).length?"":'<p class="md-note">Scores shown are general. Add a kundali for personalized event ratings.</p>'}
     </section>
-  `}function Qe(e){return`<div class="error-card" style="margin: var(--space-6) 0;"><p>${e}</p></div>`}function yn(e){Be(),he=setInterval(()=>{W--;const a=e.querySelector("#refresh-badge");a&&(a.textContent=`⏱ ${W}s`),W<=0&&(W=Y)},1e3),be=setInterval(async()=>{W=Y,await ma(e)},Y*1e3)}function Be(){be&&(clearInterval(be),be=null),he&&(clearInterval(he),he=null)}wn();function wn(){const e="muhurta-dashboard-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
+  `}function Ge(e){return`<div class="error-card" style="margin: var(--space-6) 0;"><p>${e}</p></div>`}function bn(e){Me(),me=setInterval(()=>{j--;const a=e.querySelector("#refresh-badge");a&&(a.textContent=`⏱ ${j}s`),j<=0&&(j=U)},1e3),ve=setInterval(async()=>{j=U,await ua(e)},U*1e3)}function Me(){ve&&(clearInterval(ve),ve=null),me&&(clearInterval(me),me=null)}hn();function hn(){const e="muhurta-dashboard-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
 /* ── Muhurta Dashboard Layout ── */
 .muhurta-dashboard .screen-header { display:flex; align-items:center; gap:var(--space-3); }
 .muhurta-dashboard .header-right { margin-left:auto; display:flex; align-items:center; gap:var(--space-2); }
@@ -2590,7 +2590,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
   .md-event-card.grade-f { background:#3b0a14; }
 }
 .md-note { font-size:var(--font-size-xs); color:var(--color-text-secondary); margin-top:var(--space-2); text-align:center; }
-`,document.head.appendChild(a)}const O=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"],Q={Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17},Z={Sun:"☀",Moon:"☽",Mars:"♂",Mercury:"☿",Jupiter:"♃",Venus:"♀",Saturn:"♄",Rahu:"☊",Ketu:"☋"},X={Sun:"#d97706",Moon:"#6366f1",Mars:"#dc2626",Mercury:"#16a34a",Jupiter:"#d97706",Venus:"#db2777",Saturn:"#7c3aed",Rahu:"#475569",Ketu:"#92400e"};function kn(e,a){const t=Date.now(),i=[];let n=e.getTime();for(let s=0;s<9;s++){const r=(a+s)%9,o=O[r],d=Q[o]*365.25*864e5,l=new Date(n),b=new Date(n+d),u=t>=l.getTime()&&t<b.getTime(),v=t>=b.getTime();i.push({lord:o,start:l,end:b,idx:s,isCurrent:u,isPast:v,antars:xn({lord:o,start:l})}),n+=d}return i}function xn(e){const a=Date.now(),t=O.indexOf(e.lord),i=Q[e.lord],n=[];let s=e.start.getTime();for(let r=0;r<9;r++){const o=(t+r)%9,d=O[o],l=Q[d]/120*i*365.25*864e5,b=new Date(s),u=new Date(s+l),v=a>=b.getTime()&&a<u.getTime(),c={lord:d,start:b,end:u};v&&(c.pratyantar=$n({lord:d,start:b,end:u})),n.push(c),s+=l}return n}function $n(e,a){const t=O.indexOf(e.lord),i=e.end.getTime()-e.start.getTime(),n=120,s=[];let r=e.start.getTime();for(let o=0;o<9;o++){const d=(t+o)%9,l=O[d],u=Q[l]/n*i,v=new Date(r),c=new Date(r+u);s.push({lord:l,start:v,end:c}),r+=u}return s}function ee(e){return e.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}function H(e){return e.toLocaleDateString("en-IN",{month:"short",year:"numeric"})}function ba(e,a){const t=(a.getTime()-e.getTime())/315576e5;if(t>=1)return`${t.toFixed(1)}y`;const i=t*12;return i>=1?`${i.toFixed(1)}m`:`${Math.round(t*365)}d`}function Sn(e,a){const t=Date.now();return t<=e.getTime()?0:t>=a.getTime()?100:Math.round((t-e.getTime())/(a.getTime()-e.getTime())*100)}let De,oe=-1;async function En(){const e=N();B(e);const a=window.location.hash.includes("?")?window.location.hash.split("?")[1]:"",i=new URLSearchParams(a).get("kundali_id");if(!i){e.innerHTML=ge("Missing kundali_id parameter.");return}De=parseInt(i,10),e.innerHTML=In(),ha(e);try{const n=await Ee(De);if(!n.ok||!n.data){e.innerHTML=ge(n.data?.error??"Failed to load chart data.");return}const{chart:s,kundali:r}=n.data;ga(e,s,r)}catch(n){console.error("[dasha-timeline]",n),e.innerHTML=ge("Connection error. Please try again.")}}function In(){return`
+`,document.head.appendChild(a)}const R=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"],G={Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17},Y={Sun:"☀",Moon:"☽",Mars:"♂",Mercury:"☿",Jupiter:"♃",Venus:"♀",Saturn:"♄",Rahu:"☊",Ketu:"☋"},J={Sun:"#d97706",Moon:"#6366f1",Mars:"#dc2626",Mercury:"#16a34a",Jupiter:"#d97706",Venus:"#db2777",Saturn:"#7c3aed",Rahu:"#475569",Ketu:"#92400e"};function gn(e,a){const t=Date.now(),i=[];let n=e.getTime();for(let s=0;s<9;s++){const r=(a+s)%9,o=R[r],d=G[o]*365.25*864e5,l=new Date(n),m=new Date(n+d),u=t>=l.getTime()&&t<m.getTime(),v=t>=m.getTime();i.push({lord:o,start:l,end:m,idx:s,isCurrent:u,isPast:v,antars:fn({lord:o,start:l})}),n+=d}return i}function fn(e){const a=Date.now(),t=R.indexOf(e.lord),i=G[e.lord],n=[];let s=e.start.getTime();for(let r=0;r<9;r++){const o=(t+r)%9,d=R[o],l=G[d]/120*i*365.25*864e5,m=new Date(s),u=new Date(s+l),v=a>=m.getTime()&&a<u.getTime(),c={lord:d,start:m,end:u};v&&(c.pratyantar=yn({lord:d,start:m,end:u})),n.push(c),s+=l}return n}function yn(e,a){const t=R.indexOf(e.lord),i=e.end.getTime()-e.start.getTime(),n=120,s=[];let r=e.start.getTime();for(let o=0;o<9;o++){const d=(t+o)%9,l=R[d],u=G[l]/n*i,v=new Date(r),c=new Date(r+u);s.push({lord:l,start:v,end:c}),r+=u}return s}function Q(e){return e.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}function q(e){return e.toLocaleDateString("en-IN",{month:"short",year:"numeric"})}function pa(e,a){const t=(a.getTime()-e.getTime())/315576e5;if(t>=1)return`${t.toFixed(1)}y`;const i=t*12;return i>=1?`${i.toFixed(1)}m`:`${Math.round(t*365)}d`}function wn(e,a){const t=Date.now();return t<=e.getTime()?0:t>=a.getTime()?100:Math.round((t-e.getTime())/(a.getTime()-e.getTime())*100)}let Ne,ie=-1;async function kn(){const e=N();B(e);const a=window.location.hash.includes("?")?window.location.hash.split("?")[1]:"",i=new URLSearchParams(a).get("kundali_id");if(!i){e.innerHTML=be("Missing kundali_id parameter.");return}Ne=parseInt(i,10),e.innerHTML=xn(),va(e);try{const n=await $e(Ne);if(!n.ok||!n.data){e.innerHTML=be(n.data?.error??"Failed to load chart data.");return}const{chart:s,kundali:r}=n.data;ma(e,s,r)}catch(n){console.error("[dasha-timeline]",n),e.innerHTML=be("Connection error. Please try again.")}}function xn(){return`
     <div class="screen dasha-timeline">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2600,7 +2600,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="spinner" style="margin: 40px auto;"></div>
       </div>
     </div>
-  `}function ha(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(`/birth-chart?id=${De}`)})}function ga(e,a,t){const{dasha:i,janmaNakshatra:n}=a;if(!i){e.innerHTML=ge("Dasha calculation unavailable for this chart.");return}const s=n.lord,r=O.indexOf(s),o=new Date(i.maha.start),d=i.maha.lord,l=O.indexOf(d);let b=o.getTime(),u=0;if(r!==-1&&l!==-1){u=(l-r+9)%9;for(let h=0;h<u;h++){const L=O[(r+h)%9];b-=Q[L]*365.25*864e5}}const v=kn(new Date(b),r!==-1?r:l),c=v.findIndex(h=>h.isCurrent);oe===-1&&(oe=c>=0?c:0);const p=v[0].start,g=v[v.length-1].end.getTime()-p.getTime(),y=v[oe],$=y.antars.find(h=>Date.now()>=h.start.getTime()&&Date.now()<h.end.getTime())??null;e.innerHTML=`
+  `}function va(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(`/birth-chart?id=${Ne}`)})}function ma(e,a,t){const{dasha:i,janmaNakshatra:n}=a;if(!i){e.innerHTML=be("Dasha calculation unavailable for this chart.");return}const s=n.lord,r=R.indexOf(s),o=new Date(i.maha.start),d=i.maha.lord,l=R.indexOf(d);let m=o.getTime(),u=0;if(r!==-1&&l!==-1){u=(l-r+9)%9;for(let h=0;h<u;h++){const T=R[(r+h)%9];m-=G[T]*365.25*864e5}}const v=gn(new Date(m),r!==-1?r:l),c=v.findIndex(h=>h.isCurrent);ie===-1&&(ie=c>=0?c:0);const p=v[0].start,g=v[v.length-1].end.getTime()-p.getTime(),y=v[ie],$=y.antars.find(h=>Date.now()>=h.start.getTime()&&Date.now()<h.end.getTime())??null;e.innerHTML=`
     <div class="screen dasha-timeline">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2610,13 +2610,13 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         </div>
       </header>
       <div class="dt-body">
-        ${Tn(n,i)}
-        ${Ln(v,p,g)}
-        ${Pn(v)}
-        ${Cn(y,$)}
+        ${$n(n,i)}
+        ${Sn(v,p,g)}
+        ${En(v)}
+        ${In(y,$)}
       </div>
     </div>
-  `,ha(e),zn(e,v,a,t)}function Tn(e,a){return`
+  `,va(e),Ln(e,v,a,t)}function $n(e,a){return`
     <section class="dt-section">
       <div class="dt-janma-card">
         <div class="dt-janma-nak">
@@ -2627,23 +2627,23 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="dt-current-dasha">
           <div class="dt-maha-now">
             <span class="dt-label">Mahadasha</span>
-            <span class="dt-lord" style="color:${X[a.maha.lord]??"inherit"}">
-              ${Z[a.maha.lord]??""} ${a.maha.lord}
+            <span class="dt-lord" style="color:${J[a.maha.lord]??"inherit"}">
+              ${Y[a.maha.lord]??""} ${a.maha.lord}
             </span>
-            <span class="dt-window">${H(new Date(a.maha.start))} → ${H(new Date(a.maha.end))}</span>
+            <span class="dt-window">${q(new Date(a.maha.start))} → ${q(new Date(a.maha.end))}</span>
           </div>
           <div class="dt-antar-now">
             <span class="dt-label">Antardasha</span>
-            <span class="dt-lord" style="color:${X[a.antar.lord]??"inherit"}">
-              ${Z[a.antar.lord]??""} ${a.antar.lord}
+            <span class="dt-lord" style="color:${J[a.antar.lord]??"inherit"}">
+              ${Y[a.antar.lord]??""} ${a.antar.lord}
             </span>
-            <span class="dt-window">${H(new Date(a.antar.start))} → ${H(new Date(a.antar.end))}</span>
+            <span class="dt-window">${q(new Date(a.antar.start))} → ${q(new Date(a.antar.end))}</span>
           </div>
         </div>
       </div>
     </section>
-  `}function Ln(e,a,t){const i=e.map(s=>{const r=((s.start.getTime()-a.getTime())/t*100).toFixed(2),o=((s.end.getTime()-s.start.getTime())/t*100).toFixed(2),d=X[s.lord]??"#888";return`<div class="${s.isCurrent?"tl-seg current":s.isPast?"tl-seg past":"tl-seg future"}" style="left:${r}%;width:${o}%;background:${d}${s.isPast?"66":s.isCurrent?"":"33"};"
-              title="${s.lord}: ${H(s.start)}–${H(s.end)}">
+  `}function Sn(e,a,t){const i=e.map(s=>{const r=((s.start.getTime()-a.getTime())/t*100).toFixed(2),o=((s.end.getTime()-s.start.getTime())/t*100).toFixed(2),d=J[s.lord]??"#888";return`<div class="${s.isCurrent?"tl-seg current":s.isPast?"tl-seg past":"tl-seg future"}" style="left:${r}%;width:${o}%;background:${d}${s.isPast?"66":s.isCurrent?"":"33"};"
+              title="${s.lord}: ${q(s.start)}–${q(s.end)}">
               <span class="tl-seg-label">${s.lord}</span>
             </div>`}).join(""),n=e.length>0?Math.max(0,Math.min(100,(Date.now()-a.getTime())/t*100)).toFixed(2):"0";return`
     <section class="dt-section">
@@ -2653,26 +2653,26 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="tl-now-marker" style="left:${n}%" title="Today"></div>
       </div>
       <div class="dt-timeline-labels">
-        <span>${H(e[0]?.start??new Date)}</span>
+        <span>${q(e[0]?.start??new Date)}</span>
         <span>Today</span>
-        <span>${H(e[e.length-1]?.end??new Date)}</span>
+        <span>${q(e[e.length-1]?.end??new Date)}</span>
       </div>
     </section>
-  `}function Pn(e){return`
+  `}function En(e){return`
     <section class="dt-section">
       <h3 class="dt-section-title">🪐 Mahadasha Periods <span class="dt-hint">Tap to expand</span></h3>
       <div class="dt-maha-list" id="maha-list">
-        ${e.map((t,i)=>{const n=t.isCurrent?Sn(t.start,t.end):t.isPast?100:0,s=X[t.lord]??"#888";return`
-      <div class="${t.isCurrent?"maha-card current":t.isPast?"maha-card past":"maha-card future"}${i===oe?" selected":""}" data-maha-idx="${i}" style="--planet-color:${s}">
+        ${e.map((t,i)=>{const n=t.isCurrent?wn(t.start,t.end):t.isPast?100:0,s=J[t.lord]??"#888";return`
+      <div class="${t.isCurrent?"maha-card current":t.isPast?"maha-card past":"maha-card future"}${i===ie?" selected":""}" data-maha-idx="${i}" style="--planet-color:${s}">
         <div class="maha-left">
-          <div class="maha-glyph">${Z[t.lord]??""}</div>
+          <div class="maha-glyph">${Y[t.lord]??""}</div>
           <div class="maha-info">
             <div class="maha-lord">${t.lord}</div>
-            <div class="maha-years">${Q[t.lord]}y</div>
+            <div class="maha-years">${G[t.lord]}y</div>
           </div>
         </div>
         <div class="maha-right">
-          <div class="maha-window">${ee(t.start)} → ${ee(t.end)}</div>
+          <div class="maha-window">${Q(t.start)} → ${Q(t.end)}</div>
           ${t.isCurrent?`
             <div class="maha-progress-wrap">
               <div class="maha-progress-bar" style="width:${n}%;background:${s}"></div>
@@ -2685,41 +2685,41 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
     `}).join("")}
       </div>
     </section>
-  `}function Cn(e,a){const t=e.antars.map(n=>{const s=Date.now()>=n.start.getTime()&&Date.now()<n.end.getTime(),r=Date.now()>=n.end.getTime(),o=X[n.lord]??"#888";return`
+  `}function In(e,a){const t=e.antars.map(n=>{const s=Date.now()>=n.start.getTime()&&Date.now()<n.end.getTime(),r=Date.now()>=n.end.getTime(),o=J[n.lord]??"#888";return`
       <div class="${s?"antar-row current":r?"antar-row past":"antar-row future"}">
         <div class="antar-left">
-          <span class="antar-glyph" style="color:${o}">${Z[n.lord]??""}</span>
+          <span class="antar-glyph" style="color:${o}">${Y[n.lord]??""}</span>
           <span class="antar-lord">${n.lord}</span>
           ${s?'<span class="antar-now-badge">NOW</span>':""}
         </div>
         <div class="antar-right">
-          <span class="antar-window">${ee(n.start)} → ${ee(n.end)}</span>
-          <span class="antar-dur">${ba(n.start,n.end)}</span>
+          <span class="antar-window">${Q(n.start)} → ${Q(n.end)}</span>
+          <span class="antar-dur">${pa(n.start,n.end)}</span>
         </div>
       </div>
-    `}).join(""),i=a?.pratyantar?An(a):"";return`
+    `}).join(""),i=a?.pratyantar?Tn(a):"";return`
     <section class="dt-section">
       <h3 class="dt-section-title">
-        🔵 Antardashas — ${Z[e.lord]??""} ${e.lord} Maha
-        <span class="dt-hint">(${H(e.start)} – ${H(e.end)})</span>
+        🔵 Antardashas — ${Y[e.lord]??""} ${e.lord} Maha
+        <span class="dt-hint">(${q(e.start)} – ${q(e.end)})</span>
       </h3>
       <div class="dt-antar-list">${t}</div>
       ${i}
     </section>
-  `}function An(e){if(!e.pratyantar?.length)return"";const a=e.pratyantar.map(t=>{const i=Date.now()>=t.start.getTime()&&Date.now()<t.end.getTime(),n=Date.now()>=t.end.getTime(),s=X[t.lord]??"#888";return`
+  `}function Tn(e){if(!e.pratyantar?.length)return"";const a=e.pratyantar.map(t=>{const i=Date.now()>=t.start.getTime()&&Date.now()<t.end.getTime(),n=Date.now()>=t.end.getTime(),s=J[t.lord]??"#888";return`
       <div class="${i?"prat-row current":n?"prat-row past":"prat-row"}">
-        <span class="prat-glyph" style="color:${s}">${Z[t.lord]??""}</span>
+        <span class="prat-glyph" style="color:${s}">${Y[t.lord]??""}</span>
         <span class="prat-lord">${t.lord}</span>
         ${i?'<span class="prat-now-badge">NOW</span>':""}
-        <span class="prat-window">${ee(t.start)} – ${ee(t.end)}</span>
-        <span class="prat-dur">${ba(t.start,t.end)}</span>
+        <span class="prat-window">${Q(t.start)} – ${Q(t.end)}</span>
+        <span class="prat-dur">${pa(t.start,t.end)}</span>
       </div>
     `}).join("");return`
     <div class="dt-prat-section">
       <h4 class="dt-section-title">🔴 Pratyantar — ${e.lord} Antar</h4>
       <div class="dt-prat-list">${a}</div>
     </div>
-  `}function ge(e){return`
+  `}function be(e){return`
     <div class="screen dasha-timeline">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2729,7 +2729,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="error-card"><p>${e}</p></div>
       </div>
     </div>
-  `}function zn(e,a,t,i){e.querySelectorAll(".maha-card").forEach(n=>{n.addEventListener("click",()=>{oe=parseInt(n.dataset.mahaIdx??"0",10),ga(e,t,i)})})}Mn();function Mn(){const e="dasha-timeline-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
+  `}function Ln(e,a,t,i){e.querySelectorAll(".maha-card").forEach(n=>{n.addEventListener("click",()=>{ie=parseInt(n.dataset.mahaIdx??"0",10),ma(e,t,i)})})}Cn();function Cn(){const e="dasha-timeline-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
 /* ── Dasha Timeline Layout ── */
 .dasha-timeline .screen-header { display:flex; align-items:center; gap:var(--space-3); }
 .dasha-timeline .subtitle { font-size:var(--font-size-xs); color:var(--color-text-secondary); }
@@ -2805,7 +2805,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
 .prat-now-badge { font-size:var(--font-size-xs); font-weight:700; padding:1px 5px; border-radius:99px; background:#dc2626; color:#fff; margin-right:4px; }
 .prat-window { flex:1; color:var(--color-text-secondary); }
 .prat-dur { font-weight:600; color:var(--color-text-secondary); }
-`,document.head.appendChild(a)}const Nn={I:"Self, Health, Appearance",II:"Wealth, Family, Speech",III:"Courage, Siblings, Short Trips",IV:"Property, Mother, Happiness",V:"Children, Intelligence, Speculation",VI:"Enemies, Disease, Service",VII:"Marriage, Business Partners",VIII:"Longevity, Hidden, Inheritance",IX:"Luck, Father, Dharma",X:"Career, Status, Authority",XI:"Gains, Desires, Elder Siblings",XII:"Loss, Abroad, Liberation"},Re={Sun:"☀",Moon:"☽",Mars:"♂",Mercury:"☿",Jupiter:"♃",Venus:"♀",Saturn:"♄",Rahu:"☊",Ketu:"☋"},Oe={Sun:"#d97706",Moon:"#6366f1",Mars:"#dc2626",Mercury:"#16a34a",Jupiter:"#b45309",Venus:"#db2777",Saturn:"#7c3aed",Rahu:"#475569",Ketu:"#92400e"},fa={Aries:"Ar",Taurus:"Ta",Gemini:"Ge",Cancer:"Cn",Leo:"Le",Virgo:"Vi",Libra:"Li",Scorpio:"Sc",Sagittarius:"Sg",Capricorn:"Cp",Aquarius:"Aq",Pisces:"Pi"};let _e,fe="cusps";async function Bn(){const e=N();B(e);const a=window.location.hash.includes("?")?window.location.hash.split("?")[1]:"",i=new URLSearchParams(a).get("kundali_id");if(!i){e.innerHTML=Ce("Missing kundali_id parameter.");return}_e=parseInt(i,10),e.innerHTML=qn(),ka(e);try{const n=await _a(_e);if(!n.ok||!n.data){e.innerHTML=Ce(n.data?.error??"Failed to load KP chart.");return}ya(e,n.data)}catch(n){console.error("[kp-sublords]",n),e.innerHTML=Ce("Connection error. Please try again.")}}function ya(e,a){e.innerHTML=`
+`,document.head.appendChild(a)}const Pn={I:"Self, Health, Appearance",II:"Wealth, Family, Speech",III:"Courage, Siblings, Short Trips",IV:"Property, Mother, Happiness",V:"Children, Intelligence, Speculation",VI:"Enemies, Disease, Service",VII:"Marriage, Business Partners",VIII:"Longevity, Hidden, Inheritance",IX:"Luck, Father, Dharma",X:"Career, Status, Authority",XI:"Gains, Desires, Elder Siblings",XII:"Loss, Abroad, Liberation"},qe={Sun:"☀",Moon:"☽",Mars:"♂",Mercury:"☿",Jupiter:"♃",Venus:"♀",Saturn:"♄",Rahu:"☊",Ketu:"☋"},He={Sun:"#d97706",Moon:"#6366f1",Mars:"#dc2626",Mercury:"#16a34a",Jupiter:"#b45309",Venus:"#db2777",Saturn:"#7c3aed",Rahu:"#475569",Ketu:"#92400e"},ba={Aries:"Ar",Taurus:"Ta",Gemini:"Ge",Cancer:"Cn",Leo:"Le",Virgo:"Vi",Libra:"Li",Scorpio:"Sc",Sagittarius:"Sg",Capricorn:"Cp",Aquarius:"Aq",Pisces:"Pi"};let Be,he="cusps";async function An(){const e=N();B(e);const a=window.location.hash.includes("?")?window.location.hash.split("?")[1]:"",i=new URLSearchParams(a).get("kundali_id");if(!i){e.innerHTML=Le("Missing kundali_id parameter.");return}Be=parseInt(i,10),e.innerHTML=Nn(),fa(e);try{const n=await Aa(Be);if(!n.ok||!n.data){e.innerHTML=Le(n.data?.error??"Failed to load KP chart.");return}ha(e,n.data)}catch(n){console.error("[kp-sublords]",n),e.innerHTML=Le("Connection error. Please try again.")}}function ha(e,a){e.innerHTML=`
     <div class="screen kp-sublords">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2816,21 +2816,21 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       </header>
 
       <div class="kp-tabs" role="tablist">
-        <button class="kp-tab${fe==="cusps"?" active":""}" data-tab="cusps" role="tab">
+        <button class="kp-tab${he==="cusps"?" active":""}" data-tab="cusps" role="tab">
           🏠 Bhavas (12)
         </button>
-        <button class="kp-tab${fe==="planets"?" active":""}" data-tab="planets" role="tab">
+        <button class="kp-tab${he==="planets"?" active":""}" data-tab="planets" role="tab">
           🪐 Planets (${a.planet_sub_lords.length})
         </button>
       </div>
 
       <div class="kp-body">
-        ${fe==="cusps"?Dn(a.house_cusps):_n(a.planet_sub_lords)}
+        ${he==="cusps"?zn(a.house_cusps):Mn(a.planet_sub_lords)}
       </div>
 
       <div class="kp-caveat">${a.ayanamsa_caveat}</div>
     </div>
-  `,ka(e),Hn(e,a)}function Dn(e){return`
+  `,fa(e),Bn(e,a)}function zn(e){return`
     <div class="kp-legend">
       <span class="kp-legend-item"><strong>Star Lord</strong> — Nakshatra lord of the cusp</span>
       <span class="kp-legend-sep">→</span>
@@ -2838,7 +2838,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <span class="kp-legend-sep">→</span>
       <span class="kp-legend-item"><strong>Sub²</strong> — Sub-sub lord (fine-tuning)</span>
     </div>
-    <div class="kp-rows">${e.map(t=>{const i=Nn[t.house]??"",n=t.sign??"",s=fa[n]??n.slice(0,2),r=t.deg_in_sign.toFixed(2);return`
+    <div class="kp-rows">${e.map(t=>{const i=Pn[t.house]??"",n=t.sign??"",s=ba[n]??n.slice(0,2),r=t.deg_in_sign.toFixed(2);return`
       <div class="kp-row">
         <div class="kp-row-header">
           <div class="kp-house-badge">H${t.house}</div>
@@ -2848,18 +2848,18 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           </div>
         </div>
         <div class="kp-chain">
-          ${J("Star",t.star_lord)}
-          ${Se()}
-          ${J("Sub",t.sub_lord,!0)}
-          ${Se()}
-          ${J("Sub²",t.sub_sub_lord)}
+          ${W("Star",t.star_lord)}
+          ${xe()}
+          ${W("Sub",t.sub_lord,!0)}
+          ${xe()}
+          ${W("Sub²",t.sub_sub_lord)}
         </div>
         <div class="kp-sign-lord-line">
-          Sign lord: ${wa(t.sign_lord)}
+          Sign lord: ${ga(t.sign_lord)}
         </div>
       </div>
     `}).join("")}</div>
-  `}function _n(e){return`
+  `}function Mn(e){return`
     <div class="kp-legend">
       <span class="kp-legend-item"><strong>Star Lord</strong> — Nakshatra lord of the planet</span>
       <span class="kp-legend-sep">→</span>
@@ -2867,7 +2867,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <span class="kp-legend-sep">→</span>
       <span class="kp-legend-item"><strong>Sub²</strong> — Sub-sub lord (finer detail)</span>
     </div>
-    <div class="kp-rows">${e.map(t=>{const i=t.sign??"",n=fa[i]??i.slice(0,2),s=t.deg_in_sign.toFixed(2),r=Oe[t.planet]??"#888",o=Re[t.planet]??"";return`
+    <div class="kp-rows">${e.map(t=>{const i=t.sign??"",n=ba[i]??i.slice(0,2),s=t.deg_in_sign.toFixed(2),r=He[t.planet]??"#888",o=qe[t.planet]??"";return`
       <div class="kp-row">
         <div class="kp-row-header">
           <div class="kp-planet-badge" style="color:${r}">
@@ -2878,25 +2878,25 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           </div>
         </div>
         <div class="kp-chain">
-          ${J("Star",t.star_lord)}
-          ${Se()}
-          ${J("Sub",t.sub_lord,!0)}
-          ${Se()}
-          ${J("Sub²",t.sub_sub_lord)}
+          ${W("Star",t.star_lord)}
+          ${xe()}
+          ${W("Sub",t.sub_lord,!0)}
+          ${xe()}
+          ${W("Sub²",t.sub_sub_lord)}
         </div>
         <div class="kp-sign-lord-line">
-          Sign lord: ${wa(t.sign_lord)}
+          Sign lord: ${ga(t.sign_lord)}
         </div>
       </div>
     `}).join("")}</div>
-  `}function J(e,a,t=!1){const i=Oe[a]??"#888",n=Re[a]??"";return`
+  `}function W(e,a,t=!1){const i=He[a]??"#888",n=qe[a]??"";return`
     <div class="kp-chain-cell${t?" prime":""}">
       <div class="kp-chain-label">${e}</div>
       <div class="kp-chain-lord" style="color:${i}">
         ${n} ${a}
       </div>
     </div>
-  `}function Se(){return'<div class="kp-chain-arrow">→</div>'}function wa(e){const a=Oe[e]??"#888",t=Re[e]??"";return`<span class="lord-chip" style="color:${a}">${t} ${e}</span>`}function qn(){return`
+  `}function xe(){return'<div class="kp-chain-arrow">→</div>'}function ga(e){const a=He[e]??"#888",t=qe[e]??"";return`<span class="lord-chip" style="color:${a}">${t} ${e}</span>`}function Nn(){return`
     <div class="screen kp-sublords">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2906,7 +2906,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="spinner" style="margin:40px auto"></div>
       </div>
     </div>
-  `}function Ce(e){return`
+  `}function Le(e){return`
     <div class="screen kp-sublords">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2916,7 +2916,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="error-card"><p>${e}</p></div>
       </div>
     </div>
-  `}function ka(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(`/birth-chart?id=${_e}`)})}function Hn(e,a){e.querySelectorAll(".kp-tab").forEach(t=>{t.addEventListener("click",()=>{fe=t.dataset.tab??"cusps",ya(e,a)})})}Rn();function Rn(){const e="kp-sublords-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
+  `}function fa(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(`/birth-chart?id=${Be}`)})}function Bn(e,a){e.querySelectorAll(".kp-tab").forEach(t=>{t.addEventListener("click",()=>{he=t.dataset.tab??"cusps",ha(e,a)})})}Dn();function Dn(){const e="kp-sublords-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
 /* ── KP Sub-Lords screen ── */
 .kp-sublords .screen-header { display:flex; align-items:center; gap:var(--space-3); }
 .kp-sublords .subtitle { font-size:var(--font-size-xs); color:var(--color-text-secondary); }
@@ -2960,7 +2960,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
 
 /* Caveat */
 .kp-caveat { font-size:var(--font-size-xs); color:var(--color-text-secondary); padding:var(--space-3) var(--space-4) var(--space-6); line-height:1.5; border-top:1px solid var(--color-border); margin-top:var(--space-2); }
-`,document.head.appendChild(a)}const Ze={property:{slug:"property",label:"Property Purchase",emoji:"🏠",defaultWindowDays:30,color:"#16a34a",scoringNotes:["Moon in 4th house sign (Cancer) or aspecting it = strong for property","4th house sub-lord (KP) must signify 4, 11 — not 8, 12","Venus hora or Jupiter hora preferred (wealth + expansion)","Avoid Panchaka Dosha for property transactions","Vastu direction: prefer East or North muhurta times"],auspiciousHoras:["Venus","Jupiter","Mercury"]},marriage:{slug:"marriage",label:"Marriage Muhurta",emoji:"💍",defaultWindowDays:60,color:"#db2777",scoringNotes:["7th house sub-lord (KP) must signify 1, 2, 7, 11 — not 6, 8, 12","Moon + Venus strong (no combustion, no debilitation)","Venus hora preferred; avoid Saturn hora for auspicious ceremonies","Navpancham / Trikona Tara between bride and groom is ideal","Avoid Ashtama Navamsha (Lagna in 8th part of sign during ceremony)"],auspiciousHoras:["Venus","Jupiter","Moon"]},business:{slug:"business",label:"Business Launch",emoji:"🏢",defaultWindowDays:30,color:"#2563eb",scoringNotes:["10th house sub-lord (KP) must signify 1, 6, 10, 11","Mercury hora for registration/contracts; Sun hora for authority/leadership","Moon in waxing phase (Shukla Paksha) for new ventures","Avoid Rahu hora for business starts (instability, hidden obstacles)","Jupiter must not be in 6, 8, 12 from Lagna (Guru Chandal Dosha check)"],auspiciousHoras:["Mercury","Sun","Jupiter"]},medical:{slug:"medical",label:"Medical / Surgery",emoji:"🏥",defaultWindowDays:14,color:"#dc2626",scoringNotes:["Moon must be strong — not in 8th house, not debilitated (Scorpio), not eclipsed","Avoid Ashtami (8th Tithi) and Krishna Chaturdashi (14th dark fortnight)","8th house sub-lord (KP) must NOT signify 2, 7 (maraka houses)","Sun hora for surgeries involving head/eye; Mars hora for procedures","Avoid Ganda Moola nakshatras — flag shown if active in selected window"],auspiciousHoras:["Sun","Mercury","Jupiter"]}};let F=null,Xe="property",se=null,re=null;async function On(){const e=N();B(e);const a=window.location.hash,t=a.includes("?")?a.split("?")[1]:"",i=new URLSearchParams(t),n=i.get("purpose")??"property";Xe=Ze[n]?n:"property";const s=i.get("kundali_id");F=s?parseInt(s,10):null;const r=Ze[Xe];if(e.innerHTML=Un(r),xa(e),F&&!isNaN(F))try{const o=await Ee(F);if(o.ok&&o.data){const{kundali:d}=o.data;se=d.latitude,re=d.longitude}}catch{}Kn(e,r)}function Kn(e,a){const t=new Date().toISOString().slice(0,10),i=new Date(Date.now()+a.defaultWindowDays*864e5).toISOString().slice(0,10),n=se!==null?se.toFixed(4):"",s=re!==null?re.toFixed(4):"",r=se!==null&&re!==null;e.innerHTML=`
+`,document.head.appendChild(a)}const Ye={property:{slug:"property",label:"Property Purchase",emoji:"🏠",defaultWindowDays:30,color:"#16a34a",scoringNotes:["Moon in 4th house sign (Cancer) or aspecting it = strong for property","4th house sub-lord (KP) must signify 4, 11 — not 8, 12","Venus hora or Jupiter hora preferred (wealth + expansion)","Avoid Panchaka Dosha for property transactions","Vastu direction: prefer East or North muhurta times"],auspiciousHoras:["Venus","Jupiter","Mercury"]},marriage:{slug:"marriage",label:"Marriage Muhurta",emoji:"💍",defaultWindowDays:60,color:"#db2777",scoringNotes:["7th house sub-lord (KP) must signify 1, 2, 7, 11 — not 6, 8, 12","Moon + Venus strong (no combustion, no debilitation)","Venus hora preferred; avoid Saturn hora for auspicious ceremonies","Navpancham / Trikona Tara between bride and groom is ideal","Avoid Ashtama Navamsha (Lagna in 8th part of sign during ceremony)"],auspiciousHoras:["Venus","Jupiter","Moon"]},business:{slug:"business",label:"Business Launch",emoji:"🏢",defaultWindowDays:30,color:"#2563eb",scoringNotes:["10th house sub-lord (KP) must signify 1, 6, 10, 11","Mercury hora for registration/contracts; Sun hora for authority/leadership","Moon in waxing phase (Shukla Paksha) for new ventures","Avoid Rahu hora for business starts (instability, hidden obstacles)","Jupiter must not be in 6, 8, 12 from Lagna (Guru Chandal Dosha check)"],auspiciousHoras:["Mercury","Sun","Jupiter"]},medical:{slug:"medical",label:"Medical / Surgery",emoji:"🏥",defaultWindowDays:14,color:"#dc2626",scoringNotes:["Moon must be strong — not in 8th house, not debilitated (Scorpio), not eclipsed","Avoid Ashtami (8th Tithi) and Krishna Chaturdashi (14th dark fortnight)","8th house sub-lord (KP) must NOT signify 2, 7 (maraka houses)","Sun hora for surgeries involving head/eye; Mars hora for procedures","Avoid Ganda Moola nakshatras — flag shown if active in selected window"],auspiciousHoras:["Sun","Mercury","Jupiter"]}};let K=null,Je="property",te=null,ne=null;async function _n(){const e=N();B(e);const a=window.location.hash,t=a.includes("?")?a.split("?")[1]:"",i=new URLSearchParams(t),n=i.get("purpose")??"property";Je=Ye[n]?n:"property";const s=i.get("kundali_id");K=s?parseInt(s,10):null;const r=Ye[Je];if(e.innerHTML=Kn(r),ya(e),K&&!isNaN(K))try{const o=await $e(K);if(o.ok&&o.data){const{kundali:d}=o.data;te=d.latitude,ne=d.longitude}}catch{}qn(e,r)}function qn(e,a){const t=new Date().toISOString().slice(0,10),i=new Date(Date.now()+a.defaultWindowDays*864e5).toISOString().slice(0,10),n=te!==null?te.toFixed(4):"",s=ne!==null?ne.toFixed(4):"",r=te!==null&&ne!==null;e.innerHTML=`
     <div class="screen event-muhurta-screen" style="--purpose-color:${a.color}">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -2987,7 +2987,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
 
         ${r?`
         <div class="em-location-confirmed">
-          📍 Using birth location: ${se.toFixed(4)}°N, ${re.toFixed(4)}°E
+          📍 Using birth location: ${te.toFixed(4)}°N, ${ne.toFixed(4)}°E
           <input type="hidden" id="inp-lat" value="${n}" />
           <input type="hidden" id="inp-lon" value="${s}" />
         </div>
@@ -3030,19 +3030,19 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       <div id="em-results"></div>
 
     </div>
-  `,Wn(),xa(e),Fn(e,a)}function Fn(e,a){const t=e.querySelector("#btn-scan");t&&t.addEventListener("click",async()=>{const i=document.getElementById("em-error");i.style.display="none";const n=document.getElementById("inp-lat").value,s=document.getElementById("inp-lon").value,r=document.getElementById("inp-from").value,o=document.getElementById("inp-to").value,d=parseFloat(n),l=parseFloat(s);if(!Number.isFinite(d)||d<-90||d>90){K(i,"Latitude must be between -90 and 90.");return}if(!Number.isFinite(l)||l<-180||l>180){K(i,"Longitude must be between -180 and 180.");return}if(!r||!o){K(i,"Please select a date range.");return}const b=new Date(r),u=new Date(o+"T23:59:59");if(u<=b){K(i,"'To' date must be after 'From' date.");return}const v=(u.getTime()-b.getTime())/864e5;if(v>90){K(i,"Date range cannot exceed 90 days.");return}t.disabled=!0,t.textContent="Scanning…";const c=document.getElementById("em-results");c.innerHTML=`
+  `,Fn(),ya(e),Hn(e,a)}function Hn(e,a){const t=e.querySelector("#btn-scan");t&&t.addEventListener("click",async()=>{const i=document.getElementById("em-error");i.style.display="none";const n=document.getElementById("inp-lat").value,s=document.getElementById("inp-lon").value,r=document.getElementById("inp-from").value,o=document.getElementById("inp-to").value,d=parseFloat(n),l=parseFloat(s);if(!Number.isFinite(d)||d<-90||d>90){O(i,"Latitude must be between -90 and 90.");return}if(!Number.isFinite(l)||l<-180||l>180){O(i,"Longitude must be between -180 and 180.");return}if(!r||!o){O(i,"Please select a date range.");return}const m=new Date(r),u=new Date(o+"T23:59:59");if(u<=m){O(i,"'To' date must be after 'From' date.");return}const v=(u.getTime()-m.getTime())/864e5;if(v>90){O(i,"Date range cannot exceed 90 days.");return}t.disabled=!0,t.textContent="Scanning…";const c=document.getElementById("em-results");c.innerHTML=`
       <div style="padding:var(--space-6);text-align:center">
         <div class="spinner" style="margin:0 auto"></div>
         <p style="margin-top:var(--space-3);color:var(--color-text-secondary)">
           Scanning ${Math.ceil(v)} days for auspicious windows…
         </p>
       </div>
-    `;try{const p=await na({lat:d,lon:l,purpose:a.slug,kundali_id:F??void 0,from:b.toISOString(),to:u.toISOString(),top_n:20});p.ok?jn(c,p.data,a):(K(i,p.data?.error??"Scan failed. Please try again."),c.innerHTML="")}catch{K(i,"Connection error. Please try again."),c.innerHTML=""}finally{t.disabled=!1,t.textContent="Find Best Windows (costs 5 pts)"}})}function K(e,a){e.textContent=a,e.style.display="block"}function jn(e,a,t){const i=a.windows??[];if(i.length===0){e.innerHTML=`
+    `;try{const p=await ea({lat:d,lon:l,purpose:a.slug,kundali_id:K??void 0,from:m.toISOString(),to:u.toISOString(),top_n:20});p.ok?Rn(c,p.data,a):(O(i,p.data?.error??"Scan failed. Please try again."),c.innerHTML="")}catch{O(i,"Connection error. Please try again."),c.innerHTML=""}finally{t.disabled=!1,t.textContent="Find Best Windows (costs 5 pts)"}})}function O(e,a){e.textContent=a,e.style.display="block"}function Rn(e,a,t){const i=a.windows??[];if(i.length===0){e.innerHTML=`
       <div class="em-no-results">
         <p>No auspicious windows found in this range.</p>
         <p>Try a wider date range or different location.</p>
       </div>
-    `;return}const n=new Map;for(const r of i){const o=r.timestamp.slice(0,10);n.has(o)||n.set(o,[]),n.get(o).push(r)}const s=Array.from(n.entries()).map(([r,o])=>{const d=new Date(r+"T12:00:00").toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"}),l=o[0],b=o.map(u=>{const v=new Date(u.timestamp).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",timeZone:"UTC"}),c=u.tara?Vn(u.tara.beneficence):"",p=[u.panchaka_active?'<span class="em-flag em-flag-warn">⚠ Panchaka</span>':"",u.ganda_moola?'<span class="em-flag em-flag-warn">⚠ Ganda Moola</span>':"",u.dishashool_direction?`<span class="em-flag em-flag-warn">⚠ Dishashool: ${u.dishashool_direction}</span>`:"",t.auspiciousHoras.includes(u.hora_lord)?`<span class="em-flag em-flag-good">✓ ${u.hora_lord} hora</span>`:""].filter(Boolean).join(" ");return`
+    `;return}const n=new Map;for(const r of i){const o=r.timestamp.slice(0,10);n.has(o)||n.set(o,[]),n.get(o).push(r)}const s=Array.from(n.entries()).map(([r,o])=>{const d=new Date(r+"T12:00:00").toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"}),l=o[0],m=o.map(u=>{const v=new Date(u.timestamp).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",timeZone:"UTC"}),c=u.tara?On(u.tara.beneficence):"",p=[u.panchaka_active?'<span class="em-flag em-flag-warn">⚠ Panchaka</span>':"",u.ganda_moola?'<span class="em-flag em-flag-warn">⚠ Ganda Moola</span>':"",u.dishashool_direction?`<span class="em-flag em-flag-warn">⚠ Dishashool: ${u.dishashool_direction}</span>`:"",t.auspiciousHoras.includes(u.hora_lord)?`<span class="em-flag em-flag-good">✓ ${u.hora_lord} hora</span>`:""].filter(Boolean).join(" ");return`
         <div class="em-window-row">
           <div class="em-window-time">${v} IST</div>
           <div class="em-window-score">
@@ -3062,7 +3062,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
           <span class="em-day-date">${d}</span>
           <span class="em-day-best-score" style="color:var(--purpose-color)">${l.score.toFixed(0)}/100</span>
         </div>
-        <div class="em-windows">${b}</div>
+        <div class="em-windows">${m}</div>
       </div>
     `}).join("");e.innerHTML=`
     <section class="em-results-section">
@@ -3075,7 +3075,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
       </div>
       <div class="em-day-cards">${s}</div>
     </section>
-  `}function Vn(e){return e==="benefic"?"em-tara-good":e==="malefic"?"em-tara-bad":"em-tara-neutral"}function Un(e){return`
+  `}function On(e){return e==="benefic"?"em-tara-good":e==="malefic"?"em-tara-bad":"em-tara-neutral"}function Kn(e){return`
     <div class="screen event-muhurta-screen">
       <header class="screen-header">
         <button class="btn-back" id="btn-back">←</button>
@@ -3085,7 +3085,7 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
         <div class="spinner" style="margin:0 auto"></div>
       </div>
     </div>
-  `}function xa(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(F?`/birth-chart?id=${F}`:"/dashboard")})}function Wn(){const e="event-muhurta-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
+  `}function ya(e){e.querySelector("#btn-back")?.addEventListener("click",()=>{E(K?`/birth-chart?id=${K}`:"/dashboard")})}function Fn(){const e="event-muhurta-styles";if(document.getElementById(e))return;const a=document.createElement("style");a.id=e,a.textContent=`
 /* ── Event Muhurta Screen ── */
 .event-muhurta-screen .screen-header { display:flex; align-items:center; gap:var(--space-3); }
 .event-muhurta-screen .subtitle { font-size:var(--font-size-xs); color:var(--color-text-secondary); }
@@ -3144,4 +3144,4 @@ https://www.occultviision.com`,p=`https://wa.me/?text=${encodeURIComponent(c)}`;
 .em-flag-warn { background:rgba(245,158,11,0.15); color:#d97706; }
 .em-flag-good { background:rgba(22,163,74,0.12); color:#16a34a; }
 .em-no-results { margin:var(--space-4); padding:var(--space-6); text-align:center; color:var(--color-text-secondary); border:1px dashed var(--color-border); border-radius:var(--radius-md); }
-`,document.head.appendChild(a)}class Gn{routes=new Map;constructor(){this.routes.set("/home",dt),this.routes.set("/pricing",bt),this.routes.set("/features",ht),this.routes.set("/blog",yt),this.routes.set("/contact",wt),this.routes.set("/testimonials",ot),this.routes.set("/login",kt),this.routes.set("/dashboard",xt),this.routes.set("/muhurta",Pt),this.routes.set("/kundali",At),this.routes.set("/kundali-form",Nt),this.routes.set("/kp-query",Bt),this.routes.set("/scanner",Kt),this.routes.set("/wallet",Ft),this.routes.set("/referral",jt),this.routes.set("/admin",_t),this.routes.set("/birth-chart",Xt),this.routes.set("/muhurta-dashboard",on),this.routes.set("/dasha-timeline",En),this.routes.set("/kp-sublords",Bn),this.routes.set("/event-muhurta",On)}currentRoute(){return window.location.hash.slice(1)||"/home"}basePath(a){return a.split("?")[0]??a}async route(){const a=this.currentRoute(),t=this.routes.get(this.basePath(a));if(window.scrollTo(0,0),t)try{await t()}catch(i){console.error(`Route handler error for ${a}:`,i)}else{const i=this.routes.get("/home");i&&await i()}}}function E(e){window.location.hash=e}window.addEventListener("error",e=>{const a=e.error?.message||e.message||"Unknown error";console.error("Global error:",a,e),$a({type:"uncaught-error",message:a,filename:e.filename,lineno:e.lineno,stack:e.error?.stack}),x("An error occurred. Please refresh.",!0)});window.addEventListener("unhandledrejection",e=>{const a=e.reason?.message||String(e.reason)||"Unhandled promise rejection";console.error("Unhandled rejection:",a,e.reason),$a({type:"unhandled-rejection",message:a,stack:e.reason?.stack})});async function $a(e){try{await fetch("/api/log-error",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(e)}).catch(()=>{console.log("Error log endpoint not available")})}catch{}}async function Yn(){if(!("serviceWorker"in navigator)){console.log("Service Worker not supported");return}try{const e=await navigator.serviceWorker.register("/sw.js",{scope:"/"});console.log("Service Worker registered:",e),e.addEventListener("updatefound",()=>{const a=e.installing;a?.addEventListener("statechange",()=>{a.state==="installed"&&navigator.serviceWorker.controller&&x("Update available — refresh to get the latest version",!1)})})}catch(e){console.error("Service Worker registration failed:",e)}}async function ea(){Ca(),await La(),Yn(),window.toggleTheme=Aa,window.toggleLanguage=Pa;const e=new Gn;window.addEventListener("hashchange",async()=>{await e.route(),Te()}),window.addEventListener("i18n-language-changed",()=>{Te()}),await e.route(),Te(),console.log("OccultViision PWA initialized")}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",ea):ea();
+`,document.head.appendChild(a)}class jn{routes=new Map;constructor(){this.routes.set("/home",it),this.routes.set("/pricing",lt),this.routes.set("/features",dt),this.routes.set("/blog",vt),this.routes.set("/contact",mt),this.routes.set("/testimonials",at),this.routes.set("/login",bt),this.routes.set("/dashboard",ht),this.routes.set("/muhurta",$t),this.routes.set("/kundali",Et),this.routes.set("/kundali-form",Pt),this.routes.set("/kp-query",At),this.routes.set("/scanner",qt),this.routes.set("/wallet",Ht),this.routes.set("/referral",Rt),this.routes.set("/admin",Mt),this.routes.set("/birth-chart",Yt),this.routes.set("/muhurta-dashboard",tn),this.routes.set("/dasha-timeline",kn),this.routes.set("/kp-sublords",An),this.routes.set("/event-muhurta",_n)}currentRoute(){return window.location.hash.slice(1)||"/home"}basePath(a){return a.split("?")[0]??a}async route(){const a=this.currentRoute(),t=this.routes.get(this.basePath(a));if(window.scrollTo(0,0),t)try{await t()}catch(i){console.error(`Route handler error for ${a}:`,i)}else{const i=this.routes.get("/home");i&&await i()}}}function E(e){window.location.hash=e}window.addEventListener("error",e=>{const a=e.error?.message||e.message||"Unknown error";console.error("Global error:",a,e),wa({type:"uncaught-error",message:a,filename:e.filename,lineno:e.lineno,stack:e.error?.stack}),x("An error occurred. Please refresh.",!0)});window.addEventListener("unhandledrejection",e=>{const a=e.reason?.message||String(e.reason)||"Unhandled promise rejection";console.error("Unhandled rejection:",a,e.reason),wa({type:"unhandled-rejection",message:a,stack:e.reason?.stack})});async function wa(e){try{await fetch("/api/log-error",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(e)}).catch(()=>{console.log("Error log endpoint not available")})}catch{}}async function Vn(){if(!("serviceWorker"in navigator)){console.log("Service Worker not supported");return}try{const e=await navigator.serviceWorker.register("/sw.js",{scope:"/"});console.log("Service Worker registered:",e),e.addEventListener("updatefound",()=>{const a=e.installing;a?.addEventListener("statechange",()=>{a.state==="installed"&&navigator.serviceWorker.controller&&x("Update available — refresh to get the latest version",!1)})})}catch(e){console.error("Service Worker registration failed:",e)}}async function Qe(){Sa(),await xa(),Vn(),window.toggleTheme=Ea,window.toggleLanguage=$a;const e=new jn;window.addEventListener("hashchange",async()=>{await e.route(),Ee()}),window.addEventListener("i18n-language-changed",()=>{Ee()}),await e.route(),Ee(),console.log("OccultViision PWA initialized")}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",Qe):Qe();

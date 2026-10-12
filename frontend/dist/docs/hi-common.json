@@ -2,7 +2,6 @@
   "app.title": "OCCULTVIISION कालचक्र प्रो",
   "app.tagline": "वैदिक ज्योतिष और अंकशास्त्र",
   "app.description": "जीवन मार्गदर्शन के लिए व्यावसायिक वैदिक ज्योतिष और अंकशास्त्र गणना",
-
   "nav.home": "होम",
   "nav.kundali": "कुंडली",
   "nav.muhurta": "मुहूर्त",
@@ -15,7 +14,6 @@
   "nav.logout": "लॉग आउट",
   "nav.language": "भाषा",
   "nav.theme": "थीम",
-
   "button.submit": "जमा करें",
   "button.cancel": "रद्द करें",
   "button.save": "सहेजें",
@@ -37,7 +35,6 @@
   "button.share": "साझा करें",
   "button.more": "अधिक",
   "button.less": "कम",
-
   "label.name": "नाम",
   "label.email": "ईमेल",
   "label.phone": "फोन",
@@ -59,7 +56,6 @@
   "label.state": "राज्य",
   "label.city": "शहर",
   "label.address": "पता",
-
   "message.loading": "लोड हो रहा है...",
   "message.processing": "प्रसंस्करण जारी है...",
   "message.saving": "सहेज रहे हैं...",
@@ -86,7 +82,6 @@
   "message.error": "त्रुटि",
   "message.warning": "चेतावनी",
   "message.info": "जानकारी",
-
   "form.fullName": "पूरा नाम",
   "form.dateOfBirth": "जन्म की तारीख",
   "form.timeOfBirth": "जन्म का समय (वैकल्पिक)",
@@ -99,16 +94,13 @@
   "form.children": "बच्चों की संख्या",
   "form.notes": "नोट्स",
   "form.comments": "टिप्पणियां",
-
   "theme.light": "लाइट मोड",
   "theme.dark": "डार्क मोड",
   "theme.auto": "स्वचालित",
   "theme.toggle": "थीम बदलें",
-
   "language.english": "English",
   "language.hindi": "हिंदी",
   "language.select": "भाषा चुनें",
-
   "time.now": "अभी",
   "time.today": "आज",
   "time.tomorrow": "कल",
@@ -120,7 +112,6 @@
   "time.afternoon": "दोपहर",
   "time.evening": "शाम",
   "time.night": "रात",
-
   "month.january": "जनवरी",
   "month.february": "फरवरी",
   "month.march": "मार्च",
@@ -133,7 +124,6 @@
   "month.october": "अक्टूबर",
   "month.november": "नवंबर",
   "month.december": "दिसंबर",
-
   "day.monday": "सोमवार",
   "day.tuesday": "मंगलवार",
   "day.wednesday": "बुधवार",
@@ -141,7 +131,6 @@
   "day.friday": "शुक्रवार",
   "day.saturday": "शनिवार",
   "day.sunday": "रविवार",
-
   "validation.invalidEmail": "अमान्य ईमेल पता",
   "validation.invalidPhone": "अमान्य फोन नंबर",
   "validation.invalidDate": "अमान्य तारीख",
@@ -153,14 +142,12 @@
   "validation.fieldTooLong": "यह फील्ड बहुत लंबा है",
   "validation.fieldTooShort": "यह फील्ड बहुत छोटा है",
   "validation.invalidFormat": "अमान्य प्रारूप",
-
   "status.processing": "प्रसंस्करण",
   "status.completed": "पूर्ण",
   "status.failed": "विफल",
   "status.pending": "लंबित",
   "status.cancelled": "रद्द",
   "status.archived": "संग्रहीत",
-
   "pagination.page": "पृष्ठ",
   "pagination.of": "का",
   "pagination.showing": "दिखा रहे हैं",
@@ -170,11 +157,9 @@
   "pagination.loadMore": "और लोड करें",
   "pagination.previous": "पिछला",
   "pagination.next": "अगला",
-
   "search.placeholder": "खोजें...",
   "search.noResults": "कोई परिणाम नहीं मिला",
   "search.searching": "खोज रहे हैं...",
-
   "filter.all": "सभी",
   "filter.active": "सक्रिय",
   "filter.inactive": "निष्क्रिय",
@@ -182,14 +167,12 @@
   "filter.thisWeek": "इस सप्ताह",
   "filter.thisMonth": "इस महीने",
   "filter.custom": "कस्टम",
-
   "sort.ascending": "आरोही",
   "sort.descending": "अवरोही",
   "sort.newest": "सबसे नया पहले",
   "sort.oldest": "सबसे पुराना पहले",
   "sort.aZ": "ए से जेड",
   "sort.zA": "जेड से ए",
-
   "menu.account": "खाता",
   "menu.profile": "प्रोफाइल",
   "menu.settings": "सेटिंग्स",
@@ -199,7 +182,6 @@
   "menu.logout": "लॉग आउट",
   "menu.login": "लॉगिन",
   "menu.signup": "साइन अप करें",
-
   "units.hours": "घंटे",
   "units.minutes": "मिनट",
   "units.seconds": "सेकंड",
@@ -207,11 +189,9 @@
   "units.weeks": "सप्ताह",
   "units.months": "महीने",
   "units.years": "साल",
-
   "currency.inr": "₹",
   "currency.usd": "$",
   "currency.eur": "€",
-
   "accessibility.loading": "सामग्री लोड हो रही है",
   "accessibility.error": "एक त्रुटि हुई",
   "accessibility.closeModal": "संवाद बंद करें",
@@ -220,14 +200,16 @@
   "accessibility.skip": "मुख्य सामग्री पर जाएं",
   "accessibility.back": "वापस जाएं",
   "accessibility.home": "होम पर जाएं",
-
   "footer.copyright": "© 2026 OCCULTVIISION। सर्वाधिकार सुरक्षित।",
   "footer.privacy": "गोपनीयता नीति",
   "footer.terms": "सेवा की शर्तें",
   "footer.contact": "संपर्क",
   "footer.about": "हमारे बारे में",
   "footer.language": "भाषा बदलें",
-
   "version": "v1.0",
-  "buildDate": "4 अक्टूबर, 2026"
+  "buildDate": "4 अक्टूबर, 2026",
+  "chart": {
+    "northIndian": "उत्तर भारतीय",
+    "southIndian": "दक्षिण भारतीय"
+  }
 }
