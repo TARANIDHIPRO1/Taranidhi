@@ -12,7 +12,10 @@
 //   4. Compare with header value (constant-time)
 //   5. Reject if mismatch
 
-import { crypto, type D1Database } from "@cloudflare/workers-types";
+// `crypto` is the Workers runtime global (Web Crypto). Importing it from
+// @cloudflare/workers-types (a types-only package) broke the bundle:
+// "No matching export ... for import 'crypto'", so the worker could not build.
+import type { D1Database } from "@cloudflare/workers-types";
 import { grantPoints, type Env as WalletEnv } from "../lib/wallet";
 import { isOrderFullyPaid, maybeFinalizeOrder, type Env as OrdersEnv } from "../lib/orders";
 import { upgradeTierFromOrder } from "../lib/tierUpgrade";

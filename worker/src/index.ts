@@ -26,6 +26,22 @@ import {
   handleUpdateSettings,
   handleGetAuditTrail,
 } from "./routes/admin";
+import {
+  handlePublicConfig,
+  handleSubmitContact,
+  handleSubmitTestimonial,
+  handleListTestimonials,
+} from "./routes/publicSite";
+import {
+  handleAdminListContacts,
+  handleAdminSetContactStatus,
+  handleAdminListTestimonials,
+  handleAdminReviewTestimonial,
+  handleAdminGetAppSettings,
+  handleAdminUpdateAppSettings,
+  handleAdminLookupUser,
+  handleAdminActivate,
+} from "./routes/adminSite";
 import { handleGetKpChart } from "./routes/kp";
 import { handleKpQuery, handleListActivities } from "./routes/kpQuery";
 import { handleNaturalQuery } from "./routes/naturalQuery";
@@ -179,6 +195,48 @@ export default {
       return rail === "wallet"
         ? handleFundOrderFromWallet(request, env, orderId)
         : handleFundOrderFromGateway(request, env, orderId);
+    }
+
+    // Public website (Task 78)
+    if (request.method === "GET" && pathname === "/public/config") {
+      return handlePublicConfig(request, env);
+    }
+    if (request.method === "POST" && pathname === "/public/contact") {
+      return handleSubmitContact(request, env);
+    }
+    if (request.method === "GET" && pathname === "/public/testimonials") {
+      return handleListTestimonials(request, env);
+    }
+    if (request.method === "POST" && pathname === "/public/testimonials") {
+      return handleSubmitTestimonial(request, env);
+    }
+
+    // Admin: website moderation, settings, activation tool (Task 78)
+    if (request.method === "GET" && pathname === "/admin/contact-messages") {
+      return handleAdminListContacts(request, env);
+    }
+    const adminContactMatch = /^\/admin\/contact-messages\/(\d+)\/status$/.exec(pathname);
+    if (request.method === "POST" && adminContactMatch) {
+      return handleAdminSetContactStatus(request, env, Number(adminContactMatch[1]));
+    }
+    if (request.method === "GET" && pathname === "/admin/testimonials") {
+      return handleAdminListTestimonials(request, env);
+    }
+    const adminTestimonialMatch = /^\/admin\/testimonials\/(\d+)\/review$/.exec(pathname);
+    if (request.method === "POST" && adminTestimonialMatch) {
+      return handleAdminReviewTestimonial(request, env, Number(adminTestimonialMatch[1]));
+    }
+    if (request.method === "GET" && pathname === "/admin/app-settings") {
+      return handleAdminGetAppSettings(request, env);
+    }
+    if (request.method === "POST" && pathname === "/admin/app-settings") {
+      return handleAdminUpdateAppSettings(request, env);
+    }
+    if (request.method === "GET" && pathname === "/admin/users/lookup") {
+      return handleAdminLookupUser(request, env);
+    }
+    if (request.method === "POST" && pathname === "/admin/users/activate") {
+      return handleAdminActivate(request, env);
     }
 
     if (request.method === "GET" && pathname === "/admin/users") {
