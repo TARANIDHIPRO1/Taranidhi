@@ -365,10 +365,12 @@ export async function handleNaturalQuery(request: Request, env: Env): Promise<Re
   // ── 8. Log to query_logs ─────────────────────────────────────────────────
   try {
     await env.DB.prepare(
-      `INSERT INTO query_logs (user_id, kundali_id, query_type, query_input, points_debited, created_at)
-       VALUES (?, ?, 'kp_query_natural', ?, ?, ?)`
+      // Columns must match the live query_logs schema (migration 0005).
+      // The question text itself is not stored.
+      `INSERT INTO query_logs (user_id, kundali_id, query_type, points_charged)
+       VALUES (?, ?, 'kp_query_natural', ?)`
     )
-      .bind(auth.userId, kundali_id, question.slice(0, 500), KP_QUERY_COST, now.toISOString())
+      .bind(auth.userId, kundali_id, KP_QUERY_COST)
       .run();
   } catch {
     // Non-fatal: continue even if logging fails

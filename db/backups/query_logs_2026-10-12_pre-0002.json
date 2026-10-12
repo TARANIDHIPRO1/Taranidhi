@@ -1,0 +1,4 @@
+[{"id":1,"user_id":1,"kundali_id":null,"query_type":"general_lookup","activity_category":null,"resolved_houses":null,"verdict":null,"confidence_pct":null,"muhurta_pct":75,"queried_at":"2026-10-04 07:51:59","points_charged":1},
+{"id":2,"user_id":1,"kundali_id":null,"query_type":"general_lookup","activity_category":null,"resolved_houses":null,"verdict":null,"confidence_pct":null,"muhurta_pct":85,"queried_at":"2026-10-04 12:49:30","points_charged":1},
+{"id":3,"user_id":1,"kundali_id":null,"query_type":"general_lookup","activity_category":null,"resolved_houses":null,"verdict":null,"confidence_pct":null,"muhurta_pct":85,"queried_at":"2026-10-04 12:49:48","points_charged":1},
+{"id":4,"user_id":1,"kundali_id":null,"query_type":"general_lookup","activity_category":null,"resolved_houses":null,"verdict":null,"confidence_pct":null,"muhurta_pct":80,"queried_at":"2026-10-04 13:03:45","points_charged":1}]
