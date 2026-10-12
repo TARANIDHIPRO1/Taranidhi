@@ -150,6 +150,8 @@
   --accent-prithvi-text: #065F46;
   --accent-jal-text: #075985;
   --accent-vayu-text: #164E63;
+  --error-text: #991B1B;
+  --primary-text: #1E40AF; /* text-safe primary (AAA on light bg) */
 
   /* CTA surfaces: white label reaches 7.31:1 */
   --cta-bg: #9A3412;
@@ -199,7 +201,7 @@
     --accent-agni-text: #FDBA74;
     --accent-prithvi-text: #6EE7B7;
     --accent-jal-text: #7DD3FC;
-    --accent-vayu-text: #67E8F9;
+    --accent-vayu-text: #67E8F9; --error-text: #FCA5A5; --primary-text: #93C5FD;
     --cta-bg: #9A3412;
     --cta-bg-hover: #7C2D12;
 
@@ -233,7 +235,7 @@
   --accent-agni-text: #FDBA74;
   --accent-prithvi-text: #6EE7B7;
   --accent-jal-text: #7DD3FC;
-  --accent-vayu-text: #67E8F9;
+  --accent-vayu-text: #67E8F9; --error-text: #FCA5A5; --primary-text: #93C5FD;
   --cta-bg: #9A3412;
   --cta-bg-hover: #7C2D12;
   color-scheme: dark;

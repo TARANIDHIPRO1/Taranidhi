@@ -20,7 +20,7 @@ export async function renderReferral(): Promise<void> {
 
       <div class="referral-container">
         <!-- Info Banner -->
-        <div style="background-color: var(--color-primary-light); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-secondary);">
+        <div style="background-color: var(--color-primary-light); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-6); font-size: var(--font-size-sm); color: var(--text-primary);">
           ℹ️ Earn 20% commission on each referral's first purchase. Commissions are held for 30 days (chargeback window), then activated.
         </div>
 
@@ -29,7 +29,7 @@ export async function renderReferral(): Promise<void> {
           <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-2);">
             Your Referral Code
           </div>
-          <div id="referral-code" style="font-size: 24px; font-weight: bold; letter-spacing: 2px; color: var(--color-primary); margin-bottom: var(--space-4); font-family: monospace;">
+          <div id="referral-code" style="font-size: 24px; font-weight: bold; letter-spacing: 2px; color: var(--primary-text); margin-bottom: var(--space-4); font-family: monospace;">
             Loading...
           </div>
           <button class="btn btn-secondary" id="btn-copy" style="width: 100%;">
@@ -83,7 +83,7 @@ export async function renderReferral(): Promise<void> {
         </div>
 
         <!-- Error Box -->
-        <div id="error-box" style="display: none; margin-top: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--color-danger);"></div>
+        <div id="error-box" style="display: none; margin-top: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
       </div>
     </div>
   `;

@@ -8,6 +8,11 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 .btn {
+  /* Default surface for plain .btn (no variant). Without it the browser's
+     native button grey shows through (differs per browser; white-on-grey
+     5.3:1 in Chrome dark mode). Variants below override this. */
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -109,7 +114,7 @@
 }
 
 .form-error {
-  color: var(--color-danger);
+  color: var(--error-text);
   font-size: var(--font-size-sm);
   margin-top: var(--space-1);
 }
@@ -365,17 +370,17 @@
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-full);
   background-color: var(--color-primary-light);
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 .badge.success {
   background-color: var(--color-success-light, #d1fae5);
-  color: var(--color-success);
+  color: var(--accent-prithvi-text);
 }
 
 .badge.danger {
   background-color: var(--color-error-light, #fee2e2);
-  color: var(--color-danger);
+  color: var(--error-text);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -403,7 +408,7 @@
   background: none;
   border: none;
   font-size: var(--font-size-lg);
-  color: var(--color-primary);
+  color: var(--primary-text);
   cursor: pointer;
   padding: var(--space-3);
   margin-right: var(--space-2);
@@ -460,7 +465,7 @@
 .result-item-value {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -565,7 +570,7 @@
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--color-primary);
+  color: var(--primary-text);
   opacity: 0.6;
 }
 
@@ -632,6 +637,6 @@
 
 .warn-badge--danger {
   background: var(--color-error-light, #fee2e2);
-  color: var(--color-error);
+  color: var(--error-text);
   border-color: var(--color-error-light, #fca5a5);
 }

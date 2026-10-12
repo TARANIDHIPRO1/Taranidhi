@@ -9,6 +9,7 @@
 
 import { $app, clear } from "../dom";
 import { navigate } from "../router";
+import { loadSiteConfig, applySiteConfig } from "../site-config";
 
 // ── Public nav ──────────────────────────────────────────────────────────────
 
@@ -17,6 +18,7 @@ export function renderPublicNav(activeRoute: string): string {
     { label: "Features", route: "#/features" },
     { label: "Pricing",  route: "#/pricing"  },
     { label: "Blog",     route: "#/blog"      },
+    { label: "Reviews",  route: "#/testimonials" },
     { label: "Contact",  route: "#/contact"   },
   ];
 
@@ -78,9 +80,10 @@ export function renderPublicFooter(): string {
           </div>
           <div class="pub-footer-col">
             <h4>Contact</h4>
-            <a href="tel:+919669756111">+91 96697 56111</a>
-            <a href="mailto:info@occultviision.com">info@occultviision.com</a>
+            <a href="tel:+919669756111" data-cfg="phone">+91 96697 56111</a>
+            <a href="mailto:info@occultviision.com" data-cfg="email">info@occultviision.com</a>
             <a href="#/contact">Send a Message</a>
+            <a href="#/testimonials">Share Your Experience</a>
           </div>
         </div>
       </div>
@@ -112,6 +115,10 @@ export function wrapPublicPage(activeRoute: string, bodyHtml: string): void {
   hamburger?.addEventListener("click", () => {
     mobileMenu?.classList.toggle("pub-nav-mobile-menu--open");
   });
+
+  // Contact details come from the server (admin-editable), not hardcoded.
+  const page = app.querySelector(".pub-page");
+  if (page) void loadSiteConfig().then((cfg) => applySiteConfig(page, cfg));
 
   // Close mobile menu on link click
   mobileMenu?.querySelectorAll("a").forEach(a => {

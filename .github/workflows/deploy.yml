@@ -1,0 +1,77 @@
+name: Deploy API + PWA to Cloudflare
+
+# Deploys the occultviision-api Worker (API + built PWA as static assets).
+# Runs on every push to main, or manually from the Actions tab.
+# Requires repository secret CLOUDFLARE_API_TOKEN
+# (Cloudflare "Edit Cloudflare Workers" template + Account D1 Edit).
+#
+# Database migrations are NOT run here: they are applied deliberately
+# (see worker/migrations/, 0005 header) after a rehearsal on a copy of the
+# live schema, because some of them rebuild tables.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 2d192176385b0b114d4e05090a20f7b9
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check the deploy token is configured
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Repository secret CLOUDFLARE_API_TOKEN is missing (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Worker - install and unit tests (deploy is blocked if any fail)
+        working-directory: worker
+        run: |
+          npm ci
+          npx vitest run
+
+      - name: Frontend - install and build PWA
+        working-directory: frontend
+        run: |
+          npm ci
+          npx vite build
+          test -f dist/index.html
+          test -f dist/manifest.webmanifest
+          test -f dist/apple-touch-icon.png
+
+      - name: Deploy Worker (API + static PWA assets)
+        id: deploy
+        working-directory: worker
+        run: |
+          npx wrangler deploy -c wrangler.toml 2>&1 | tee deploy.log
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test the live deployment
+        if: steps.deploy.outputs.url != ''
+        run: |
+          base="${{ steps.deploy.outputs.url }}"
+          echo "Testing $base"
+          sleep 5
+          curl -fsS "$base/health" | grep -q ok
+          curl -fsS "$base/public/config" | grep -q whatsapp_number
+          curl -fsS "$base/public/testimonials" | grep -q testimonials
+          curl -fsS -o /dev/null "$base/manifest.webmanifest"
+          curl -fsS -o /dev/null "$base/apple-touch-icon.png"
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$base/admin/app-settings")
+          test "$code" = "401" || { echo "admin route not protected: $code"; exit 1; }
+          echo "Smoke test passed: $base"

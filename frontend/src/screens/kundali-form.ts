@@ -66,11 +66,11 @@ export async function renderKundaliForm(): Promise<void> {
             <button type="button" class="btn btn-small" id="btn-gps">📍</button>
           </div>
           <div id="place-results" style="display:none; margin-top:4px; background:#fff8ef; border:1px solid #E8C89A; border-radius:6px; max-height:160px; overflow-y:auto;"></div>
-          <div id="place-confirmed" style="display:none; margin-top:4px; font-size:0.78rem; color:#7a4800;"></div>
+          <div id="place-confirmed" style="display:none; margin-top:4px; font-size:0.78rem; color:var(--accent-agni-text);"></div>
         </div>
 
         <div class="form-group">
-          <label>Coordinates <span style="font-size:0.75rem; color:#7a4800;">(auto-filled from city search)</span></label>
+          <label>Coordinates <span style="font-size:0.75rem; color:var(--accent-agni-text);">(auto-filled from city search)</span></label>
           <div class="location-row">
             <input
               id="lat"
@@ -113,7 +113,7 @@ export async function renderKundaliForm(): Promise<void> {
         </div>
       </form>
 
-      <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--color-danger);"></div>
+      <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
     </div>
   `;
 
@@ -166,7 +166,7 @@ export async function renderKundaliForm(): Promise<void> {
         const res2 = await fetch(url2, { headers: { "Accept-Language": "en,hi" } });
         const data2 = await res2.json();
         if (!data2.length) {
-          placeResults.innerHTML = `<div style="padding:8px;color:#7a4800;font-size:0.82rem;">
+          placeResults.innerHTML = `<div style="padding:8px;color:var(--accent-agni-text);font-size:0.82rem;">
             Jagah nahi mili. Try karein:<br>
             • Poora naam likhein (e.g. "Raghogarh Madhya Pradesh")<br>
             • Tehsil ya district add karein (e.g. "Mendori Raisen")<br>

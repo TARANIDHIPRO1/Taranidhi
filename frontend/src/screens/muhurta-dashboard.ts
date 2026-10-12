@@ -805,7 +805,7 @@ function injectStyles(): void {
 }
 .navtara-unavailable { padding:var(--space-4); border-radius:var(--radius-md); border:1px dashed var(--color-border); text-align:center; display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:var(--color-text-secondary); font-size:var(--font-size-sm); }
 .navtara-unavail-icon { font-size:1.5rem; }
-.navtara-add-link { font-size:var(--font-size-xs); color:var(--color-primary); text-decoration:none; }
+.navtara-add-link { font-size:var(--font-size-xs); color:var(--primary-text); text-decoration:none; }
 
 /* Warnings */
 .md-warnings-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--space-2); }

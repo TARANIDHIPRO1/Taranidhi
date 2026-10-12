@@ -36,6 +36,18 @@ export function clear(el: HTMLElement) {
   el.innerHTML = "";
 }
 
+/** Escape text before interpolating it into an innerHTML template.
+ *  Required for anything that came from a user or the API (contact
+ *  messages, testimonials, names) to prevent script injection. */
+export function esc(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function showToast(msg: string, isError = false) {
   let toast = document.getElementById("ov-toast");
   if (!toast) {

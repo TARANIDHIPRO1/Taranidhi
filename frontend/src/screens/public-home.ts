@@ -1,8 +1,10 @@
 /**
- * Public Homepage — Hero, Value Props, How It Works, CTA, Testimonials
+ * Public Homepage — Hero, Value Props, How It Works, Reviews (approved only), CTA
  */
 
 import { wrapPublicPage } from "./public-layout";
+import { listPublicTestimonials } from "../api";
+import { renderTestimonialCards, type PublicTestimonial } from "./public-testimonials";
 
 export function renderPublicHome(): void {
   const html = `
@@ -135,45 +137,21 @@ export function renderPublicHome(): void {
       </div>
     </section>
 
-    <!-- ── Social Proof ── -->
-    <section class="pub-section pub-section--alt">
+    <!-- ── Client reviews (approved submissions only, loaded from the API) ── -->
+    <section class="pub-section pub-section--alt" id="home-reviews" hidden>
       <div class="pub-container">
-        <h2 class="pub-section-title">Used by consultants and families across India</h2>
-        <div class="pub-testimonials">
-          <div class="pub-testi">
-            <p class="pub-testi-quote">
-              "I've cross-checked the sub-lord outputs against onlinejyotish.com
-              and my own manual calculations. 22 out of 22 match. That's the
-              benchmark I set — it passed."
-            </p>
-            <div class="pub-testi-author">
-              <span class="pub-testi-name">Naveen K. Rai</span>
-              <span class="pub-testi-role">Founder, Astronumerologist · Bhopal</span>
-            </div>
-          </div>
-          <div class="pub-testi">
-            <p class="pub-testi-quote">
-              "The Muhurta scanner saved us three weeks of back-and-forth.
-              We picked the registration date, the banker confirmed the slot,
-              and everything aligned."
-            </p>
-            <div class="pub-testi-author">
-              <span class="pub-testi-name">Property client</span>
-              <span class="pub-testi-role">Bhopal, MP</span>
-            </div>
-          </div>
-          <div class="pub-testi">
-            <p class="pub-testi-quote">
-              "As a KP practitioner I was skeptical of any app claiming
-              sub-lord accuracy. The 243-fold table and Placidus houses
-              are correct — this is the real system."
-            </p>
-            <div class="pub-testi-author">
-              <span class="pub-testi-name">Consulting astrologer</span>
-              <span class="pub-testi-role">Mumbai</span>
-            </div>
-          </div>
-        </div>
+        <h2 class="pub-section-title">What clients say</h2>
+        <div class="pub-testimonials" id="home-testi-list"></div>
+        <p class="pub-section-more">
+          <a href="#/testimonials" class="pub-btn pub-btn--ghost">Read all reviews or share yours</a>
+        </p>
+      </div>
+    </section>
+    <section class="pub-section pub-section--alt" id="home-reviews-empty">
+      <div class="pub-container pub-cta-inner">
+        <h2 class="pub-section-title">Worked with Naveen?</h2>
+        <p class="pub-section-sub">Share your experience. Reviews are published only with your permission.</p>
+        <a href="#/testimonials" class="pub-btn pub-btn--ghost">Write a review</a>
       </div>
     </section>
 
@@ -192,4 +170,24 @@ export function renderPublicHome(): void {
   `;
 
   wrapPublicPage("#/home", html);
+  void loadHomeReviews();
+}
+
+// Shows up to 3 approved reviews. Until any are approved, the "Write a
+// review" invitation is shown instead -- no placeholder or invented quotes.
+async function loadHomeReviews(): Promise<void> {
+  try {
+    const res = await listPublicTestimonials();
+    const items: PublicTestimonial[] = res.ok ? res.data?.testimonials ?? [] : [];
+    if (!items.length) return;
+    const list = document.getElementById("home-testi-list");
+    const section = document.getElementById("home-reviews");
+    const empty = document.getElementById("home-reviews-empty");
+    if (!list || !section || !empty) return;
+    list.innerHTML = renderTestimonialCards(items.slice(0, 3));
+    section.hidden = false;
+    empty.hidden = true;
+  } catch {
+    /* keep the invitation section */
+  }
 }

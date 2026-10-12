@@ -268,7 +268,7 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
   if (!id || isNaN(id)) {
     app.innerHTML = `<div class="screen"><header class="screen-header">
       <button class="btn-back" id="btn-back">←</button><h2>Birth Chart</h2></header>
-      <div style="padding:2rem;text-align:center;color:var(--color-danger)">
+      <div style="padding:2rem;text-align:center;color:var(--error-text)">
         No kundali selected.<br><br>
         <button class="btn btn-primary" id="btn-list">Go to My Kundalis</button>
       </div></div>`;
@@ -282,7 +282,7 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
     <button class="ti-logout" id="btn-back">← Back</button>
   </header>
   <div style="padding:2rem;text-align:center"><div class="spinner"></div>
-  <p style="margin-top:1rem;color:#a78bfa">Computing birth chart…</p></div></div>`;
+  <p style="margin-top:1rem;color:var(--accent-akash-text)">Computing birth chart…</p></div></div>`;
   document.getElementById("btn-back")!.addEventListener("click", () => navigate("/kundali"));
 
   const res = await getKundaliChart(id);

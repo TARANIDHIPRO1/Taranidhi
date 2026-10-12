@@ -1,6 +1,6 @@
 /**
  * Hash-based SPA Router
- * Routes: #/home, #/pricing, #/features, #/blog, #/contact (public)
+ * Routes: #/home, #/pricing, #/features, #/blog, #/contact, #/testimonials (public)
  *         #/login, #/dashboard, #/muhurta, #/scanner, #/kp, #/kp-query,
  *         #/kundali, #/kundali-form, #/wallet, #/referral, #/birth-chart,
  *         #/muhurta-dashboard, #/dasha-timeline, #/kp-sublords,
@@ -19,6 +19,7 @@ import { renderPublicPricing }  from "./screens/public-pricing";
 import { renderPublicFeatures } from "./screens/public-features";
 import { renderPublicBlog }     from "./screens/public-blog";
 import { renderPublicContact }  from "./screens/public-contact";
+import { renderPublicTestimonials } from "./screens/public-testimonials";
 
 // App screens
 import { renderLogin } from "./screens/login";
@@ -49,6 +50,7 @@ export class Router {
     this.routes.set("/features", renderPublicFeatures);
     this.routes.set("/blog",     renderPublicBlog);
     this.routes.set("/contact",  renderPublicContact);
+    this.routes.set("/testimonials", renderPublicTestimonials);
 
     // App routes
     this.routes.set("/login", renderLogin);
@@ -82,6 +84,11 @@ export class Router {
   async route(): Promise<void> {
     const path = this.currentRoute();
     const handler = this.routes.get(this.basePath(path));
+
+    // A new page starts at the top (the SPA otherwise keeps the previous
+    // page's scroll position). In-page anchors like #/blog#kp are not affected
+    // because they don't change the route.
+    window.scrollTo(0, 0);
 
     if (handler) {
       try {

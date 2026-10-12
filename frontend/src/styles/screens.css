@@ -21,13 +21,19 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; /* iPhone Safari: excludes the toolbar, so the bottom is not cut off */
   background-color: var(--color-bg);
 }
 
+/* #app must NOT clip. It used to be height:100vh + overflow:hidden, which
+   made everything below the first screen of the public pages (home, pricing,
+   contact, reviews) impossible to reach by touch or mouse -- only scripts
+   could scroll it. In-app screens still scroll inside their own content
+   areas because .screen is exactly one viewport tall. */
 #app {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -224,7 +230,7 @@
   outline-offset: 2px;
 }
 
-.login-screen .btn-link:hover { color: var(--color-primary); }
+.login-screen .btn-link:hover { color: var(--primary-text); }
 
 /* Legacy login containers — kept for backward compat */
 .login-container { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; padding: var(--space-6); gap: var(--space-6); }
@@ -251,7 +257,7 @@
 }
 
 .app-header h1 {
-  color: var(--color-secondary);
+  color: var(--accent-vayu-text);
   font-family: 'Georgia', serif;
   font-size: 1.15rem;
   letter-spacing: 3px;
@@ -262,7 +268,7 @@
 
 .app-header .badge {
   background: rgba(200, 150, 12, 0.18);
-  color: var(--color-secondary);
+  color: var(--accent-vayu-text);
   border: 1px solid rgba(200,150,12,0.5);
   font-size: 0.72rem;
   padding: 0.15rem 0.55rem;
@@ -373,13 +379,13 @@
 }
 
 .btn-link:hover {
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 /* Dashboard legacy aliases (kept for any older references) */
 .dashboard-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-.dashboard-header { padding: var(--space-6); background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00); color: var(--color-secondary); border-bottom: 3px solid var(--color-secondary); }
-.dashboard-header h1 { margin-bottom: var(--space-2); color: var(--color-secondary); letter-spacing: 3px; }
+.dashboard-header { padding: var(--space-6); background: linear-gradient(135deg, #1a0a00, #3a0800, #1a0a00); color: var(--accent-vayu-text); border-bottom: 3px solid var(--color-secondary); }
+.dashboard-header h1 { margin-bottom: var(--space-2); color: var(--accent-vayu-text); letter-spacing: 3px; }
 .dashboard-content { padding: var(--space-6); flex: 1; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); }
 .action-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; cursor: pointer; transition: all var(--transition-base); }
@@ -529,7 +535,7 @@
   background-color: rgba(220, 38, 38, 0.1);
   border: 1px solid var(--color-danger);
   border-radius: var(--radius-md);
-  color: var(--color-danger);
+  color: var(--error-text);
   font-size: var(--font-size-sm);
 }
 
@@ -703,13 +709,13 @@
   font-size: 1.1rem;
   letter-spacing: 6px;
   font-weight: 700;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
 }
 
 .ti-tagline {
   font-size: 0.72rem;
   letter-spacing: 2px;
-  color: #6b6b80;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
@@ -743,7 +749,7 @@
 .ti-brand-tag {
   font-size: 0.55rem;
   letter-spacing: 3px;
-  color: var(--color-secondary);
+  color: var(--accent-vayu-text);
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -793,7 +799,7 @@
 
 .ti-theme-toggle:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 .ti-lang-toggle {
@@ -815,7 +821,7 @@
 
 .ti-lang-toggle:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 .ti-logout {
@@ -837,7 +843,7 @@
 
 .ti-logout:hover {
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--primary-text);
 }
 
 /* ── LIVE STRIP ──────────────────────────────────────────────────────────── */
@@ -871,7 +877,7 @@
 .ti-live-key {
   font-size: 0.55rem;
   letter-spacing: 1.5px;
-  color: #6b6b80;
+  color: var(--text-secondary);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -888,7 +894,7 @@
 .ti-section-label {
   font-size: 0.58rem;
   letter-spacing: 2.5px;
-  color: #6b6b80;
+  color: var(--text-secondary);
   text-transform: uppercase;
   font-weight: 600;
   padding: 20px 20px 8px;
@@ -932,13 +938,13 @@
 
 .ti-profile-lagna {
   font-size: 0.72rem;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   margin-bottom: 3px;
 }
 
 .ti-profile-nak {
   font-size: 0.68rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
 }
 
 .ti-profile-right {
@@ -966,7 +972,7 @@
 
 .ti-dasha-label {
   font-size: 0.6rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   letter-spacing: 0.5px;
 }
 
@@ -1019,7 +1025,7 @@
 
 .ti-action-icon {
   font-size: 1.1rem;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   flex-shrink: 0;
   width: 20px;
   text-align: center;
@@ -1038,7 +1044,7 @@
 
 .ti-action-desc {
   font-size: 0.68rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
 }
 
 .ti-action-arrow {
@@ -1075,7 +1081,7 @@
   white-space: nowrap;
   font-family: inherit;
   font-size: 0.72rem;
-  color: #9090a8;
+  color: var(--text-secondary);
   font-weight: 500;
   transition: all 0.15s;
   flex-shrink: 0;
@@ -1083,7 +1089,7 @@
 
 .ti-decision-btn:hover {
   border-color: #a78bfa;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   background: #13131f;
 }
 
@@ -1111,7 +1117,7 @@
   background: none;
   border: 1px solid #1e1e2e;
   border-radius: 6px;
-  color: #6b6b80;
+  color: var(--text-secondary);
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
@@ -1125,7 +1131,7 @@
 
 .ti-secondary-btn:hover {
   border-color: #3a3a55;
-  color: #9090a8;
+  color: var(--text-secondary);
 }
 
 /* ── FOOTER ──────────────────────────────────────────────────────────────── */
@@ -1161,7 +1167,7 @@
 
 .ti-onboard-icon {
   font-size: 2.5rem;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   line-height: 1;
   animation: ti-pulse 3s ease-in-out infinite;
 }
@@ -1176,7 +1182,7 @@
 
 .ti-onboard-sub {
   font-size: 0.85rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   line-height: 1.6;
   max-width: 280px;
   margin: 0;
@@ -1221,7 +1227,7 @@
 
 .ti-feature-icon {
   font-size: 1rem;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   margin-bottom: 8px;
 }
 
@@ -1234,7 +1240,7 @@
 
 .ti-feature-desc {
   font-size: 0.65rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -1288,7 +1294,7 @@
 .kc-back {
   background: none;
   border: none;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   font-size: 1.25rem;
   cursor: pointer;
   /* Fix 4: WCAG 2.5.5 – minimum 44×44px touch target */
@@ -1303,7 +1309,7 @@
 .kc-back:hover { background: rgba(167,139,250,.15); }
 .kc-title { flex: 1; }
 .kc-name  { display: block; font-size: 0.95rem; font-weight: 600; color: #e8e8f0; }
-.kc-sub   { display: block; font-size: 0.7rem; color: #6b6b80; }
+.kc-sub   { display: block; font-size: 0.7rem; color: var(--text-secondary); }
 .kc-delete {
   background: none;
   border: none;
@@ -1368,7 +1374,7 @@
   font-size: 0.78rem;
   padding: 3px 0;
 }
-.kc-birth-label { color: #6b6b80; min-width: 68px; }
+.kc-birth-label { color: var(--text-secondary); min-width: 68px; }
 .kc-birth-val   { color: #c4c4d8; }
 
 /* ── Chart toggle ── */
@@ -1388,7 +1394,7 @@
   border-radius: 8px;
   border: 1px solid #1e1e30;
   background: #111120;
-  color: #6b6b80;
+  color: var(--text-secondary);
   font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.15s;
@@ -1401,7 +1407,7 @@
 .kc-toggle.active {
   background: rgba(167,139,250,.12);
   border-color: #a78bfa;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   font-weight: 600;
 }
 
@@ -1589,7 +1595,7 @@
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   border-bottom: 1px solid #1e1e30;
 }
 
@@ -1606,7 +1612,7 @@
 }
 .kc-panch-label {
   font-size: 0.62rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   margin-bottom: 3px;
 }
 .kc-panch-val {
@@ -1627,7 +1633,7 @@
 .kc-asc-sign {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   margin-bottom: 4px;
 }
 .kc-asc-deg {
@@ -1643,7 +1649,7 @@
 }
 .kc-kp {
   font-size: 0.72rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   font-family: monospace;
 }
 
@@ -1669,7 +1675,7 @@
 }
 .kc-dasha-type {
   font-size: 0.62rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   margin-bottom: 3px;
 }
 .kc-dasha-dates {
@@ -1705,7 +1711,7 @@
 }
 .kc-tara-num {
   font-size: 0.65rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   margin-bottom: 2px;
 }
 .kc-tara-name {
@@ -1732,7 +1738,7 @@
 }
 .kc-table th {
   background: #0d0d1a;
-  color: #6b6b80;
+  color: var(--text-secondary);
   text-align: left;
   padding: 6px 10px;
   font-size: 0.62rem;
@@ -1783,12 +1789,12 @@
   padding: 8px 4px;
   background: none;
   border: none;
-  color: #6b6b80;
+  color: var(--text-secondary);
   font-size: 0.65rem;
   cursor: pointer;
   transition: color 0.15s;
 }
-.kc-nav-btn:hover { color: #a78bfa; }
+.kc-nav-btn:hover { color: var(--accent-akash-text); }
 .kc-nav-btn:focus-visible {
   outline: 2px solid #a78bfa;
   outline-offset: -2px;
@@ -1813,7 +1819,7 @@
 }
 .balance-label {
   font-size: 0.75rem;
-  color: #6b6b80;
+  color: var(--text-secondary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -1821,7 +1827,7 @@
 .balance-amount {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #a78bfa;
+  color: var(--accent-akash-text);
   line-height: 1.1;
 }
 
@@ -3519,3 +3525,117 @@ a.pub-contact-method:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Task 78: contact save flow, reviews page, admin panel tabs
+   All colours via tokens; text colours meet WCAG AAA in both themes.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Honeypot field: off-screen for people, still in the DOM for bots */
+.pub-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.pub-form-error { color: var(--error-text); font-size: 14px; margin: 6px 0 0; }
+.pub-form-hint { color: var(--text-secondary); font-size: 13px; font-weight: 400; margin: 4px 0 0; }
+.pub-form-status { color: var(--text-primary); font-size: 14px; margin: 12px 0 0; min-height: 1em; }
+.pub-form-status a { color: var(--accent-akash-text); text-decoration: underline; }
+[aria-invalid="true"] { border-color: var(--error-text) !important; }
+
+.pub-consent {
+  display: flex; gap: 12px; align-items: flex-start; cursor: pointer;
+  color: var(--text-primary); font-size: 14px; line-height: 1.5;
+}
+.pub-consent input { width: 22px; height: 22px; min-width: 22px; margin-top: 1px; accent-color: var(--accent-akash-text); }
+
+.pub-rating { border: 0; padding: 0; margin: 0; min-width: 0; }
+.pub-rating legend { color: var(--text-primary); font-weight: 600; font-size: 14px; margin-bottom: 8px; padding: 0; }
+.pub-rating-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.pub-rating-opt {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px;
+  border: 1px solid var(--border-color); border-radius: 999px; cursor: pointer;
+  color: var(--text-primary); background: var(--bg-primary);
+}
+.pub-rating-opt input { accent-color: var(--accent-akash-text); }
+.pub-rating-opt:has(input:checked) { border-color: var(--accent-akash-text); background: var(--bg-tertiary); }
+.pub-rating-opt:has(input:focus-visible) { outline: 3px solid var(--accent-akash-text); outline-offset: 2px; }
+
+.pub-testi { margin: 0; }
+.pub-testi blockquote { margin: 0; }
+.pub-testi-stars { color: var(--accent-agni-text); letter-spacing: 2px; margin-bottom: 8px; font-size: 16px; }
+.pub-testi-empty { grid-column: 1 / -1; text-align: center; color: var(--text-secondary); }
+.pub-testi-empty a { color: var(--accent-akash-text); text-decoration: underline; }
+.pub-section-more { text-align: center; margin-top: 24px; }
+.pub-testi-form-container { max-width: 640px; }
+
+.pub-contact-success {
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-prithvi-text); border-radius: 12px; padding: 24px;
+  display: flex; flex-direction: column; gap: 12px; color: var(--text-primary);
+}
+.pub-contact-success h2, .pub-contact-success h3 { margin: 0; color: var(--text-primary); }
+.pub-contact-success p { margin: 0; color: var(--text-secondary); }
+.pub-contact-success :focus-visible { outline: 3px solid var(--accent-akash-text); outline-offset: 2px; }
+
+/* ── Admin panel ── */
+.admin-screen { height: auto; min-height: 100vh; min-height: 100dvh; padding-bottom: 48px; }
+.admin-tabs {
+  display: flex; gap: 4px; overflow-x: auto; padding: 0 16px;
+  border-bottom: 1px solid var(--border-color); scrollbar-width: thin;
+}
+.admin-tab {
+  flex: 0 0 auto; min-height: 44px; padding: 0 16px; background: none; border: 0;
+  border-bottom: 3px solid transparent; color: var(--text-secondary); font: inherit; font-weight: 600; cursor: pointer;
+}
+.admin-tab[aria-selected="true"] { color: var(--accent-akash-text); border-bottom-color: var(--accent-akash-text); }
+.admin-tab:focus-visible { outline: 3px solid var(--accent-akash-text); outline-offset: -3px; }
+.admin-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; max-width: 900px; margin: 0 auto; }
+.admin-card { display: flex; flex-direction: column; gap: 8px; margin: 0; min-width: 0; }
+.admin-card h3 { margin: 0; }
+.admin-card p { margin: 0; overflow-wrap: anywhere; }
+.admin-card a { color: var(--accent-akash-text); }
+.admin-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.admin-grow { flex: 1 1 200px; min-width: 0; }
+.admin-form { display: flex; flex-direction: column; gap: 6px; }
+.admin-form label { font-weight: 600; font-size: 14px; color: var(--text-primary); margin-top: 8px; }
+.admin-form input, .admin-form select, .admin-row select, .admin-row input {
+  min-height: 44px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 8px;
+  background: var(--bg-primary); color: var(--text-primary); font: inherit; width: 100%; box-sizing: border-box;
+}
+.admin-row select { width: auto; }
+.admin-form button, .admin-actions button, .admin-row button { min-height: 44px; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.admin-muted { color: var(--text-secondary); font-size: 14px; }
+.admin-error { color: var(--error-text); }
+.admin-ok { color: var(--accent-prithvi-text); font-weight: 600; }
+.admin-message {
+  margin: 0; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;
+  color: var(--text-primary); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.admin-confirm { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); }
+.admin-confirm ul { margin: 6px 0 0; padding-left: 20px; }
+.admin-user { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.admin-table th, .admin-table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+/* Header + tabs stick together so tabs stay reachable after scrolling */
+.admin-sticky {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 100;
+  background: var(--bg-primary);
+}
+.admin-sticky .screen-header { position: static; }
+.admin-tabs { background: var(--bg-primary); }
+/* .screen is a flex container; without min-width:0 the admin body grows to
+   its widest child (the nowrap points table) and is clipped off-screen. */
+.admin-body { min-width: 0; width: 100%; box-sizing: border-box; }
+.admin-body > *, .admin-user, .admin-user > * { min-width: 0; max-width: 100%; }
+.admin-table-wrap { max-width: 100%; }
+/* On phones, wrap tabs onto two rows so every section is visible (no hidden scroll) */
+@media (max-width: 599px) {
+  .admin-tabs { flex-wrap: wrap; overflow-x: visible; }
+  .admin-tab { flex: 1 1 30%; padding: 0 8px; }
+}
+.admin-actions button { min-width: 88px; padding: 0 16px; }

@@ -158,7 +158,7 @@ export async function renderKpQuery(): Promise<void> {
         <div id="error-box" style="display:none; margin: var(--space-4) 0;
              padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1);
              border: 1px solid var(--color-danger); border-radius: var(--radius-md);
-             color: var(--color-danger); font-size: var(--font-size-sm);"></div>
+             color: var(--error-text); font-size: var(--font-size-sm);"></div>
 
         <!-- Result panel (shared) -->
         <div id="result" style="display:none; margin-top: var(--space-6);"></div>

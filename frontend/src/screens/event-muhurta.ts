@@ -499,7 +499,7 @@ function injectStyles(): void {
 .em-date-row input[type="date"] { min-width:0; max-width:100%; }
 .em-date-label { font-size:var(--font-size-xs); color:var(--color-text-secondary); margin-bottom:2px; }
 .em-location-confirmed { font-size:var(--font-size-xs); color:var(--color-text-secondary); padding:var(--space-2); background:color-mix(in srgb,var(--purpose-color,#16a34a) 8%,var(--color-surface-2)); border-radius:var(--radius-sm); border:1px solid color-mix(in srgb,var(--purpose-color,#16a34a) 30%,transparent); }
-.em-error { color:var(--color-danger,#dc2626); font-size:var(--font-size-sm); padding:var(--space-2); }
+.em-error { color:var(--error-text); font-size:var(--font-size-sm); padding:var(--space-2); }
 .em-scan-btn { width:100%; margin-top:var(--space-2); }
 
 /* Results */

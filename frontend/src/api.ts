@@ -144,6 +144,31 @@ export const walletRecharge = (amountPaise: number) =>
 // ── Referral ──
 export const referralCode = () => apiFetch("/referral/code");
 
+// ── Public website (no login) ──
+export const getPublicConfig = () => apiFetch("/public/config");
+export const submitContact = (body: Record<string, unknown>) =>
+  apiFetch("/public/contact", { method: "POST", body: JSON.stringify(body) });
+export const submitTestimonial = (body: Record<string, unknown>) =>
+  apiFetch("/public/testimonials", { method: "POST", body: JSON.stringify(body) });
+export const listPublicTestimonials = () => apiFetch("/public/testimonials");
+
+// ── Admin: website moderation, settings, activation tool ──
+export const adminListContacts = (status = "new") =>
+  apiFetch(`/admin/contact-messages?status=${encodeURIComponent(status)}`);
+export const adminSetContactStatus = (id: number, status: string) =>
+  apiFetch(`/admin/contact-messages/${id}/status`, { method: "POST", body: JSON.stringify({ status }) });
+export const adminListTestimonials = (status = "pending") =>
+  apiFetch(`/admin/testimonials?status=${encodeURIComponent(status)}`);
+export const adminReviewTestimonial = (id: number, status: "approved" | "rejected") =>
+  apiFetch(`/admin/testimonials/${id}/review`, { method: "POST", body: JSON.stringify({ status }) });
+export const adminGetAppSettings = () => apiFetch("/admin/app-settings");
+export const adminUpdateAppSettings = (patch: Record<string, string>) =>
+  apiFetch("/admin/app-settings", { method: "POST", body: JSON.stringify(patch) });
+export const adminLookupUser = (phone: string) =>
+  apiFetch(`/admin/users/lookup?phone=${encodeURIComponent(phone)}`);
+export const adminActivateUser = (body: Record<string, unknown>) =>
+  apiFetch("/admin/users/activate", { method: "POST", body: JSON.stringify(body) });
+
 // ── Admin ──
 export const adminStats = () => apiFetch("/admin/stats");
 export const adminListUsers = () => apiFetch("/admin/users");

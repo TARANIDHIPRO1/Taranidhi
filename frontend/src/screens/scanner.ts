@@ -79,7 +79,7 @@ export async function renderScanner(): Promise<void> {
           </div>
         </form>
 
-        <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--color-danger);"></div>
+        <div id="error-box" style="display: none; margin: var(--space-4); padding: var(--space-4); background-color: rgba(220, 38, 38, 0.1); border: 1px solid var(--color-danger); border-radius: var(--radius-md); color: var(--error-text);"></div>
 
         <div id="results" style="display: none; margin-top: var(--space-6);"></div>
       </div>
