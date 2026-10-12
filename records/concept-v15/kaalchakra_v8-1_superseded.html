@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OCCULTVIISION | Kaalchakra Pro v5</title>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2/astronomy.browser.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══ COMPLETE THEME SYSTEM — All vars defined in every theme ═══ */
+
+/* DEFAULT: Deep Navy-Teal (Lucky for Birth 8 + Life Path 5) */
+:root{
+  /* ── DIVINE SAFFRON CREAM (Default) ── */
+  --bg-a:#1a1200; --bg-b:#110d00; --bg-c:#1e1600;
+  --card:rgba(255,235,180,.06); --card2:rgba(255,235,180,.1);
+  --bdr:rgba(245,158,11,.32); --bdr2:rgba(253,211,77,.8);
+  --gold:#f59e0b; --gold2:#fcd34d; --gold3:#fef9c3; --gold-d:#78350f;
+  --text:#fef9eb; --tm:#c8a565; --td:#8b6832;
+  --ok:#22c55e; --warn:#ef4444; --amber:#f59e0b;
+  --cream:#fef9c3; --cream2:#fffde7; --orange:#f97316;
+  --sun-orange:#fb923c; --deep-orange:#ea580c;
+  --s-sun:#7c2d12;--t-sun:#fed7aa;
+  --s-moon:#1e3a5f;--t-moon:#bfdbfe;
+  --s-mars:#4c0519;--t-mars:#fecdd3;
+  --s-merc:#14532d;--t-merc:#bbf7d0;
+  --s-jupi:#713f12;--t-jupi:#fef08a;
+  --s-venu:#2e1065;--t-venu:#ddd6fe;
+  --s-satu:#1c1917;--t-satu:#e7e5e4;
+  --r:10px;
+}
+/* ── Theme: Maroon Rose ── */
+body.tg{background:linear-gradient(160deg,#1a0002 0%,#110001 40%,#1e0003 70%,#0e0001 100%)!important;
+  --bg-a:#1a0408; --bg-b:#110204; --bg-c:#1e050a;
+  --card:rgba(251,113,133,.05); --card2:rgba(251,113,133,.09);
+  --bdr:rgba(251,113,133,.3); --bdr2:rgba(253,164,175,.75);
+  --gold:#fb7185; --gold2:#fda4af; --gold3:#ffe4e6; --gold-d:#9f1239;
+  --text:#fff1f2; --tm:#fda4af; --td:#fb7185;
+}
+/* ── Theme: Royal Blue ── */
+body.ts{background:linear-gradient(160deg,#000818 0%,#000612 45%,#000a1e 100%)!important;
+  --bg-a:#030a1c; --bg-b:#020714; --bg-c:#040c20;
+  --card:rgba(96,165,250,.05); --card2:rgba(96,165,250,.09);
+  --bdr:rgba(96,165,250,.3); --bdr2:rgba(147,197,253,.75);
+  --gold:#60a5fa; --gold2:#93c5fd; --gold3:#dbeafe; --gold-d:#1d4ed8;
+  --text:#eff6ff; --tm:#93c5fd; --td:#60a5fa;
+}
+/* ── Theme: Forest Emerald ── */
+body.te{background:linear-gradient(160deg,#000e04 0%,#000a02 40%,#001406 70%,#000802 100%)!important;
+  --bg-a:#020e06; --bg-b:#010a04; --bg-c:#031408;
+  --card:rgba(52,211,153,.05); --card2:rgba(52,211,153,.09);
+  --bdr:rgba(52,211,153,.3); --bdr2:rgba(110,231,183,.75);
+  --gold:#34d399; --gold2:#6ee7b7; --gold3:#d1fae5; --gold-d:#059669;
+  --text:#f0fdf9; --tm:#6ee7b7; --td:#34d399;
+}
+/* ── Theme: Deep Violet ── */
+body.tv{background:linear-gradient(160deg,#060318 0%,#040210 40%,#080420 70%,#030110 100%)!important;
+  --bg-a:#0a0318; --bg-b:#070210; --bg-c:#0c041e;
+  --card:rgba(192,132,252,.05); --card2:rgba(192,132,252,.09);
+  --bdr:rgba(192,132,252,.3); --bdr2:rgba(232,121,249,.75);
+  --gold:#c084fc; --gold2:#e879f9; --gold3:#fae8ff; --gold-d:#7c3aed;
+  --text:#faf5ff; --tm:#c084fc; --td:#a855f7;
+}
+
+/* ═══ BASE ═══ */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;overflow-x:hidden;}
+body{min-height:100vh;color:var(--text);transition:background .4s ease;
+  background:linear-gradient(160deg,#221a00 0%,#1a1400 40%,#261e00 70%,#181200 100%);
+  background-attachment:fixed;}
+
+/* ── STARS ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.st{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,2s) ease-in-out infinite var(--dl,0s);}
+@keyframes tw{0%,100%{opacity:.08;}50%{opacity:.7;}}
+
+/* ── MODALS ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;backdrop-filter:blur(16px);flex-direction:column;justify-content:center;align-items:center;padding:14px;}
+.ov.show{display:flex;}
+.mbox{background:linear-gradient(160deg,rgba(3,17,30,.98),rgba(2,11,20,.98));border:2px solid var(--bdr2);border-radius:16px;padding:24px 20px;max-width:500px;width:100%;box-shadow:0 0 60px rgba(0,200,180,.12);}
+.mtitle{font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:var(--gold2);text-align:center;margin-bottom:8px;letter-spacing:3px;}
+.mdesc{font-size:13px;color:var(--tm);text-align:center;line-height:1.6;margin-bottom:14px;}
+.ki{width:100%;padding:12px;background:rgba(0,0,0,.5);border:2px solid var(--bdr);color:var(--gold2);border-radius:9px;font-size:14px;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:2px;text-align:center;outline:none;margin-bottom:10px;}
+.ki:focus{border-color:var(--bdr2);}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:9px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;}
+.btn-g{background:linear-gradient(135deg,var(--gold-d),var(--gold2));color:#000;padding:13px 18px;font-size:14px;width:100%;}
+.btn-g:hover{filter:brightness(1.1);}
+.btn-gr{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:12px 18px;font-size:13px;width:100%;}
+/* Save Profile button — MAROON */
+#saveBtn{background:linear-gradient(135deg,#ca8a04,#eab308,#ca8a04)!important;
+  color:#1c1400!important;border:1px solid rgba(234,179,8,.5)!important;
+  box-shadow:0 2px 10px rgba(202,138,4,.35)!important;
+  font-size:12px!important;padding:9px 14px!important;
+  font-weight:900!important;width:auto!important;border-radius:8px!important;}
+#saveBtn:hover{background:linear-gradient(135deg,#eab308,#fbbf24,#eab308)!important;
+  box-shadow:0 4px 16px rgba(234,179,8,.5)!important;}
+.btn-wa{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;border:none;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
+.btn-s{background:var(--card2);border:1px solid var(--bdr);color:var(--tm);padding:6px 12px;font-size:11px;border-radius:20px;cursor:pointer;transition:all .2s;}
+.btn-s:hover{border-color:var(--gold2);color:var(--gold2);}
+
+/* ── APP SHELL ── */
+.app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:6px 8px 80px;}
+
+/* ── BRAND — ORANGE+CREAM with SUNRISE FLAIR + GOLDEN SPARKLES ── */
+.brand{text-align:center;padding:20px 8px 14px;position:relative;overflow:hidden;}
+
+/* Sunrise background glow */
+.sunrise-bg{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:600px;height:180px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 100% at 50% 100%,
+    rgba(99,102,241,.3) 0%,rgba(167,139,250,.18) 25%,rgba(253,230,138,.12) 55%,transparent 100%);
+  animation:sunrisePulse 4s ease-in-out infinite;}
+@keyframes sunrisePulse{0%,100%{opacity:.7;transform:translateX(-50%) scaleX(1);}50%{opacity:1;transform:translateX(-50%) scaleX(1.08);}}
+
+/* Sun rays */
+.sun-rays{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:0;height:0;pointer-events:none;z-index:0;}
+.sun-ray{position:absolute;bottom:0;left:0;width:1.5px;height:0;
+  background:linear-gradient(to top,rgba(99,102,241,.5),rgba(167,139,250,.3),rgba(253,230,138,.15),transparent);
+  transform-origin:bottom center;animation:rayGrow 3s ease-in-out infinite;}
+@keyframes rayGrow{0%,100%{opacity:.3;}50%{opacity:.8;}}
+
+/* Brand 3D text */
+.b3d{position:relative;z-index:2;
+  font-family:'Cinzel',serif;
+  font-size:clamp(26px,5.5vw,48px);
+  font-weight:900;
+  /* Golden text with Royal Indigo 3D depth */
+  color:#fde68a;
+  letter-spacing:5px;
+  text-shadow:
+    0 1px 0 #f59e0b,
+    0 2px 0 #3730a3,
+    0 3px 0 #312e81,
+    0 4px 0 #1e1b4b,
+    0 5px 4px rgba(0,0,0,.7),
+    0 0 20px rgba(253,230,138,.6),
+    0 0 40px rgba(167,139,250,.4),
+    0 0 80px rgba(99,102,241,.2);
+  animation:brandGlow 3s ease-in-out infinite;}
+@keyframes brandGlow{
+  0%,100%{
+    text-shadow:
+      0 1px 0 #f59e0b,0 2px 0 #3730a3,0 3px 0 #312e81,0 4px 0 #1e1b4b,0 5px 4px rgba(0,0,0,.7),
+      0 0 18px rgba(253,230,138,.55),0 0 35px rgba(167,139,250,.35);
+  }
+  50%{
+    text-shadow:
+      0 1px 0 #fcd34d,0 2px 0 #4338ca,0 3px 0 #3730a3,0 4px 0 #312e81,0 5px 4px rgba(0,0,0,.7),
+      0 0 28px #fff,0 0 50px rgba(253,230,138,.95),0 0 90px rgba(167,139,250,.7),0 0 140px rgba(99,102,241,.4);
+  }
+}
+.bsub{position:relative;z-index:2;font-family:'Cinzel',serif;font-size:clamp(7px,1.6vw,10px);
+  font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:4px;margin-top:5px;opacity:.85;}
+
+/* Golden sparkle particles (larger + brighter) */
+.sp-wrap{position:absolute;inset:0;pointer-events:none;z-index:3;}
+.sp{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fde68a 30%,#a78bfa 70%,transparent 100%);
+  animation:spa var(--sd,2.5s) ease-in-out infinite var(--del,0s);opacity:0;}
+@keyframes spa{0%,100%{opacity:0;transform:scale(0) rotate(0deg);}40%{opacity:1;transform:scale(1.5) rotate(180deg);}60%{opacity:.8;transform:scale(1.2) rotate(270deg);}}
+/* Extra 4-pointed star sparkles */
+.sp-star{position:absolute;width:8px;height:8px;pointer-events:none;z-index:3;
+  animation:spStar var(--sd,3s) ease-in-out infinite var(--del,0s);opacity:0;}
+.sp-star::before,.sp-star::after{content:'';position:absolute;background:#ffd700;border-radius:2px;}
+.sp-star::before{width:2px;height:8px;left:3px;top:0;}
+.sp-star::after{width:8px;height:2px;left:0;top:3px;}
+@keyframes spStar{0%,100%{opacity:0;transform:scale(0) rotate(0deg);}50%{opacity:1;transform:scale(1) rotate(45deg);}}
+
+/* ── STATUS BAR ── */
+.sbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:rgba(255,243,195,.12);border:1px solid var(--bdr);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;backdrop-filter:blur(10px);}
+.ldot{width:9px;height:9px;border-radius:50%;}
+.ldot.active{background:#00ff88;box-shadow:0 0 7px #00ff88;animation:bl 2s ease-in-out infinite;}
+.ldot.trial{background:#ffb020;box-shadow:0 0 5px #ffb020;}
+.ldot.exp{background:#ff3040;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sbar-left{display:flex;align-items:center;gap:7px;}
+.ltext{font-size:12px;font-weight:800;color:var(--text);}
+.lsub{font-size:10px;color:var(--tm);}
+.clk{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--gold2);}
+.sbar-right{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.lbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tm);padding:4px 9px;border-radius:15px;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s;}
+.lbtn.a{background:var(--gold-d);color:var(--gold3);border-color:var(--gold);}
+.lbtn:hover{border-color:var(--gold);color:var(--gold);}
+.kbtn{background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#000;border:none;padding:5px 11px;border-radius:15px;font-size:11px;font-weight:900;cursor:pointer;}
+
+/* Theme dots — MUST have visible colors to show they work */
+.tdots{display:flex;gap:6px;align-items:center;}
+.td{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.25);transition:transform .2s,box-shadow .2s;flex-shrink:0;}
+.td:hover{transform:scale(1.35);box-shadow:0 0 12px var(--bdr2);}
+.td.active-theme{border-color:#fff;transform:scale(1.2);box-shadow:0 0 10px #fff;}
+
+/* ── CARDS — fully theme-aware ── */
+.card{background:rgba(255,243,195,.14);border:1px solid var(--bdr);border-radius:14px;
+  padding:14px;margin-bottom:8px;backdrop-filter:blur(10px);
+  box-shadow:0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,160,40,.08);}
+.card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bdr);}
+.ch-title{font-size:13px;font-weight:900;color:var(--gold2);display:flex;align-items:center;gap:7px;}
+
+/* ── LIVE UPHORA ── */
+.live-bar{background:linear-gradient(90deg,rgba(255,248,210,.07),rgba(255,240,180,.03));border:1px solid var(--bdr);border-radius:var(--r);padding:9px 14px;margin-bottom:6px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;}
+.lb-dot{width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;animation:bl .8s ease-in-out infinite;flex-shrink:0;}
+.lb-label{font-size:11px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:1px;}
+.lb-lord{font-size:13px;font-weight:900;color:var(--gold2);}
+.lb-left{display:flex;align-items:center;gap:8px;}
+.lb-time{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:var(--text);}
+.lb-score{font-size:13px;font-weight:900;}
+.lb-cd{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);}
+
+/* ── GOLDEN WINDOW ── */
+.gw-box{background:linear-gradient(135deg,rgba(255,248,210,.08),rgba(255,200,80,.04));border:2px solid var(--bdr2);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;
+  box-shadow:0 0 25px rgba(249,115,22,.2),inset 0 0 30px rgba(255,140,20,.04);}
+.gw-label{font-size:12px;font-weight:900;color:var(--gold3);display:flex;align-items:center;gap:7px;}
+.gw-val{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,2.5vw,15px);font-weight:900;color:var(--gold2);}
+
+/* ── LOCATION ── */
+.loc-bar{background:rgba(255,248,210,.06);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 12px;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.loc-lbl{font-size:11px;font-weight:800;color:var(--tm);white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.loc-sel,.loc-inp{flex:1;min-width:130px;padding:8px 10px;background:rgba(0,0,0,.4);border:1px solid var(--bdr);color:var(--text);border-radius:8px;font-size:12px;font-weight:600;outline:none;transition:border-color .2s;}
+.loc-sel:focus,.loc-inp:focus{border-color:var(--gold2);}
+.loc-sel option{background:var(--bg-b,#020b14);}
+.loc-inp{display:none;}
+.loc-inp::placeholder{color:var(--td);}
+.loc-stat{font-size:11px;color:var(--ok);font-weight:700;white-space:nowrap;}
+.btn-loco{background:var(--card2);border:1px solid var(--bdr);color:var(--gold);padding:8px 12px;border-radius:8px;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.btn-loco:hover{background:var(--bdr);color:var(--text);}
+
+/* ── PROFILE ── */
+.slot-row{display:flex;gap:5px;margin-bottom:12px;}
+.slot{flex:1;padding:7px 4px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;border:1px solid var(--bdr);background:rgba(255,243,195,.09);color:var(--tm);text-align:center;transition:all .2s;}
+.slot.a{background:rgba(99,102,241,.2);color:#c7d2fe;border-color:#818cf8;box-shadow:0 0 12px rgba(99,102,241,.3);}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
+@media(max-width:560px){.f2,.f3{grid-template-columns:1fr;}}
+.full{grid-column:1/-1;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg label{font-size:10px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:.3px;}
+.fg input,.fg select,.fg textarea{padding:10px 11px;
+  background:rgba(255,248,210,.09);border:1.5px solid rgba(245,158,11,.22);
+  color:var(--cream2);border-radius:9px;font-size:13px;font-weight:600;outline:none;
+  transition:border-color .3s,background .3s;}
+.fg input:focus,.fg select:focus{border-color:var(--gold);box-shadow:0 0 12px color-mix(in srgb,var(--gold2) 20%,transparent);}
+.fg select option{background:#020b14;}
+.qrow{display:flex;gap:6px;}
+.qrow input{flex:1;padding:10px 11px;background:rgba(0,0,0,.35);border:1.5px solid color-mix(in srgb,var(--gold) 25%,transparent);color:var(--text);border-radius:9px;font-size:13px;outline:none;transition:border-color .2s;}
+.qrow input:focus{border-color:var(--gold);}
+.btn-an{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;padding:10px 16px;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;}
+.aipill{align-items:center;gap:7px;background:color-mix(in srgb,var(--gold2) 8%,transparent);border:1px solid color-mix(in srgb,var(--gold2) 30%,transparent);border-radius:20px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--gold3);margin-top:6px;display:none;}
+.aipill.show{display:flex;}
+.pd{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;flex-shrink:0;animation:bl 1.5s infinite;}
+.req-badge{font-size:9px;color:#f87171;font-weight:800;margin-left:4px;
+  transition:opacity .3s,width .3s;display:inline-block;}
+.req-badge.filled{opacity:0;width:0;overflow:hidden;margin:0;}
+
+/* ── PANCHANG ── */
+.pg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+@media(max-width:520px){.pg{grid-template-columns:repeat(2,1fr);}}
+.pc{background:rgba(255,243,195,.13);border:1px solid var(--bdr);border-radius:9px;padding:8px 10px;}
+.pc label{font-size:9px;font-weight:800;color:var(--td);text-transform:uppercase;display:block;margin-bottom:3px;}
+.pc .pv{font-size:13px;font-weight:800;color:var(--text);}
+.pc.pb{background:rgba(200,20,20,.18);border-color:rgba(248,113,113,.3);}
+.pc.pb label{color:#f87171;}.pc.pb .pv{color:#fca5a5;}
+.pc.py{background:rgba(180,80,0,.15);border-color:rgba(251,146,60,.3);}
+.pc.py label{color:#fb923c;}.pc.py .pv{color:#fdba74;}
+.pc.pg2{background:rgba(100,100,120,.12);border-color:rgba(150,150,150,.2);}
+.pc.pg2 label{color:#9ca3af;}.pc.pg2 .pv{color:#d1d5db;}
+.pc.ps{background:color-mix(in srgb,var(--gold-d) 25%,transparent);border-color:color-mix(in srgb,var(--gold) 40%,transparent);}
+.pc.ps .pv{color:var(--gold2);}
+
+/* ── DATE TABS ── */
+.date-tabs{display:flex;gap:5px;margin-bottom:8px;}
+.dtab{flex:1;padding:10px 6px;border-radius:9px;font-weight:800;font-size:12px;cursor:pointer;border:1px solid var(--bdr);background:rgba(255,248,210,.07);color:var(--tm);text-align:center;transition:all .2s;}
+.dtab.act{background:linear-gradient(135deg,rgba(253,211,77,.2),rgba(245,158,11,.12));color:var(--gold3);border-color:var(--gold2);box-shadow:0 0 16px rgba(253,211,77,.4);animation:dtabBlink 1.8s ease-in-out infinite;}
+@keyframes dtabBlink{0%,100%{box-shadow:0 0 10px rgba(253,211,77,.3);}50%{box-shadow:0 0 24px rgba(253,211,77,.7),0 0 45px rgba(245,158,11,.3);}}
+.dtab:hover{border-color:var(--gold);color:var(--gold);}
+.dtab-day{font-size:10px;font-weight:700;opacity:.8;margin-top:2px;}
+.date-picker-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dpick{flex:1;padding:9px 11px;background:rgba(0,0,0,.35);border:1.5px solid var(--bdr);color:var(--gold2);border-radius:9px;font-size:12px;font-weight:700;outline:none;font-family:'JetBrains Mono',monospace;}
+
+/* ── HORA / UPHORA ── */
+.ptabs{display:flex;gap:5px;margin-bottom:7px;}
+.ptab{flex:1;padding:10px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;border:1px solid var(--bdr);background:rgba(0,0,0,.3);color:var(--tm);text-align:center;transition:all .2s;}
+.ptab.aday{background:color-mix(in srgb,var(--gold2) 12%,transparent);color:var(--gold2);border-color:var(--gold);}
+.ptab.anight{background:rgba(60,80,200,.12);color:#93c5fd;border-color:#3b82f6;}
+.hbanner{border-radius:9px;padding:9px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;}
+.hbanner.d{background:color-mix(in srgb,var(--gold2) 8%,transparent);border:1px solid color-mix(in srgb,var(--gold2) 30%,transparent);color:var(--gold3);}
+.hbanner.n{background:rgba(60,80,200,.08);border:1px solid rgba(96,130,255,.25);color:#93c5fd;}
+.hbanner span{font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+/* ── HORA ROW ── */
+.hrow{background:rgba(255,243,195,.12);border:1.5px solid var(--bdr);border-radius:12px;margin-bottom:6px;overflow:hidden;transition:all .2s;}
+.hrow.hact{border-color:var(--gold2);box-shadow:0 0 16px color-mix(in srgb,var(--gold2) 25%,transparent);}
+.hrow.hgold{border-color:var(--gold2);box-shadow:0 0 22px color-mix(in srgb,var(--gold2) 35%,transparent);background:color-mix(in srgb,var(--gold-d) 15%,transparent);}
+.hhead{padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;}
+@media(max-width:500px){.hhead{grid-template-columns:auto 1fr auto;}}
+.hlord{font-size:13px;font-weight:900;padding:7px 12px;border-radius:7px;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.hinfo{min-width:0;}
+.htimes{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;}
+.hgoldhint{font-size:10px;color:var(--tm);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hnav{font-size:11px;font-weight:900;text-align:right;white-space:nowrap;}
+.hexp{background:color-mix(in srgb,var(--gold2) 12%,transparent);border:1px solid var(--bdr);color:var(--gold2);padding:5px 9px;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;}
+.hexp:hover{background:color-mix(in srgb,var(--gold2) 22%,transparent);}
+
+/* ── 7 UPHORA CHIPS ── */
+.ugrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:5px 8px 9px;}
+@media(max-width:560px){.ugrid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:380px){.ugrid{grid-template-columns:repeat(3,1fr);}}
+.uc{border-radius:8px;padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.07);position:relative;}
+.uc.ug{background:rgba(5,80,35,.55);border-color:rgba(50,200,100,.4);}
+.uc.us{background:rgba(30,50,140,.45);border-color:rgba(96,165,250,.3);}
+.uc.un{background:rgba(25,18,30,.4);}
+.uc.ub{background:rgba(80,10,10,.45);border-color:rgba(248,113,113,.2);}
+.uc.uhigh{border-color:var(--gold2)!important;box-shadow:0 0 8px color-mix(in srgb,var(--gold2) 40%,transparent);background:color-mix(in srgb,var(--gold-d) 30%,transparent)!important;}
+.uc.unow{border-color:var(--gold2)!important;box-shadow:0 0 6px color-mix(in srgb,var(--gold2) 40%,transparent);}
+.uc-lord{font-size:9px;font-weight:800;color:var(--text);}
+.uc-time{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--td);line-height:1.3;}
+.uc-sc{font-size:9px;font-weight:900;}
+.uc-gw{position:absolute;top:-6px;right:-3px;background:var(--gold2);color:#000;font-size:7px;font-weight:900;padding:1px 4px;border-radius:8px;}
+
+/* ── CHOGHADIYA ── */
+.chogh-wrap{margin-bottom:8px;}
+.chogh-toggle{display:flex;justify-content:space-between;align-items:center;background:rgba(255,243,195,.12);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;cursor:pointer;user-select:none;transition:background .2s;}
+.chogh-toggle:hover{background:var(--card2);}
+.chogh-toggle-title{font-size:12px;font-weight:800;color:var(--tm);display:flex;align-items:center;gap:7px;}
+.chogh-body{display:none;margin-top:6px;}
+.chogh-body.show{display:block;}
+.tl{display:flex;height:32px;border-radius:8px;overflow:visible;position:relative;margin-bottom:16px;}
+.tls{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:2px;position:relative;}
+.tls-n{font-size:7.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);}
+.tls-h{font-size:6px;font-weight:700;color:rgba(255,255,255,.75);}
+.tls-t{position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);font-size:7.5px;font-weight:700;color:var(--td);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.needle{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--gold2);border-radius:2px;z-index:10;box-shadow:0 0 7px var(--gold2);}
+.needle::before{content:'▼';position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gold2);}
+.cgg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:18px;}
+@media(max-width:500px){.cgg{grid-template-columns:repeat(2,1fr);}}
+.cgc{border-radius:10px;padding:8px 7px;text-align:center;border:1.5px solid transparent;position:relative;transition:transform .2s;}
+.cgc.cn{transform:scale(1.04);border-color:var(--gold2)!important;box-shadow:0 0 14px color-mix(in srgb,var(--gold2) 30%,transparent);}
+.cgc-nb{position:absolute;top:-7px;right:-7px;background:var(--gold2);color:#000;font-size:8px;font-weight:900;padding:2px 6px;border-radius:10px;}
+.cgc-rb{position:absolute;top:-7px;left:-7px;background:#dc2626;color:#fff;font-size:8px;font-weight:900;padding:2px 6px;border-radius:10px;}
+.cgc-ic{font-size:16px;margin-bottom:3px;}
+.cgc-nm{font-size:14px;font-weight:900;margin-bottom:2px;}
+.cgc-hi{font-size:9px;font-weight:700;opacity:.85;margin-bottom:4px;}
+.cgc-tm{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;line-height:1.5;}
+.cgc-sc{font-size:10px;font-weight:900;margin-top:3px;}
+.bar{height:3px;border-radius:2px;margin:4px 0 2px;opacity:.7;}
+.ca{background:rgba(5,80,35,.5);border-color:rgba(50,200,100,.3)!important;}.ca .cgc-nm{color:#34d399;}.ca .cgc-sc{color:#34d399;}.ca .bar{background:#34d399;}
+.cb{background:rgba(30,50,150,.5);border-color:rgba(96,165,250,.3)!important;}.cb .cgc-nm{color:#60a5fa;}.cb .cgc-sc{color:#60a5fa;}.cb .bar{background:#3b82f6;}
+.cl{background:rgba(80,20,150,.5);border-color:rgba(192,132,252,.3)!important;}.cl .cgc-nm{color:#c084fc;}.cl .cgc-sc{color:#c084fc;}.cl .bar{background:#a855f7;}
+.cc{background:rgba(5,80,120,.5);border-color:rgba(34,211,238,.3)!important;}.cc .cgc-nm{color:#22d3ee;}.cc .cgc-sc{color:#22d3ee;}.cc .bar{background:#0891b2;}
+.cu{background:rgba(100,35,0,.5);border-color:rgba(251,146,60,.3)!important;}.cu .cgc-nm{color:#fb923c;}.cu .cgc-sc{color:#fb923c;}.cu .bar{background:#ea580c;}
+.ck{background:rgba(80,50,0,.5);border-color:rgba(251,191,36,.3)!important;}.ck .cgc-nm{color:#fbbf24;}.ck .cgc-sc{color:#fbbf24;}.ck .bar{background:#b45309;}
+.cr{background:rgba(100,10,10,.5);border-color:rgba(248,113,113,.3)!important;}.cr .cgc-nm{color:#f87171;}.cr .cgc-sc{color:#f87171;}.cr .bar{background:#dc2626;}
+
+/* ── WA MODAL ── */
+.wmbox{max-width:540px;width:100%;}
+.wa-r{display:flex;flex-direction:column;gap:4px;margin-bottom:9px;}
+.wa-r label{font-size:11px;font-weight:800;color:var(--tm);}
+.wa-r input,.wa-r select,.wa-r textarea{padding:10px 12px;background:rgba(0,0,0,.45);border:1.5px solid var(--bdr);color:var(--text);border-radius:9px;font-size:13px;outline:none;transition:border-color .2s;}
+.wa-r input:focus,.wa-r textarea:focus{border-color:var(--gold2);}
+.wa-r textarea{height:70px;resize:none;}
+.intent-g{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.ib{padding:10px;border-radius:9px;border:1.5px solid var(--bdr);background:rgba(0,0,0,.3);color:var(--tm);font-size:12px;font-weight:800;cursor:pointer;text-align:center;transition:all .2s;}
+.ib.sl{background:color-mix(in srgb,var(--gold2) 12%,transparent);border-color:var(--gold);color:var(--gold2);}
+.ib:hover{border-color:var(--gold);color:var(--gold);}
+.cxt{display:none;background:color-mix(in srgb,var(--gold2) 6%,transparent);border:1px solid color-mix(in srgb,var(--gold2) 25%,transparent);border-radius:9px;padding:10px;margin-bottom:10px;}
+.cxt.show{display:block;}
+
+/* ── PLANNER ── */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+@media(max-width:560px){.plan-grid{grid-template-columns:1fr;}}
+.fcard{background:color-mix(in srgb,var(--card) 80%,rgba(0,80,30,.4));border:1.5px solid color-mix(in srgb,var(--bdr) 60%,rgba(50,180,80,.3));border-radius:11px;padding:12px;}
+.fcard.ftoday{border-color:var(--gold);background:color-mix(in srgb,var(--gold-d) 20%,rgba(0,0,0,.4));}
+.fhead{font-size:12px;font-weight:900;color:var(--gold3);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;}
+.fnak{font-size:14px;font-weight:900;color:var(--text);}
+.fnav{font-size:11px;font-weight:800;margin-top:3px;}
+.ftrans{font-size:10px;color:var(--tm);margin-top:3px;}
+.dc{display:flex;align-items:center;gap:5px;}
+.ds{background:rgba(0,0,0,.4);border:1px solid var(--bdr);color:var(--gold);padding:4px 10px;border-radius:7px;font-size:11px;font-weight:900;cursor:pointer;transition:all .2s;}
+.ds:hover{background:var(--card2);}
+.dinp{background:rgba(0,0,0,.4);border:1.5px solid var(--bdr);color:var(--gold2);padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;outline:none;font-family:'JetBrains Mono',monospace;}
+
+/* ── FOOTER ── */
+.footer{background:rgba(255,248,210,.06);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center;margin-top:10px;}
+.fb{font-family:'Cinzel',serif;font-size:20px;font-weight:900;color:var(--gold2);letter-spacing:3px;}
+.fc{font-size:13px;font-weight:800;color:var(--gold3);margin-top:4px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:22px;font-size:13px;font-weight:800;z-index:99999;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.5);transition:opacity .4s;white-space:nowrap;}
+
+/* ── MD/AD/PD DASHA SECTION ── */
+.dasha-card{background:rgba(255,248,210,.07);border:1.5px solid rgba(251,191,36,.3);border-radius:14px;padding:14px;margin-bottom:8px;}
+.dasha-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(251,191,36,.2);}
+.dasha-title{font-size:13px;font-weight:900;color:var(--gold2);display:flex;align-items:center;gap:7px;}
+.dasha-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+@media(max-width:520px){.dasha-grid{grid-template-columns:1fr;}}
+.dasha-cell{background:rgba(255,240,180,.06);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:10px 12px;text-align:center;}
+.dasha-cell-lbl{font-size:9px;font-weight:800;color:var(--td);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.dasha-cell-lord{font-size:18px;font-weight:900;color:var(--gold2);margin-bottom:3px;}
+.dasha-cell-dates{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tm);}
+.dasha-cell.md-cell{background:rgba(255,200,80,.08);border-color:rgba(251,191,36,.45);}
+.dasha-cell.ad-cell{background:rgba(255,160,50,.07);border-color:rgba(251,191,36,.35);}
+.dasha-cell.pd-cell{background:rgba(255,120,30,.06);border-color:rgba(251,191,36,.25);}
+/* Dasha-Hora match indicator */
+.dasha-match-bar{background:rgba(255,248,210,.07);border:1px solid rgba(251,191,36,.2);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:800;}
+.dasha-match-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.dasha-match-item:last-child{border:none;}
+.dasha-match-label{color:var(--tm);}
+.dasha-match-result{font-family:'JetBrains Mono',monospace;font-weight:900;}
+.dasha-score-hero{text-align:center;padding:10px;margin-top:8px;background:rgba(255,240,180,.06);border-radius:9px;border:1px solid rgba(251,191,36,.25);}
+.dasha-score-pct{font-size:28px;font-weight:900;font-family:'JetBrains Mono',monospace;}
+.dasha-score-lbl{font-size:10px;color:var(--tm);margin-top:2px;}
+
+/* ── FEEDBACK FLOATING PANEL ── */
+.feedback-fab{position:fixed;bottom:20px;right:16px;z-index:888;
+  background:linear-gradient(135deg,#92400e,var(--gold));
+  color:#000;border:none;width:54px;height:54px;border-radius:50%;
+  font-size:20px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s;}
+.feedback-fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,0,0,.5);}
+.feedback-fab-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;
+  font-size:9px;font-weight:900;width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;}
+.feedback-panel{position:fixed;bottom:80px;right:12px;z-index:889;
+  background:linear-gradient(160deg,rgba(18,14,0,.97),rgba(14,10,0,.97));
+  border:1.5px solid var(--bdr);border-radius:16px;padding:16px;
+  width:min(360px,calc(100vw - 24px));
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+  transform:translateY(20px) scale(.95);opacity:0;pointer-events:none;
+  transition:all .3s cubic-bezier(.4,0,.2,1);}
+.feedback-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all;}
+.fp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bdr);}
+.fp-title{font-size:14px;font-weight:900;color:var(--gold2);}
+.fp-close{background:none;border:none;color:var(--tm);cursor:pointer;font-size:16px;}
+.fp-stars{display:flex;gap:6px;margin-bottom:10px;justify-content:center;}
+.fp-star{font-size:24px;cursor:pointer;transition:transform .15s;color:var(--td);user-select:none;}
+.fp-star.active{color:var(--gold2);}
+.fp-star:hover{transform:scale(1.2);}
+.fp-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.fp-row label{font-size:10px;font-weight:800;color:var(--tm);text-transform:uppercase;}
+.fp-row input,.fp-row textarea,.fp-row select{padding:9px 11px;background:rgba(255,248,210,.08);
+  border:1.5px solid var(--bdr);color:var(--text);border-radius:8px;font-size:12px;outline:none;}
+.fp-row textarea{height:65px;resize:none;}
+.fp-section-title{font-size:11px;font-weight:800;color:var(--gold);margin:10px 0 6px;
+  text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;}
+.fp-topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+.fp-topic{padding:7px 8px;border-radius:7px;border:1px solid var(--bdr);background:rgba(255,248,210,.07);
+  color:var(--tm);font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;}
+.fp-topic.sel{background:rgba(251,191,36,.15);border-color:var(--gold);color:var(--gold2);}
+.btn-fp-wa{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;border:none;
+  padding:12px;border-radius:9px;font-size:13px;font-weight:900;cursor:pointer;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;}
+.btn-fp-wa:hover{filter:brightness(1.1);}
+
+/* ── BHAVA SCORE DISPLAY IN HORA ── */
+.bhava-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(251,191,36,.1);
+  border:1px solid rgba(251,191,36,.3);border-radius:5px;padding:2px 7px;
+  font-size:9px;font-weight:800;color:var(--gold);margin-left:6px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .b3d{font-size:22px;letter-spacing:2px;}
+  .app{padding:5px 6px 70px;}
+  .card{padding:11px 10px;}
+  .hhead{gap:7px;}
+  .ugrid{grid-template-columns:repeat(4,1fr);}
+}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<!-- LOCK MODAL -->
+<div class="ov" id="lockMod">
+  <div class="mbox">
+    <div style="font-size:42px;text-align:center;margin-bottom:10px;">✨</div>
+    <div class="mtitle">OCCULTVIISION</div>
+    <div class="mdesc" id="lockDesc">3-दिवसीय परीक्षण समाप्त। लाइसेंस की दर्ज करें।</div>
+    <input class="ki" id="lockInp" placeholder="LICENSE KEY" type="text" autocomplete="off">
+    <input class="ki" id="lockName" placeholder="आपका नाम (जिस नाम पर key है)" type="text" autocomplete="off" style="margin-top:4px;font-size:13px;letter-spacing:0;">
+    <button class="btn btn-g" onclick="applyKey(document.getElementById('lockInp').value, document.getElementById('lockName').value)">
+      <i class="fa-solid fa-key"></i> ACTIVATE LICENSE
+    </button>
+    <div style="font-size:11px;color:var(--td);text-align:center;margin-top:8px;">Key के लिए: +91 9669756111 · 3-Day Demo सभी के लिए FREE है</div>
+  </div>
+</div>
+
+<!-- WA MODAL -->
+<div class="ov" id="waMod">
+  <div class="mbox wmbox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-size:15px;font-weight:900;color:var(--gold2);"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp</div>
+      <button class="btn-s" onclick="closeWa()">✕ Close</button>
+    </div>
+    <div class="wa-r"><label>Client का नाम *</label><input id="waN" placeholder="Name"></div>
+    <div class="wa-r"><label>WhatsApp Number *</label><input id="waP" type="tel" placeholder="919XXXXXXXXX"></div>
+    <div class="wa-r"><label>Client की Query / Question *</label>
+      <textarea id="waQ" placeholder="Client का प्रश्न लिखें — जैसे: property registration करनी है, best time kya hai?"></textarea>
+    </div>
+    <div style="font-size:12px;font-weight:800;color:var(--gold3);margin-bottom:6px;">Send Type:</div>
+    <div class="intent-g">
+      <div class="ib sl" id="ib1" onclick="setWI('general')">📋 General Query<br><small>आज का शुभ समय</small></div>
+      <div class="ib" id="ib2" onclick="setWI('fullchart')">📊 Full Uphora Chart<br><small>पूरा दिन का चार्ट</small></div>
+      <div class="ib" id="ib3" onclick="setWI('7day')">📅 7-Day Chart<br><small>सात दिन का चार्ट</small></div>
+      <div class="ib" id="ib4" onclick="setWI('consult')">👑 Consultation<br><small>व्यक्तिगत परामर्श</small></div>
+    </div>
+    <div class="cxt" id="cxt4">
+      <div class="wa-r"><label>Preferred Time</label><input id="waT" placeholder="e.g. Saturday 6-8 PM"></div>
+      <div class="wa-r"><label>Budget Range</label>
+        <select id="waB"><option>₹500–₹1,000</option><option>₹1,000–₹2,500</option><option>₹2,500–₹5,000</option><option>₹5,000+</option></select>
+      </div>
+    </div>
+    <button class="btn-wa" onclick="sendWa()"><i class="fa-brands fa-whatsapp"></i> Send on WhatsApp</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+<!-- BRAND -->
+<div class="brand">
+  <!-- Sunrise background -->
+  <div class="sunrise-bg"></div>
+  <!-- Sun rays -->
+  <div class="sun-rays" id="sunRays"></div>
+  <!-- Sparkles -->
+  <div class="sp-wrap" id="spWrap"></div>
+  <!-- Brand -->
+  <div class="b3d">OCCULTVIISION</div>
+  <div class="bsub" id="bsub">Kaalchakra Pro v5 · Drik Siddhant · Hora-Uphora Engine</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="sbar">
+  <div class="sbar-left">
+    <div class="ldot trial" id="ldot"></div>
+    <div><div class="ltext" id="ltxt">Loading...</div><div class="lsub" id="lsub">—</div></div>
+  </div>
+  <div class="clk" id="clk">—</div>
+  <div class="sbar-right">
+    <div class="tdots">
+      <div class="td active-theme" style="background:linear-gradient(135deg,#fcd34d,#78350f);" onclick="setT('')" title="Divine Saffron"></div>
+      <div class="td" style="background:linear-gradient(135deg,#fda4af,#1a0408);" onclick="setT('tg')" title="Maroon Rose"></div>
+      <div class="td" style="background:linear-gradient(135deg,#93c5fd,#010812);" onclick="setT('ts')" title="Sapphire Blue"></div>
+      <div class="td" style="background:linear-gradient(135deg,#6ee7b7,#01120a);" onclick="setT('te')" title="Emerald Forest"></div>
+      <div class="td" style="background:linear-gradient(135deg,#e879f9,#0d0520);" onclick="setT('tv')" title="Deep Violet"></div>
+    </div>
+    <div style="display:flex;gap:3px;">
+      <button class="lbtn a" id="bHi" onclick="setLang('hi')">हिंदी</button>
+      <button class="lbtn" id="bEn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="kbtn" onclick="promptKey()"><i class="fa-solid fa-key"></i> Key</button>
+  </div>
+</div>
+
+<!-- LOCATION BAR -->
+<div class="loc-bar">
+  <div class="loc-lbl"><i class="fa-solid fa-location-dot" style="color:var(--gold);"></i> Location</div>
+  <select class="loc-sel" id="citySel" onchange="onCity(this.value)">
+    <option value="">— Select City —</option>
+    <optgroup label="North India">
+      <option value="Delhi">Delhi</option><option value="Jaipur">Jaipur</option>
+      <option value="Lucknow">Lucknow</option><option value="Agra">Agra</option>
+      <option value="Chandigarh">Chandigarh</option><option value="Varanasi">Varanasi</option>
+      <option value="Dehradun">Dehradun</option><option value="Amritsar">Amritsar</option>
+    </optgroup>
+    <optgroup label="Central India">
+      <option value="Bhopal" selected>Bhopal</option><option value="Indore">Indore</option>
+      <option value="Nagpur">Nagpur</option><option value="Raipur">Raipur</option>
+      <option value="Jabalpur">Jabalpur</option>
+    </optgroup>
+    <optgroup label="West India">
+      <option value="Mumbai">Mumbai</option><option value="Pune">Pune</option>
+      <option value="Ahmedabad">Ahmedabad</option><option value="Surat">Surat</option>
+    </optgroup>
+    <optgroup label="South India">
+      <option value="Bangalore">Bangalore</option><option value="Chennai">Chennai</option>
+      <option value="Hyderabad">Hyderabad</option><option value="Kochi">Kochi</option>
+    </optgroup>
+    <optgroup label="East India">
+      <option value="Kolkata">Kolkata</option><option value="Patna">Patna</option>
+      <option value="Bhubaneswar">Bhubaneswar</option><option value="Guwahati">Guwahati</option>
+    </optgroup>
+    <optgroup label="International">
+      <option value="Dubai">Dubai (GST+4)</option><option value="London">London (GMT+1)</option>
+      <option value="New York">New York (EST-5)</option><option value="Toronto">Toronto (EST-5)</option>
+      <option value="Los Angeles">Los Angeles (PST-8)</option>
+      <option value="Singapore">Singapore (SGT+8)</option>
+      <option value="Sydney">Sydney (AEST+10)</option>
+      <option value="Kathmandu">Kathmandu (NPT+5:45)</option>
+      <option value="Dhaka">Dhaka (BST+6)</option>
+      <option value="Dubai">Dubai (GST+4)</option>
+    </optgroup>
+    <option value="custom">✏️ Type any city</option>
+    <option value="auto">📍 Auto-detect</option>
+  </select>
+  <input class="loc-inp" id="cityInp" placeholder="Type city name and press Search...">
+  <button class="btn-loco" id="geoBtn" style="display:none;" onclick="geocode()">🔍 Search</button>
+  <button class="btn-loco" onclick="autoLoc()"><i class="fa-solid fa-location-crosshairs"></i> Auto</button>
+  <div class="loc-stat" id="locStat">📍 Bhopal, India</div>
+</div>
+
+<!-- LIVE UPHORA BAR — COMPACT -->
+<div class="live-bar" id="liveBar">
+  <div class="lb-left">
+    <div class="lb-dot"></div>
+    <div class="lb-label">Live Uphora</div>
+    <div class="lb-lord" id="lbLord">—</div>
+  </div>
+  <div class="lb-time" id="lbTime">—</div>
+  <div class="lb-score" id="lbScore">—</div>
+  <div class="lb-cd" id="lbCd">—</div>
+</div>
+
+<!-- GOLDEN WINDOW -->
+<div class="gw-box" style="flex-direction:column;gap:6px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="gw-label"><i class="fa-solid fa-crown"></i>&nbsp;<span id="gwLabel">⭐ Best Muhurta (Golden Windows)</span></div>
+    <div style="font-size:10px;color:var(--td);">Score ≥ 75%</div>
+  </div>
+  <div class="gw-val" id="gwVal">—</div>
+  <div id="gwList"></div>
+</div>
+
+<!-- PANCHANG -->
+<div class="card" id="panchCard">
+  <div class="card-hd">
+    <div class="ch-title"><i class="fa-solid fa-calendar-star"></i>&nbsp;<span id="s0T">पंचांग</span></div>
+    <span id="varaD" style="font-size:13px;font-weight:900;color:var(--gold);">—</span>
+  </div>
+  <div class="pg">
+    <div class="pc"><label>तिथि</label><div class="pv" id="dTit">—</div></div>
+    <div class="pc"><label>नक्षत्र</label><div class="pv" id="dNak">—</div></div>
+    <div class="pc"><label>योग</label><div class="pv" id="dYog">—</div></div>
+    <div class="pc"><label>करण</label><div class="pv" id="dKar">—</div></div>
+    <div class="pc pb"><label>⚠ राहुकाल</label><div class="pv" id="dRahu">—</div></div>
+    <div class="pc py"><label>⚠ यमगण्ड</label><div class="pv" id="dYama">—</div></div>
+    <div class="pc pg2"><label>⚠ गुलिक</label><div class="pv" id="dGul">—</div></div>
+    <div class="pc ps"><label>🌅 सूर्योदय/अस्त</label><div class="pv" id="dSun">—</div></div>
+  </div>
+</div>
+
+<!-- PROFILE CARD -->
+<div class="card">
+  <div class="card-hd">
+    <div class="ch-title"><i class="fa-solid fa-user-circle"></i>&nbsp;<span id="s1T">जातक विवरण</span></div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-s" id="resetBtn" onclick="resetSlot()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+    </div>
+  </div>
+  <div class="slot-row">
+    <div class="slot a" id="sl1" onclick="sw(1)">👤 Profile 1</div>
+    <div class="slot" id="sl2" onclick="sw(2)">👤 Profile 2</div>
+    <div class="slot" id="sl3" onclick="sw(3)">👤 Profile 3</div>
+  </div>
+  <div class="f2" style="margin-bottom:9px;">
+    <div class="fg"><label>पूरा नाम <span class="req-badge" id="reqName">*required</span></label><input id="cN" type="text" placeholder="Rahul Sharma"></div>
+    <div class="fg"><label>WhatsApp <span class="req-badge" id="reqPhone">*required</span></label><input id="cW" type="tel" placeholder="919XXXXXXXXX"></div>
+    <div class="fg"><label>Email <span class="req-badge" id="reqEmail">*required</span></label><input id="cE" type="email" placeholder="client@email.com"></div>
+    <div class="fg"><label>जन्म-तिथि (DOB)</label><input id="cDob" type="date" onchange="onDob()"></div>
+    <div class="fg"><label>जन्म-समय (TOB)</label><input id="cTob" type="time" onchange="onDob()"></div>
+    <div class="fg"><label>जन्म शहर</label><input id="cCity" placeholder="Bhopal"></div>
+  </div>
+  <div class="f3" style="margin-bottom:9px;">
+    <div class="fg"><label>जन्म नक्षत्र</label><select id="nakSel" onchange="onNak()"></select></div>
+    <div class="fg"><label>पद (Pada 1-4)</label><select id="padaSel"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+
+  </div>
+  <!-- MINI DASHA BELOW NAKSHATRA/PADA -->
+  <div id="miniDasha" style="display:none;background:rgba(255,248,210,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;padding:8px 10px;margin-bottom:9px;">
+    <div style="font-size:9px;font-weight:800;color:var(--td);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between;">
+      <span>🪐 विमशोत्तरी दशा (Vimshottari)</span>
+      <span style="color:var(--td);">120yr cycle</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
+      <div style="text-align:center;padding:5px;background:rgba(255,248,200,.06);border-radius:7px;border:1px solid rgba(245,158,11,.2);">
+        <div style="font-size:8px;color:var(--td);font-weight:800;margin-bottom:2px;">MD</div>
+        <div id="miniMd" style="font-size:13px;font-weight:900;color:var(--gold2);">—</div>
+        <div id="miniMdD" style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--tm);">—</div>
+      </div>
+      <div style="text-align:center;padding:5px;background:rgba(255,248,200,.06);border-radius:7px;border:1px solid rgba(245,158,11,.18);">
+        <div style="font-size:8px;color:var(--td);font-weight:800;margin-bottom:2px;">AD</div>
+        <div id="miniAd" style="font-size:13px;font-weight:900;color:var(--gold2);">—</div>
+        <div id="miniAdD" style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--tm);">—</div>
+      </div>
+      <div style="text-align:center;padding:5px;background:rgba(255,248,200,.06);border-radius:7px;border:1px solid rgba(245,158,11,.15);">
+        <div style="font-size:8px;color:var(--td);font-weight:800;margin-bottom:2px;">PD</div>
+        <div id="miniPd" style="font-size:13px;font-weight:900;color:var(--gold2);">—</div>
+        <div id="miniPdD" style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--tm);">—</div>
+      </div>
+    </div>
+  </div>
+  <!-- QUERY + PURPOSE COMBINED WINDOW -->
+  <div style="background:rgba(255,243,195,.08);border:1.5px solid rgba(245,158,11,.3);border-radius:11px;padding:10px 12px;margin-bottom:9px;">
+    <div style="font-size:10px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp;Query & Purpose
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <input id="qInp" type="text" oninput="onQueryInput()" placeholder="अपना प्रश्न लिखें — auto detects purpose..."
+        style="flex:1;padding:10px 11px;background:rgba(255,243,195,.1);border:1.5px solid rgba(245,158,11,.25);color:var(--text);border-radius:9px;font-size:13px;outline:none;">
+      <button onclick="analyzeQ()" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+    </div>
+    <select id="purpSel" onchange="run()" style="width:100%;padding:10px 11px;background:rgba(255,243,195,.09);border:1.5px solid rgba(245,158,11,.22);color:var(--text);border-radius:9px;font-size:13px;font-weight:600;outline:none;"></select>
+    <div class="aipill" id="aiPill" style="margin-top:7px;"><div class="pd"></div><span id="aiTxt">— Type query above to auto-detect purpose</span></div>
+  </div>
+  <button class="btn btn-gr" id="saveBtn" onclick="saveP()" style="margin-top:10px;">
+    <i class="fa-solid fa-floppy-disk"></i> <span id="saveTxt">💾 Save Profile</span>
+  </button>
+</div>
+
+<!-- DASHA MOVED TO BOTTOM -->
+<div id="dashaCard" style="display:none;">
+  <div class="dasha-header">
+    <div class="dasha-title">
+      <i class="fa-solid fa-circle-nodes"></i>&nbsp;
+      <span id="dashaTitle">विमशोत्तरी दशा — MD / AD / PD</span>
+    </div>
+    <div style="font-size:10px;color:var(--td);">Vimshottari · 120yr cycle</div>
+  </div>
+  <div class="dasha-grid">
+    <div class="dasha-cell md-cell">
+      <div class="dasha-cell-lbl">महादशा (MD)</div>
+      <div class="dasha-cell-lord" id="mdLord">DOB डालें</div>
+      <div class="dasha-cell-dates" id="mdDates">—</div>
+    </div>
+    <div class="dasha-cell ad-cell">
+      <div class="dasha-cell-lbl">अंतर्दशा (AD)</div>
+      <div class="dasha-cell-lord" id="adLord">—</div>
+      <div class="dasha-cell-dates" id="adDates">—</div>
+    </div>
+    <div class="dasha-cell pd-cell">
+      <div class="dasha-cell-lbl">प्रत्यंतर (PD)</div>
+      <div class="dasha-cell-lord" id="pdLord">—</div>
+      <div class="dasha-cell-dates" id="pdDates">—</div>
+    </div>
+  </div>
+  <div class="dasha-match-bar">
+    <div class="dasha-match-item">
+      <span class="dasha-match-label">Hora vs MD:</span>
+      <span class="dasha-match-result" id="dashaMdMatch">—</span>
+    </div>
+    <div class="dasha-match-item">
+      <span class="dasha-match-label">Hora vs AD:</span>
+      <span class="dasha-match-result" id="dashaAdMatch">—</span>
+    </div>
+    <div class="dasha-match-item">
+      <span class="dasha-match-label">Bhava Match:</span>
+      <span class="dasha-match-result" id="dashaBhavaMatch">—</span>
+    </div>
+    <div class="dasha-match-item">
+      <span class="dasha-match-label">Navtara Quality:</span>
+      <span class="dasha-match-result" id="dashaNavtara">—</span>
+    </div>
+  </div>
+  <div class="dasha-score-hero">
+    <div class="dasha-score-pct" id="dashaScorePct" style="color:var(--gold2);">—</div>
+    <div class="dasha-score-lbl" id="dashaScoreLbl">Dasha-Hora-Navtara Combined Score</div>
+  </div>
+</div>
+
+<!-- 3-DAY DATE TABS -->
+<div class="date-tabs" id="dateTabs"></div>
+<div class="date-picker-row">
+  <input type="date" id="datePick" class="dpick" onchange="onDPick(this.value)">
+  <button class="btn-loco" onclick="setToday()">📅 Today</button>
+  <div style="font-size:12px;font-weight:800;color:var(--tm);" id="dispDateLabel">—</div>
+</div>
+
+<!-- HORA + UPHORA -->
+<div class="card">
+  <div class="card-hd">
+    <div class="ch-title"><i class="fa-solid fa-clock"></i>&nbsp;<span id="s2T">Hora + 7-Uphora Matrix</span></div>
+    <div style="font-size:10px;color:var(--td);" id="prefHoraLabel">Preferred Hora: —</div>
+  </div>
+  <!-- OVERALL RESULT HEADER -->
+  <div id="overallResultBar" style="background:rgba(255,243,195,.13);border:1px solid var(--bdr);border-radius:9px;padding:8px 14px;margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;">
+    <div style="font-size:11px;font-weight:800;color:var(--tm);">📊 Overall Result (Current Hora):</div>
+    <div id="overallResultText" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:900;color:var(--gold2);">—</div>
+  </div>
+  <div class="ptabs">
+    <button class="ptab aday" id="tbD" onclick="switchTab('day')">☀️ <span id="tbDL">12 Day Horas</span></button>
+    <button class="ptab" id="tbN" onclick="switchTab('night')">🌙 <span id="tbNL">12 Night Horas</span></button>
+  </div>
+  <div id="dayHP">
+    <div class="hbanner d"><span id="dHL">☀️ Sunrise → Sunset</span><span id="dSrD">—</span></div>
+    <div id="dayHC"></div>
+  </div>
+  <div id="nightHP" style="display:none;">
+    <div class="hbanner n"><span id="nHL">🌙 Sunset → Next Sunrise</span><span id="nSsD">—</span></div>
+    <div id="nightHC"></div>
+  </div>
+</div>
+
+<!-- CHOGHADIYA — SECONDARY / COLLAPSED -->
+<div class="chogh-wrap">
+  <div class="chogh-toggle" onclick="toggleChogh()">
+    <div class="chogh-toggle-title"><i class="fa-solid fa-clock-rotate-left"></i>&nbsp;<span id="s3T">चौघड़िया (Choghadiya) — 8-Yam</span></div>
+    <div style="font-size:11px;color:var(--tm);" id="choghArrow">▼ Show</div>
+  </div>
+  <div class="chogh-body" id="choghBody">
+    <div class="card" style="margin-top:6px;">
+      <div style="font-size:12px;font-weight:900;color:var(--gold);margin-bottom:8px;">☀️ <span id="dcLbl">Day Choghadiya</span></div>
+      <div style="position:relative;margin-bottom:18px;"><div class="tl" id="dayTL"></div></div>
+      <div class="cgg" id="dayGrid"></div>
+      <div style="font-size:12px;font-weight:900;color:var(--gold);margin:16px 0 8px;">🌙 <span id="ncLbl">Night Choghadiya</span></div>
+      <div style="position:relative;margin-bottom:18px;"><div class="tl" id="nightTL"></div></div>
+      <div class="cgg" id="nightGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WA BUTTONS -->
+<!-- WhatsApp moved to floating feedback button -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="fb">OCCULTVIISION</div>
+  <div class="fc">AstroNumerologist Naveenn Chadraa Raii · +91 9669756111</div>
+  <div style="font-size:10px;color:var(--td);margin-top:4px;">Kaalchakra Pro v5 · Classical 7-Uphora Engine · Naisargika Maitri · Navtara Tara Bala · Drik Siddhant</div>
+  <button onclick="toggleFeedback()" style="background:linear-gradient(135deg,#92400e,var(--gold));color:#000;border:none;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:900;cursor:pointer;margin-top:10px;display:inline-flex;align-items:center;gap:8px;">
+    <i class="fa-brands fa-whatsapp"></i> Book Personal Consultation
+  </button>
+</div>
+</div>
+
+
+<!-- ── FEEDBACK FAB BUTTON ── -->
+<button class="feedback-fab" onclick="toggleFeedback()" title="Feedback & WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+  <div class="feedback-fab-badge" id="fabBadge">!</div>
+</button>
+
+<!-- ── FEEDBACK + INVITE PANEL ── -->
+<div class="feedback-panel" id="feedbackPanel">
+  <div class="fp-head">
+    <div class="fp-title"><i class="fa-solid fa-comments"></i>&nbsp;Feedback & Share</div>
+    <button class="fp-close" onclick="toggleFeedback()">✕</button>
+  </div>
+  <!-- Tabs -->
+  <div style="display:flex;gap:5px;margin-bottom:12px;">
+    <div id="fptab1" onclick="switchFpTab('feedback')" style="flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;background:rgba(255,243,195,.12);color:var(--gold2);">💬 Feedback</div>
+    <div id="fptab2" onclick="switchFpTab('invite')" style="flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;color:var(--tm);">🔗 Invite & Share</div>
+  </div>
+
+  <!-- FEEDBACK TAB -->
+  <div id="fpTabFeedback">
+    <div style="text-align:center;margin-bottom:10px;">
+      <div style="font-size:11px;color:var(--tm);margin-bottom:6px;">Rate this session:</div>
+      <div class="fp-stars" id="fpStars">
+        <span class="fp-star" onclick="setRating(1)">★</span>
+        <span class="fp-star" onclick="setRating(2)">★</span>
+        <span class="fp-star" onclick="setRating(3)">★</span>
+        <span class="fp-star" onclick="setRating(4)">★</span>
+        <span class="fp-star" onclick="setRating(5)">★</span>
+      </div>
+    </div>
+    <div class="wa-r"><label>Name</label><input id="fpName" placeholder="Your name" type="text"></div>
+    <div class="wa-r"><label>WhatsApp</label><input id="fpPhone" type="tel" placeholder="919XXXXXXXXX"></div>
+    <div class="fp-topic-grid">
+      <div class="fp-topic sel" id="fp-ib1" onclick="setWI('general');fpHighlight('fp-ib1')">📋 General</div>
+      <div class="fp-topic" id="fp-ib2" onclick="setWI('fullchart');fpHighlight('fp-ib2')">📊 Full Chart</div>
+      <div class="fp-topic" id="fp-ib3" onclick="setWI('7day');fpHighlight('fp-ib3')">📅 7-Day</div>
+      <div class="fp-topic" id="fp-ib4" onclick="setWI('consult');fpHighlight('fp-ib4')">👑 Consult</div>
+    </div>
+    <div id="cxt4" style="display:none;background:rgba(255,243,195,.07);border:1px solid var(--bdr);border-radius:9px;padding:10px;margin-bottom:8px;">
+      <div class="wa-r"><label>Preferred Time</label><input id="waT" placeholder="e.g. Saturday 6-8 PM"></div>
+      <div class="wa-r"><label>Budget</label>
+        <select id="waB"><option>₹500–₹1,000</option><option>₹1,000–₹2,500</option><option>₹2,500–₹5,000</option><option>₹5,000+</option></select>
+      </div>
+    </div>
+    <div class="wa-r"><label>Message / Query</label>
+      <textarea id="fpMsg" style="height:65px;resize:none;" placeholder="अपना प्रश्न या feedback लिखें..."></textarea>
+    </div>
+    <button class="btn-fp-wa" onclick="sendFeedbackWA()">
+      <i class="fa-brands fa-whatsapp"></i> Send to +91 9669756111
+    </button>
+    <div style="font-size:10px;color:var(--td);text-align:center;margin-top:6px;">⏱ Response within 30 min · 9 AM–9 PM IST</div>
+  </div>
+
+  <!-- INVITE TAB -->
+  <div id="fpTabInvite" style="display:none;">
+    <div style="background:rgba(255,243,195,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--gold2);margin-bottom:6px;">🎁 Invite करें — 3 दिन FREE!</div>
+      <div style="font-size:11px;color:var(--tm);line-height:1.6;margin-bottom:10px;">
+        अपने दोस्त/client को invite करें।<br>
+        <b style="color:var(--gold2);">3 दिन का FREE Demo</b> + <span style="color:#86efac;">आपको Reward 🏆</span>
+      </div>
+      <div style="font-size:10px;color:var(--td);background:rgba(0,0,0,.25);padding:7px 10px;border-radius:7px;margin-bottom:8px;word-break:break-all;font-family:'JetBrains Mono',monospace;" id="inviteLinkDisplay">Link generate करें ↓</div>
+      <button onclick="generateInviteLink()" style="background:linear-gradient(135deg,#78350f,var(--gold2));color:#000;border:none;padding:9px;border-radius:8px;font-weight:900;font-size:12px;cursor:pointer;width:100%;margin-bottom:6px;">
+        🔗 Generate Invite Link
+      </button>
+      <button class="btn-fp-wa" onclick="shareInviteWA()" id="shareWABtn" style="display:none;">
+        <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+      </button>
+    </div>
+    <div style="font-size:11px;color:var(--tm);">
+      <div style="font-weight:800;color:var(--gold);margin-bottom:5px;">🔒 Privacy Guarantee:</div>
+      <div>✓ सिर्फ आपका <b>नाम</b> invite में जाएगा</div>
+      <div>✓ Phone/Email share नहीं होगा</div>
+      <div>✓ Client का data private रहेगा</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════ VIMSHOTTARI DASHA ENGINE ══════════ */
+
+/* Dasha sequence and years — Vimshottari 120-year cycle */
+const DASHA_SEQ = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+const DASHA_YRS = {Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
+const DASHA_TOTAL = 120;
+/* Nakshatra → Dasha lord (0=Ashwini → Ketu, repeating 3 cycles) */
+const NAK_DASHA = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+                    'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+                    'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+/* Planet Hindi names for display */
+const PLANET_HI_DASHA = {
+  Sun:'सूर्य',Moon:'चंद्र',Mars:'मंगल',Mercury:'बुध',Jupiter:'गुरु',
+  Venus:'शुक्र',Saturn:'शनि',Rahu:'राहु',Ketu:'केतु'
+};
+/* Planet colors for dasha display */
+const DASHA_COLOR = {
+  Sun:'#fb923c',Moon:'#93c5fd',Mars:'#fca5a5',Mercury:'#86efac',
+  Jupiter:'#fde68a',Venus:'#ddd6fe',Saturn:'#e7e5e4',Rahu:'#c4b5fd',Ketu:'#86efac'
+};
+
+function calcVimshottariDasha(dobStr, tobStr, nakIdx, tzOff) {
+  /* nakIdx: 0-26 (zero-indexed) */
+  if (!dobStr) return null;
+  const tob = tobStr || '12:00';
+
+  /* Birth DateTime in UTC */
+  const birthUTC = new Date(dobStr + 'T' + tob + ':00Z');
+  birthUTC.setTime(birthUTC.getTime() - tzOff * 3600000);
+
+  /* Moon's sidereal longitude at birth */
+  let moonL;
+  try { moonL = moonLon(birthUTC); } catch(e) { return null; }
+  const nakSpan = 360 / 27;
+  const nak = Math.floor(moonL / nakSpan); // which nak (0-26)
+  const fracDone = (moonL % nakSpan) / nakSpan; // fraction completed in this nak
+
+  const startLord = NAK_DASHA[nak];
+  const startTotalYrs = DASHA_YRS[startLord];
+  const remainYrs = (1 - fracDone) * startTotalYrs; // years remaining at birth
+
+  /* Build full dasha sequence from birth */
+  const startIdx = DASHA_SEQ.indexOf(startLord);
+  const MS_PER_YEAR = 365.25 * 24 * 3600 * 1000;
+  const dashas = [];
+  let cursor = new Date(birthUTC);
+
+  /* First (partial) Mahadasha */
+  let endMS = cursor.getTime() + remainYrs * MS_PER_YEAR;
+  dashas.push({ lord: startLord, start: new Date(cursor), end: new Date(endMS), yrs: remainYrs });
+  cursor = new Date(endMS);
+
+  /* Remaining 8 full Mahadashas */
+  for (let i = 1; i < 9; i++) {
+    const lord = DASHA_SEQ[(startIdx + i) % 9];
+    const yrs = DASHA_YRS[lord];
+    endMS = cursor.getTime() + yrs * MS_PER_YEAR;
+    dashas.push({ lord, start: new Date(cursor), end: new Date(endMS), yrs });
+    cursor = new Date(endMS);
+  }
+
+  return dashas;
+}
+
+function calcAntardashas(md) {
+  const maIdx = DASHA_SEQ.indexOf(md.lord);
+  const MS_PER_YEAR = 365.25 * 24 * 3600 * 1000;
+  const ads = [];
+  let cursor = new Date(md.start);
+  for (let i = 0; i < 9; i++) {
+    const lord = DASHA_SEQ[(maIdx + i) % 9];
+    const yrs = (md.yrs * DASHA_YRS[lord]) / DASHA_TOTAL;
+    const end = new Date(cursor.getTime() + yrs * MS_PER_YEAR);
+    ads.push({ lord, start: new Date(cursor), end, yrs });
+    cursor = new Date(end);
+  }
+  return ads;
+}
+
+function calcPratyantars(ad) {
+  const adIdx = DASHA_SEQ.indexOf(ad.lord);
+  const MS_PER_YEAR = 365.25 * 24 * 3600 * 1000;
+  const pds = [];
+  let cursor = new Date(ad.start);
+  for (let i = 0; i < 9; i++) {
+    const lord = DASHA_SEQ[(adIdx + i) % 9];
+    const yrs = (ad.yrs * DASHA_YRS[lord]) / DASHA_TOTAL;
+    const end = new Date(cursor.getTime() + yrs * MS_PER_YEAR);
+    pds.push({ lord, start: new Date(cursor), end, yrs });
+    cursor = new Date(end);
+  }
+  return pds;
+}
+
+function getCurrentDasha(dashas, now) {
+  const md = dashas.find(d => now >= d.start && now < d.end);
+  if (!md) return null;
+  const ads = calcAntardashas(md);
+  const ad = ads.find(d => now >= d.start && now < d.end);
+  if (!ad) return { md, ad: null, pd: null };
+  const pds = calcPratyantars(ad);
+  const pd = pds.find(d => now >= d.start && now < d.end);
+  return { md, ad: ad || null, pd: pd || null };
+}
+
+function fmtDashaDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+}
+
+/* ── ENHANCED GOLDEN SCORE with Dasha + Bhava ── */
+function goldenScoreAdvanced(horaLord, subLord, inRahu, inYama, currentDasha, catBhava, catHora) {
+  if (inRahu) return { sc: 0, label: 'राहुकाल', color: '#ef4444', class: 'ub', breakdown: {} };
+
+  const hn = hNav(horaLord);
+  const sn = hNav(subLord);
+
+  /* Base Navtara score (60% uphora, 40% hora) */
+  let base = hn.sc * 0.4 + sn.sc * 0.6;
+  if (hn.bad) base = Math.min(base, 30);
+  if (sn.bad) base = Math.min(base, sn.bad && hn.bad ? 5 : 25);
+
+  /* Maitri bonus */
+  const rel = (MAITRI[horaLord] || {})[subLord];
+  const mitriBonus = rel === 'F' ? 8 : rel === 'E' ? -10 : 0;
+  if (horaLord === subLord) base = Math.min(100, base + 5);
+
+  /* Dasha bonus */
+  let dashaMdBonus = 0, dashaAdBonus = 0, dashaPdBonus = 0;
+  if (currentDasha) {
+    if (currentDasha.md && currentDasha.md.lord === horaLord) dashaMdBonus = 15;
+    else if (currentDasha.md && currentDasha.md.lord === subLord) dashaMdBonus = 8;
+    if (currentDasha.ad && currentDasha.ad.lord === horaLord) dashaAdBonus = 10;
+    else if (currentDasha.ad && currentDasha.ad.lord === subLord) dashaAdBonus = 5;
+    if (currentDasha.pd && currentDasha.pd.lord === horaLord) dashaPdBonus = 5;
+    /* MD-AD Maitri bonus */
+    if (currentDasha.md && currentDasha.ad) {
+      const mdAdRel = (MAITRI[currentDasha.md.lord] || {})[currentDasha.ad.lord];
+      if (mdAdRel === 'F') dashaMdBonus += 3;
+    }
+  }
+
+  /* Bhava match bonus — if query's preferred hora = current hora */
+  const bhavaBonus = (catHora && catHora === horaLord) ? 12 : 0;
+
+  /* Yamaganda penalty */
+  const yamaFactor = inYama ? 0.7 : 1;
+
+  let total = (base + mitriBonus + dashaMdBonus + dashaAdBonus + dashaPdBonus + bhavaBonus) * yamaFactor;
+  total = Math.round(Math.max(0, Math.min(100, total)));
+
+  const isGold = total >= 82 && !hn.bad && !sn.bad;
+  const label = total >= 88 ? '★★ GOLDEN' : total >= 75 ? '★ Shubh' : total >= 50 ? '◇ Normal' : '✕ Avoid';
+  const color = total >= 88 ? '#fde68a' : total >= 75 ? '#86efac' : total >= 50 ? '#fbbf24' : '#f87171';
+  const cls = total >= 88 ? 'ug' : total >= 65 ? 'us' : total >= 40 ? 'un' : 'ub';
+
+  return {
+    sc: total, label, color, class: cls, isGold, hn, sn, rel,
+    breakdown: { base: Math.round(base), maitri: mitriBonus, md: dashaMdBonus, ad: dashaAdBonus, pd: dashaPdBonus, bhava: bhavaBonus }
+  };
+}
+
+/* Global dasha state */
+let currentDashaState = null;
+
+function updateDashaDisplay() {
+  /* Null-safe helper */
+  const setText=(id,v,color)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(color)el.style.color=color;}};
+  const setHTML=(id,v)=>{const el=document.getElementById(id);if(el)el.innerHTML=v;};
+  const dob = $('cDob') ? $('cDob').value : '';
+  const tob = $('cTob') ? $('cTob').value : '12:00';
+  if (!dob) {
+    setText('mdLord','DOB डालें');setText('adLord','—');setText('pdLord','—');
+    return;
+  }
+  const dashas = calcVimshottariDasha(dob, tob, janmaNak - 1, tzOff);
+  if (!dashas) return;
+  const now = new Date();
+  const current = getCurrentDasha(dashas, now);
+  currentDashaState = current;
+
+  if (!current) return;
+  const { md, ad, pd } = current;
+
+  /* Display MD - full + mini */
+  setText('mdLord',(PLANET_HI_DASHA[md.lord]||md.lord)+' '+md.lord, DASHA_COLOR[md.lord]||'var(--gold2)');
+  setText('mdDates', fmtDashaDate(md.start)+' – '+fmtDashaDate(md.end));
+  setText('miniMd',(PLANET_HI_DASHA[md.lord]||md.lord)+' '+md.lord, DASHA_COLOR[md.lord]);
+  setText('miniMdD', fmtDashaDate(md.end));
+  const md2=document.getElementById('miniDasha');if(md2)md2.style.display='block';
+  /* Display AD */
+  if(ad){
+    setText('adLord',(PLANET_HI_DASHA[ad.lord]||ad.lord)+' '+ad.lord, DASHA_COLOR[ad.lord]||'var(--gold2)');
+    setText('adDates', fmtDashaDate(ad.start)+' – '+fmtDashaDate(ad.end));
+    setText('miniAd',(PLANET_HI_DASHA[ad.lord]||ad.lord)+' '+ad.lord, DASHA_COLOR[ad.lord]);
+    setText('miniAdD', fmtDashaDate(ad.end));
+  }
+  /* Display PD */
+  if(pd){
+    setText('pdLord',(PLANET_HI_DASHA[pd.lord]||pd.lord)+' '+pd.lord, DASHA_COLOR[pd.lord]||'var(--gold2)');
+    setText('pdDates', fmtDashaDate(pd.start)+' – '+fmtDashaDate(pd.end));
+    setText('miniPd',(PLANET_HI_DASHA[pd.lord]||pd.lord)+' '+pd.lord, DASHA_COLOR[pd.lord]);
+    setText('miniPdD', fmtDashaDate(pd.end));
+  }
+  /* Match analysis with current hora */
+  const curHora=allHoras.find(h=>{const n=new Date();return n>=h.s&&n<h.e;});
+  if(curHora){
+    const mdMatch=md.lord===curHora.lord;
+    const adMatch=ad&&ad.lord===curHora.lord;
+    const cat=CATS.find(c=>c.key===($('purpSel')?$('purpSel').value:''));
+    const bhavaMatch=cat&&cat.hora===curHora.lord;
+    const hn=hNav(curHora.lord);
+    const mc=(v,yes,no)=>`<span style="color:${v?'#86efac':'#f87171'};font-weight:900;">${v?yes:no}</span>`;
+    setHTML('dashaMdMatch', mdMatch?mc(true,'✓ Same — Max Power'):mc(false,'','✗ '+md.lord+' ≠ '+curHora.lord));
+    setHTML('dashaAdMatch', adMatch?mc(true,'✓ AD Match +10%'):mc(false,'','◇ '+(ad?ad.lord:'—')+' ≠ '+curHora.lord));
+    setHTML('dashaBhavaMatch', bhavaMatch?mc(true,'✓ Bhava+Hora ✓'):mc(false,'','◇ Partial'));
+    setHTML('dashaNavtara', hn.bad?'<span style="color:#f87171;">✕ '+hn.hi+' Avoid</span>':'<span style="color:#86efac;">★ '+hn.hi+' '+hn.sc+'%</span>');
+    /* Score */
+    try{
+      const ups=buildUphoras7(curHora);
+      const curUp=ups.find(u=>{const n=new Date();return n>=u.s&&n<u.e;});
+      if(curUp){
+        const gs=goldenScoreAdvanced(curHora.lord,curUp.sub,false,false,current,cat?.bhava,cat?.hora);
+        setText('dashaScorePct', gs.sc+'%', gs.sc>=82?'#fde68a':gs.sc>=65?'#86efac':gs.sc>=45?'#fbbf24':'#f87171');
+        setText('dashaScoreLbl', `Hora(${Math.round(gs.breakdown.base)}%)+Dasha(+${gs.breakdown.md+gs.breakdown.ad+gs.breakdown.pd}%)+Bhava(+${gs.breakdown.bhava}%)=${gs.label}`);
+      }
+    }catch(e){setText('dashaScorePct','—');}
+  } else {
+    setText('dashaScorePct','—');
+    setText('dashaScoreLbl','अभी कोई Hora active नहीं है');
+  }
+}
+
+/* ══════════ CONSTANTS ══════════ */
+
+/* Choghadiya */
+const CSEQ=['Udveg','Char','Labh','Amrit','Kaal','Shubh','Rog'];
+const CDS=[0,3,6,2,5,1,4]; // Day start by weekday
+const CNS=[5,1,4,0,3,6,2]; // Night start by weekday
+const CM={
+  Amrit:{hi:'अमृत',en:'Amrit',ic:'🌟',sc:100,css:'ca',g:true},
+  Shubh:{hi:'शुभ',en:'Shubh',ic:'⭐',sc:85,css:'cb',g:true},
+  Labh:{hi:'लाभ',en:'Labh',ic:'💰',sc:80,css:'cl',g:true},
+  Char:{hi:'चर',en:'Char',ic:'✈️',sc:65,css:'cc',g:true},
+  Udveg:{hi:'उद्वेग',en:'Udveg',ic:'⚡',sc:25,css:'cu',g:false},
+  Kaal:{hi:'काल',en:'Kaal',ic:'⚠️',sc:20,css:'ck',g:false},
+  Rog:{hi:'रोग',en:'Rog',ic:'🚫',sc:10,css:'cr',g:false},
+};
+const RAHU_S=[8,2,7,5,6,4,3];
+const YAMA_S=[4,3,2,1,7,6,5];
+const GULI_S=[7,6,5,4,3,2,1];
+
+/* Hora */
+const CHALD=['Saturn','Jupiter','Mars','Sun','Venus','Mercury','Moon'];
+const DL=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+const HS={
+  Sun:{bg:'#7c2d12',text:'#fed7aa',hi:'सूर्य',en:'Sun'},
+  Moon:{bg:'#1e3a5f',text:'#bfdbfe',hi:'चंद्र',en:'Moon'},
+  Mars:{bg:'#4c0519',text:'#fecdd3',hi:'मंगल',en:'Mars'},
+  Mercury:{bg:'#14532d',text:'#bbf7d0',hi:'बुध',en:'Mercury'},
+  Jupiter:{bg:'#713f12',text:'#fef08a',hi:'गुरु',en:'Jupiter'},
+  Venus:{bg:'#2e1065',text:'#ddd6fe',hi:'शुक्र',en:'Venus'},
+  Saturn:{bg:'#1c1917',text:'#e7e5e4',hi:'शनि',en:'Saturn'},
+};
+
+/* Naisargika Maitri — BPHS classical table (asymmetric) */
+const MAITRI={
+  Sun:    {Moon:'F',Mars:'F',Jupiter:'F',Mercury:'N',Venus:'E',Saturn:'E'},
+  Moon:   {Sun:'F',Mercury:'F',Mars:'N',Jupiter:'N',Venus:'N',Saturn:'N'},
+  Mars:   {Sun:'F',Moon:'F',Jupiter:'F',Venus:'N',Saturn:'N',Mercury:'E'},
+  Mercury:{Sun:'F',Venus:'F',Mars:'N',Jupiter:'N',Saturn:'N',Moon:'E'},
+  Jupiter:{Sun:'F',Moon:'F',Mars:'F',Saturn:'N',Mercury:'E',Venus:'E'},
+  Venus:  {Mercury:'F',Saturn:'F',Mars:'N',Jupiter:'N',Sun:'E',Moon:'E'},
+  Saturn: {Mercury:'F',Venus:'F',Jupiter:'N',Sun:'E',Moon:'E',Mars:'E'},
+};
+
+/* Planet primary nakshatra (for Navtara of hora lord) */
+const PNAK={Sun:3,Moon:4,Mars:5,Mercury:9,Jupiter:7,Venus:2,Saturn:8,Rahu:6,Ketu:1};
+
+/* Navtara scoring — classical Tara Bala */
+const NV={
+  1:{hi:'जन्म',en:'Janma',sc:45,bad:false},
+  2:{hi:'सम्पत',en:'Sampat',sc:95,bad:false},
+  3:{hi:'विपत',en:'Vipat',sc:10,bad:true},
+  4:{hi:'क्षेम',en:'Kshema',sc:82,bad:false},
+  5:{hi:'प्रत्यरि',en:'Pratyari',sc:12,bad:true},
+  6:{hi:'साधक',en:'Sadhaka',sc:90,bad:false},
+  7:{hi:'वध',en:'Vadha',sc:3,bad:true},
+  8:{hi:'मित्र',en:'Mitra',sc:78,bad:false},
+  9:{hi:'अति-मित्र',en:'Ati-Mitra',sc:98,bad:false},
+};
+
+/* Nakshatra lists */
+const NH=['अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशिरा','आर्द्रा','पुनर्वसु','पुष्य','आश्लेषा','मघा','पूर्वाफाल्गुनी','उत्तराफाल्गुनी','हस्त','चित्रा','स्वाति','विशाखा','अनुराधा','ज्येष्ठा','मूल','पूर्वाषाढ़ा','उत्तराषाढ़ा','श्रवण','धनिष्ठा','शतभिषा','पूर्वाभाद्रपद','उत्तराभाद्रपद','रेवती'];
+const NE=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+
+const TN=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Purnima'];
+const YN=['Vishkamba','Priti','Ayushman','Saubhagya','Shobhana','Atiganda','Sukarma','Dhriti','Shoola','Ganda','Vriddhi','Dhruva','Vyaghata','Harshana','Vajra','Siddhi','Vyatipata','Variyan','Parigha','Shiva','Siddha','Sadhya','Shubha','Shukla','Brahma','Aindra','Vaidhriti'];
+const KN=['Bava','Balava','Kaulava','Taitila','Gara','Vanija','Vishti','Shakuni','Chatushpada','Naga','Kimsthughna'];
+
+/* Cities db */
+const CITIES={
+  Delhi:{lat:28.6139,lng:77.209,tz:5.5},Jaipur:{lat:26.9124,lng:75.7873,tz:5.5},
+  Lucknow:{lat:26.8467,lng:80.9462,tz:5.5},Agra:{lat:27.1767,lng:78.0081,tz:5.5},
+  Chandigarh:{lat:30.7333,lng:76.7794,tz:5.5},Varanasi:{lat:25.3176,lng:82.9739,tz:5.5},
+  Dehradun:{lat:30.3165,lng:78.0322,tz:5.5},Amritsar:{lat:31.634,lng:74.8723,tz:5.5},
+  Bhopal:{lat:23.2599,lng:77.4126,tz:5.5},Indore:{lat:22.7196,lng:75.8577,tz:5.5},
+  Nagpur:{lat:21.1458,lng:79.0882,tz:5.5},Raipur:{lat:21.2514,lng:81.6296,tz:5.5},
+  Jabalpur:{lat:23.1815,lng:79.9864,tz:5.5},Mumbai:{lat:19.076,lng:72.8777,tz:5.5},
+  Pune:{lat:18.5204,lng:73.8567,tz:5.5},Ahmedabad:{lat:23.0225,lng:72.5714,tz:5.5},
+  Surat:{lat:21.1702,lng:72.8311,tz:5.5},Bangalore:{lat:12.9716,lng:77.5946,tz:5.5},
+  Chennai:{lat:13.0827,lng:80.2707,tz:5.5},Hyderabad:{lat:17.385,lng:78.4867,tz:5.5},
+  Kochi:{lat:9.9312,lng:76.2673,tz:5.5},Kolkata:{lat:22.5726,lng:88.3639,tz:5.5},
+  Patna:{lat:25.5941,lng:85.1376,tz:5.5},Bhubaneswar:{lat:20.2961,lng:85.8245,tz:5.5},
+  Guwahati:{lat:26.1445,lng:91.7362,tz:5.5},Dubai:{lat:25.2048,lng:55.2708,tz:4},
+  London:{lat:51.5074,lng:-0.1278,tz:1},'New York':{lat:40.7128,lng:-74.006,tz:-5},
+  Toronto:{lat:43.6532,lng:-79.3832,tz:-5},'Los Angeles':{lat:34.0522,lng:-118.2437,tz:-8},
+  Singapore:{lat:1.3521,lng:103.8198,tz:8},Sydney:{lat:-33.8688,lng:151.2093,tz:10},
+  Kathmandu:{lat:27.7172,lng:85.324,tz:5.75},Dhaka:{lat:23.8103,lng:90.4125,tz:6},
+};
+
+/* Categories with bhava, preferred hora lord, and keywords */
+const CATS=[
+  {key:'cash_deposit',ic:'🏦',hi:'बैंक कैश जमा',en:'Cash Deposit',gr:'Finance',bhava:2,hora:'Jupiter',kws:['cash deposit','नकद जमा','bank deposit','बैंक जमा','fd','fixed deposit','जमा']},
+  {key:'cash_withdraw',ic:'💵',hi:'कैश निकासी',en:'Cash Withdrawal',gr:'Finance',bhava:2,hora:'Jupiter',kws:['withdraw','निकासी','atm','cash nikalna','पैसे निकालना']},
+  {key:'money_transfer',ic:'💸',hi:'पैसे ट्रांसफर',en:'Money Transfer NEFT/UPI',gr:'Finance',bhava:3,hora:'Mercury',kws:['neft','rtgs','imps','upi','gpay','phonepe','paytm','transfer','ट्रांसफर','पैसे भेजना','wire']},
+  {key:'loan_apply',ic:'🏧',hi:'लोन आवेदन',en:'Loan Application',gr:'Finance',bhava:6,hora:'Jupiter',kws:['loan','लोन','ऋण','home loan','personal loan','business loan','apply loan','bank loan']},
+  {key:'gold_buy',ic:'🥇',hi:'सोना/चाँदी खरीदना',en:'Gold/Silver Purchase',gr:'Finance',bhava:2,hora:'Jupiter',kws:['gold','सोना','silver','चाँदी','jewellery','jewelry','bullion','आभूषण','ornament']},
+  {key:'stock_trading',ic:'📈',hi:'शेयर ट्रेडिंग',en:'Stock Trading / Intraday',gr:'Finance',bhava:5,hora:'Mercury',kws:['stock','trading','nifty','sensex','शेयर','ट्रेडिंग','intraday','f&o','options','zerodha','groww']},
+  {key:'investment',ic:'📊',hi:'निवेश / SIP',en:'Investment / Mutual Fund',gr:'Finance',bhava:5,hora:'Jupiter',kws:['invest','investment','mutual fund','SIP','निवेश','ppf','nps','elss']},
+  {key:'insurance',ic:'🛡️',hi:'बीमा',en:'Insurance',gr:'Finance',bhava:8,hora:'Jupiter',kws:['insurance','बीमा','policy','LIC','term plan','health insurance']},
+  {key:'departure',ic:'🚪',hi:'घर से निकलना',en:'Departure from Home',gr:'Travel',bhava:3,hora:'Moon',kws:['घर से निकलना','departure','कब निकलूँ','nikalna','leave home','ghar se','जाना है','nikaalna','kab niklu','jana chahiye','jane ka','nikal','kab jau','jana chahta']},
+  {key:'train_journey',ic:'🚂',hi:'ट्रेन यात्रा',en:'Train Journey',gr:'Travel',bhava:3,hora:'Moon',kws:['train','रेल','ट्रेन','irctc','railway','rail']},
+  {key:'flight',ic:'✈️',hi:'फ्लाइट / हवाई यात्रा',en:'Flight / Air Travel',gr:'Travel',bhava:9,hora:'Venus',kws:['flight','हवाई','plane','airport','airline','फ्लाइट']},
+  {key:'international',ic:'🌍',hi:'विदेश यात्रा / वीजा',en:'International Travel / Visa',gr:'Travel',bhava:12,hora:'Venus',kws:['foreign','visa','विदेश','abroad','immigration','passport','canada','usa','uk','australia']},
+  {key:'ticket_booking',ic:'🎫',hi:'टिकट बुकिंग',en:'Ticket Booking',gr:'Travel',bhava:3,hora:'Moon',kws:['ticket','टिकट','booking','reserve','irctc','tatkal','बुकिंग']},
+  {key:'vehicle_purchase',ic:'🚘',hi:'वाहन खरीदना',en:'Vehicle Purchase',gr:'Travel',bhava:4,hora:'Moon',kws:['car','vehicle','bike','गाड़ी','कार','vehicle purchase','वाहन']},
+  {key:'pilgrimage',ic:'🛕',hi:'तीर्थ यात्रा',en:'Pilgrimage',gr:'Travel',bhava:9,hora:'Jupiter',kws:['tirth','तीर्थ','pilgrimage','yatra','char dham','vaishno','tirupati']},
+  {key:'doctor_appt',ic:'🏥',hi:'डॉक्टर अपॉइंटमेंट',en:'Doctor Appointment',gr:'Health',bhava:6,hora:'Sun',kws:['doctor','डॉक्टर','appointment','clinic','hospital','OPD','check up','physician']},
+  {key:'surgery',ic:'🔬',hi:'सर्जरी / ऑपरेशन',en:'Surgery / Operation',gr:'Health',bhava:8,hora:'Mars',kws:['surgery','operation','ऑपरेशन','सर्जरी','hospital admission','surgeon']},
+  {key:'medicine_time',ic:'💊',hi:'दवाई लेने का समय',en:'Medicine Timing',gr:'Health',bhava:1,hora:'Sun',kws:['medicine','दवाई','tablet','capsule','दवा','medicine time','dose','दवाई लेना']},
+  {key:'health_test',ic:'🧪',hi:'स्वास्थ्य जाँच',en:'Health Test / Lab',gr:'Health',bhava:6,hora:'Sun',kws:['blood test','lab test','health test','CBC','जाँच','pathology','MRI','CT scan']},
+  {key:'gym_start',ic:'🏋️',hi:'जिम / व्यायाम',en:'Gym / Fitness Start',gr:'Health',bhava:1,hora:'Mars',kws:['gym','fitness','exercise','yoga','workout','जिम','व्यायाम','jogging']},
+  {key:'job_interview',ic:'💼',hi:'नौकरी इंटरव्यू',en:'Job Interview',gr:'Career',bhava:10,hora:'Sun',kws:['interview','इंटरव्यू','job interview','HR round','walk in','campus','job','naukri']},
+  {key:'resume_send',ic:'📧',hi:'रिज्यूमे भेजना',en:'Resume Sending',gr:'Career',bhava:3,hora:'Mercury',kws:['resume','CV','job apply','resume send','apply job','रिज्यूमे','linkedin','naukri.com']},
+  {key:'office_join',ic:'🏢',hi:'नई नौकरी जॉइन',en:'New Job Joining',gr:'Career',bhava:10,hora:'Sun',kws:['join','joining','office join','new job','नौकरी जॉइन','first day']},
+  {key:'marketing_call',ic:'📞',hi:'मार्केटिंग कॉल',en:'Marketing / Sales Call',gr:'Career',bhava:3,hora:'Mercury',kws:['marketing call','client call','sales call','pitch','presentation','बिक्री कॉल','cold call','follow up','telecalling','client se baat','client baat','client karna']},
+  {key:'business_meeting',ic:'🤝',hi:'व्यापार मीटिंग',en:'Business Meeting',gr:'Career',bhava:7,hora:'Mercury',kws:['meeting','business meeting','deal','negotiation','client se','client ke paas','client milna','मीटिंग','partnership','MOU','client jana','client se milna','jana hai client']},
+  {key:'contract_sign',ic:'📜',hi:'अनुबंध/Agreement',en:'Contract Signing',gr:'Career',bhava:7,hora:'Mercury',kws:['contract','sign','agreement','अनुबंध','हस्ताक्षर','legal sign','paper sign','deed']},
+  {key:'business_launch',ic:'🚀',hi:'व्यापार/दुकान शुरू',en:'Business / Shop Launch',gr:'Career',bhava:10,hora:'Mercury',kws:['business start','shop open','launch','उद्घाटन','दुकान खोलना','startup','inauguration']},
+  {key:'election_form',ic:'🗳️',hi:'चुनाव फॉर्म',en:'Election Form / Nomination',gr:'Legal',bhava:10,hora:'Sun',kws:['election','चुनाव','nomination','voter','candidate','नामांकन','EC','form 6']},
+  {key:'court_hearing',ic:'⚖️',hi:'कोर्ट केस',en:'Court Hearing',gr:'Legal',bhava:6,hora:'Mars',kws:['court','कोर्ट','case','hearing','lawyer','मुकदमा','trial','bail','FIR']},
+  {key:'property_reg',ic:'📝',hi:'प्रॉपर्टी रजिस्ट्री',en:'Property Registration',gr:'Legal',bhava:4,hora:'Mars',kws:['property registration','रजिस्ट्री','registry','plot registration','sale deed','जमीन रजिस्ट्री']},
+  {key:'property_buy',ic:'🏠',hi:'प्रॉपर्टी खरीदना',en:'Property Purchase',gr:'Legal',bhava:4,hora:'Mars',kws:['property','house','land','plot','flat','apartment','जमीन','मकान','खरीदना','bungalow']},
+  {key:'govt_form',ic:'📄',hi:'सरकारी फॉर्म',en:'Government Form / Scheme',gr:'Legal',bhava:10,hora:'Sun',kws:['government','सरकारी','scheme','yojana','आवेदन','portal','online apply','PM scheme']},
+  {key:'passport_visa',ic:'🛂',hi:'पासपोर्ट / वीजा',en:'Passport / Visa Application',gr:'Legal',bhava:9,hora:'Jupiter',kws:['passport','visa','वीजा','पासपोर्ट','travel document','embassy','renew']},
+  {key:'exam_appear',ic:'📚',hi:'परीक्षा देना',en:'Appearing for Exam',gr:'Education',bhava:5,hora:'Mercury',kws:['exam','परीक्षा','test','board exam','UPSC','JEE','NEET','CAT','SSC','bank exam']},
+  {key:'exam_form',ic:'📝',hi:'परीक्षा फॉर्म',en:'Exam Form Filling',gr:'Education',bhava:5,hora:'Mercury',kws:['form fill','form','exam form','registration','online form','आवेदन फॉर्म','fill form']},
+  {key:'admission',ic:'🎓',hi:'एडमिशन',en:'Admission Application',gr:'Education',bhava:4,hora:'Jupiter',kws:['admission','एडमिशन','college admission','university','enrollment','प्रवेश']},
+  {key:'puja_hawan',ic:'🛕',hi:'पूजा / हवन',en:'Puja / Hawan',gr:'Religious',bhava:9,hora:'Jupiter',kws:['puja','पूजा','hawan','yagna','aarti','gruh puja','कथा','pooja','prayer','bhajan']},
+  {key:'marriage',ic:'💍',hi:'विवाह / शादी',en:'Marriage / Wedding',gr:'Personal',bhava:7,hora:'Venus',kws:['marriage','wedding','शादी','विवाह','nikah','court marriage','शादी की तारीख']},
+  {key:'engagement',ic:'💑',hi:'सगाई / रोका',en:'Engagement',gr:'Personal',bhava:7,hora:'Venus',kws:['engagement','सगाई','roka','ring ceremony','propose','mangni']},
+  {key:'social_post',ic:'📲',hi:'सोशल मीडिया पोस्ट',en:'Social Media Post',gr:'Media',bhava:3,hora:'Mercury',kws:['social media','instagram','facebook','youtube','post','content','video','reel','upload']},
+  {key:'shooting',ic:'🎥',hi:'शूटिंग / रिकॉर्डिंग',en:'Shooting / Recording',gr:'Media',bhava:3,hora:'Mercury',kws:['shooting','recording','video shoot','photoshoot','film','shoot','photography','शूटिंग']},
+  {key:'important_call',ic:'📱',hi:'महत्वपूर्ण फोन कॉल',en:'Important Phone Call',gr:'Daily',bhava:3,hora:'Mercury',kws:['call','phone call','important call','बात करना','ring','फोन','phon karna']},
+  {key:'email_send',ic:'📧',hi:'ईमेल भेजना',en:'Email Sending',gr:'Daily',bhava:3,hora:'Mercury',kws:['email','mail','send email','ईमेल','gmail','outlook','letter']},
+  {key:'delivery',ic:'📦',hi:'डिलीवरी',en:'Delivery / Courier',gr:'Logistics',bhava:3,hora:'Mercury',kws:['delivery','courier','send','ship','dispatch','भेजना','parcel']},
+  {key:'crypto',ic:'₿',hi:'क्रिप्टो ट्रेडिंग',en:'Crypto Trading',gr:'Finance',bhava:5,hora:'Mercury',kws:['crypto','bitcoin','ethereum','usdt','crypto buy','क्रिप्टो','altcoin','web3']},
+  {key:'muhurta',ic:'⏱️',hi:'मुहूर्त',en:'General Muhurta',gr:'Religious',bhava:1,hora:'Jupiter',kws:['muhurta','मुहूर्त','shubh','auspicious','samay','best time']},
+];
+
+/* Bhava → group descriptions */
+const BHAVA_DESC={1:'Self/Health/New Start',2:'Wealth/Family/Accumulation',3:'Communication/Short Travel/Media',4:'Home/Property/Vehicles',5:'Education/Children/Speculation',6:'Health/Debt/Competition',7:'Marriage/Partnerships/Contracts',8:'Transformation/Surgery/Loans',9:'Religion/Long Travel/Higher Study',10:'Career/Government/Authority',11:'Income/Gains/Network',12:'Foreign/Expenses/Moksha'};
+
+/* Query keywords pool */
+const QKW={};
+CATS.forEach(c=>{c.kws.forEach(kw=>{if(!QKW[kw])QKW[kw]=c;});});
+
+const WEBHOOK='https://script.google.com/macros/s/YOUR_DEPLOYED_APP_SCRIPT_ID/exec';
+const DN_HI=['रविवार','सोमवार','मंगलवार','बुधवार','गुरुवार','शुक्रवार','शनिवार'];
+const DN_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* ══════════ STATE ══════════ */
+let LANG='hi', activeSlot=1, janmaNak=1, janmaPada=1;
+let lat=23.2599, lng=77.4126, tzOff=5.5, cityName='Bhopal, India';
+let tgtDate=new Date(), SR, SS, NSR;
+let waIntent='general';
+let allHoras=[];
+let choghOpen=false;
+
+/* ══════════ ASTRONOMY (validated) ══════════ */
+function lahiri(jd){const T=(jd-2451545)/36525;return(85885.53192+5028.796195*T+1.1054348*T*T+0.00007964*T*T*T)/3600;}
+function moonLon(d){const t=Astronomy.MakeTime(d);const jd=t.ut+2451545;return((Astronomy.EclipticGeoMoon(t).lon-lahiri(jd))+360)%360;}
+function nakI(lon){return{idx:Math.floor(lon/(360/27)),pada:Math.floor((lon%(360/27))/((360/27)/4))+1};}
+
+function getSun(ds){
+  const obs=new Astronomy.Observer(lat,lng,0);
+  const mid=new Date(new Date(ds+'T00:00:00Z').getTime()-tzOff*3600000+3*3600000);
+  const r=Astronomy.SearchRiseSet(Astronomy.Body.Sun,obs,+1,Astronomy.MakeTime(mid),1);
+  const s=Astronomy.SearchRiseSet(Astronomy.Body.Sun,obs,-1,r.date,1);
+  const nr=Astronomy.SearchRiseSet(Astronomy.Body.Sun,obs,+1,s.date,1);
+  return{r:r.date,s:s.date,nr:nr.date};
+}
+
+function ft(d){
+  const l=new Date(d.getTime()+tzOff*3600000);
+  const h=l.getUTCHours(),m=l.getUTCMinutes();
+  return`${String(h%12||12).padStart(2,'0')}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
+}
+function fr(s,e){return`${ft(s)} – ${ft(e)}`;}
+function ldow(d){return new Date(d.getTime()+tzOff*3600000).getUTCDay();}
+
+function sunLon(d){const t=Astronomy.MakeTime(d);const jd=t.ut+2451545;return((Astronomy.SunPosition(t).elon-lahiri(jd))+360)%360;}
+function panchang(ds){
+  const ref=new Date(new Date(ds+'T00:00:00Z').getTime()-tzOff*3600000+6*3600000);
+  const ml=moonLon(ref),sl=sunLon(ref);
+  const diff=((ml-sl)+360)%360;
+  const tn=Math.floor(diff/12)+1;
+  const ti=(tn-1)%15;
+  const pk=tn<=15?(LANG==='hi'?'शुक्ल':'Shukla'):(LANG==='hi'?'कृष्ण':'Krishna');
+  const tname=ti===14?(tn===15?(LANG==='hi'?'पूर्णिमा':'Purnima'):(LANG==='hi'?'अमावस्या':'Amavasya')):TN[ti];
+  return{tithi:`${pk} ${tname}`,nak:(LANG==='hi'?NH:NE)[Math.floor(ml/(360/27))],yoga:YN[Math.floor(((ml+sl)%360)/(360/27))]||'—',karana:KN[Math.floor(diff/6)%11]||'—'};
+}
+
+/* ══════════ NAVTARA — CLASSICAL FORMULA ══════════ */
+/* count = ((target - janma + 27) % 27) + 1 → then ((count-1) % 9) + 1 */
+function navtara(janmaNak, targetNak){
+  const count=((targetNak-janmaNak+27)%27)+1;
+  const rem=((count-1)%9)+1;
+  return NV[rem];
+}
+function hNav(lord){
+  const pn=PNAK[lord];
+  return pn?navtara(janmaNak,pn):NV[1];
+}
+
+/* ══════════ GOLDEN WINDOW SCORE ══════════ */
+/* Engineered heuristic based on:
+   1. Hora Navtara (40% weight)
+   2. Uphora Navtara (60% weight — the precise window)
+   3. Naisargika Maitri bonus/penalty
+   4. Hard block if Rahu Kaal */
+function goldenScore(horaLord, subLord, inRahu, inYama){
+  if(inRahu) return{sc:0,label:'राहुकाल',color:'#dc2626',class:'ub'};
+  const hn=hNav(horaLord);
+  const sn=hNav(subLord);
+  if(hn.bad&&sn.bad) return{sc:5,label:`${hn.hi}+${sn.hi}`,color:'#ef4444',class:'ub'};
+  
+  let sc=hn.sc*0.4+sn.sc*0.6;
+  
+  // Maitri bonus (engineered heuristic)
+  const rel=(MAITRI[horaLord]||{})[subLord];
+  if(rel==='F') sc=Math.min(100,sc+8);
+  if(rel==='E') sc=Math.max(0,sc-10);
+  if(horaLord===subLord) sc=Math.min(100,sc+5); // concentrated energy
+  
+  if(inYama) sc=Math.max(0,sc*0.65);
+  
+  sc=Math.round(sc);
+  const isGold=sc>=82&&!hn.bad&&!sn.bad;
+  const label=isGold?'★ GOLDEN':sc>=70?'◆ Shubh':sc>=45?'◇ Normal':'✕ Avoid';
+  const color=isGold?'#ffd700':sc>=70?'#34d399':sc>=45?'#fbbf24':'#f87171';
+  const cls=isGold?'ug':sc>=65?'us':sc>=40?'un':'ub';
+  return{sc,label,color,class:cls,hn,sn,rel,isGold};
+}
+
+/* ══════════ CHOGHADIYA ══════════ */
+function buildChogh(dow){
+  const dd=(SS-SR)/8,nd=(NSR-SS)/8;
+  const day=[],night=[];
+  for(let i=0;i<8;i++){const nm=CSEQ[(CDS[dow]+i)%7];day.push({nm,m:CM[nm],s:new Date(SR.getTime()+i*dd),e:new Date(SR.getTime()+(i+1)*dd)});}
+  for(let i=0;i<8;i++){const nm=CSEQ[(CNS[dow]+i)%7];night.push({nm,m:CM[nm],s:new Date(SS.getTime()+i*nd),e:new Date(SS.getTime()+(i+1)*nd)});}
+  return{day,night};
+}
+function buildInausp(dow){
+  const dur=(SS-SR)/8;
+  const mk=s=>({s:new Date(SR.getTime()+(s-1)*dur),e:new Date(SR.getTime()+s*dur)});
+  return{rahu:mk(RAHU_S[dow]),yama:mk(YAMA_S[dow]),gulik:mk(GULI_S[dow])};
+}
+function inWindow(now,w){return now>=w.s&&now<w.e;}
+
+/* ══════════ HORA — 7-PART UPHORA (classical 7-fold, not 12) ══════════ */
+function buildHoras(dow){
+  const li=CHALD.indexOf(DL[dow]);
+  const dd=(SS-SR)/12,nd=(NSR-SS)/12;
+  return Array.from({length:24},(_,i)=>{
+    const n=i>=12;
+    return{lord:CHALD[(li+i)%7],isNight:n,i,
+      s:n?new Date(SS.getTime()+(i-12)*nd):new Date(SR.getTime()+i*dd),
+      e:n?new Date(SS.getTime()+(i-11)*nd):new Date(SR.getTime()+(i+1)*dd)};
+  });
+}
+function buildUphoras7(h){
+  /* 7-part sub-hora: start from Hora lord, cycle Chaldean */
+  const li=CHALD.indexOf(h.lord);
+  const dur=(h.e-h.s)/7;
+  return Array.from({length:7},(_,j)=>({
+    sub:CHALD[(li+j)%7],
+    s:new Date(h.s.getTime()+j*dur),
+    e:new Date(h.s.getTime()+(j+1)*dur),
+  }));
+}
+
+/* ══════════ RENDER ══════════ */
+const TLC={
+  Amrit:'rgba(5,100,40,.85)',Shubh:'rgba(30,60,180,.8)',Labh:'rgba(80,20,150,.8)',
+  Char:'rgba(5,100,160,.8)',Udveg:'rgba(140,50,0,.85)',Kaal:'rgba(100,70,0,.85)',Rog:'rgba(140,15,15,.85)'
+};
+const TLB={Amrit:'#34d399',Shubh:'#60a5fa',Labh:'#c084fc',Char:'#22d3ee',Udveg:'#fb923c',Kaal:'#fbbf24',Rog:'#f87171'};
+
+function renderTL(id,slots,now){
+  const el=document.getElementById(id);
+  const ts=slots[0].s.getTime(),te=slots[slots.length-1].e.getTime(),tot=te-ts,nowMs=now.getTime();
+  let h='';
+  slots.forEach(s=>{
+    const w=((s.e-s.s)/tot*100).toFixed(2);
+    const act=nowMs>=s.s.getTime()&&nowMs<s.e.getTime();
+    h+=`<div class="tls" style="width:${w}%;background:${TLC[s.nm]};border-top:2px solid ${TLB[s.nm]};${act?'box-shadow:0 0 8px '+TLB[s.nm]:''}">
+      <div class="tls-n">${s.nm}</div><div class="tls-h">${s.m.hi}</div>
+      <div class="tls-t">${ft(s.s)}</div></div>`;
+  });
+  el.innerHTML=h;el.style.position='relative';
+  if(nowMs>=ts&&nowMs<=te){
+    const p=((nowMs-ts)/tot*100).toFixed(2);
+    const n=document.createElement('div');n.className='needle';n.style.left=p+'%';el.appendChild(n);
+  }
+}
+
+function renderChoghGrid(id,slots,now,inausp){
+  const el=document.getElementById(id);
+  const nowMs=now.getTime();
+  el.innerHTML=slots.map(s=>{
+    const m=s.m,act=nowMs>=s.s.getTime()&&nowMs<s.e.getTime();
+    const isR=inausp&&!(s.e<=inausp.rahu.s||s.s>=inausp.rahu.e);
+    return`<div class="cgc ${m.css}${act?' cn':''}">
+      ${act?'<div class="cgc-nb">▶ NOW</div>':''}${isR?'<div class="cgc-rb">⚠ RAHU</div>':''}
+      <div class="cgc-ic">${m.ic}</div>
+      <div class="cgc-nm">${m.en}</div><div class="cgc-hi">${m.hi}</div>
+      <div class="cgc-tm">${ft(s.s)}<br>–${ft(s.e)}</div>
+      <div class="bar" style="width:${m.sc}%;"></div>
+      <div class="cgc-sc">${m.sc}%${m.g?' ★':' ✕'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHoras(horas,elId,now,inausp,prefLord){
+  const el=document.getElementById(elId);
+  const nowMs=now.getTime();
+  el.innerHTML='';
+  let goldStr='', goldScore=0;
+
+  horas.forEach(h=>{
+    const hs2=HS[h.lord];
+    const hn=hNav(h.lord);
+    const isAct=nowMs>=h.s.getTime()&&nowMs<h.e.getTime();
+    const inR=inausp&&inWindow(now,inausp.rahu)&&isAct;
+    const inY=inausp&&inWindow(now,inausp.yama)&&isAct;
+    const isPreferred=h.lord===prefLord;
+    
+    // Build 7 uphoras
+    const ups=buildUphoras7(h);
+    let bestSc=-1,bestGW=null,bestGWStr='';
+    
+    let upHtml=ups.map((u,j)=>{
+      const actU=nowMs>=u.s.getTime()&&nowMs<u.e.getTime();
+      const inRU=inausp&&inWindow(new Date((u.s.getTime()+u.e.getTime())/2),inausp.rahu);
+      const inYU=inausp&&inWindow(new Date((u.s.getTime()+u.e.getTime())/2),inausp.yama);
+      const cat_=CATS.find(c=>c.key===($('purpSel')?$('purpSel').value:''));
+      const gs=goldenScoreAdvanced(h.lord,u.sub,inRU,inYU,currentDashaState,cat_?.bhava,cat_?.hora);
+      
+      if(gs.sc>bestSc){bestSc=gs.sc;bestGW={u,gs};bestGWStr=`${ft(u.s)} (${gs.sc}% ${gs.label})`;}
+      if(gs.isGold&&gs.sc>goldScore){goldScore=gs.sc;goldStr=`${HS[h.lord]?.hi||h.lord} Hora + ${HS[u.sub]?.hi||u.sub} Uphora → ${fr(u.s,u.e)} | ${gs.sc}%`;}
+      
+      const hs3=HS[u.sub];
+      const sc_c=gs.sc>=82?'#ffd700':gs.sc>=65?'#34d399':gs.sc>=40?'#fbbf24':'#f87171';
+      return`<div class="uc ${gs.class}${actU?' unow':''}${gs.isGold?' uhigh':''}">
+        ${gs.isGold?'<div class="uc-gw">GW</div>':''}
+        <div class="uc-lord">${hs3?.hi||u.sub}</div>
+        <div class="uc-time">${ft(u.s)}<br>${ft(u.e)}</div>
+        <div class="uc-sc" style="color:${sc_c};">${gs.sc}%</div>
+      </div>`;
+    }).join('');
+    
+    const nc=hn.bad?'#f87171':hn.sc>=80?'#34d399':'#60a5fa';
+    const isGoldHora=bestSc>=82&&!hn.bad;
+    
+    const div=document.createElement('div');
+    div.className=`hrow${isAct?' hact':''}${isGoldHora?' hgold':''}`;
+    div.innerHTML=`<div class="hhead">
+      <div class="hlord" style="background:${hs2.bg};color:${hs2.text};${isPreferred?'box-shadow:0 0 10px rgba(212,160,23,.5);':''}">${hs2.hi}${isPreferred?' ⭐':''}</div>
+      <div class="hinfo">
+        <div class="htimes">${fr(h.s,h.e)}</div>
+        <div class="hgoldhint" title="${bestGWStr}">★ ${bestGWStr}</div>
+      </div>
+      <div class="hnav" style="color:${nc};">${hn.hi||hn.en} ${hn.sc}%</div>
+      <button class="hexp" onclick="event.stopPropagation();toggleUphora(this)">7 Uphoras ▼</button>
+    </div>
+    <div class="ugrid" style="display:none;">${upHtml}</div>`;
+    
+    // Auto-expand current hora
+    if(isAct){
+      setTimeout(()=>{const ug=div.querySelector('.ugrid');if(ug)ug.style.display='grid';},100);
+    }
+    
+    el.appendChild(div);
+  });
+  
+  return goldStr;
+}
+
+function toggleUphora(btn){
+  const ug=btn.closest('.hrow').querySelector('.ugrid');
+  if(!ug)return;
+  const show=ug.style.display==='none';
+  ug.style.display=show?'grid':'none';
+  btn.textContent=show?'7 Uphoras ▲':'7 Uphoras ▼';
+}
+
+/* ══════════ LIVE UPHORA UPDATE ══════════ */
+function buildConsolidatedGW(horas, inausp){
+  const now=new Date();const windows=[];
+  try{
+    horas.forEach(h=>{
+      if(!h||!h.s||!h.e)return;
+      const ups=buildUphoras7(h);
+      ups.forEach(u=>{
+        if(!u||!u.s||!u.e)return;
+        const midTime=new Date((u.s.getTime()+u.e.getTime())/2);
+        const inR=inausp&&inWindow(midTime,inausp.rahu);
+        const inY=inausp&&inWindow(midTime,inausp.yama);
+        const cat=CATS.find(c=>c.key===($('purpSel')?$('purpSel').value:''));
+        const gs=goldenScoreAdvanced(h.lord,u.sub,inR,inY,currentDashaState,cat?.bhava,cat?.hora);
+        if(gs.sc>=75){
+          windows.push({horaLord:h.lord,subLord:u.sub,s:u.s,e:u.e,sc:gs.sc,
+            label:gs.label,isPast:u.e<now,
+            horaHi:HS[h.lord]?.hi||h.lord,subHi:HS[u.sub]?.hi||u.sub});
+        }
+      });
+    });
+    windows.sort((a,b)=>b.sc-a.sc);
+  }catch(e){}
+  return windows;
+}
+
+function updateLiveBar(){
+  try{
+  const now=new Date(),nowMs=now.getTime();
+  if(!allHoras||!allHoras.length)return;
+  const h=allHoras.find(h=>h&&h.s&&h.e&&nowMs>=h.s.getTime()&&nowMs<h.e.getTime());
+  if(!h)return;
+  const ups=buildUphoras7(h);
+  const u=ups.find(u=>nowMs>=u.s.getTime()&&nowMs<u.e.getTime());
+  if(!u)return;
+  const gs=goldenScoreAdvanced(h.lord,u.sub,false,false,currentDashaState,null,null);
+  const hs2=HS[u.sub];
+  const remMs=u.e.getTime()-nowMs;
+  const rm=Math.floor(remMs/60000),rs=Math.floor((remMs%60000)/1000);
+  const lbLord=document.getElementById('lbLord');if(lbLord)lbLord.textContent=`${HS[h.lord]?.hi||h.lord} → ${hs2?.hi||u.sub}`;
+  const lbTime=document.getElementById('lbTime');if(lbTime)lbTime.textContent=fr(u.s,u.e);
+  const lbScore=document.getElementById('lbScore');if(lbScore)lbScore.innerHTML=`<span style="color:${gs.color};font-weight:900;">${gs.sc}% ${gs.label}</span>`;
+  const lbCd=document.getElementById('lbCd');if(lbCd)lbCd.textContent=`⏱ ${rm}m ${rs}s left`;
+  }catch(e){}
+}
+
+/* ══════════ 3-DATE TABS ══════════ */
+function buildDateTabs(){
+  const tabs=document.getElementById('dateTabs');
+  if(!tabs)return;
+  tabs.innerHTML='';
+  /* Compute today's date string (local) */
+  const todayLocal=new Date();
+  const todayStr=[todayLocal.getFullYear(),String(todayLocal.getMonth()+1).padStart(2,'0'),String(todayLocal.getDate()).padStart(2,'0')].join('-');
+  const tgtStr=[tgtDate.getFullYear(),String(tgtDate.getMonth()+1).padStart(2,'0'),String(tgtDate.getDate()).padStart(2,'0')].join('-');
+
+  [0,1,2].forEach(off=>{
+    const d=new Date(todayLocal.getFullYear(),todayLocal.getMonth(),todayLocal.getDate()+off);
+    const ds=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+    const isAct=ds===tgtStr;
+    const dayLabel=['Today','Tomorrow','Day +2'][off];
+    const dl=d.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+    const btn=document.createElement('div');
+    btn.className=`dtab${isAct?' act':''}`;
+    btn.dataset.date=ds;
+    btn.innerHTML=`<div style="font-size:12px;font-weight:900;">${dayLabel}</div><div class="dtab-day">${dl}</div>`;
+    btn.onclick=()=>{jumpTo(ds);};
+    tabs.appendChild(btn);
+  });
+}
+
+/* ══════════ MASTER ENGINE ══════════ */
+function run(){
+  try{
+  if(!checkLic())return;
+  const ds=tgtDate.toISOString().slice(0,10),now=new Date();
+  const st=getSun(ds);SR=st.r;SS=st.s;NSR=st.nr;
+  const dow=ldow(SR);
+  
+  document.getElementById('dSrD').textContent=ft(SR);
+  document.getElementById('nSsD').textContent=ft(SS);
+  document.getElementById('dSun').textContent=`${ft(SR)} / ${ft(SS)}`;
+  document.getElementById('varaD').textContent=(LANG==='hi'?'वार: ':'Day: ')+(LANG==='hi'?DN_HI:DN_EN)[dow];
+  document.getElementById('dHL').textContent=`☀️ ${ft(SR)} → ${ft(SS)}`;
+  document.getElementById('nHL').textContent=`🌙 ${ft(SS)} → ${ft(NSR)}`;
+  
+  const pc=panchang(ds);
+  document.getElementById('dTit').textContent=pc.tithi;
+  document.getElementById('dNak').textContent=pc.nak;
+  document.getElementById('dYog').textContent=pc.yoga;
+  document.getElementById('dKar').textContent=pc.karana;
+  
+  const inausp=buildInausp(dow);
+  document.getElementById('dRahu').textContent=fr(inausp.rahu.s,inausp.rahu.e);
+  document.getElementById('dYama').textContent=fr(inausp.yama.s,inausp.yama.e);
+  document.getElementById('dGul').textContent=fr(inausp.gulik.s,inausp.gulik.e);
+  
+  // Hora
+  allHoras=buildHoras(dow);
+  const cat=CATS.find(c=>c.key===document.getElementById('purpSel').value);
+  const prefLord=cat?.hora||'Jupiter';
+  document.getElementById('prefHoraLabel').textContent=`Preferred: ${HS[prefLord]?.hi||prefLord} Hora (Bhava ${cat?.bhava||'—'} — ${BHAVA_DESC[cat?.bhava]||''})`;
+  
+  const dh=allHoras.filter(h=>!h.isNight);
+  const nh=allHoras.filter(h=>h.isNight);
+  const goldStr=renderHoras(dh,'dayHC',now,inausp,prefLord);
+  renderHoras(nh,'nightHC',now,inausp,prefLord);
+  
+  // Choghadiya
+  const {day:dc,night:nc}=buildChogh(dow);
+  renderTL('dayTL',dc,now);renderTL('nightTL',nc,now);
+  renderChoghGrid('dayGrid',dc,now,inausp);
+  renderChoghGrid('nightGrid',nc,now,null);
+  
+  // Golden window
+  /* Consolidated golden window display */
+  try{
+    const gwEl=document.getElementById('gwVal');
+    const gwEl2=document.getElementById('gwList');
+    const allH=[...dh,...nh];
+    const gws=buildConsolidatedGW(allH,inausp);
+    const now=new Date();
+    const upcoming=gws.filter(w=>!w.isPast&&w.e>now).slice(0,3);
+    const past=gws.filter(w=>w.isPast).slice(0,2);
+    if(gwEl){
+      if(upcoming.length>0){
+        const best=upcoming[0];
+        gwEl.innerHTML=`<span style="color:${best.sc>=85?'#fde68a':'#86efac'};font-weight:900;">${best.horaHi} + ${best.subHi} → ${ft(best.s)}–${ft(best.e)} | ${best.sc}%</span>`;
+      } else {
+        gwEl.textContent=goldStr||'कोई Golden Window नहीं मिला';
+      }
+    }
+    if(gwEl2){
+      gwEl2.innerHTML=upcoming.map(w=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:6px;background:rgba(255,243,195,.07);border:1px solid rgba(245,158,11,.2);margin-bottom:4px;">
+          <div><span style="font-weight:900;color:var(--gold2);">${w.horaHi}+${w.subHi}</span>
+            <span style="font-size:10px;color:var(--tm);margin-left:6px;">${fr(w.s,w.e)}</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:900;font-size:13px;color:${w.sc>=85?'#fde68a':'#86efac'};">${w.sc}%</div>
+        </div>`).join('')||'<div style="font-size:11px;color:var(--td);">Day में कोई upcoming Golden Window नहीं</div>';
+    }
+  }catch(e){}
+  
+  // Date tabs + label
+  buildDateTabs();
+  document.getElementById('dispDateLabel').textContent=`📅 ${tgtDate.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+  
+  // Live bar
+  updateLiveBar();
+  updateDashaDisplay();
+  try{autoSwitchDayNight();}catch(e){}
+  /* Update overall result bar */
+  try{
+    const orEl=document.getElementById('overallResultBar');
+    if(orEl&&goldStr){
+      const orTxt=document.getElementById('overallResultText');
+      if(orTxt){
+        const parts=goldStr.match(/(\d+)%/);
+        const pct=parts?parseInt(parts[1]):0;
+        orTxt.style.color=pct>=82?'#fde68a':pct>=65?'#86efac':pct>=45?'#fbbf24':'#f87171';
+      }
+    }
+  }catch(e){}
+  
+  // Backend log
+    logActivity('ENGINE_RUN',{ds,city:cityName,nak:janmaNak,cat:cat?.key||'—'});
+  }catch(runErr){console.warn('run:',runErr.message);}
+}
+
+/* ══════════ LICENSE ══════════ */
+function checkLic(){
+  let l=JSON.parse(localStorage.getItem('ov_lic')||'null');
+  if(!l){const ex=new Date(Date.now()+3*86400000);l={tier:'3-Day Trial',expiry:ex.toISOString(),isPro:false};localStorage.setItem('ov_lic',JSON.stringify(l));}
+  const exp=new Date(l.expiry),days=Math.ceil((exp-new Date())/86400000),ok=l.isPro||days>0;
+  const dot=document.getElementById('ldot');
+  dot.className='ldot '+(l.isPro?'active':ok?'trial':'exp');
+  document.getElementById('ltxt').textContent=l.isPro?`👑 ${l.tier} (${days}d left)`:`⏳ ${l.tier} — ${Math.max(0,days)}d left`;
+  document.getElementById('lsub').textContent=l.isPro?'✅ License Active':`Demo • Exp ${exp.toLocaleDateString('en-IN')}`;
+  document.getElementById('lockMod').classList.toggle('show',!ok);
+  return ok;
+}
+function applyKey(k,enteredName){
+  k=k.trim().toUpperCase();
+  /* Name-bound one-time key check */
+  try{
+    const rks=JSON.parse(localStorage.getItem('ov_reg_keys')||'[]');
+    const found=rks.find(r=>r&&r.key===k);
+    if(found){
+      if(found.usedAt){toast('❌ Key already used','var(--warn)');return;}
+      const nm=(enteredName||($('lockName')||{value:''}).value||'').trim();
+      if(found.clientName&&nm&&found.clientName.toLowerCase()!==nm.toLowerCase()){toast('❌ Key for: '+found.clientName,'var(--warn)');return;}
+      found.usedAt=new Date().toISOString();found.usedBy=nm||found.clientName;
+      localStorage.setItem('ov_reg_keys',JSON.stringify(rks));
+      const ex=new Date(Date.now()+found.days*86400000);
+      localStorage.setItem('ov_lic',JSON.stringify({tier:found.tier,expiry:ex.toISOString(),isPro:true,clientName:found.clientName}));
+      logActivity('KEY_USED',{tier:found.tier,client:found.clientName});
+      toast('✅ '+found.tier+' — Welcome '+found.clientName+'!','#15803d');
+      setTimeout(()=>location.reload(),1500);return;
+    }
+  }catch(e){}
+  /* Legacy admin keys */
+  const n=new Date();
+  const dd=String(n.getDate()).padStart(2,'0'),mm=String(n.getMonth()+1).padStart(2,'0'),yyyy=n.getFullYear();
+  let tier='',days=0;
+  if([`NAVEEN${dd}${mm}${yyyy}`,`NAVEEN${yyyy}${mm}${dd}`,'NAVEEN'].includes(k)){tier='15-Day Master';days=15;}
+  else if(k.startsWith('OV-1M-')){tier='1-Month License';days=30;}
+  else if(k.startsWith('OV-1Y-')){tier='1-Year License';days=365;}
+  else if(k.startsWith('OV-3Y-')){tier='3-Year License';days=1095;}
+  else if(k.startsWith('OV-PRO')){tier='1-Year Corporate';days=365;}
+  else if(k.startsWith('OV-ENT')){tier='10-Year Enterprise';days=3650;}
+  else{toast('❌ Invalid key. Contact +91 9669756111','var(--warn)');return;}
+  const ex=new Date(n.getTime()+days*86400000);
+  localStorage.setItem('ov_lic',JSON.stringify({tier,expiry:ex.toISOString(),isPro:true}));
+  logActivity('LICENSE_ACTIVATE',{tier,days,key:k.slice(0,8)+'...'});
+  toast('✅ '+tier+' — '+days+' days!','#15803d');
+  setTimeout(()=>location.reload(),1500);
+}
+
+function promptKey(){
+  const k=prompt('License Key दर्ज करें (या RESET):');
+  if(!k)return;
+  if(k.trim().toUpperCase()==='RESET'){localStorage.removeItem('ov_lic');location.reload();return;}
+  applyKey(k);
+}
+
+/* ══════════ PROFILE — RESET FIXED ══════════ */
+const FIELDS=['cN','cW','cE','cDob','cTob','cCity'];
+function getP(){return{name:$('cN').value,phone:$('cW').value,email:$('cE').value,dob:$('cDob').value,tob:$('cTob').value,city:$('cCity').value,nak:janmaNak,pada:janmaPada,saved:new Date().toISOString()};}
+function loadP(d){
+  /* Single clean mapping — no duplicates */
+  try{$('cN').value=d.name||'';}catch(e){}
+  try{$('cW').value=d.phone||'';}catch(e){}
+  try{$('cE').value=d.email||'';}catch(e){}
+  try{$('cDob').value=d.dob||'';}catch(e){}
+  try{$('cTob').value=d.tob||'';}catch(e){}
+  try{$('cCity').value=d.city||'';}catch(e){}
+  janmaNak=d.nak||1;janmaPada=d.pada||1;
+  $('nakSel').value=janmaNak;$('padaSel').value=janmaPada;
+}
+function sw(n){
+  activeSlot=n;
+  try{[1,2,3].forEach(i=>{const el=document.getElementById('sl'+i);if(el)el.classList.toggle('a',i===n);});}catch(e){}
+  const s=localStorage.getItem('ov_p_'+n);
+  if(s){try{const d=JSON.parse(s);
+    document.getElementById('cN').value=d.name||'';document.getElementById('cW').value=d.phone||'';document.getElementById('cE').value=d.email||'';
+    document.getElementById('cDob').value=d.dob||'';document.getElementById('cTob').value=d.tob||'';document.getElementById('cCity').value=d.city||'';
+    janmaNak=d.nak||1;janmaPada=d.pada||1;
+    const ns=document.getElementById('nakSel');if(ns)ns.value=janmaNak;
+    const ps=document.getElementById('padaSel');if(ps)ps.value=janmaPada;
+    setTimeout(()=>{try{initRequiredBadges();}catch(e){}},50);
+    run();setTimeout(updateDashaDisplay,500);}catch(e){}}
+}
+function resetSlot(){
+  if(!confirm(`Profile ${activeSlot} को reset करें?`))return;
+  localStorage.removeItem(`ov_p_${activeSlot}`);
+  FIELDS.forEach(id=>$(id).value='');
+  janmaNak=1;janmaPada=1;$('nakSel').value=1;$('padaSel').value=1;
+  toast(`✅ Profile ${activeSlot} reset successfully`,'#15803d');
+  run();
+}
+function saveP(){
+  const n=$('cN').value.trim(),ph=$('cW').value.trim(),em=$('cE').value.trim();
+  if(!n){toast('❌ नाम आवश्यक है','#dc2626');return;}
+  if(!ph){toast('❌ WhatsApp number आवश्यक है','#dc2626');return;}
+  if(!em){toast('❌ Email आवश्यक है','#dc2626');return;}
+  const btn=$('saveBtn'),t=$('saveTxt');
+  btn.disabled=true;t.textContent='Saving...';
+  setTimeout(()=>{
+    const p=getP();
+    localStorage.setItem(`ov_p_${activeSlot}`,JSON.stringify(p));
+    logActivity('PROFILE_SAVE',{slot:activeSlot,name:p.name,phone:p.phone.slice(0,6)+'****',email:p.email.replace(/(.{2}).+(@.+)/,'$1****$2')});
+    btn.disabled=false;t.textContent='✅ Save & Submit Profile';
+    toast(`✅ Profile ${activeSlot} saved: ${p.name}`,'#15803d');
+  },600);
+}
+function onDob(){
+  const dob=$('cDob').value,tob=$('cTob').value||'12:00';
+  if(!dob)return;
+  const d=new Date(`${dob}T${tob}:00Z`);d.setTime(d.getTime()-tzOff*3600000);
+  const {idx,pada}=nakI(moonLon(d));
+  janmaNak=idx+1;janmaPada=pada;
+  $('nakSel').value=janmaNak;$('padaSel').value=janmaPada;
+  toast(`Nakshatra: ${(LANG==='hi'?NH:NE)[idx]} Pada ${pada}`,'#a07810');
+  run();
+  setTimeout(updateDashaDisplay,300);
+}
+function onNak(){janmaNak=+$('nakSel').value;janmaPada=+$('padaSel').value;run();}
+
+/* ══════════ AI QUERY — AUTO-PURPOSE ══════════ */
+function analyzeQ(){const q=($('qInp')||{value:''}).value.trim();if(!q){toast('Query लिखें','#a07810');return;}detectAndSetCategory(q,true);}
+
+function onQueryInput(){const q=($('qInp')||{value:''}).value.trim();if(q.length>1)detectAndSetCategory(q,false);}
+
+function detectAndSetCategory(q,showToast){
+  const ql=q.toLowerCase();
+  /* Quick keyword map for instant match - most common queries */
+  const quickMap=[
+    {words:['jana','jaana','jau','jata','nikal','ghar se','leave','departure','kab jau'],key:'departure'},
+    {words:['client se','client ko','client ka','client milna','client jana','client meeting'],key:'business_meeting'},
+    {words:['meeting','milna','milne','interview','job'],key:'business_meeting'},
+    {words:['stock','share','trading','nifty','crypto','invest'],key:'stock_trading'},
+    {words:['bank','cash deposit','paisa','money','neft','upi','transfer'],key:'money_transfer'},
+    {words:['doctor','dawai','medicine','hospital','health','dawa'],key:'doctor_appt'},
+    {words:['shaadi','vivah','marriage','wedding','engagement','sagai'],key:'marriage'},
+    {words:['property','makan','plot','ghar kharidna','zameen'],key:'property_buy'},
+    {words:['court','case','hearing','vakil','lawyer'],key:'court_hearing'},
+    {words:['exam','pariksha','board','result','admission'],key:'exam_appear'},
+    {words:['puja','hawan','mandir','pooja','temple'],key:'puja_hawan'},
+    {words:['resume','cv','job apply','naukri'],key:'resume_send'},
+    {words:['ticket','train','flight','bus','travel','safar','yatra'],key:'train_journey'},
+    {words:['loan','rin','emi','borrow'],key:'loan_apply'},
+  ];
+  /* Check quick map first */
+  for(const {words,key} of quickMap){
+    if(words.some(w=>ql.includes(w))){
+      const cat=CATS.find(c=>c.key===key);
+      if(cat){
+        applyCategory(cat,showToast);return;
+      }
+    }
+  }
+  /* Fallback: score all categories */
+  let best=null,bestSc=0;
+  CATS.forEach(c=>{
+    let sc=0;
+    c.kws.forEach(kw=>{const kwl=kw.toLowerCase();if(ql.includes(kwl))sc+=kwl.split(' ').length*2;});
+    if(sc===0){c.kws.forEach(kw=>{kw.toLowerCase().split(' ').forEach(w=>{if(w.length>=3&&ql.includes(w))sc+=1;});});}
+    if(sc>bestSc){bestSc=sc;best=c;}
+  });
+  const pill=$('aiPill'),txt=$('aiTxt');
+  if(pill)pill.style.display='flex';
+  if(best&&bestSc>0){applyCategory(best,showToast);}
+  else{if(txt)txt.innerHTML='⚡ General — Amrit + Jupiter Hora';}
+  logActivity('QUERY_ANALYZE',{query:q.slice(0,50),detected:best?.key||'general'});
+}
+
+function applyCategory(cat,showToast){
+  const sel=$('purpSel');const txt=$('aiTxt');
+  if(sel&&sel.value!==cat.key){
+    sel.value=cat.key;
+    sel.style.borderColor='var(--gold2)';sel.style.boxShadow='0 0 16px rgba(253,211,77,.6)';
+    setTimeout(()=>{if(sel){sel.style.borderColor='';sel.style.boxShadow='';}},1500);
+  }
+  if(txt)txt.innerHTML=`⚡ <b>${LANG==='hi'?cat.hi:cat.en}</b> | Bhava ${cat.bhava} | ${HS[cat.hora]?.hi||cat.hora} Hora`;
+  const pill=$('aiPill');if(pill)pill.style.display='flex';
+  if(showToast)toast(`✅ ${LANG==='hi'?cat.hi:cat.en}`,'#78350f');
+  run();
+}
+
+
+/* ══════════ LOCATION ══════════ */
+function onCity(v){
+  const ci=$('cityInp'),gb=$('geoBtn');
+  ci.style.display=v==='custom'?'block':'none';
+  gb.style.display=v==='custom'?'block':'none';
+  if(v==='auto'){autoLoc();return;}
+  if(v==='custom'||!v)return;
+  if(CITIES[v]){const c=CITIES[v];lat=c.lat;lng=c.lng;tzOff=c.tz;cityName=v;$('locStat').textContent=`📍 ${v}`;run();}
+}
+function autoLoc(){
+  if(!navigator.geolocation){toast('Geolocation not supported','#dc2626');return;}
+  toast('📍 Detecting...','#a07810');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    lat=pos.coords.latitude;lng=pos.coords.longitude;
+    tzOff=Math.round(lng/15*2)/2;
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`)
+      .then(r=>r.json()).then(d=>{
+        cityName=(d.address?.city||d.address?.town||d.address?.state||`${lat.toFixed(2)}°N`);
+        $('locStat').textContent=`📍 ${cityName}`;
+        toast(`📍 ${cityName}`,'#15803d');
+        logActivity('LOCATION_AUTO',{city:cityName,lat:lat.toFixed(3),lng:lng.toFixed(3)});
+        run();
+      }).catch(()=>run());
+  },e=>{toast('Location denied','#dc2626');});
+}
+async function geocode(){
+  const city=$('cityInp').value.trim();
+  if(!city){toast('City name लिखें','#dc2626');return;}
+  toast('🔍 Searching...','#a07810');
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
+    const d=await r.json();
+    if(d.length>0){
+      lat=parseFloat(d[0].lat);lng=parseFloat(d[0].lon);
+      cityName=d[0].display_name.split(',').slice(0,2).join(',').trim();
+      tzOff=Math.round(lng/15*2)/2;
+      $('locStat').textContent=`📍 ${cityName}`;
+      toast(`✅ ${cityName} (tz ${tzOff>0?'+':''}${tzOff})`,'#15803d');
+      logActivity('LOCATION_GEOCODE',{city:cityName,lat:lat.toFixed(3),lng:lng.toFixed(3)});
+      run();
+    } else toast('City not found. Try full name.','#dc2626');
+  }catch{toast('Search failed. Check connection.','#dc2626');}
+}
+
+/* ══════════ WA ══════════ */
+function setWI(i){
+  waIntent=i;
+  try{
+    ['general','fullchart','7day','consult'].forEach((x,n)=>{
+      const el=document.getElementById('ib'+(n+1));
+      if(el)el.classList.toggle('sl',x===i);
+    });
+    const cxt=document.getElementById('cxt4');
+    if(cxt)cxt.style.display=i==='consult'?'block':'none';
+  }catch(e){}
+}
+function openWa(){
+  $('waN').value=$('cN').value;
+  $('waP').value=$('cW').value;
+  $('waMod').classList.add('show');
+}
+function closeWa(){$('waMod').classList.remove('show');}
+function buildFullChart(){
+  const ds=tgtDate.toISOString().slice(0,10);
+  const cat=CATS.find(c=>c.key===$('purpSel').value);
+  const prefLord=cat?.hora||'Jupiter';
+  let msg=`☀️ *OCCULTVIISION — Uphora Chart*\n`;
+  msg+=`📅 Date: ${ds} | 📍 ${cityName}\n`;
+  msg+=`🎯 Purpose: ${LANG==='hi'?cat?.hi:cat?.en||'General'}\n`;
+  msg+=`⭐ Preferred Hora: ${HS[prefLord]?.hi||prefLord}\n\n`;
+  msg+=`*GOLDEN WINDOWS (≥82%):*\n`;
+  let found=false;
+  allHoras.forEach(h=>{
+    buildUphoras7(h).forEach(u=>{
+      const cat_=CATS.find(c=>c.key===($('purpSel')?$('purpSel').value:''));
+    const gs=goldenScoreAdvanced(h.lord,u.sub,false,false,currentDashaState,cat_?.bhava,cat_?.hora);
+      if(gs.isGold){
+        msg+=`🌟 ${ft(u.s)}–${ft(u.e)} | ${HS[h.lord]?.hi||h.lord}+${HS[u.sub]?.hi||u.sub} = ${gs.sc}%\n`;
+        found=true;
+      }
+    });
+  });
+  if(!found)msg+=`(No Golden Windows today)\n`;
+  msg+=`\nRahu Kaal: ${document.getElementById('dRahu').textContent}\n`;
+  msg+=`\n_Kaalchakra Pro v5 | +91 9669756111_`;
+  return msg;
+}
+function build7DayChart(){
+  let msg=`☀️ *OCCULTVIISION — 7-Day Uphora Chart*\n📍 ${cityName}\n\n`;
+  const cat=CATS.find(c=>c.key===$('purpSel').value);
+  msg+=`🎯 Purpose: ${LANG==='hi'?cat?.hi:cat?.en||'General'}\n\n`;
+  const now=new Date();
+  for(let d=0;d<7;d++){
+    const dt=new Date(now);dt.setDate(dt.getDate()+d);
+    const ds=dt.toISOString().slice(0,10);
+    const st=getSun(ds);
+    const dow=ldow(st.r);
+    const h7=buildHoras2(dow,st.r,st.s,st.nr);
+    const dstr=dt.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+    msg+=`📅 *${dstr}*\n`;
+    let bestW=null,bestSc=0;
+    h7.forEach(h=>{
+      buildUphoras7(h).forEach(u=>{
+        const cat_=CATS.find(c=>c.key===($('purpSel')?$('purpSel').value:''));
+    const gs=goldenScoreAdvanced(h.lord,u.sub,false,false,currentDashaState,cat_?.bhava,cat_?.hora);
+        if(gs.sc>bestSc){bestSc=gs.sc;bestW={h,u,gs};}
+      });
+    });
+    if(bestW)msg+=`★ Best: ${ft(bestW.u.s)}–${ft(bestW.u.e)} | ${HS[bestW.h.lord]?.hi||bestW.h.lord}+${HS[bestW.u.sub]?.hi||bestW.u.sub} = ${bestSc}%\n`;
+    else msg+=`★ Check Hora engine\n`;
+  }
+  msg+=`\n_Kaalchakra Pro v5 | +91 9669756111_`;
+  return msg;
+}
+function buildHoras2(dow,sr,ss,ns){
+  const li=CHALD.indexOf(DL[dow]);
+  const dd=(ss-sr)/12,nd=(ns-ss)/12;
+  return Array.from({length:24},(_,i)=>{
+    const n=i>=12;
+    return{lord:CHALD[(li+i)%7],s:n?new Date(ss.getTime()+(i-12)*nd):new Date(sr.getTime()+i*dd),e:n?new Date(ss.getTime()+(i-11)*nd):new Date(sr.getTime()+(i+1)*dd)};
+  });
+}
+function sendWa(){
+  const nm=$('waN').value||'Client';
+  const ph=$('waP').value.replace(/\D/g,'')||'919669756111';
+  const qr=$('waQ').value;
+  if(!qr){toast('Query लिखें','#dc2626');return;}
+  let msg='';
+  if(waIntent==='fullchart') msg=buildFullChart();
+  else if(waIntent==='7day') msg=build7DayChart();
+  else if(waIntent==='consult'){
+    msg=`☀️ *OCCULTVIISION | Consultation Request*\n\n👤 ${nm}\n📱 ${ph}\n📋 Query: ${qr}\n\n👑 *Personal Consultation चाहिए*\n⏰ Preferred: ${$('waT').value||'Flexible'}\n💰 Budget: ${$('waB').value}\n\n🙏 Please confirm appointment.`;
+  } else {
+    msg=`☀️ *OCCULTVIISION | Kaalchakra Pro v5*\n\n👤 ${nm} | 📱 ${ph}\n📅 ${tgtDate.toLocaleDateString('en-IN')}\n📍 ${cityName}\n📋 Query: ${qr}\n\n_Please advise best muhurta. Sent via Kaalchakra Pro v5_`;
+  }
+  logActivity('WA_SEND',{name:nm,phone:ph.slice(0,6)+'****',intent:waIntent,city:cityName});
+  window.open(`https://api.whatsapp.com/send?phone=919669756111&text=${encodeURIComponent(msg)}`,'_blank');
+  closeWa();
+}
+
+/* ══════════ BACKEND LOGGING — Always Active ══════════ */
+function logActivity(type,data){
+  try{
+    const payload={type,timestamp:new Date().toISOString(),city:cityName,nak:janmaNak,...data};
+    fetch(WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
+    // Also store locally for audit
+    const logs=JSON.parse(localStorage.getItem('ov_log')||'[]');
+    logs.unshift({...payload,local:true});
+    if(logs.length>100)logs.pop();
+    localStorage.setItem('ov_log',JSON.stringify(logs));
+  }catch(e){}
+}
+
+/* ══════════ UI HELPERS ══════════ */
+function $(id){return document.getElementById(id);}
+function switchTab(t){
+  $('dayHP').style.display=t==='day'?'block':'none';
+  $('nightHP').style.display=t==='night'?'block':'none';
+  $('tbD').className='ptab'+(t==='day'?' aday':'');
+  $('tbN').className='ptab'+(t==='night'?' anight':'');
+}
+function toggleChogh(){
+  choghOpen=!choghOpen;
+  $('choghBody').classList.toggle('show',choghOpen);
+  $('choghArrow').textContent=choghOpen?'▲ Hide':'▼ Show';
+}
+function shiftDate(d){tgtDate.setDate(tgtDate.getDate()+d);syncD();buildDateTabs();run();}
+function setToday(){tgtDate=new Date();syncD();buildDateTabs();run();}
+function jumpTo(s){tgtDate=new Date(s+'T00:00:00');syncD();buildDateTabs();run();autoSwitchDayNight();}
+function autoSwitchDayNight(){
+  if(!SR||!SS)return;
+  const now=new Date();
+  const isTodaySelected=tgtDate.toDateString()===now.toDateString();
+  if(isTodaySelected){switchTab(now>=SR&&now<SS?'day':'night');}
+  else{switchTab('day');}
+}
+function onDPick(v){if(v){tgtDate=new Date(v+'T00:00:00');buildDateTabs();run();}}
+function syncD(){const d=tgtDate;$('datePick').value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function setTheme(t){
+  document.body.className=t;
+  try{document.querySelectorAll('.td').forEach((dot,i)=>{if(dot){const themes=['','tg','ts','te','tv'];dot.classList.toggle('active-theme',themes[i]===t);}});}catch(e){}
+  const labels={'':'Divine Saffron','tg':'Maroon Rose','ts':'Royal Blue','te':'Forest Emerald','tv':'Deep Violet'};
+  const colors={'':'#78350f','tg':'#9f1239','ts':'#1d4ed8','te':'#059669','tv':'#7c3aed'};
+  toast(`Theme: ${labels[t]||t} ✓`, colors[t]||'#006b52');
+}
+function setT(t){setTheme(t);}
+function setLang(l){LANG=l;$('bHi').classList.toggle('a',l==='hi');$('bEn').classList.toggle('a',l==='en');populateNak();populatePurp();run();}
+/* ══════════ FEEDBACK PANEL ══════════ */
+let fpRating = 0;
+let fpTopic = 'general';
+
+/* ══════════ INVITE & REFERRAL SYSTEM ══════════ */
+let currentInviteLink = '';
+let inviteRefCode = '';
+
+function generateInviteLink(){
+  /* Generate ref code from client name — no personal data in URL */
+  const name = ($('cN')||{value:'OccultUser'}).value.trim()||'OccultUser';
+  const clean = name.replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,6);
+  const rand = Math.random().toString(36).substring(2,6).toUpperCase();
+  inviteRefCode = clean + rand;  // e.g. NAVEEN7K2M
+  
+  /* Store invite in local registry */
+  const invites = JSON.parse(localStorage.getItem('ov_invites')||'[]');
+  invites.push({
+    code: inviteRefCode,
+    inviterName: name,  // only name stored, no phone/email
+    createdAt: new Date().toISOString(),
+    uses: 0
+  });
+  localStorage.setItem('ov_invites', JSON.stringify(invites));
+  
+  /* Build invite URL - app base URL + ref code only */
+  const baseURL = window.location.href.split('?')[0];
+  currentInviteLink = `${baseURL}?ref=${inviteRefCode}&demo=3day`;
+  
+  const display = document.getElementById('inviteLinkDisplay');
+  if(display) display.textContent = currentInviteLink;
+  
+  const shareBtn = document.getElementById('shareWABtn');
+  if(shareBtn) shareBtn.style.display = 'flex';
+  
+  /* Log to backend */
+  logActivity('INVITE_GENERATED',{code:inviteRefCode,inviterName:name});
+  toast('✅ Invite link ready!','#15803d');
+}
+
+function shareInviteWA(){
+  if(!currentInviteLink) return;
+  const name = ($('cN')||{value:''}).value.trim()||'एक OccultViision User';
+  const msg = `🌟 *OccultViision | Kaalchakra Pro* 🌟
+
+`
+    + `*${name}* ने आपको invite किया है!
+
+`
+    + `🎁 *3 दिन FREE Demo* पाएं
+`
+    + `⭐ Hora + Uphora + MD/AD/PD Dasha Analysis
+`
+    + `📅 Daily Best Muhurta Calculator
+
+`
+    + `👇 अभी Download करें:
+${currentInviteLink}
+
+`
+    + `_+91 9669756111 | OCCULTVIISION_`;
+  
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`,'_blank');
+  logActivity('INVITE_SHARED',{code:inviteRefCode,via:'whatsapp'});
+}
+
+function switchFpTab(tab){
+  try{
+  const fb = document.getElementById('fpTabFeedback');
+  const inv = document.getElementById('fpTabInvite');
+  const t1 = document.getElementById('fptab1');
+  const t2 = document.getElementById('fptab2');
+  if(!fb||!inv)return;
+  fb.style.display = tab==='feedback'?'block':'none';
+  inv.style.display = tab==='invite'?'block':'none';
+  if(t1)t1.style.cssText=tab==='feedback'?'flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;background:rgba(255,248,200,.1);color:var(--gold2);':'flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;color:var(--tm);';
+  if(t2)t2.style.cssText=tab==='invite'?'flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;background:rgba(255,248,200,.1);color:var(--gold2);':'flex:1;padding:7px;text-align:center;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;font-size:11px;font-weight:800;color:var(--tm);';
+  /* Pre-fill from profile when opening invite */
+  if(tab==='invite'){
+    const lnk=document.getElementById('inviteLinkDisplay');
+    if(lnk&&lnk.textContent==='Link generate करें ↓')generateInviteLink();
+  }
+  }catch(e){}
+}
+
+/* Check if this session has a referral code in URL */
+function checkReferral(){
+  const params=new URLSearchParams(window.location.search);
+  const ref=params.get('ref');
+  const demo=params.get('demo');
+  if(ref&&demo==='3day'){
+    /* Track the referral */
+    const lic=JSON.parse(localStorage.getItem('ov_lic')||'null');
+    if(!lic){
+      /* New user — give 3 day demo and track referral */
+      const ex=new Date(Date.now()+3*86400000);
+      localStorage.setItem('ov_lic',JSON.stringify({tier:'3-Day Free Demo',expiry:ex.toISOString(),isPro:false,referredBy:ref}));
+      /* Update invite record use count */
+      logActivity('REFERRAL_ACTIVATED',{refCode:ref,activatedAt:new Date().toISOString()});
+      toast(`🎁 3 दिन का FREE Demo activated! Ref: ${ref.slice(0,4)}****`,'#15803d');
+    }
+  }
+}
+
+function fpHighlight(activeId){
+  ['fp-ib1','fp-ib2','fp-ib3','fp-ib4'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.toggle('sel',id===activeId);
+  });
+}
+function toggleFeedback() {
+  const panel = document.getElementById('feedbackPanel');
+  const badge = document.getElementById('fabBadge');
+  if(panel) panel.classList.toggle('open');
+  if(badge) badge.style.display = 'none';
+  /* Pre-fill from profile */
+  try{
+    const fpn=document.getElementById('fpName');
+    const fpp=document.getElementById('fpPhone');
+    const cn=$('cN'),cw=$('cW');
+    if(fpn&&cn) fpn.value=cn.value||'';
+    if(fpp&&cw) fpp.value=cw.value||'';
+  }catch(e){}
+}
+
+function setRating(r) {
+  fpRating = r;
+  document.querySelectorAll('.fp-star').forEach((s, i) => {
+    s.classList.toggle('active', i < r);
+  });
+}
+
+function fpSelectTopic(el, topic) {
+  fpTopic = topic;
+  document.querySelectorAll('.fp-topic').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function sendFeedbackWA() {
+  const fpNameEl=document.getElementById('fpName');
+  const fpPhoneEl=document.getElementById('fpPhone');
+  const fpMsgEl=document.getElementById('fpMsg');
+  const nm = (fpNameEl&&fpNameEl.value)||($('cN')&&$('cN').value)||'Client';
+  const ph = ((fpPhoneEl&&fpPhoneEl.value)||($('cW')&&$('cW').value)||'919669756111').replace(/\D/g,'');
+  const msg = (fpMsgEl&&fpMsgEl.value)||'';
+  if (!msg) { toast('Message लिखें', '#ef4444'); return; }
+
+  const stars = '★'.repeat(fpRating) + '☆'.repeat(5 - fpRating);
+  const topicLabel = { general: 'General Query', consult: 'Personal Consultation', chart: 'Full Chart Request', feedback: 'Feedback' }[fpTopic] || fpTopic;
+
+  let waMsg = `☀️ *OCCULTVIISION | Kaalchakra Pro*\n\n`;
+  waMsg += `👤 *${nm}* | 📱 ${ph}\n`;
+  waMsg += `⭐ Rating: ${stars} (${fpRating}/5)\n`;
+  waMsg += `📋 Topic: ${topicLabel}\n\n`;
+  waMsg += `💬 *Message:*\n${msg}\n\n`;
+
+  /* Add current dasha if available */
+  if (currentDashaState) {
+    const { md, ad } = currentDashaState;
+    waMsg += `🔮 Current Dasha: ${md?.lord || '—'} MD / ${ad?.lord || '—'} AD\n`;
+  }
+  waMsg += `📍 ${cityName} | 📅 ${new Date().toLocaleDateString('en-IN')}\n`;
+  waMsg += `_Via Kaalchakra Pro v7_`;
+
+  logActivity('FEEDBACK_WA', { name: nm, phone: ph.slice(0,6)+'****', rating: fpRating, topic: fpTopic });
+  window.open(`https://api.whatsapp.com/send?phone=919669756111&text=${encodeURIComponent(waMsg)}`, '_blank');
+  toggleFeedback();
+  toast(`✅ Sending to WhatsApp... (Rating: ${fpRating}⭐)`, '#15803d');
+}
+
+function toast(msg,bg='#a07810'){
+  const t=document.createElement('div');t.className='toast';t.style.background=bg;t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},2500);
+}
+function populateNak(){
+  const sel=$('nakSel'),ns=LANG==='hi'?NH:NE;
+  sel.innerHTML=ns.map((n,i)=>`<option value="${i+1}"${i+1===janmaNak?' selected':''}>${i+1}. ${n}</option>`).join('');
+}
+function populatePurp(){
+  const sel=$('purpSel');
+  const groups=[...new Set(CATS.map(c=>c.gr))];
+  let h='';
+  groups.forEach(g=>{
+    h+=`<optgroup label="── ${g} ──">`;
+    CATS.filter(c=>c.gr===g).forEach(c=>{h+=`<option value="${c.key}">${c.ic} ${LANG==='hi'?c.hi:c.en}</option>`;});
+    h+=`</optgroup>`;
+  });
+  sel.innerHTML=h;
+}
+function updateClock(){
+  const n=new Date(),h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  $('clk').textContent=`${String(h%12||12).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
+}
+function initSparkles(){
+  const c=document.getElementById('spWrap');if(!c)return;
+  /* Round glow sparkles */
+  for(let i=0;i<18;i++){
+    const s=document.createElement('div');s.className='sp';
+    const a=Math.random()*360,r=25+Math.random()*70;
+    const sz=(Math.random()*4+2).toFixed(1);
+    s.style.cssText=`left:${50+Math.cos(a*Math.PI/180)*r}%;top:${30+Math.sin(a*Math.PI/180)*40}%;width:${sz}px;height:${sz}px;--sd:${(Math.random()*2.5+1.5).toFixed(1)}s;--del:${(Math.random()*3).toFixed(1)}s;`;
+    c.appendChild(s);
+  }
+  /* 4-pointed stars */
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');s.className='sp-star';
+    const a=Math.random()*360,r=20+Math.random()*80;
+    s.style.cssText=`left:${50+Math.cos(a*Math.PI/180)*r}%;top:${20+Math.sin(a*Math.PI/180)*50}%;--sd:${(Math.random()*3+2).toFixed(1)}s;--del:${(Math.random()*3).toFixed(1)}s;`;
+    c.appendChild(s);
+  }
+}
+function initSunRays(){
+  const c=document.getElementById('sunRays');if(!c)return;
+  const angles=[-70,-55,-40,-25,-10,0,10,25,40,55,70];
+  angles.forEach((ang,i)=>{
+    const r=document.createElement('div');r.className='sun-ray';
+    const h=60+Math.random()*80;
+    r.style.cssText=`transform:rotate(${ang}deg);height:${h}px;animation-delay:${(i*0.2).toFixed(1)}s;animation-duration:${(2.5+Math.random()*2).toFixed(1)}s;`;
+    c.appendChild(r);
+  });
+}
+function initStars(){
+  const c=$('stars');
+  for(let i=0;i<60;i++){const st=document.createElement('div');const sz=Math.random()*2.5+.5;
+    st.className='st';st.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${sz}px;height:${sz}px;--d:${(Math.random()*2+1.5).toFixed(1)}s;--dl:${(Math.random()*3).toFixed(1)}s;`;
+    c.appendChild(st);}
+}
+
+/* ══════════ INIT ══════════ */
+/* Hide *REQUIRED badge when field has value */
+function initRequiredBadges(){
+  try{
+    [['cN','reqName'],['cW','reqPhone'],['cE','reqEmail']].forEach(([id,bid])=>{
+      const inp=document.getElementById(id);
+      const b=document.getElementById(bid);
+      if(!inp||!b)return;
+      const chk=()=>{if(b)b.classList.toggle('filled',inp.value.trim().length>0);};
+      inp.addEventListener('input',chk);inp.addEventListener('change',chk);chk();
+    });
+  }catch(e){}
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  try{checkReferral();}catch(e){}
+  try{initStars();}catch(e){}
+  try{initSparkles();}catch(e){}
+  try{initSunRays();}catch(e){}
+  try{populateNak();populatePurp();}catch(e){}
+  syncD();
+  try{sw(1);}catch(e){}
+  try{initRequiredBadges();}catch(e){}
+  updateClock();
+  setInterval(updateClock,1000);
+  setInterval(()=>{updateLiveBar();},15000);
+  setInterval(()=>{try{run();}catch(e){}},60000);
+  run();
+  document.onkeydown=e=>{if(e.keyCode===123||(e.ctrlKey&&[85,73].includes(e.keyCode)))return false;};
+});
+</script>
+</body>
+</html>
