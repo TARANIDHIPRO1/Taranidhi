@@ -12,9 +12,10 @@
 //   4. Compare with header value (constant-time)
 //   5. Reject if mismatch
 
-import { crypto } from "@cloudflare/workers-types";
+import { crypto, type D1Database } from "@cloudflare/workers-types";
 import { grantPoints, type Env as WalletEnv } from "../lib/wallet";
 import { isOrderFullyPaid, maybeFinalizeOrder, type Env as OrdersEnv } from "../lib/orders";
+import { upgradeTierFromOrder } from "../lib/tierUpgrade";
 import { json, errorJson } from "../lib/response";
 import { WALLET_POINTS_PER_HUNDRED_PAISE } from "./wallet";
 
@@ -137,14 +138,14 @@ export async function handleRazorpayWebhook(request: Request, env: Env): Promise
 
     // Find the internal order by razorpay_order_id
     const orderRow = await env.DB.prepare(
-      `SELECT id, user_id, amount_due FROM orders
+      `SELECT id, user_id, amount_due, purpose FROM orders
        WHERE id IN (
          SELECT order_id FROM payments WHERE razorpay_order_id = ?
        )
        LIMIT 1`
     )
       .bind(razorpayOrderId)
-      .first<{ id: number; user_id: number; amount_due: number }>();
+      .first<{ id: number; user_id: number; amount_due: number; purpose: string }>();
 
     if (!orderRow) {
       console.warn(`[webhooks] No order found for Razorpay order ${razorpayOrderId}`);
@@ -152,7 +153,7 @@ export async function handleRazorpayWebhook(request: Request, env: Env): Promise
       return json({ received: true });
     }
 
-    const { id: orderId, user_id: userId, amount_due: orderAmountDue } = orderRow;
+    const { id: orderId, user_id: userId, amount_due: orderAmountDue, purpose: orderPurpose } = orderRow;
 
     // Update the payments row to mark this payment completed
     const updateRes = await env.DB.prepare(
@@ -166,7 +167,7 @@ export async function handleRazorpayWebhook(request: Request, env: Env): Promise
     // Check if order is now fully paid
     const fullyPaid = await maybeFinalizeOrder(env, orderId);
 
-    // If this payment completes the order, grant wallet points
+    // If this payment completes the order, grant wallet points and upgrade tier if needed
     if (fullyPaid && (updateRes.meta?.changes ?? 0) > 0) {
       // Calculate points: amount_paise / 100 * POINTS_PER_HUNDRED_PAISE
       const pointsToGrant = Math.floor((orderAmountDue / 100) * WALLET_POINTS_PER_HUNDRED_PAISE);
@@ -184,6 +185,47 @@ export async function handleRazorpayWebhook(request: Request, env: Env): Promise
           `[webhooks] Granted ${pointsToGrant} points to user ${userId} ` +
             `(order ${orderId}, batch ${grantRes.batch_id})`
         );
+      }
+
+      // Task 73: Tier upgrade on payment completion
+      try {
+        const tierResult = await upgradeTierFromOrder(env.DB, userId, orderId, orderPurpose as any);
+
+        if (tierResult.upgraded) {
+          console.log(
+            `[webhooks] Tier upgraded: user ${userId} ` +
+              `${tierResult.fromTier} → ${tierResult.toTier} (order ${orderId}, purpose: ${orderPurpose})`
+          );
+          // Log audit trail for tier upgrade
+          await env.DB.prepare(
+            `INSERT INTO audit_log (admin_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)`
+          )
+            .bind(
+              null,
+              "tier_upgrade_payment",
+              "user",
+              userId,
+              JSON.stringify({
+                from_tier: tierResult.fromTier,
+                to_tier: tierResult.toTier,
+                order_id: orderId,
+                order_purpose: orderPurpose,
+              })
+            )
+            .run()
+            .catch(() => {});
+          // TODO: Send activation notification (email + in-app toast) when tier upgraded
+        } else {
+          console.log(
+            `[webhooks] No tier upgrade: ${tierResult.reason} (user ${userId}, order ${orderId})`
+          );
+        }
+      } catch (err: any) {
+        console.error(
+          "[webhooks] Tier upgrade error after payment capture:",
+          err?.message ?? err
+        );
+        // Log for manual review but don't fail webhook (order is already marked paid)
       }
     }
 
