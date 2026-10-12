@@ -9,6 +9,7 @@
 import { handleRequestOtp, handleVerifyOtp } from "./routes/auth";
 import { handleCreateKundali, handleListKundalis, handleGetKundali, handleDeleteKundali } from "./routes/kundali";
 import { handleMuhurtaNow } from "./routes/muhurta";
+import { handleMuhurtaCommercial } from "./routes/muhurtaCommercial";
 import { handleGetBalance, handlePostRecharge } from "./routes/wallet";
 import { handleCreateOrder, handleFundOrderFromWallet, handleFundOrderFromGateway } from "./routes/orders";
 import { handleRazorpayWebhook } from "./routes/webhooks";
@@ -136,6 +137,9 @@ export default {
 
     if (request.method === "GET" && pathname === "/muhurta/now") {
       return handleMuhurtaNow(request, env);
+    }
+    if (request.method === "GET" && pathname === "/muhurta/commercial") {
+      return handleMuhurtaCommercial(request, env);
     }
     if (request.method === "GET" && pathname === "/muhurta/scan") {
       return handleMuhurtaScan(request, env);
