@@ -216,7 +216,7 @@ p {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--accent-akash-text);
   text-decoration: none;
   transition: color var(--transition-fast);
 }

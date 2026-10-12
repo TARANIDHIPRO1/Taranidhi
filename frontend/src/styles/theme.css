@@ -25,7 +25,7 @@
 
   /* Text */
   --text-primary: #1A1A1A;
-  --text-secondary: #666666;
+  --text-secondary: #4D4D4D;
   --text-inverse: #FFFFFF;
 
   /* Borders */
@@ -111,12 +111,41 @@
   --color-bg: #FFFFFF;
   --color-bg-secondary: #F8F7F6;
   --color-text: #1A1A1A;
-  --color-text-secondary: #666666;
+  --color-text-secondary: #4D4D4D;
   --color-border: #D1D5DB;
   --color-border-light: #E5E7EB;
   --color-shadow-light: rgba(0,0,0,0.05);
   --color-shadow-medium: rgba(0,0,0,0.1);
   --color-shadow-dark: rgba(0,0,0,0.15);
+
+  /* Public-site aliases (Task 78). Previously referenced but undefined,
+     which made backgrounds transparent and white CTA text invisible. */
+  --accent-akash: var(--color-akash);
+  --accent-akash-light: var(--color-akash-light);
+  --accent-agni: var(--color-agni);
+  --accent-jal: var(--color-jal);
+  --accent-vayu: var(--color-vayu);
+  --accent-prithvi: var(--color-prithvi);
+  --bg-hover: var(--bg-tertiary);
+  --bg-nav: var(--bg-primary);
+  --bg-footer: var(--bg-secondary);
+  --text-tertiary: var(--text-secondary);
+
+  /* Text-safe accents (WCAG AAA 7:1 on the page background) */
+  --accent-akash-text: #5B21B6;
+  --accent-agni-text: #7C2D12;
+  --accent-prithvi-text: #065F46;
+  --accent-jal-text: #075985;
+  --accent-vayu-text: #164E63;
+
+  /* CTA surfaces: white label reaches 7.31:1 */
+  --cta-bg: #9A3412;
+  --cta-bg-hover: #7C2D12;
+  /* Chip surfaces that carry white labels (same in both themes) */
+  --chip-akash: #5B21B6;
+  --chip-prithvi: #065F46;
+  --chip-jal: #075985;
+  --chip-agni: #9A3412;
 }
 
 /* ============================================================
@@ -132,7 +161,7 @@
 
     /* Text */
     --text-primary: #FFFFFF;
-    --text-secondary: #AAAAAA;
+    --text-secondary: #BBBBBB;
     --text-inverse: #1A1A1A;
 
     /* Borders */
@@ -151,7 +180,15 @@
     --color-bg: #0F0F0F;
     --color-bg-secondary: #1A1A1A;
     --color-text: #FFFFFF;
-    --color-text-secondary: #AAAAAA;
+    --color-text-secondary: #BBBBBB;
+
+    --accent-akash-text: #C4B5FD;
+    --accent-agni-text: #FDBA74;
+    --accent-prithvi-text: #6EE7B7;
+    --accent-jal-text: #7DD3FC;
+    --accent-vayu-text: #67E8F9;
+    --cta-bg: #9A3412;
+    --cta-bg-hover: #7C2D12;
 
     color-scheme: dark;
   }
@@ -166,7 +203,7 @@
   --bg-secondary: #1A1A1A;
   --bg-tertiary: #242424;
   --text-primary: #FFFFFF;
-  --text-secondary: #AAAAAA;
+  --text-secondary: #BBBBBB;
   --border-color: #404040;
   --color-akash: #A78BFA;
   --color-agni: #FB923C;
@@ -178,7 +215,14 @@
   --color-bg: #0F0F0F;
   --color-bg-secondary: #1A1A1A;
   --color-text: #FFFFFF;
-  --color-text-secondary: #AAAAAA;
+  --color-text-secondary: #BBBBBB;
+  --accent-akash-text: #C4B5FD;
+  --accent-agni-text: #FDBA74;
+  --accent-prithvi-text: #6EE7B7;
+  --accent-jal-text: #7DD3FC;
+  --accent-vayu-text: #67E8F9;
+  --cta-bg: #9A3412;
+  --cta-bg-hover: #7C2D12;
   color-scheme: dark;
 }
 
@@ -187,7 +231,7 @@
   --bg-secondary: #F8F7F6;
   --bg-tertiary: #F0EEEC;
   --text-primary: #1A1A1A;
-  --text-secondary: #666666;
+  --text-secondary: #4D4D4D;
   --border-color: #D1D5DB;
   --color-primary: #3B82F6;
   --color-primary-hover: #2563EB;
@@ -195,7 +239,7 @@
   --color-bg: #FFFFFF;
   --color-bg-secondary: #F8F7F6;
   --color-text: #1A1A1A;
-  --color-text-secondary: #666666;
+  --color-text-secondary: #4D4D4D;
   color-scheme: light;
 }
 
@@ -309,16 +353,16 @@ code {
 
 /* Primary Button */
 .btn-primary {
-  background-color: var(--color-info);
-  color: var(--text-inverse);
+  background-color: var(--cta-bg);
+  color: #fff;
 }
 
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(0.9);
+  background-color: var(--cta-bg-hover);
 }
 
 .btn-primary:active:not(:disabled) {
-  filter: brightness(0.85);
+  background-color: var(--cta-bg-hover);
 }
 
 /* Secondary Button */
