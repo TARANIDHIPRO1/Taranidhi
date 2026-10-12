@@ -688,8 +688,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #0a0a0f;
-  color: #e8e8f0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
   overflow-y: auto;
   flex-direction: column;
@@ -776,7 +776,7 @@
 .ti-live-label {
   font-size: 0.6rem;
   letter-spacing: 2px;
-  color: #4ade80;
+  color: var(--accent-prithvi-text);
   font-weight: 600;
 }
 
@@ -851,8 +851,8 @@
 .ti-live-strip {
   display: flex;
   align-items: center;
-  background: #111118;
-  border-bottom: 1px solid #1e1e2e;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
   padding: 0;
   overflow-x: auto;
 }
@@ -870,7 +870,7 @@
 .ti-live-value {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e8e8f0;
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -885,7 +885,7 @@
 .ti-live-divider {
   width: 1px;
   height: 28px;
-  background: #1e1e2e;
+  background: var(--border-color);
   flex-shrink: 0;
 }
 
@@ -904,8 +904,8 @@
 
 .ti-profile-card {
   margin: 0 16px;
-  background: linear-gradient(135deg, #13131f 0%, #1a1a2e 100%);
-  border: 1px solid #2a2a3e;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -916,7 +916,7 @@
 }
 
 .ti-profile-card:hover {
-  border-color: #a78bfa;
+  border-color: var(--accent-akash-text);
   box-shadow: 0 0 0 1px rgba(167,139,250,0.2), 0 8px 24px rgba(0,0,0,0.4);
   transform: translateY(-1px);
 }
@@ -929,7 +929,7 @@
 .ti-profile-name {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -962,12 +962,12 @@
 .ti-dasha-lord {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   letter-spacing: 1px;
 }
 
 .ti-dasha-antar {
-  color: #60a5fa;
+  color: var(--primary-text);
 }
 
 .ti-dasha-label {
@@ -978,7 +978,7 @@
 
 .ti-profile-arrow {
   font-size: 1.2rem;
-  color: #3a3a55;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -996,8 +996,8 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: #111118;
-  border: 1px solid #1e1e2e;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s;
@@ -1008,18 +1008,18 @@
 }
 
 .ti-action-card:hover {
-  border-color: #2a2a3e;
-  background: #16161f;
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
   transform: translateX(2px);
 }
 
 .ti-action-primary {
-  border-color: #2a2a3e;
-  background: linear-gradient(135deg, #13131f, #1a1428);
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
 }
 
 .ti-action-primary:hover {
-  border-color: #a78bfa;
+  border-color: var(--accent-akash-text);
   box-shadow: 0 0 0 1px rgba(167,139,250,0.15);
 }
 
@@ -1038,7 +1038,7 @@
 .ti-action-title {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 2px;
 }
 
@@ -1049,7 +1049,7 @@
 
 .ti-action-arrow {
   font-size: 1rem;
-  color: #3a3a55;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -1074,8 +1074,8 @@
   gap: 5px;
   min-height: 44px;
   padding: 10px 14px;
-  background: #111118;
-  border: 1px solid #1e1e2e;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
@@ -1088,14 +1088,14 @@
 }
 
 .ti-decision-btn:hover {
-  border-color: #a78bfa;
+  border-color: var(--accent-akash-text);
   color: var(--accent-akash-text);
-  background: #13131f;
+  background: var(--bg-secondary);
 }
 
 .ti-decision-icon {
   font-size: 0.75rem;
-  color: #3a3a55;
+  color: var(--text-secondary);
 }
 
 /* ── SECONDARY ROW ───────────────────────────────────────────────────────── */
@@ -1115,7 +1115,7 @@
   align-items: center;
   padding: 5px 14px;
   background: none;
-  border: 1px solid #1e1e2e;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -1125,12 +1125,12 @@
 
 .ti-decision-btn:focus-visible,
 .ti-secondary-btn:focus-visible {
-  outline: 2px solid #a78bfa;
+  outline: 2px solid var(--accent-akash-text);
   outline-offset: 2px;
 }
 
 .ti-secondary-btn:hover {
-  border-color: #3a3a55;
+  border-color: var(--border-color);
   color: var(--text-secondary);
 }
 
@@ -1141,9 +1141,9 @@
   text-align: center;
   font-size: 0.58rem;
   letter-spacing: 1.5px;
-  color: #3a3a55;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  border-top: 1px solid #111118;
+  border-top: 1px solid var(--border-color);
   margin-top: auto;
 }
 
@@ -1175,7 +1175,7 @@
 .ti-onboard-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #e8e8f0;
+  color: var(--text-primary);
   letter-spacing: -0.3px;
   margin: 0;
 }
@@ -1191,8 +1191,8 @@
 .ti-cta-primary {
   margin-top: 8px;
   padding: 14px 32px;
-  background: #a78bfa;
-  color: #0a0a0f;
+  background: var(--cta-bg);
+  color: #fff;
   border: none;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -1205,7 +1205,7 @@
 }
 
 .ti-cta-primary:hover {
-  background: #c4b5fd;
+  background: var(--cta-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 8px 28px rgba(167,139,250,0.4);
 }
@@ -1219,8 +1219,8 @@
 }
 
 .ti-feature {
-  background: #111118;
-  border: 1px solid #1e1e2e;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 14px;
 }
@@ -1234,7 +1234,7 @@
 .ti-feature-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
@@ -1272,8 +1272,8 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 .kc-screen {
-  background: #0a0a14;
-  color: #e8e8f0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
   padding-bottom: 80px;
   font-family: var(--font-body, sans-serif);
@@ -1285,8 +1285,8 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: #0d0d1a;
-  border-bottom: 1px solid #1e1e30;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -1308,7 +1308,7 @@
 }
 .kc-back:hover { background: rgba(167,139,250,.15); }
 .kc-title { flex: 1; }
-.kc-name  { display: block; font-size: 0.95rem; font-weight: 600; color: #e8e8f0; }
+.kc-name  { display: block; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
 .kc-sub   { display: block; font-size: 0.7rem; color: var(--text-secondary); }
 .kc-delete {
   background: none;
@@ -1335,7 +1335,7 @@
   margin: 12px 16px;
   padding: 10px 14px;
   font-size: 0.8rem;
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1347,7 +1347,7 @@
   align-items: center;
   background: rgba(251,191,36,.15);
   border: 1px solid rgba(251,191,36,.4);
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   border-radius: 6px;
   padding: 4px 14px;
   font-size: 0.75rem;
@@ -1356,15 +1356,15 @@
 }
 
 .kc-warn-btn:focus-visible {
-  outline: 2px solid #fbbf24;
+  outline: 2px solid var(--accent-agni-text);
   outline-offset: 2px;
 }
 
 /* ── Birth details banner ── */
 .kc-birth-banner {
   margin: 12px 16px;
-  background: #111120;
-  border: 1px solid #1e1e30;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 12px 14px;
 }
@@ -1375,7 +1375,7 @@
   padding: 3px 0;
 }
 .kc-birth-label { color: var(--text-secondary); min-width: 68px; }
-.kc-birth-val   { color: #c4c4d8; }
+.kc-birth-val   { color: var(--text-primary); }
 
 /* ── Chart toggle ── */
 .kc-chart-toggle {
@@ -1392,8 +1392,8 @@
   justify-content: center;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid #1e1e30;
-  background: #111120;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
   font-size: 0.78rem;
   cursor: pointer;
@@ -1401,12 +1401,12 @@
 }
 
 .kc-toggle:focus-visible {
-  outline: 2px solid #a78bfa;
+  outline: 2px solid var(--accent-akash-text);
   outline-offset: 2px;
 }
 .kc-toggle.active {
   background: rgba(167,139,250,.12);
-  border-color: #a78bfa;
+  border-color: var(--accent-akash-text);
   color: var(--accent-akash-text);
   font-weight: 600;
 }
@@ -1430,7 +1430,7 @@
   border: 1.5px solid rgba(167,139,250,.5);
   border-radius: 8px;
   overflow: hidden;
-  background: #0d0d1a;
+  background: var(--bg-primary);
 }
 .ni-cell {
   border: 1px solid rgba(167,139,250,.15);
@@ -1466,27 +1466,27 @@
   font-size: 0.55rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(167,139,250,.4);
+  color: var(--text-secondary);
 }
 .ni-center-sub {
   font-size: 0.5rem;
-  color: rgba(167,139,250,.3);
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 .ni-house-num {
   font-size: 0.45rem;
-  color: rgba(167,139,250,.4);
+  color: var(--text-secondary);
   line-height: 1;
 }
 .ni-rashi {
   font-size: 0.58rem;
-  color: #8888aa;
+  color: var(--text-secondary);
   font-weight: 600;
   line-height: 1.2;
 }
 .ni-asc {
   font-size: 0.5rem;
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   font-weight: 700;
 }
 .ni-planets {
@@ -1510,7 +1510,7 @@
   border: 1.5px solid rgba(167,139,250,.5);
   border-radius: 8px;
   overflow: hidden;
-  background: #0d0d1a;
+  background: var(--bg-primary);
 }
 .si-cell {
   border: 1px solid rgba(167,139,250,.15);
@@ -1551,13 +1551,13 @@
 .si-asc { background: rgba(251,191,36,.06) !important; }
 .si-rashi-name {
   font-size: 0.58rem;
-  color: #8888aa;
+  color: var(--text-secondary);
   font-weight: 600;
   line-height: 1.2;
 }
 .si-la {
   font-size: 0.5rem;
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   font-weight: 700;
 }
 .si-house-num {
@@ -1584,19 +1584,19 @@
 /* ── Sections ── */
 .kc-section {
   margin: 0 16px 16px;
-  background: #111120;
-  border: 1px solid #1e1e30;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   overflow: hidden;
 }
 .kc-section-title {
-  background: #0d0d1a;
+  background: var(--bg-primary);
   padding: 8px 12px;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--accent-akash-text);
-  border-bottom: 1px solid #1e1e30;
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* ── Panchang grid ── */
@@ -1604,10 +1604,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
-  background: #1e1e30;
+  background: var(--border-color);
 }
 .kc-panch-item {
-  background: #111120;
+  background: var(--bg-secondary);
   padding: 10px 12px;
 }
 .kc-panch-label {
@@ -1618,12 +1618,12 @@
 .kc-panch-val {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 2px;
 }
 .kc-panch-sub {
   font-size: 0.62rem;
-  color: #8888aa;
+  color: var(--text-secondary);
 }
 
 /* ── Ascendant card ── */
@@ -1638,13 +1638,13 @@
 }
 .kc-asc-deg {
   font-size: 0.82rem;
-  color: #c4c4d8;
+  color: var(--text-primary);
   font-family: monospace;
   margin-bottom: 4px;
 }
 .kc-asc-nak {
   font-size: 0.78rem;
-  color: #8888aa;
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
 .kc-kp {
@@ -1666,11 +1666,11 @@
 .kc-dasha-planet {
   font-size: 1rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: var(--accent-agni-text);
   margin-bottom: 2px;
 }
 .kc-antar .kc-dasha-planet {
-  color: #fb923c;
+  color: var(--accent-agni-text);
   font-size: 0.9rem;
 }
 .kc-dasha-type {
@@ -1680,11 +1680,11 @@
 }
 .kc-dasha-dates {
   font-size: 0.68rem;
-  color: #8888aa;
+  color: var(--text-secondary);
 }
 .kc-dasha-arrow {
   font-size: 1.2rem;
-  color: rgba(167,139,250,.4);
+  color: var(--text-secondary);
 }
 
 /* ── Janma Nakshatra + Tara ── */
@@ -1692,22 +1692,22 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
-  background: #1e1e30;
+  background: var(--border-color);
 }
 .kc-nak-card,
 .kc-tara-card {
-  background: #111120;
+  background: var(--bg-secondary);
   padding: 12px 14px;
 }
 .kc-nak-name {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #e8e8f0;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 .kc-nak-detail {
   font-size: 0.72rem;
-  color: #8888aa;
+  color: var(--text-secondary);
 }
 .kc-tara-num {
   font-size: 0.65rem;
@@ -1721,11 +1721,11 @@
 }
 .kc-tara-sub {
   font-size: 0.65rem;
-  color: #8888aa;
+  color: var(--text-secondary);
 }
-.tara-good .kc-tara-name { color: #4ade80; }
-.tara-bad  .kc-tara-name { color: #f87171; }
-.tara-mid  .kc-tara-name { color: #fbbf24; }
+.tara-good .kc-tara-name { color: var(--accent-prithvi-text); }
+.tara-bad  .kc-tara-name { color: var(--error-text); }
+.tara-mid  .kc-tara-name { color: var(--accent-agni-text); }
 
 /* ── Tables ── */
 .kc-table-wrap {
@@ -1737,7 +1737,7 @@
   font-size: 0.72rem;
 }
 .kc-table th {
-  background: #0d0d1a;
+  background: var(--bg-primary);
   color: var(--text-secondary);
   text-align: left;
   padding: 6px 10px;
@@ -1748,20 +1748,20 @@
 }
 .kc-table td {
   padding: 6px 10px;
-  border-top: 1px solid #1a1a2a;
-  color: #c4c4d8;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 .kc-table .tc { text-align: center; }
 .kc-table .mono { font-family: monospace; font-size: 0.65rem; }
-.kc-table .kp-cell { font-family: monospace; font-size: 0.62rem; color: #8888aa; }
+.kc-table .kp-cell { font-family: monospace; font-size: 0.62rem; color: var(--text-secondary); }
 .kc-table .row-alt td { background: rgba(167,139,250,.025); }
 
 /* ── Engine note ── */
 .kc-engine-note {
   text-align: center;
   font-size: 0.62rem;
-  color: #3a3a50;
+  color: var(--text-secondary);
   margin: 0 16px 16px;
 }
 
@@ -1773,8 +1773,8 @@
   right: 0;
   display: flex;
   gap: 0;
-  background: #0d0d1a;
-  border-top: 1px solid #1e1e30;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
   z-index: 20;
   /* Fix 6: iOS safe area for iPhone X+ home indicator */
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -1796,7 +1796,7 @@
 }
 .kc-nav-btn:hover { color: var(--accent-akash-text); }
 .kc-nav-btn:focus-visible {
-  outline: 2px solid #a78bfa;
+  outline: 2px solid var(--accent-akash-text);
   outline-offset: -2px;
 }
 
@@ -1811,8 +1811,8 @@
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 .balance-card {
-  background: linear-gradient(135deg, #1a0a2e 0%, #16213e 100%);
-  border: 1px solid #2d1b69;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px 20px;
   text-align: center;
@@ -3639,3 +3639,39 @@ a.pub-contact-method:hover {
   .admin-tab { flex: 1 1 30%; padding: 0 8px; }
 }
 .admin-actions button { min-width: 88px; padding: 0 16px; }
+
+/* Toast notifications (dom.ts showToast). Previously unstyled: messages
+   such as "Logged in!" appeared as loose text at the bottom of the page. */
+#ov-toast.ov-toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 16px); z-index: 1000;
+  max-width: min(92vw, 420px); padding: 12px 18px; border-radius: 10px;
+  background: var(--text-primary); color: var(--bg-primary);
+  font-size: 15px; font-weight: 600; line-height: 1.4; text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+#ov-toast.ov-toast.show { opacity: 1; transform: translate(-50%, 0); }
+#ov-toast.ov-toast.error { background: var(--error-text); color: var(--bg-primary); }
+
+/* Planet label colours (birth chart). Light values read on white;
+   dark values read on the dark chart surface. Both target >= 7:1. */
+:root {
+  --pc-sun: #6B4300; --pc-moon: #1F2937; --pc-mars: #991B1B; --pc-mercury: #14532D;
+  --pc-jupiter: #7C2D12; --tara-benefic: #14532D; --tara-malefic: #991B1B; --tara-neutral: #78350F; --pc-venus: #9D174D; --pc-saturn: #334155;
+  --pc-rahu: #5B21B6; --pc-ketu: #5B21B6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pc-sun: #FDE68A; --pc-moon: #F1F5F9; --pc-mars: #FECACA; --pc-mercury: #BBF7D0;
+    --pc-jupiter: #FED7AA; --pc-venus: #FBCFE8; --pc-saturn: #CBD5E1;
+    --pc-rahu: #DDD6FE; --pc-ketu: #DDD6FE;
+    --tara-benefic: #86EFAC; --tara-malefic: #FCA5A5; --tara-neutral: #FDE68A;
+  }
+}
+:root[data-theme="dark"] {
+  --pc-sun: #FDE68A; --pc-moon: #F1F5F9; --pc-mars: #FECACA; --pc-mercury: #BBF7D0;
+  --pc-jupiter: #FED7AA; --pc-venus: #FBCFE8; --pc-saturn: #CBD5E1;
+  --pc-rahu: #DDD6FE; --pc-ketu: #DDD6FE;
+  --tara-benefic: #86EFAC; --tara-malefic: #FCA5A5; --tara-neutral: #FDE68A;
+}

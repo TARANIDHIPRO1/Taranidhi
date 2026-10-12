@@ -129,7 +129,7 @@ async function renderIntelligenceDashboard(app: HTMLElement, primaryKundali: any
   const horaUntil = live?.hora?.end ? formatTime(new Date(live.hora.end)) : "—";
 
   // Tara beneficence
-  const taraColor = tara?.beneficence === "benefic" ? "#4ade80" : tara?.beneficence === "malefic" ? "#f87171" : "#fbbf24";
+  const taraColor = tara?.beneficence === "benefic" ? "var(--tara-benefic)" : tara?.beneficence === "malefic" ? "var(--tara-malefic)" : "var(--tara-neutral)";
   const taraLabel = tara ? `${tara.name} (${tara.number})` : "—";
 
   app.innerHTML = `

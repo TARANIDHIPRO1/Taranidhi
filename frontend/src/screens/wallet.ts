@@ -105,7 +105,7 @@ export async function renderWallet(): Promise<void> {
                 <div style="background-color: var(--color-bg); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid ${isExpiring ? "#ef4444" : "#10b981"};">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
                     <strong>${batch.source === "free_trial" ? "Free Trial" : batch.source === "subscription" ? "Subscription" : batch.source === "referral" ? "Referral" : "Top-up"}</strong>
-                    <span style="background: ${batch.status === "active" ? "#d1fae5" : batch.status === "held" ? "#fef3c7" : "#f3f4f6"}; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${batch.status === "active" ? "#047857" : batch.status === "held" ? "#92400e" : "#6b7280"}; font-weight: bold;">
+                    <span style="background: ${batch.status === "active" ? "#d1fae5" : batch.status === "held" ? "#fef3c7" : "#f3f4f6"}; padding: 4px 8px; border-radius: 4px; font-size: var(--font-size-xs); color: ${batch.status === "active" ? "#064E3B" : batch.status === "held" ? "#78350F" : "#374151"}; font-weight: bold;">
                       ${status}
                     </span>
                   </div>

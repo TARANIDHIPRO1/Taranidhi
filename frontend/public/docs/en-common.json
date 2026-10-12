@@ -2,7 +2,6 @@
   "app.title": "OCCULTVIISION Kaalchakra Pro",
   "app.tagline": "Vedic Astrology & Numerology",
   "app.description": "Professional Vedic astrology and numerology calculations for life guidance",
-
   "nav.home": "Home",
   "nav.kundali": "Birth Chart",
   "nav.muhurta": "Muhurta Timing",
@@ -15,7 +14,6 @@
   "nav.logout": "Logout",
   "nav.language": "Language",
   "nav.theme": "Theme",
-
   "button.submit": "Submit",
   "button.cancel": "Cancel",
   "button.save": "Save",
@@ -37,7 +35,6 @@
   "button.share": "Share",
   "button.more": "More",
   "button.less": "Less",
-
   "label.name": "Name",
   "label.email": "Email",
   "label.phone": "Phone",
@@ -59,7 +56,6 @@
   "label.state": "State",
   "label.city": "City",
   "label.address": "Address",
-
   "message.loading": "Loading...",
   "message.processing": "Processing...",
   "message.saving": "Saving...",
@@ -86,7 +82,6 @@
   "message.error": "Error",
   "message.warning": "Warning",
   "message.info": "Information",
-
   "form.fullName": "Full Name",
   "form.dateOfBirth": "Date of Birth",
   "form.timeOfBirth": "Time of Birth (optional)",
@@ -99,16 +94,13 @@
   "form.children": "Number of Children",
   "form.notes": "Notes",
   "form.comments": "Comments",
-
   "theme.light": "Light Mode",
   "theme.dark": "Dark Mode",
   "theme.auto": "Auto",
   "theme.toggle": "Toggle Theme",
-
   "language.english": "English",
   "language.hindi": "हिंदी",
   "language.select": "Select Language",
-
   "time.now": "Now",
   "time.today": "Today",
   "time.tomorrow": "Tomorrow",
@@ -120,7 +112,6 @@
   "time.afternoon": "Afternoon",
   "time.evening": "Evening",
   "time.night": "Night",
-
   "month.january": "January",
   "month.february": "February",
   "month.march": "March",
@@ -133,7 +124,6 @@
   "month.october": "October",
   "month.november": "November",
   "month.december": "December",
-
   "day.monday": "Monday",
   "day.tuesday": "Tuesday",
   "day.wednesday": "Wednesday",
@@ -141,7 +131,6 @@
   "day.friday": "Friday",
   "day.saturday": "Saturday",
   "day.sunday": "Sunday",
-
   "validation.invalidEmail": "Invalid email address",
   "validation.invalidPhone": "Invalid phone number",
   "validation.invalidDate": "Invalid date",
@@ -153,14 +142,12 @@
   "validation.fieldTooLong": "This field is too long",
   "validation.fieldTooShort": "This field is too short",
   "validation.invalidFormat": "Invalid format",
-
   "status.processing": "Processing",
   "status.completed": "Completed",
   "status.failed": "Failed",
   "status.pending": "Pending",
   "status.cancelled": "Cancelled",
   "status.archived": "Archived",
-
   "pagination.page": "Page",
   "pagination.of": "of",
   "pagination.showing": "Showing",
@@ -170,11 +157,9 @@
   "pagination.loadMore": "Load More",
   "pagination.previous": "Previous",
   "pagination.next": "Next",
-
   "search.placeholder": "Search...",
   "search.noResults": "No results found",
   "search.searching": "Searching...",
-
   "filter.all": "All",
   "filter.active": "Active",
   "filter.inactive": "Inactive",
@@ -182,14 +167,12 @@
   "filter.thisWeek": "This Week",
   "filter.thisMonth": "This Month",
   "filter.custom": "Custom",
-
   "sort.ascending": "Ascending",
   "sort.descending": "Descending",
   "sort.newest": "Newest First",
   "sort.oldest": "Oldest First",
   "sort.aZ": "A to Z",
   "sort.zA": "Z to A",
-
   "menu.account": "Account",
   "menu.profile": "Profile",
   "menu.settings": "Settings",
@@ -199,7 +182,6 @@
   "menu.logout": "Logout",
   "menu.login": "Login",
   "menu.signup": "Sign Up",
-
   "units.hours": "hours",
   "units.minutes": "minutes",
   "units.seconds": "seconds",
@@ -207,11 +189,9 @@
   "units.weeks": "weeks",
   "units.months": "months",
   "units.years": "years",
-
   "currency.inr": "₹",
   "currency.usd": "$",
   "currency.eur": "€",
-
   "accessibility.loading": "Content is loading",
   "accessibility.error": "An error occurred",
   "accessibility.closeModal": "Close dialog",
@@ -220,14 +200,16 @@
   "accessibility.skip": "Skip to main content",
   "accessibility.back": "Go back",
   "accessibility.home": "Go to home",
-
   "footer.copyright": "© 2026 OCCULTVIISION. All rights reserved.",
   "footer.privacy": "Privacy Policy",
   "footer.terms": "Terms of Service",
   "footer.contact": "Contact",
   "footer.about": "About Us",
   "footer.language": "Change Language",
-
   "version": "v1.0",
-  "buildDate": "Oct 4, 2026"
+  "buildDate": "Oct 4, 2026",
+  "chart": {
+    "northIndian": "North Indian",
+    "southIndian": "South Indian"
+  }
 }

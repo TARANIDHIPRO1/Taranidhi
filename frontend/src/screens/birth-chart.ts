@@ -27,10 +27,9 @@ const PLANET_SHORT: Record<string,string> = {
   Sun:"Su", Moon:"Mo", Mars:"Ma", Mercury:"Me",
   Jupiter:"Ju", Venus:"Ve", Saturn:"Sa", Rahu:"Ra", Ketu:"Ke"
 };
-const PLANET_COLOR: Record<string,string> = {
-  Sun:"#fbbf24", Moon:"#e2e8f0", Mars:"#f87171", Mercury:"#4ade80",
-  Jupiter:"#fb923c", Venus:"#f472b6", Saturn:"#94a3b8", Rahu:"#a78bfa", Ketu:"#a78bfa"
-};
+// Planet label colours are theme tokens (--pc-*, defined in screens.css) so
+// each one keeps AAA contrast on the chart background in both light and dark.
+const pcVar = (planet: string): string => `var(--pc-${String(planet).toLowerCase()}, var(--pc-moon))`;
 
 const TITHI_NAMES = ["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami",
   "Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi",
@@ -133,7 +132,7 @@ function buildNIChart(ascRashi: number, planets: any[]): string {
   planets.forEach(p => {
     const h = p.house;
     if (h >= 1 && h <= 12) {
-      const color = PLANET_COLOR[p.planet] ?? "#e2e8f0";
+      const color = pcVar(p.planet);
       housePlanets[h].push(`<span style="color:${color}">${PLANET_SHORT[p.planet] ?? p.planet}</span>`);
     }
   });
@@ -186,7 +185,7 @@ function buildSIChart(ascRashi: number, planets: any[]): string {
   planets.forEach(p => {
     const r = p.rashi ?? 0;
     if (r >= 0 && r < 12) {
-      const color = PLANET_COLOR[p.planet] ?? "#e2e8f0";
+      const color = pcVar(p.planet);
       rashiPlanets[r].push(`<span style="color:${color}">${PLANET_SHORT[p.planet] ?? p.planet}</span>`);
     }
   });
@@ -366,7 +365,7 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
       <!-- Chart Legend -->
       <div class="kc-legend">
         ${Object.entries(PLANET_SHORT).map(([full, abbr]) =>
-          `<span class="kc-leg-item" style="color:${PLANET_COLOR[full]}">${abbr}=${full}</span>`
+          `<span class="kc-leg-item" style="color:${pcVar(full)}">${abbr}=${full}</span>`
         ).join("")}
       </div>
 
@@ -455,7 +454,7 @@ export async function renderBirthChart(kundaliId?: number): Promise<void> {
             </tr></thead>
             <tbody>
               ${chart.planets.map(p => `<tr>
-                <td style="color:${PLANET_COLOR[p.planet]}">${p.planet}</td>
+                <td style="color:${pcVar(p.planet)}">${p.planet}</td>
                 <td class="tc">${p.house}</td>
                 <td>${p.rashiName}</td>
                 <td class="mono">${fmtDeg(p.degInRashi)}</td>

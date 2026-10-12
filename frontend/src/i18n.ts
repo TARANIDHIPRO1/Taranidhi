@@ -136,7 +136,12 @@ export function translateDOM(): void {
   elements.forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (key) {
+      // Missing key: keep the text already in the HTML. i18next.t() returns
+      // the key itself when no translation exists, which used to replace
+      // readable labels with raw keys such as "chart.northIndian".
+      if (typeof window.i18next.exists === "function" && !window.i18next.exists(key)) return;
       const translated = window.i18next.t(key);
+      if (!translated || translated === key) return;
       if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
         (el as HTMLInputElement).placeholder = translated;
       } else {
