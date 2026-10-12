@@ -285,12 +285,13 @@ export async function handleNaturalQuery(request: Request, env: Env): Promise<Re
   // Synthesize KP verdict from primary house
   let kpVerdict: "PROMISED" | "DENIED" | "NEUTRAL" = "NEUTRAL";
   const pv = primaryVerdict.verdict;
-  if (pv === "PROMISED") kpVerdict = "PROMISED";
-  else if (pv === "DENIED") kpVerdict = "DENIED";
+  // evaluateHouse returns lowercase "promised" | "denied" (see kpVerdict.ts).
+  if (pv === "promised") kpVerdict = "PROMISED";
+  else if (pv === "denied") kpVerdict = "DENIED";
 
   // If multiple houses, require all to be PROMISED; one DENIED → DENIED
   for (const hv of houseVerdicts) {
-    if (hv.verdict === "DENIED") {
+    if (hv.verdict === "denied") {
       kpVerdict = "DENIED";
       break;
     }
@@ -299,17 +300,21 @@ export async function handleNaturalQuery(request: Request, env: Env): Promise<Re
   // ── 5. Today's Panchang layer ────────────────────────────────────────────
   // Use birth location for Rahu Kaal & Hora (most users in India, birth location is fine)
   const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const { sunrise, sunset } = realSunriseSunset(todayUtc, row.latitude, row.longitude);
+  const { sunrise, sunset, nextSunrise } = realSunriseSunset(todayUtc, row.latitude, row.longitude);
+  const todayDow = now.getUTCDay(); // 0=Sun … 6=Sat, same convention as routes/muhurta.ts
 
   // Hora
-  const vara = getVara(sunrise);
-  const horaWindows = buildHoraWindows(sunrise, sunset);
+  const vara = getVara(todayDow);
+  const horaWindows = buildHoraWindows(sunrise, sunset, nextSunrise, now);
   const activeHora = getActiveHora(horaWindows, now);
   const horaLord = activeHora?.lord ?? "Unknown";
-  const horaQuality = getHoraQuality(horaLord, slug) as "GOOD" | "MIXED" | "BAD";
+  // getHoraQuality returns { nature: benefic|neutral|malefic }; map to the
+  // GOOD/MIXED/BAD labels this route uses downstream.
+  const natureToLabel = { benefic: "GOOD", neutral: "MIXED", malefic: "BAD" } as const;
+  const horaQuality: "GOOD" | "MIXED" | "BAD" = natureToLabel[getHoraQuality(horaLord, slug).nature];
 
   // Rahu Kaal
-  const rahuKaalWindow = getRahuKaal(sunrise, sunset, vara);
+  const rahuKaalWindow = getRahuKaal(sunrise, sunset, todayDow);
   const rahuActive = isWithinRahuKaal(now, rahuKaalWindow);
   let rahuKaalEndTime: string | null = null;
   if (rahuActive && rahuKaalWindow) {
@@ -327,7 +332,7 @@ export async function handleNaturalQuery(request: Request, env: Env): Promise<Re
   const todayNakIdx = Math.floor(((nowMoonLon % 360) + 360) % 360 / (360 / 27));
   const todayNakName = NAKSHATRA_NAMES[todayNakIdx] ?? "Unknown";
   const taraResult = computeTara(janmaNakIdx, todayNakIdx);
-  const taraScore: number = taraResult.tara;
+  const taraScore: number = taraResult.number;
   const taraName: string = taraResult.name;
 
   // ── 6. Combined verdict ──────────────────────────────────────────────────
@@ -352,7 +357,7 @@ export async function handleNaturalQuery(request: Request, env: Env): Promise<Re
     activityLabel,
     slug,
     kpVerdict,
-    kpDetails: primaryVerdict.reasoning ?? "",
+    kpDetails: `Cusp sub-lord ${primaryVerdict.cuspSubLord}; favourable houses ${primaryVerdict.favorableCount}, unfavourable ${primaryVerdict.unfavorableCount}.`,
     isRahuKaal: rahuActive,
     rahuKaalEndTime,
     taraScore,
