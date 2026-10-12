@@ -493,8 +493,10 @@ function injectStyles(): void {
 .em-input { padding:var(--space-2) var(--space-3); border:1px solid var(--color-border); border-radius:var(--radius-sm); font-size:var(--font-size-sm); background:var(--color-surface-2); color:var(--color-text-primary); width:100%; box-sizing:border-box; }
 .em-input:focus { outline:none; border-color:var(--purpose-color,var(--color-primary)); box-shadow:0 0 0 2px color-mix(in srgb,var(--purpose-color,var(--color-primary)) 20%,transparent); }
 .em-hint { font-size:var(--font-size-xs); color:var(--color-text-secondary); }
-.em-latlon-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-2); }
-.em-date-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-2); }
+.em-latlon-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--space-2); }
+.em-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--space-2); }
+.em-latlon-row > *, .em-date-row > * { min-width:0; }
+.em-date-row input[type="date"] { min-width:0; max-width:100%; }
 .em-date-label { font-size:var(--font-size-xs); color:var(--color-text-secondary); margin-bottom:2px; }
 .em-location-confirmed { font-size:var(--font-size-xs); color:var(--color-text-secondary); padding:var(--space-2); background:color-mix(in srgb,var(--purpose-color,#16a34a) 8%,var(--color-surface-2)); border-radius:var(--radius-sm); border:1px solid color-mix(in srgb,var(--purpose-color,#16a34a) 30%,transparent); }
 .em-error { color:var(--color-danger,#dc2626); font-size:var(--font-size-sm); padding:var(--space-2); }

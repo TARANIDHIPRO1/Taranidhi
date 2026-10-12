@@ -131,6 +131,19 @@
   --bg-footer: var(--bg-secondary);
   --text-tertiary: var(--text-secondary);
 
+  /* Legacy names used by injected screen styles (event-muhurta, dasha-timeline,
+     kp-sublords, muhurta-dashboard, components.css). Undefined before, so
+     backgrounds went transparent and text fell back to inherited colour. */
+  --color-surface-1: var(--bg-secondary);
+  --color-surface-2: var(--bg-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-error-light: color-mix(in srgb, var(--color-error) 15%, var(--bg-primary));
+  --color-warning-light: color-mix(in srgb, var(--color-warning) 15%, var(--bg-primary));
+  --color-success-light: color-mix(in srgb, var(--color-success) 15%, var(--bg-primary));
+  --space-5: 20px;
+  --font-size-md: var(--font-size-base);
+
   /* Text-safe accents (WCAG AAA 7:1 on the page background) */
   --accent-akash-text: #5B21B6;
   --accent-agni-text: #7C2D12;
