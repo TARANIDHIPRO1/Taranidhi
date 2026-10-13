@@ -1,0 +1,43 @@
+name = "taranidhi-worker"
+type = "service"
+main = "src/index.ts"
+compatibility_date = "2024-09-19"
+
+# Production environment
+env = "production"
+
+[env.production]
+routes = [
+    { pattern = "https://api.taranidhi.com/*", zone_name = "taranidhi.com" }
+]
+
+vars = {
+    ENVIRONMENT = "production",
+    LOG_LEVEL = "info",
+    API_VERSION = "1.0.0"
+}
+
+[env.production.d1]
+# NEON PostgreSQL via Hyperdrive
+binding = "DB"
+id = "production_database"
+
+[env.production.services]
+[[env.production.services]]
+binding = "HYPERDRIVE"
+service = "taranidhi-hyperdrive"
+
+[build]
+command = "npm run build"
+cwd = "worker"
+main = "./dist/index.js"
+
+[build.upload]
+format = "modules"
+
+[dev]
+port = 8787
+local_protocol = "http"
+
+[triggers.crons]
+crons = ["0 0 * * *"]  # Daily backup trigger at midnight UTC
