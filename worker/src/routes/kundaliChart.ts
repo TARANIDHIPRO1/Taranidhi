@@ -95,17 +95,27 @@ export async function handleGetKundaliChart(request: Request, env: Env): Promise
 
   // Enrich each planet with computed metadata
   const planets = natalChart.planets.map((p) => {
+    // BUG-02 FIX: Validate Rashi and Nakshatra indices before accessing arrays
+    // Rashi: 0-11 (12 zodiac signs)
+    // Nakshatra: 0-26 (27 lunar mansions)
+    if (p.rashi < 0 || p.rashi >= 12) {
+      throw new Error(`Invalid rashi index: ${p.rashi} for planet ${p.planet}`);
+    }
+    if (p.nakIdx < 0 || p.nakIdx >= 27) {
+      throw new Error(`Invalid nakshatra index: ${p.nakIdx} for planet ${p.planet}`);
+    }
+
     const kpChain = getSubLordChain(p.deg);
     return {
       planet: p.planet,
       deg: round4(p.deg),
       rashi: p.rashi,
-      rashiName: RASHI_NAMES[p.rashi] ?? "Unknown",
-      rashiLord: SIGN_LORDS[p.rashi] ?? "Unknown",
+      rashiName: RASHI_NAMES[p.rashi]!,  // Now safe to use non-null assertion
+      rashiLord: SIGN_LORDS[p.rashi]!,
       degInRashi: round4(p.degInRashi),
       nakIdx: p.nakIdx,
-      nakName: NAKSHATRA_NAMES[p.nakIdx] ?? "Unknown",
-      nakLord: NAK_LORDS[p.nakIdx] ?? "Unknown",
+      nakName: NAKSHATRA_NAMES[p.nakIdx]!,  // Now safe
+      nakLord: NAK_LORDS[p.nakIdx]!,
       nakPada: p.nakPada,
       house: p.house,
       kp: {

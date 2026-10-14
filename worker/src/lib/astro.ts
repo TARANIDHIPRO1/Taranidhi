@@ -25,6 +25,50 @@ import * as Astronomy from "astronomy-engine";
 const DEG = Math.PI / 180;
 const norm360 = (x: number): number => ((x % 360) + 360) % 360;
 
+// ── Astrological Configuration (BUG-06 FIX) ──
+// These values determine which ayanamsa, house system, and dasha system are used
+// for chart calculations. They are now environment-aware instead of hardcoded,
+// allowing configuration per deployment environment.
+//
+// Per ARCHITECTURE.md Section 4:
+// - Lahiri ayanamsa is the app-wide default (not Krishnamurti, which is KP-specific)
+// - Placidus is the standard house system for KP charts
+// - Vimshottari is the classical Dasha system (120-year cycle)
+export type AyanamsaType = "lahiri" | "fagan" | "deluce";
+export type HouseSystem = "placidus" | "equal" | "whole-sign";
+export type DashaSystem = "vimshottari" | "ashtottari";
+
+const VALID_AYANAMSAS: AyanamsaType[] = ["lahiri", "fagan", "deluce"];
+const VALID_HOUSE_SYSTEMS: HouseSystem[] = ["placidus", "equal", "whole-sign"];
+const VALID_DASHA_SYSTEMS: DashaSystem[] = ["vimshottari", "ashtottari"];
+
+export const AYANAMSA_TYPE: AyanamsaType = (
+  process.env.AYANAMSA_TYPE ?? "lahiri"
+) as AyanamsaType;
+export const HOUSE_SYSTEM: HouseSystem = (
+  process.env.HOUSE_SYSTEM ?? "placidus"
+) as HouseSystem;
+export const DASHA_SYSTEM: DashaSystem = (
+  process.env.DASHA_SYSTEM ?? "vimshottari"
+) as DashaSystem;
+
+// Validate configuration at startup
+if (!VALID_AYANAMSAS.includes(AYANAMSA_TYPE)) {
+  throw new Error(
+    `Invalid AYANAMSA_TYPE: "${AYANAMSA_TYPE}". Must be one of: ${VALID_AYANAMSAS.join(", ")}`
+  );
+}
+if (!VALID_HOUSE_SYSTEMS.includes(HOUSE_SYSTEM)) {
+  throw new Error(
+    `Invalid HOUSE_SYSTEM: "${HOUSE_SYSTEM}". Must be one of: ${VALID_HOUSE_SYSTEMS.join(", ")}`
+  );
+}
+if (!VALID_DASHA_SYSTEMS.includes(DASHA_SYSTEM)) {
+  throw new Error(
+    `Invalid DASHA_SYSTEM: "${DASHA_SYSTEM}". Must be one of: ${VALID_DASHA_SYSTEMS.join(", ")}`
+  );
+}
+
 export function julianDayFromUtc(date: Date): number {
   return date.getTime() / 86400000 + 2440587.5;
 }
@@ -223,8 +267,13 @@ export function getCurrentDasha(
   const nakLordIdx = chart.janmaNakIdx % 9;
   const startLord = DASHA_SEQ[nakLordIdx]!;
   const moonPlanet = chart.planets.find((p) => p.planet === "Moon");
-  const degInNak = moonPlanet ? moonPlanet.deg % (360 / 27) : 0;
-  const fractionElapsed = degInNak / (360 / 27);
+
+  // BUG-01 FIX: Properly normalize degree before calculating Nakshatra fraction
+  // Nakshatra size = 360° / 27 = 13°20' (13.333...°)
+  const NAK_SIZE = 360 / 27;
+  const normalizedDeg = moonPlanet ? ((moonPlanet.deg % 360) + 360) % 360 : 0;
+  const degInNak = normalizedDeg % NAK_SIZE;
+  const fractionElapsed = degInNak / NAK_SIZE;
 
   const birthMs = (chart.birthJd - 2440587.5) * 86400000;
   const startLordYears = DASHA_YEARS[startLord]!;
@@ -404,6 +453,46 @@ export const NAKSHATRA_NAMES = [
   "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha",
   "Uttara Ashadha", "Shravana", "Dhanishtha", "Shatabhisha", "Purva Bhadrapada",
   "Uttara Bhadrapada", "Revati",
+];
+
+// ── Tithi (Lunar Day) Names ──
+// Classical Vedic lunar calendar: 30 tithis in a lunar month
+// Shukla Paksha (bright half): days 0-14 (New Moon to Full Moon)
+// Krishna Paksha (dark half): days 15-29 (Full Moon to New Moon)
+// Source: Brihat Parashara Hora Shastra, Panchanga chapter
+export const TITHI_NAMES = [
+  // Shukla Paksha (Bright Half - Days 0-14)
+  "Shukla Pratipada",      // 0: New Moon to 1st quarter
+  "Shukla Dwitiya",        // 1
+  "Shukla Tritiya",        // 2
+  "Shukla Chaturthi",      // 3
+  "Shukla Panchami",       // 4
+  "Shukla Shashthi",       // 5
+  "Shukla Saptami",        // 6
+  "Shukla Ashtami",        // 7
+  "Shukla Navami",         // 8
+  "Shukla Dashami",        // 9
+  "Shukla Ekadashi",       // 10
+  "Shukla Dwadashi",       // 11
+  "Shukla Trayodashi",     // 12
+  "Shukla Chaturdashi",    // 13
+  "Shukla Purnima",        // 14: Full Moon
+  // Krishna Paksha (Dark Half - Days 15-29)
+  "Krishna Pratipada",     // 15: Full Moon to 3rd quarter
+  "Krishna Dwitiya",       // 16
+  "Krishna Tritiya",       // 17
+  "Krishna Chaturthi",     // 18
+  "Krishna Panchami",      // 19
+  "Krishna Shashthi",      // 20
+  "Krishna Saptami",       // 21
+  "Krishna Ashtami",       // 22
+  "Krishna Navami",        // 23
+  "Krishna Dashami",       // 24
+  "Krishna Ekadashi",      // 25
+  "Krishna Dwadashi",      // 26
+  "Krishna Trayodashi",    // 27
+  "Krishna Chaturdashi",   // 28
+  "Krishna Amavasya",      // 29: New Moon
 ];
 
 // ── Navamsha (D9) Lord ──

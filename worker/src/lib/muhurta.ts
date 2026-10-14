@@ -731,16 +731,29 @@ export function getKarana(moonLon: number, sunLon: number): KaranaResult {
   const diff = ((moonLon - sunLon) + 360) % 360;
   const position = Math.floor(diff / 6) + 1; // 1-60
 
+  // BUG-04 FIX: Validate karana position bounds (60-element cycle)
+  // Karana cycle: 360° / 6° per karana = 60 total
+  // Positions should always be 1-60
+  if (position < 1 || position > 60) {
+    throw new Error(`Invalid karana position: ${position}. Expected 1-60.`);
+  }
+
   let name: string;
   let isMovable: boolean;
 
   if (position <= 56) {
-    // Movable Karanas: 7-cycle
+    // Movable Karanas: 7-cycle (positions 1-56)
+    // Cycle repeats every 7: (position - 1) % 7
     name = MOVABLE_KARANAS[(position - 1) % 7]!;
     isMovable = true;
   } else {
     // Fixed Karanas at end of month (positions 57-60)
-    name = FIXED_KARANAS[position - 57]!;
+    // Direct indexing: position 57->index 0, 58->1, 59->2, 60->3
+    const fixedIdx = position - 57;
+    if (fixedIdx < 0 || fixedIdx >= FIXED_KARANAS.length) {
+      throw new Error(`Invalid fixed karana index: ${fixedIdx} for position ${position}`);
+    }
+    name = FIXED_KARANAS[fixedIdx]!;
     isMovable = false;
   }
 
