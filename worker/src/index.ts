@@ -106,7 +106,7 @@ export default {
 
       const decision = await checkRateLimit(
         env,
-        { bucket: "global", windowSeconds: 60, maxRequests: 60, captchaThreshold: 40 },
+        { bucket: "global", windowSeconds: 60, maxRequests: 180, captchaThreshold: 120 },
         ip,
         userId
       );
