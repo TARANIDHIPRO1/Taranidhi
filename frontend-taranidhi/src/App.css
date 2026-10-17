@@ -1,0 +1,226 @@
+:root {
+  --royal-indigo: #4B0082;
+  --emerald-green: #50C878;
+  --gold: #FFD700;
+  --cream: #F5E6D3;
+  --dark-brown: #5C4033;
+  --mars-red: #FF4444;
+  --venus-green: #00FF44;
+  --jupiter-blue: #4444FF;
+  --saturn-black: #000000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--cream);
+  color: var(--dark-brown);
+}
+
+.bg-royal-indigo { background-color: var(--royal-indigo); }
+.bg-emerald { background-color: var(--emerald-green); }
+.bg-cream { background-color: var(--cream); }
+.text-gold { color: var(--gold); }
+.text-white { color: white; }
+
+/* Tabs */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--royal-indigo);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: var(--cream);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--dark-brown);
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  border-bottom-color: var(--royal-indigo);
+  color: var(--royal-indigo);
+  font-weight: bold;
+}
+
+/* Panchang section */
+.panchang-row {
+  display: flex;
+  border-bottom: 1px solid #e0d4c4;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.panchang-row:hover {
+  background-color: rgba(75, 0, 130, 0.1);
+}
+
+.panchang-label {
+  width: 120px;
+  padding: 12px;
+  font-weight: bold;
+  color: var(--dark-brown);
+  background-color: rgba(255, 215, 0, 0.15);
+}
+
+.panchang-value {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Symbols */
+.symbol {
+  font-size: 20px;
+}
+
+/* Popup */
+.popup {
+  background-color: var(--emerald-green);
+  color: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 2px solid white;
+  padding-bottom: 12px;
+}
+
+.popup h2 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-details {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.popup-detail {
+  display: flex;
+  gap: 8px;
+}
+
+.popup-label {
+  color: var(--gold);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.popup-description {
+  border-top: 2px solid white;
+  padding-top: 12px;
+  margin-top: 12px;
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Info card */
+.info-card {
+  background: linear-gradient(135deg, var(--royal-indigo), #6b0fa8);
+  color: var(--gold);
+  padding: 20px;
+  margin: 16px;
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.moon-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #333;
+  flex-shrink: 0;
+}
+
+.info-text h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.info-text p {
+  font-size: 14px;
+  color: white;
+  margin: 2px 0;
+}
+
+.date-large {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+/* Time options */
+.time-tabs {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-bottom: 1px solid #e0d4c4;
+}
+
+.time-tab {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid var(--royal-indigo);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.time-tab.active {
+  background-color: var(--royal-indigo);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panchang-row {
+    flex-direction: column;
+  }
+
+  .panchang-label {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #d4a574;
+  }
+}
