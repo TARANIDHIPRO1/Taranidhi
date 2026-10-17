@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07143d">
+<title>About | Naveen K. Rai | TaraNidhi™</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
+
+:root {
+  --gold: #ffdc83;
+  --gold2: #f6b83f;
+  --ink: #f8f3e9;
+  --muted: #d2d8f0;
+  --line: #d9c9ff6b;
+  --glass: rgba(9, 15, 58, .70);
+  --blue: #08113c;
+  --violet: #4d39a1;
+  --green: #43f0a2;
+  --dark-bg: #050a24;
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; background: var(--dark-bg); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font: 14px 'DM Sans', system-ui, sans-serif;
+  background: radial-gradient(ellipse at 50% 0%, #273b99 0, transparent 40%),
+              radial-gradient(ellipse at 5% 38%, #173b9b 0, transparent 30%),
+              radial-gradient(ellipse at 100% 62%, #442a9a 0, transparent 30%),
+              linear-gradient(180deg, #050a24, #10134d 55%, #050b2d);
+  overflow-x: hidden;
+}
+
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .65;
+  background-image:
+    radial-gradient(1px 1px at 7% 9%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 22% 35%, #ffe5a0 0, transparent 2px),
+    radial-gradient(1px 1px at 76% 12%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 89% 45%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 44% 68%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 15% 83%, #d8d4ff 0, transparent 2px),
+    radial-gradient(1px 1px at 68% 91%, #fff 0, transparent 2px);
+  background-size: 100% 100%;
+  z-index: -1;
+}
+
+button, a { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 94px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px clamp(15px, 3vw, 28px);
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(5, 10, 36, 0.9), rgba(5, 10, 36, 0.7));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 220, 131, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #ffdf8d;
+  overflow: hidden;
+  box-shadow: 0 0 24px #ffce6a45;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+
+.brand-copy strong {
+  display: block;
+  font: 700 27px 'Cormorant Garamond', serif;
+  letter-spacing: .015em;
+  color: #ffe9a9;
+  line-height: 1;
+}
+
+.brand-copy span {
+  display: block;
+  font-size: 8px;
+  letter-spacing: .16em;
+  margin-top: 5px;
+  color: #e7e4ff;
+}
+
+.profile-section {
+  padding: 40px clamp(15px, 3vw, 28px);
+  text-align: center;
+}
+
+.profile-name {
+  font: 700 42px 'Cormorant Garamond', serif;
+  color: var(--gold);
+  margin: 0 0 8px;
+  text-shadow: 0 0 20px rgba(255, 220, 131, 0.3);
+}
+
+.profile-title {
+  font: 500 20px 'Cormorant Garamond', serif;
+  color: #43f0a2;
+  margin: 0 0 15px;
+  letter-spacing: .02em;
+}
+
+.profile-subtitle {
+  color: #d3d5f2;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.panel {
+  background: linear-gradient(120deg, rgba(7, 13, 52, .87), rgba(14, 19, 71, .76));
+  border: 1px solid #f4d27f;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px #f5ce6933, 0 0 25px #f7c64c1b, inset 0 0 28px #5a5ed41b;
+  backdrop-filter: blur(14px);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+  padding: 25px 20px;
+}
+
+.panel h2 {
+  font: 700 24px 'Cormorant Garamond', serif;
+  color: #ffe294;
+  margin: 0 0 20px;
+}
+
+.expertise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.expertise-item {
+  padding: 15px;
+  border: 1px solid rgba(255, 220, 123, 0.4);
+  border-radius: 12px;
+  background: linear-gradient(140deg, rgba(18, 23, 76, 0.3), rgba(7, 13, 56, 0.5));
+  text-align: center;
+}
+
+.expertise-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.expertise-item h4 {
+  font: 600 14px 'DM Sans';
+  color: var(--gold);
+  margin: 0 0 5px;
+}
+
+.expertise-item p {
+  font-size: 12px;
+  color: #d3d5f2;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about-text {
+  color: #d3d5f2;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.credentials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.credential-item {
+  padding: 15px;
+  background: linear-gradient(140deg, rgba(77, 57, 161, 0.15), rgba(255, 220, 131, 0.08));
+  border: 1px solid rgba(255, 220, 131, 0.2);
+  border-radius: 12px;
+}
+
+.credential-item strong {
+  color: var(--gold);
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.credential-item p {
+  font-size: 12px;
+  color: #d3d5f2;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.contact-section {
+  text-align: center;
+  padding: 20px;
+  margin: 20px 0;
+  background: linear-gradient(135deg, rgba(77, 57, 161, 0.15), rgba(255, 220, 131, 0.08));
+  border: 1px solid rgba(255, 220, 131, 0.2);
+  border-radius: 15px;
+}
+
+.contact-item {
+  margin: 12px 0;
+  font-size: 13px;
+  color: #d3d5f2;
+}
+
+.contact-item strong {
+  color: var(--gold);
+}
+
+.cta-btn {
+  display: inline-block;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, var(--violet), var(--gold2));
+  color: var(--blue);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  font: 600 13px 'DM Sans';
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  margin-top: 15px;
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(255, 220, 131, 0.2);
+}
+
+.footer {
+  text-align: center;
+  font-size: 9px;
+  color: #9fa9d8;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, #060a2cf5 22%);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+}
+
+.nav-inner {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nav-item {
+  border: 0;
+  background: transparent;
+  color: #d5d8f3;
+  padding: 5px 2px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-item .nav-icon {
+  font-size: 24px;
+  color: #f5d98c;
+}
+
+.nav-item.active {
+  color: #ffe6a0;
+  text-shadow: 0 0 12px #ffda6c55;
+}
+
+.nav-item.active .nav-icon {
+  filter: drop-shadow(0 0 9px #ffd35c);
+}
+
+@media (max-width: 540px) {
+  .profile-name { font-size: 32px; }
+  .profile-title { font-size: 16px; }
+  .credentials { grid-template-columns: 1fr; }
+  .expertise-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="header">
+    <a class="brand" href="index.html">
+      <div class="logo"><img src="logo-taranidhi.png" alt="TaraNidhi"></div>
+      <div class="brand-copy">
+        <strong>TaraNidhi™</strong>
+        <span>COSMIC INTELLIGENCE</span>
+      </div>
+    </a>
+  </header>
+
+  <section class="profile-section">
+    <div class="profile-name">Naveen K. Rai</div>
+    <div class="profile-title">Astronumerologist & Professional Business Astrologer</div>
+    <p class="profile-subtitle">
+      Founder of OCCULTVIISION™ · Bhopal-based Cosmic Consultant<br>
+      Aligning Destinies with Ancient Wisdom & Modern Intelligence
+    </p>
+  </section>
+
+  <div class="panel">
+    <h2>🌟 About Me</h2>
+    <p class="about-text">
+      With over two decades of experience in Vedic astrology, numerology, and Vastu, I help individuals and businesses align with cosmic timing to achieve their highest potential. My approach combines classical astrological systems with modern life challenges, offering practical guidance rooted in ancient principles.
+    </p>
+    <p class="about-text">
+      OCCULTVIISION™ was founded to bring precision and authenticity to astrology consultation. Every calculation is verified against classical sources, and every recommendation is backed by verified cosmic principles.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h2>💎 Core Expertise</h2>
+    <div class="expertise-grid">
+      <div class="expertise-item">
+        <span class="expertise-icon">🔮</span>
+        <h4>Vedic Astrology</h4>
+        <p>Parashari, Jaimini & KP systems with 249-fold accuracy</p>
+      </div>
+
+      <div class="expertise-item">
+        <span class="expertise-icon">✨</span>
+        <h4>Numerology</h4>
+        <p>Pythagorean, Chaldean & Kabalah systems</p>
+      </div>
+
+      <div class="expertise-item">
+        <span class="expertise-icon">🏠</span>
+        <h4>Vastu Shastra</h4>
+        <p>Space harmonization & energy optimization</p>
+      </div>
+
+      <div class="expertise-item">
+        <span class="expertise-icon">💼</span>
+        <h4>Business Astrology</h4>
+        <p>Startup timing, expansion, and strategic alignment</p>
+      </div>
+
+      <div class="expertise-item">
+        <span class="expertise-icon">💑</span>
+        <h4>Relationship Analysis</h4>
+        <p>Compatibility, marriage timing, and life partnerships</p>
+      </div>
+
+      <div class="expertise-item">
+        <span class="expertise-icon">🎯</span>
+        <h4>Dasha & Life Periods</h4>
+        <p>Personal period analysis and life progression</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🎓 Professional Credentials</h2>
+    <div class="credentials">
+      <div class="credential-item">
+        <strong>KP Astrology Certification</strong>
+        <p>Advanced training in Krishnamurti Paddhati with 249-fold subdivisions</p>
+      </div>
+
+      <div class="credential-item">
+        <strong>Classical Vedic Studies</strong>
+        <p>Trained in Parashari & Jaimini systems with authoritative Sanskrit texts</p>
+      </div>
+
+      <div class="credential-item">
+        <strong>Numerology Master</strong>
+        <p>Expert in Pythagorean, Chaldean, and Kabalah numerology systems</p>
+      </div>
+
+      <div class="credential-item">
+        <strong>Vastu Consultant</strong>
+        <p>Certified in traditional Vastu Shastra principles and applications</p>
+      </div>
+
+      <div class="credential-item">
+        <strong>Business Advisory</strong>
+        <p>Specializing in entrepreneurial timing and strategic decisions</p>
+      </div>
+
+      <div class="credential-item">
+        <strong>Astrological Research</strong>
+        <p>Ongoing verification against classical sources and modern data</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>👥 Who I Serve</h2>
+    <p class="about-text">
+      <strong style="color: var(--gold);">Entrepreneurs & CEOs</strong> — Timing major business decisions, launches, and strategic pivots<br><br>
+      <strong style="color: var(--gold);">Individuals Seeking Clarity</strong> — Career direction, relationship guidance, and life purpose<br><br>
+      <strong style="color: var(--gold);">Organizations & Startups</strong> — Company formation timing, expansion planning, and growth strategy<br><br>
+      <strong style="color: var(--gold);">Conscious Professionals</strong> — Those who value cosmic alignment in their personal and professional growth
+    </p>
+  </div>
+
+  <div class="panel">
+    <h2>📞 Let's Connect</h2>
+    <div class="contact-section">
+      <div class="contact-item">
+        <strong>Phone:</strong> +91 9669756111
+      </div>
+      <div class="contact-item">
+        <strong>Location:</strong> Bhopal, Madhya Pradesh, India
+      </div>
+      <div class="contact-item">
+        <strong>Consultation Hours:</strong> Monday–Saturday, 10:00 AM–6:00 PM IST
+      </div>
+      <div class="contact-item">
+        <strong>Website:</strong> www.occultviision.com
+      </div>
+      <a href="kundali.html" class="cta-btn">Schedule Your Reading</a>
+    </div>
+  </div>
+
+  <div class="panel" style="text-align: center;">
+    <h3 style="font: 600 18px 'Cormorant Garamond', serif; color: #ffe294; margin: 0 0 10px;">OCCULTVIISION™</h3>
+    <p style="color: #d3d5f2; font-size: 12px; margin: 0; line-height: 1.6;">
+      "When you align with cosmic timing, destiny becomes your choice, not your accident."<br>
+      — Naveen K. Rai
+    </p>
+  </div>
+
+  <div class="footer">
+    TaraNidhi™ · Precision Cosmic Time Intelligence · © 2026 OCCULTVIISION™ · Founder: Naveen K. Rai
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span>HOME</a>
+    <a href="advertisement.html" class="nav-item"><span class="nav-icon">📢</span>ADVERTISE</a>
+    <a href="offers.html" class="nav-item"><span class="nav-icon">🎁</span>OFFERS</a>
+    <a href="about.html" class="nav-item active"><span class="nav-icon">👤</span>ABOUT</a>
+    <a href="kundali.html" class="nav-item"><span class="nav-icon">📊</span>KUNDALI</a>
+  </div>
+</nav>
+
+</body>
+</html>

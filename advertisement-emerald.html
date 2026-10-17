@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07143d">
+<title>Advertisement | TaraNidhi™</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
+
+:root {
+  --emerald: #10b981;
+  --emerald-dark: #059669;
+  --gold: #ffdc83;
+  --ink: #f8f3e9;
+  --muted: #d2d8f0;
+  --line: #d9c9ff6b;
+  --glass: rgba(9, 15, 58, .70);
+  --blue: #08113c;
+  --violet: #4d39a1;
+  --green: #10b981;
+  --dark-bg: #050a24;
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; background: var(--dark-bg); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font: 14px 'DM Sans', system-ui, sans-serif;
+  background: radial-gradient(ellipse at 50% 0%, #1a5a4d 0, transparent 40%),
+              radial-gradient(ellipse at 5% 38%, #0d4a3d 0, transparent 30%),
+              radial-gradient(ellipse at 100% 62%, #1a4a3f 0, transparent 30%),
+              linear-gradient(180deg, #050a24, #0f2d2a 55%, #050b2d);
+  overflow-x: hidden;
+}
+
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .65;
+  background-image:
+    radial-gradient(1px 1px at 7% 9%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 22% 35%, #10b981 0, transparent 2px),
+    radial-gradient(1px 1px at 76% 12%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 89% 45%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 44% 68%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 15% 83%, #10b981 0, transparent 2px),
+    radial-gradient(1px 1px at 68% 91%, #fff 0, transparent 2px);
+  background-size: 100% 100%;
+  z-index: -1;
+}
+
+button, a { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 94px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px clamp(15px, 3vw, 28px);
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(5, 10, 36, 0.9), rgba(5, 10, 36, 0.7));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #10b981;
+  overflow: hidden;
+  box-shadow: 0 0 24px #10b98145;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+
+.brand-copy strong {
+  display: block;
+  font: 700 27px 'Cormorant Garamond', serif;
+  letter-spacing: .015em;
+  color: #10d98a;
+  line-height: 1;
+}
+
+.brand-copy span {
+  display: block;
+  font-size: 8px;
+  letter-spacing: .16em;
+  margin-top: 5px;
+  color: #e7e4ff;
+}
+
+.hero-banner {
+  text-align: center;
+  padding: 40px clamp(15px, 3vw, 28px) 50px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08));
+  border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.hero-banner h1 {
+  font: 700 clamp(36px, 8vw, 72px) 'Cormorant Garamond', serif;
+  letter-spacing: .06em;
+  margin: 0 0 10px;
+  color: var(--emerald);
+  text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.hero-banner p {
+  font: 500 clamp(16px, 2.5vw, 24px) 'Cormorant Garamond', serif;
+  letter-spacing: .03em;
+  color: #f2efff;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.panel {
+  background: linear-gradient(120deg, rgba(7, 13, 52, .87), rgba(14, 19, 71, .76));
+  border: 1px solid #10b981;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px #10b98133, 0 0 25px #10b9811b, inset 0 0 28px #10b9811b;
+  backdrop-filter: blur(14px);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+  padding: 25px 20px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.feature-card {
+  padding: 20px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 15px;
+  background: linear-gradient(140deg, rgba(18, 23, 76, 0.3), rgba(7, 13, 56, 0.5));
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  border-color: var(--emerald);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+  transform: translateY(-3px);
+  background: linear-gradient(140deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.08));
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.feature-card h3 {
+  font: 600 18px 'Cormorant Garamond', serif;
+  color: #10d98a;
+  margin: 0 0 10px;
+}
+
+.feature-card p {
+  font-size: 13px;
+  color: #d3d5f2;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 30px 20px;
+  margin: 30px clamp(12px, 2.5vw, 24px);
+}
+
+.cta-btn {
+  padding: 16px 40px;
+  background: linear-gradient(135deg, var(--emerald), #059669);
+  color: #fff;
+  border: 1px solid var(--emerald);
+  border-radius: 12px;
+  font: 700 16px 'DM Sans';
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.benefit-item {
+  padding: 15px;
+  background: linear-gradient(140deg, rgba(18, 23, 76, 0.3), rgba(7, 13, 56, 0.5));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #d3d5f2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.benefit-item:before {
+  content: "✓";
+  color: var(--emerald);
+  font-weight: 700;
+  font-size: 18px;
+  flex: 0 0 20px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 9px;
+  color: #9fa9d8;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, #060a2cf5 22%);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+}
+
+.nav-inner {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nav-item {
+  border: 0;
+  background: transparent;
+  color: #d5d8f3;
+  padding: 5px 2px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-item .nav-icon {
+  font-size: 24px;
+  color: #10b981;
+}
+
+.nav-item.active {
+  color: #10d98a;
+  text-shadow: 0 0 12px #10b98155;
+}
+
+.nav-item.active .nav-icon {
+  filter: drop-shadow(0 0 9px #10b981);
+}
+
+@media (max-width: 540px) {
+  .hero-banner { padding: 30px 15px 40px; }
+  .hero-banner h1 { font-size: 36px; }
+  .panel { margin: 15px 10px; padding: 18px 15px; }
+  .feature-grid { grid-template-columns: 1fr; gap: 12px; }
+  .benefits { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="header">
+    <a class="brand" href="index.html">
+      <div class="logo"><img src="logo-taranidhi.png" alt="TaraNidhi"></div>
+      <div class="brand-copy">
+        <strong>TaraNidhi™</strong>
+        <span>COSMIC INTELLIGENCE</span>
+      </div>
+    </a>
+  </header>
+
+  <section class="hero-banner">
+    <h1>Transform Your Destiny</h1>
+    <p>Harness the power of cosmic time intelligence to align with your highest purpose</p>
+  </section>
+
+  <div class="panel">
+    <h2 style="font: 700 28px 'Cormorant Garamond', serif; color: #10d98a; margin: 0 0 20px; text-align: center;">Why Choose TaraNidhi?</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Precise Calculations</h3>
+        <p>KP system with 249-fold accuracy verified against classical sources</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔮</div>
+        <h3>Real-Time Analysis</h3>
+        <p>Live Hora, Muhurta, and current planetary influences at your location</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Professional Reports</h3>
+        <p>Comprehensive Kundali with Dasha periods, predictions, and remedies</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💼</div>
+        <h3>Business Astrology</h3>
+        <p>Optimal timing for launches, expansions, and major business decisions</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💑</div>
+        <h3>Relationship Insights</h3>
+        <p>Compatibility analysis and auspicious timing for life events</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Life Guidance</h3>
+        <p>Career, health, finance, and personal growth aligned with cosmic timing</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08)); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 15px;">
+      <h3 style="font: 600 18px 'Cormorant Garamond', serif; color: #10d98a; margin: 0 0 15px;">Trusted by Professionals Worldwide</h3>
+      <p style="color: #d3d5f2; margin: 0 0 15px; line-height: 1.6;">
+        TaraNidhi serves entrepreneurs, CEOs, and individuals seeking alignment with cosmic timing. Our verified calculations follow classical Vedic principles trusted for thousands of years.
+      </p>
+      <div class="benefits">
+        <div class="benefit-item">Verified astrology calculations</div>
+        <div class="benefit-item">24/7 instant access</div>
+        <div class="benefit-item">Privacy-first design</div>
+        <div class="benefit-item">Multilingual support</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <h2 style="font: 600 24px 'Cormorant Garamond', serif; color: #10d98a; margin: 0 0 20px;">Ready to Align with Your Cosmic Destiny?</h2>
+    <a href="kundali.html" class="cta-btn">Generate Your Kundali Now</a>
+  </div>
+
+  <div class="footer">
+    TaraNidhi™ · Precision Cosmic Time Intelligence · © 2026 OCCULTVIISION™
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span>HOME</a>
+    <a href="advertisement-emerald.html" class="nav-item active"><span class="nav-icon">📢</span>ADVERTISE</a>
+    <a href="offers-emerald.html" class="nav-item"><span class="nav-icon">🎁</span>OFFERS</a>
+    <a href="about-emerald.html" class="nav-item"><span class="nav-icon">👤</span>ABOUT</a>
+    <a href="kundali.html" class="nav-item"><span class="nav-icon">📊</span>KUNDALI</a>
+  </div>
+</nav>
+
+</body>
+</html>

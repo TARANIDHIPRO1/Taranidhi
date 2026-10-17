@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07143d">
+<title>Special Offers | TaraNidhi™</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
+
+:root {
+  --gold: #ffdc83;
+  --gold2: #f6b83f;
+  --ink: #f8f3e9;
+  --muted: #d2d8f0;
+  --line: #d9c9ff6b;
+  --glass: rgba(9, 15, 58, .70);
+  --blue: #08113c;
+  --violet: #4d39a1;
+  --green: #43f0a2;
+  --dark-bg: #050a24;
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; background: var(--dark-bg); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font: 14px 'DM Sans', system-ui, sans-serif;
+  background: radial-gradient(ellipse at 50% 0%, #273b99 0, transparent 40%),
+              radial-gradient(ellipse at 5% 38%, #173b9b 0, transparent 30%),
+              radial-gradient(ellipse at 100% 62%, #442a9a 0, transparent 30%),
+              linear-gradient(180deg, #050a24, #10134d 55%, #050b2d);
+  overflow-x: hidden;
+}
+
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .65;
+  background-image:
+    radial-gradient(1px 1px at 7% 9%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 22% 35%, #ffe5a0 0, transparent 2px),
+    radial-gradient(1px 1px at 76% 12%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 89% 45%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 44% 68%, #fff 0, transparent 2px),
+    radial-gradient(1px 1px at 15% 83%, #d8d4ff 0, transparent 2px),
+    radial-gradient(1px 1px at 68% 91%, #fff 0, transparent 2px);
+  background-size: 100% 100%;
+  z-index: -1;
+}
+
+button, a { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 94px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px clamp(15px, 3vw, 28px);
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(5, 10, 36, 0.9), rgba(5, 10, 36, 0.7));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 220, 131, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #ffdf8d;
+  overflow: hidden;
+  box-shadow: 0 0 24px #ffce6a45;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.logo img { width: 100%; height: 100%; object-fit: cover; }
+
+.brand-copy strong {
+  display: block;
+  font: 700 27px 'Cormorant Garamond', serif;
+  letter-spacing: .015em;
+  color: #ffe9a9;
+  line-height: 1;
+}
+
+.brand-copy span {
+  display: block;
+  font-size: 8px;
+  letter-spacing: .16em;
+  margin-top: 5px;
+  color: #e7e4ff;
+}
+
+.hero-banner {
+  text-align: center;
+  padding: 40px clamp(15px, 3vw, 28px) 50px;
+  background: linear-gradient(135deg, rgba(77, 57, 161, 0.2), rgba(255, 220, 131, 0.1));
+  border-bottom: 2px solid rgba(255, 220, 131, 0.3);
+}
+
+.hero-banner h1 {
+  font: 700 clamp(36px, 8vw, 72px) 'Cormorant Garamond', serif;
+  letter-spacing: .06em;
+  margin: 0 0 10px;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(255, 220, 131, 0.4);
+}
+
+.hero-banner .tagline {
+  font: 500 16px 'Cormorant Garamond', serif;
+  letter-spacing: .03em;
+  color: #43f0a2;
+  margin: 0;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 30px clamp(12px, 2.5vw, 24px);
+}
+
+.pricing-card {
+  padding: 25px;
+  border: 2px solid rgba(255, 220, 131, 0.4);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(77, 57, 161, 0.15), rgba(7, 13, 52, 0.6));
+  backdrop-filter: blur(14px);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.pricing-card.featured {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(255, 220, 131, 0.25);
+  transform: scale(1.05);
+}
+
+.pricing-card:hover:not(.featured) {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(255, 220, 131, 0.2);
+  transform: translateY(-5px);
+}
+
+.pricing-card .badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: linear-gradient(135deg, var(--violet), var(--gold2));
+  color: var(--blue);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.pricing-card h3 {
+  font: 700 22px 'Cormorant Garamond', serif;
+  color: #ffe294;
+  margin: 15px 0 10px;
+}
+
+.price {
+  font: 700 36px 'Cormorant Garamond', serif;
+  color: var(--gold);
+  margin: 15px 0;
+  text-shadow: 0 0 15px rgba(255, 220, 131, 0.2);
+}
+
+.price-currency {
+  font-size: 18px;
+  vertical-align: super;
+}
+
+.price-period {
+  font-size: 14px;
+  color: #d3d5f2;
+  font-weight: 400;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.features-list li {
+  padding: 8px 0;
+  color: #d3d5f2;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(217, 201, 255, 0.1);
+}
+
+.features-list li:before {
+  content: "✓";
+  color: var(--green);
+  font-weight: 700;
+  font-size: 14px;
+  flex: 0 0 16px;
+}
+
+.price-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--violet), var(--gold2));
+  color: var(--blue);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  font: 600 13px 'DM Sans';
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  margin-top: 15px;
+}
+
+.price-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(255, 220, 131, 0.2);
+}
+
+.panel {
+  background: linear-gradient(120deg, rgba(7, 13, 52, .87), rgba(14, 19, 71, .76));
+  border: 1px solid #f4d27f;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px #f5ce6933, 0 0 25px #f7c64c1b, inset 0 0 28px #5a5ed41b;
+  backdrop-filter: blur(14px);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+  padding: 25px 20px;
+}
+
+.faq-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(217, 201, 255, 0.2);
+}
+
+.faq-item h4 {
+  font: 600 14px 'DM Sans';
+  color: var(--gold);
+  margin: 0 0 8px;
+  cursor: pointer;
+}
+
+.faq-item p {
+  font-size: 12px;
+  color: #d3d5f2;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.footer {
+  text-align: center;
+  font-size: 9px;
+  color: #9fa9d8;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+  margin: 20px clamp(12px, 2.5vw, 24px);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, #060a2cf5 22%);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(217, 201, 255, 0.2);
+}
+
+.nav-inner {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nav-item {
+  border: 0;
+  background: transparent;
+  color: #d5d8f3;
+  padding: 5px 2px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-item .nav-icon {
+  font-size: 24px;
+  color: #f5d98c;
+}
+
+.nav-item.active {
+  color: #ffe6a0;
+  text-shadow: 0 0 12px #ffda6c55;
+}
+
+.nav-item.active .nav-icon {
+  filter: drop-shadow(0 0 9px #ffd35c);
+}
+
+@media (max-width: 540px) {
+  .hero-banner { padding: 30px 15px 40px; }
+  .hero-banner h1 { font-size: 36px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-card.featured { transform: scale(1); }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="header">
+    <a class="brand" href="index.html">
+      <div class="logo"><img src="logo-taranidhi.png" alt="TaraNidhi"></div>
+      <div class="brand-copy">
+        <strong>TaraNidhi™</strong>
+        <span>COSMIC INTELLIGENCE</span>
+      </div>
+    </a>
+  </header>
+
+  <section class="hero-banner">
+    <h1>Special Offers</h1>
+    <p class="tagline">Exclusive packages tailored for your cosmic needs</p>
+  </section>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <h3>🌙 Starter</h3>
+      <div class="price"><span class="price-currency">₹</span>999<span class="price-period">/month</span></div>
+      <p style="color: #d3d5f2; font-size: 12px; margin: 10px 0;">Explore your cosmic timing basics</p>
+      <ul class="features-list">
+        <li>Kundali Registration</li>
+        <li>Basic Panchang Analysis</li>
+        <li>Current Hora Display</li>
+        <li>Monthly Insights</li>
+      </ul>
+      <button class="price-btn">Get Started</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="badge">⭐ Most Popular</div>
+      <h3>⭐ Professional</h3>
+      <div class="price"><span class="price-currency">₹</span>2,499<span class="price-period">/month</span></div>
+      <p style="color: #d3d5f2; font-size: 12px; margin: 10px 0;">Complete cosmic alignment</p>
+      <ul class="features-list">
+        <li>Full Kundali Chart</li>
+        <li>Dasha Periods Analysis</li>
+        <li>Real-Time Muhurta</li>
+        <li>Business Timing Advisor</li>
+        <li>Monthly Video Consultation</li>
+        <li>Custom Remedies</li>
+      </ul>
+      <button class="price-btn">Subscribe Now</button>
+    </div>
+
+    <div class="pricing-card">
+      <h3>💎 Premium</h3>
+      <div class="price"><span class="price-currency">₹</span>4,999<span class="price-period">/month</span></div>
+      <p style="color: #d3d5f2; font-size: 12px; margin: 10px 0;">Executive cosmic mastery</p>
+      <ul class="features-list">
+        <li>Everything in Professional</li>
+        <li>Priority Support (24/7)</li>
+        <li>Quarterly In-Depth Reports</li>
+        <li>Life Event Planning</li>
+        <li>Business Strategy Sessions</li>
+        <li>Personal Numerology Report</li>
+      </ul>
+      <button class="price-btn">Upgrade</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 style="font: 700 24px 'Cormorant Garamond', serif; color: #ffe294; margin: 0 0 25px; text-align: center;">Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <h4>What's included in the Kundali registration?</h4>
+      <p>Your complete birth chart with planetary positions, house analysis, Dasha periods, and personalized insights based on KP calculations.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>Can I cancel anytime?</h4>
+      <p>Yes, no lock-in periods. Cancel your subscription anytime. You'll have access until the end of your billing cycle.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>How accurate are the calculations?</h4>
+      <p>Our calculations follow classical Vedic principles verified against 249-fold KP boundaries and checked against authoritative sources.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>Do you offer one-time readings?</h4>
+      <p>Yes, we offer single professional readings and special consultations. Contact us for custom packages.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>What's the money-back guarantee?</h4>
+      <p>30-day satisfaction guarantee. If you're not happy, we'll refund your subscription in full, no questions asked.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>How do I get support?</h4>
+      <p>Professional and Premium members get priority support via email and video consultation. Response within 24 hours.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    TaraNidhi™ · Precision Cosmic Time Intelligence · © 2026 OCCULTVIISION™
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span>HOME</a>
+    <a href="advertisement.html" class="nav-item"><span class="nav-icon">📢</span>ADVERTISE</a>
+    <a href="offers.html" class="nav-item active"><span class="nav-icon">🎁</span>OFFERS</a>
+    <a href="about.html" class="nav-item"><span class="nav-icon">👤</span>ABOUT</a>
+    <a href="kundali.html" class="nav-item"><span class="nav-icon">📊</span>KUNDALI</a>
+  </div>
+</nav>
+
+</body>
+</html>
