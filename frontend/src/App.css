@@ -9,6 +9,8 @@
   --venus-green: #00FF44;
   --jupiter-blue: #4444FF;
   --saturn-black: #1a1a1a;
+  --cosmic-dark: #001a33;
+  --cosmic-darker: #000d1a;
 }
 
 * {
@@ -19,7 +21,7 @@
 
 body {
   font-family: 'Poppins', 'Inter', sans-serif;
-  background: linear-gradient(135deg, var(--bright-blue) 0%, var(--teal) 100%);
+  background: linear-gradient(135deg, var(--cosmic-darker) 0%, var(--cosmic-dark) 50%, var(--bright-blue) 100%);
   color: var(--white);
   min-height: 100vh;
   overflow-x: hidden;
@@ -77,25 +79,27 @@ body {
 
 /* Header */
 .header {
-  background: rgba(0, 71, 171, 0.9);
+  background: linear-gradient(135deg, rgba(0, 71, 171, 0.95), rgba(0, 206, 209, 0.85));
   padding: 30px 20px;
   text-align: center;
-  border-bottom: 2px solid var(--gold);
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
 }
 
 .header h1 {
   font-size: 48px;
   font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  color: #FFEB3B;
+  text-shadow: 0 0 30px rgba(255, 235, 59, 0.8), 0 0 60px rgba(255, 215, 0, 0.6);
   margin-bottom: 10px;
+  letter-spacing: 2px;
 }
 
 .header p {
   font-size: 16px;
-  color: var(--teal);
+  color: #ffffff;
   letter-spacing: 1px;
+  font-weight: 500;
 }
 
 /* Tabs Navigation */
@@ -103,16 +107,16 @@ body {
   display: flex;
   gap: 10px;
   padding: 20px;
-  background: rgba(0, 71, 171, 0.8);
+  background: rgba(0, 30, 60, 0.95);
   overflow-x: auto;
-  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  border-bottom: 2px solid var(--gold);
 }
 
 .tab-btn {
   padding: 12px 24px;
-  background: rgba(0, 206, 209, 0.2);
+  background: rgba(0, 206, 209, 0.3);
   border: 2px solid var(--teal);
-  color: var(--teal);
+  color: #ffffff;
   cursor: pointer;
   border-radius: 8px;
   font-size: 14px;
@@ -122,14 +126,16 @@ body {
 }
 
 .tab-btn:hover {
-  background: rgba(0, 206, 209, 0.4);
-  box-shadow: 0 0 15px rgba(0, 206, 209, 0.5);
+  background: rgba(0, 206, 209, 0.6);
+  box-shadow: 0 0 20px rgba(0, 206, 209, 0.8);
+  color: #ffffff;
 }
 
 .tab-btn.active {
   background: var(--teal);
   color: var(--bright-blue);
-  box-shadow: 0 0 25px rgba(0, 206, 209, 0.8);
+  box-shadow: 0 0 30px rgba(0, 206, 209, 1), 0 0 60px rgba(255, 215, 0, 0.5);
+  font-weight: 700;
 }
 
 /* Main Content */
@@ -142,11 +148,11 @@ body {
 }
 
 .tab-section {
-  background: rgba(0, 71, 171, 0.7);
-  border: 2px solid var(--gold);
+  background: rgba(0, 71, 171, 0.85);
+  border: 3px solid var(--gold);
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(0, 206, 209, 0.1);
   animation: fadeIn 0.5s ease-in;
 }
 
@@ -157,16 +163,18 @@ body {
 
 .tab-section h2 {
   font-size: 32px;
-  color: var(--gold);
+  color: #FFEB3B;
   margin-bottom: 20px;
-  text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 0 20px rgba(255, 235, 59, 0.8), 0 0 40px rgba(255, 215, 0, 0.6);
+  font-weight: 700;
 }
 
 .subtitle {
-  color: var(--teal);
+  color: #ffffff;
   font-size: 14px;
   margin-bottom: 20px;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 /* Kundali Form */
@@ -193,28 +201,30 @@ body {
 
 .form-group label {
   font-size: 14px;
-  color: var(--gold);
+  color: #FFEB3B;
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   padding: 12px 15px;
-  background: rgba(0, 206, 209, 0.1);
+  background: rgba(0, 206, 209, 0.25);
   border: 2px solid var(--teal);
   border-radius: 8px;
-  color: var(--white);
+  color: #ffffff;
   font-size: 14px;
   transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: rgba(0, 206, 209, 0.5);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-group input:focus,
@@ -222,30 +232,30 @@ body {
 .form-group select:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-  background: rgba(0, 206, 209, 0.2);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(0, 206, 209, 0.2);
+  background: rgba(0, 206, 209, 0.35);
 }
 
 /* Buttons */
 .submit-btn {
   padding: 15px 40px;
   background: linear-gradient(135deg, var(--teal), var(--bright-blue));
-  color: var(--bright-blue);
-  border: 2px solid var(--gold);
+  color: #000000;
+  border: 3px solid var(--gold);
   border-radius: 8px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 206, 209, 0.4);
+  box-shadow: 0 0 30px rgba(0, 206, 209, 0.7), 0 0 60px rgba(255, 215, 0, 0.4);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .submit-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-  background: linear-gradient(135deg, var(--gold), var(--teal));
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.8), 0 0 80px rgba(0, 206, 209, 0.6);
+  background: linear-gradient(135deg, #FFEB3B, var(--teal));
 }
 
 .submit-btn:active {
@@ -261,7 +271,7 @@ body {
 }
 
 .panchang-card {
-  background: rgba(0, 206, 209, 0.15);
+  background: rgba(0, 206, 209, 0.25);
   border: 2px solid var(--teal);
   border-radius: 12px;
   padding: 20px;
@@ -275,15 +285,15 @@ body {
 }
 
 .panchang-card:hover {
-  background: rgba(0, 206, 209, 0.3);
-  box-shadow: 0 0 20px rgba(0, 206, 209, 0.6);
+  background: rgba(0, 206, 209, 0.45);
+  box-shadow: 0 0 30px rgba(0, 206, 209, 0.8);
   transform: translateY(-5px);
 }
 
 .panchang-card.active {
-  background: rgba(255, 215, 0, 0.2);
+  background: rgba(255, 215, 0, 0.3);
   border-color: var(--gold);
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
 }
 
 .card-symbol {
@@ -292,16 +302,18 @@ body {
 
 .card-name {
   font-size: 18px;
-  color: var(--gold);
+  color: #FFEB3B;
   font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.6);
 }
 
 .card-effect {
   font-size: 12px;
-  color: var(--teal);
+  color: #ffffff;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 215, 0, 0.3);
+  border-top: 1px solid var(--gold);
+  font-weight: 500;
 }
 
 /* Info Cards */
@@ -313,7 +325,7 @@ body {
 }
 
 .info-card {
-  background: rgba(0, 206, 209, 0.15);
+  background: rgba(0, 206, 209, 0.25);
   border: 2px solid var(--teal);
   border-radius: 12px;
   padding: 25px;
@@ -321,28 +333,32 @@ body {
 }
 
 .info-card:hover {
-  box-shadow: 0 0 20px rgba(0, 206, 209, 0.5);
+  box-shadow: 0 0 30px rgba(0, 206, 209, 0.7);
   transform: translateY(-3px);
+  background: rgba(0, 206, 209, 0.35);
 }
 
 .info-card h3 {
-  color: var(--gold);
+  color: #FFEB3B;
   margin-bottom: 10px;
   font-size: 18px;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.6);
 }
 
 .info-card p {
-  color: var(--teal);
+  color: #ffffff;
   font-size: 13px;
   margin-bottom: 15px;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 .stat {
   font-size: 24px;
-  color: var(--white);
+  color: #ffffff;
   font-weight: 700;
-  text-shadow: 0 0 15px rgba(0, 206, 209, 0.4);
+  text-shadow: 0 0 20px rgba(0, 206, 209, 0.6), 0 0 40px rgba(255, 215, 0, 0.3);
 }
 
 /* Query Form */
@@ -372,8 +388,8 @@ body {
 }
 
 .muhurta-card {
-  background: rgba(0, 206, 209, 0.15);
-  border: 3px solid;
+  background: rgba(0, 206, 209, 0.25);
+  border: 3px solid var(--teal);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -386,9 +402,10 @@ body {
 }
 
 .muhurta-card:hover {
-  background: rgba(0, 206, 209, 0.3);
-  box-shadow: 0 0 20px rgba(0, 206, 209, 0.6);
+  background: rgba(0, 206, 209, 0.45);
+  box-shadow: 0 0 30px rgba(0, 206, 209, 0.8);
   transform: translateY(-5px);
+  border-color: var(--gold);
 }
 
 .muhurta-icon {
@@ -397,24 +414,27 @@ body {
 
 .muhurta-name {
   font-size: 16px;
-  color: var(--white);
+  color: #ffffff;
   font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
 }
 
 .muhurta-hint {
   font-size: 11px;
-  color: var(--teal);
-  opacity: 0.8;
+  color: #ffffff;
+  opacity: 1;
+  font-weight: 500;
 }
 
 /* Footer */
 .footer {
-  background: rgba(0, 71, 171, 0.9);
+  background: rgba(0, 30, 60, 0.95);
   padding: 20px;
   text-align: center;
   border-top: 2px solid var(--gold);
-  color: var(--teal);
+  color: #ffffff;
   font-size: 14px;
+  font-weight: 500;
 }
 
 /* Responsive */
