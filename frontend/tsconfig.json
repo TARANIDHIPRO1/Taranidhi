@@ -9,8 +9,9 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "emitDeclarationOnly": false,
+    "noEmit": true,
     "strict": true,
+    "allowImportingTsExtensions": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "isolatedModules": true
