@@ -1,11 +1,11 @@
 import React from 'react';
 
 const tabs = [
-  { id: 'amanta', label: '🌙 Amanta' },
-  { id: 'date', label: '📅 Date' },
-  { id: 'today', label: '📋 Today' },
-  { id: 'calendar', label: '📆 Calendar' },
-  { id: 'chart', label: '📊 Chart' },
+  { id: 'panchang', label: '📋 Panchang' },
+  { id: 'hora', label: '🕐 Hora & Lagna' },
+  { id: 'kundali', label: '📊 Kundali' },
+  { id: 'query', label: '❓ Query' },
+  { id: 'muhurta', label: '✨ Pro Muhurta' },
 ];
 
 export default function TabNavigation({ activeTab, setActiveTab }: any) {
