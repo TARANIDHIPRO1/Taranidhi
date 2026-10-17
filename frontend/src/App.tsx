@@ -1,170 +1,284 @@
 import React, { useState } from 'react';
 import './App.css';
-import Header from './components/Header';
-import TabNavigation from './components/TabNavigation';
-import PanchagInfo from './components/PanchagInfo';
-import PanchagViewer from './components/PanchagViewer';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('panchang');
-  const [selectedElement, setSelectedElement] = useState<{type: string; data: any} | null>(null);
+  const [activeTab, setActiveTab] = useState('kundali');
+  const [jatakName, setJatakName] = useState('');
+  const [dob, setDob] = useState('');
+  const [tob, setTob] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [country, setCountry] = useState('');
+  const [gpsLat, setGpsLat] = useState('');
+  const [gpsLon, setGpsLon] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [selectedPanchang, setSelectedPanchang] = useState<string | null>(null);
+
+  const panchaElements = [
+    { name: 'Tithi', symbol: '🌙', effect: 'Moon phase energy' },
+    { name: 'Nakshatra', symbol: '⭐', effect: 'Star constellation influence' },
+    { name: 'Yoga', symbol: '☀️', effect: 'Sun-Moon combination energy' },
+    { name: 'Karana', symbol: '🔄', effect: 'Half-day planetary effect' },
+    { name: 'Vara', symbol: '📅', effect: 'Weekday planetary ruler' },
+  ];
+
+  const muhurtaCategories = [
+    { icon: '💼', name: 'Business', color: '#FF8C00' },
+    { icon: '🏠', name: 'Property', color: '#10B981' },
+    { icon: '💍', name: 'Marriage', color: '#EC4899' },
+    { icon: '🚗', name: 'Vehicle', color: '#8B5CF6' },
+    { icon: '⚕️', name: 'Medical', color: '#EF4444' },
+    { icon: '📚', name: 'Education', color: '#3B82F6' },
+  ];
+
+  const handleSubmitKundali = () => {
+    const formData = {
+      name: jatakName,
+      dob,
+      tob,
+      city,
+      state,
+      country,
+      gpsLat,
+      gpsLon,
+      mobile,
+      timestamp: new Date().toISOString(),
+    };
+    console.log('Saving Kundali:', formData);
+    alert(`Kundali registered for ${jatakName} - ${dob} ${tob}`);
+  };
 
   return (
-    <div className="min-h-screen bg-cream">
-      <Header />
-      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      {/* PANCHANG TAB */}
-      {activeTab === 'panchang' && (
-        <>
-          <PanchagInfo />
-          <PanchagViewer selectedElement={selectedElement} setSelectedElement={setSelectedElement} />
-        </>
-      )}
-
-      {/* HORA & LAGNA TAB */}
-      {activeTab === 'hora' && (
-        <div className="content-section">
-          <div className="card">
-            <h2>Hora & Lagna</h2>
-            <p>Lagna (Ascendant): Libra (Tula)</p>
-            <div className="feature-list">
-              <div className="feature-item">
-                <span className="label">Lagna Lord:</span>
-                <span className="value">Venus</span>
-              </div>
-              <div className="feature-item">
-                <span className="label">Hora Strength:</span>
-                <span className="value">Strong</span>
-              </div>
-              <div className="feature-item">
-                <span className="label">Current Hora:</span>
-                <span className="value">Sun's Hora (Power & Authority)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* KUNDALI TAB */}
-      {activeTab === 'kundali' && (
-        <div className="content-section">
-          <div className="card">
-            <h2>Kundali (Birth Chart)</h2>
-            <div className="chart-section">
-              <p className="feature-info">Enter your birth details to generate your complete Kundli:</p>
-              <div className="form-group">
-                <label>Date of Birth:</label>
-                <input type="date" placeholder="DD/MM/YYYY" />
-              </div>
-              <div className="form-group">
-                <label>Time of Birth:</label>
-                <input type="time" />
-              </div>
-              <div className="form-group">
-                <label>Place of Birth:</label>
-                <input type="text" placeholder="City/Location" />
-              </div>
-              <button className="btn-primary">Generate Kundli</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* QUERY TAB */}
-      {activeTab === 'query' && (
-        <div className="content-section">
-          <div className="card">
-            <h2>Astrological Query</h2>
-            <div className="query-section">
-              <div className="form-group">
-                <label>Your Question:</label>
-                <textarea placeholder="Ask any astrological question..."></textarea>
-              </div>
-              <div className="form-group">
-                <label>Question Type:</label>
-                <select>
-                  <option>Relationship</option>
-                  <option>Career</option>
-                  <option>Finance</option>
-                  <option>Health</option>
-                  <option>Education</option>
-                  <option>Business</option>
-                </select>
-              </div>
-              <button className="btn-primary">Get Analysis</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* PROFESSIONAL MUHURTA TAB */}
-      {activeTab === 'muhurta' && (
-        <div className="content-section">
-          <div className="card">
-            <h2>Professional Muhurta (व्यावसायिक)</h2>
-            <p className="section-subtitle">Select a category to find auspicious timing:</p>
-            <div className="muhurta-categories">
-              <div className="category-item" data-category="business">
-                <div className="category-icon">💼</div>
-                <div className="category-name">Business Launch</div>
-              </div>
-              <div className="category-item" data-category="property">
-                <div className="category-icon">🏠</div>
-                <div className="category-name">Property Purchase</div>
-              </div>
-              <div className="category-item" data-category="marriage">
-                <div className="category-icon">💍</div>
-                <div className="category-name">Wedding Date</div>
-              </div>
-              <div className="category-item" data-category="vehicle">
-                <div className="category-icon">🚗</div>
-                <div className="category-name">Vehicle Purchase</div>
-              </div>
-              <div className="category-item" data-category="medical">
-                <div className="category-icon">⚕️</div>
-                <div className="category-name">Medical Procedure</div>
-              </div>
-              <div className="category-item" data-category="education">
-                <div className="category-icon">📚</div>
-                <div className="category-name">Education Start</div>
-              </div>
-            </div>
-            <div className="muhurta-results">
-              <p className="results-info">Select a category to see auspicious dates and times</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedElement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <DetailPopup element={selectedElement} onClose={() => setSelectedElement(null)} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DetailPopup({ element, onClose }: any) {
-  return (
-    <div className="bg-emerald-500 rounded-lg p-6 max-w-md w-full text-white">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">{element.data.name}</h2>
-        <button onClick={onClose} className="text-2xl font-bold">×</button>
+    <div className="app-container">
+      {/* Cosmic Background */}
+      <div className="cosmic-bg">
+        <div className="stars"></div>
+        <div className="planets"></div>
+        <div className="glow-center"></div>
       </div>
-      <div className="space-y-2 text-sm">
-        {element.data.details && element.data.details.map((detail: any, i: number) => (
-          <div key={i}>
-            <span className="text-gold">{detail.label}:</span> {detail.value}
-          </div>
+
+      {/* Header */}
+      <header className="header">
+        <div className="header-content">
+          <h1>✨ TaraNidhi ✨</h1>
+          <p>Advanced Vedic Astrology & Numerology</p>
+        </div>
+      </header>
+
+      {/* Navigation Tabs */}
+      <nav className="tabs-nav">
+        {['kundali', 'panchang', 'hora', 'query', 'muhurta'].map(tab => (
+          <button
+            key={tab}
+            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === 'kundali' && '📊 Kundali'}
+            {tab === 'panchang' && '📋 Panchang'}
+            {tab === 'hora' && '🕐 Hora & Lagna'}
+            {tab === 'query' && '❓ Query'}
+            {tab === 'muhurta' && '✨ Muhurta'}
+          </button>
         ))}
-      </div>
-      {element.data.description && (
-        <p className="mt-4 text-sm italic border-t border-white pt-4">
-          {element.data.description}
-        </p>
-      )}
+      </nav>
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* KUNDALI TAB - Registration Form */}
+        {activeTab === 'kundali' && (
+          <section className="tab-section kundali-section">
+            <h2>📊 Jatak Kundali (Birth Chart Registration)</h2>
+            <div className="form-container">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Jatak Ka Nam (Name) *</label>
+                  <input
+                    type="text"
+                    value={jatakName}
+                    onChange={(e) => setJatakName(e.target.value)}
+                    placeholder="Enter person's name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Date of Birth (DD/MM/YYYY) *</label>
+                  <input
+                    type="text"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    placeholder="DD/MM/YYYY"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Time of Birth (HH:MM:SS) *</label>
+                  <input
+                    type="text"
+                    value={tob}
+                    onChange={(e) => setTob(e.target.value)}
+                    placeholder="HH:MM:SS"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>City *</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Birth city"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>State *</label>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="State/Province"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Country *</label>
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="Country"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>GPS Latitude *</label>
+                  <input
+                    type="text"
+                    value={gpsLat}
+                    onChange={(e) => setGpsLat(e.target.value)}
+                    placeholder="Latitude"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>GPS Longitude *</label>
+                  <input
+                    type="text"
+                    value={gpsLon}
+                    onChange={(e) => setGpsLon(e.target.value)}
+                    placeholder="Longitude"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group full-width">
+                  <label>Mobile Number (Registration) *</label>
+                  <input
+                    type="tel"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    placeholder="+91 XXXXX XXXXX"
+                  />
+                </div>
+              </div>
+
+              <button className="submit-btn" onClick={handleSubmitKundali}>
+                🔮 Generate Kundali Chart
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* PANCHANG TAB */}
+        {activeTab === 'panchang' && (
+          <section className="tab-section panchang-section">
+            <h2>📋 Panchang (5-Fold Timing System)</h2>
+            <p className="subtitle">Click any element to see its meaning and effect</p>
+            <div className="panchang-grid">
+              {panchaElements.map((elem) => (
+                <div
+                  key={elem.name}
+                  className={`panchang-card ${selectedPanchang === elem.name ? 'active' : ''}`}
+                  onClick={() => setSelectedPanchang(selectedPanchang === elem.name ? null : elem.name)}
+                >
+                  <div className="card-symbol">{elem.symbol}</div>
+                  <div className="card-name">{elem.name}</div>
+                  {selectedPanchang === elem.name && (
+                    <div className="card-effect">{elem.effect}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* HORA & LAGNA TAB */}
+        {activeTab === 'hora' && (
+          <section className="tab-section hora-section">
+            <h2>🕐 Hora & Lagna (Hour & Ascendant)</h2>
+            <div className="info-cards">
+              <div className="info-card">
+                <h3>🌅 Lagna (Ascendant)</h3>
+                <p>Your rising sign at birth - determines personality and life path</p>
+                <div className="stat">Libra ♎</div>
+              </div>
+              <div className="info-card">
+                <h3>⏰ Current Hora</h3>
+                <p>Current planetary hour and its ruling planet</p>
+                <div className="stat">Sun's Hora (Power)</div>
+              </div>
+              <div className="info-card">
+                <h3>💪 Hora Strength</h3>
+                <p>Overall strength of current planetary influence</p>
+                <div className="stat">Strong ✓</div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* QUERY TAB */}
+        {activeTab === 'query' && (
+          <section className="tab-section query-section">
+            <h2>❓ Ask an Astrological Question</h2>
+            <div className="query-form">
+              <textarea placeholder="Ask any astrological question..."></textarea>
+              <select>
+                <option>Career</option>
+                <option>Relationship</option>
+                <option>Health</option>
+                <option>Finance</option>
+                <option>Education</option>
+              </select>
+              <button className="submit-btn">🔮 Get Analysis</button>
+            </div>
+          </section>
+        )}
+
+        {/* MUHURTA TAB */}
+        {activeTab === 'muhurta' && (
+          <section className="tab-section muhurta-section">
+            <h2>✨ Professional Muhurta (Auspicious Timing)</h2>
+            <p className="subtitle">Select category to find auspicious dates and times</p>
+            <div className="muhurta-grid">
+              {muhurtaCategories.map((cat) => (
+                <div key={cat.name} className="muhurta-card" style={{ borderColor: cat.color }}>
+                  <div className="muhurta-icon">{cat.icon}</div>
+                  <div className="muhurta-name">{cat.name}</div>
+                  <div className="muhurta-hint">Click to find dates</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p>© 2026 OCCULTVIISION™ | Advanced Vedic Astrology</p>
+      </footer>
     </div>
   );
 }
