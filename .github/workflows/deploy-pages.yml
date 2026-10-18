@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -11,15 +11,15 @@ jobs:
     permissions:
       contents: read
       deployments: write
-    name: Deploy TaraNidhi to Cloudflare Pages
+    name: Deploy TaraNidhi to Cloudflare Workers
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy . --project-name=taranidhi-pro1
+          command: deploy
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
