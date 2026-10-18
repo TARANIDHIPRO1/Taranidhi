@@ -286,10 +286,26 @@
         var v = e.target.closest('[data-view]'), d = e.target.closest('[data-del]'), lo = e.target.closest('#tn-logout');
         if (v) showChart(v.getAttribute('data-view'));
         if (lo) { store(TOKEN_KEY, null); store(PHONE_KEY, null); wrap.remove(); app.innerHTML = ''; status('Logged out.'); }
-        if (d && window.confirm('Delete this saved kundali?')) {
+        if (d) {
+          var msg = wrap.querySelector('#saved-msg');
+          function say(t, bad) { if (!msg) { msg = document.createElement('p'); msg.id = 'saved-msg'; msg.className = 'card-subtitle'; wrap.insertBefore(msg, wrap.children[1] || null); } msg.textContent = t; msg.style.color = bad ? '#ff9b9b' : ''; }
+          if (d.getAttribute('data-armed') !== '1') {
+            d.setAttribute('data-armed', '1'); d.textContent = 'Tap again to confirm'; d.style.background = '#8a2b2b'; d.style.color = '#fff';
+            say('Tap "Tap again to confirm" to permanently delete this kundali.');
+            setTimeout(function () { if (d.isConnected && d.getAttribute('data-armed') === '1') { d.removeAttribute('data-armed'); d.textContent = 'Delete'; d.style.background = ''; d.style.color = ''; } }, 6000);
+            return;
+          }
+          d.disabled = true; d.textContent = 'Deleting …';
           api('/kundali/' + d.getAttribute('data-del'), { method: 'DELETE' }).then(function (x) {
-            if (!x.ok) { status(x.body.error || 'Could not delete.', 'error'); return; }
-            wrap.remove(); renderSaved(); status('Deleted. You can now generate a new kundali.');
+            if (x.status === 401) { store(TOKEN_KEY, null); say('Session expired. Log in again (generate once) and retry.', true); d.disabled = false; d.textContent = 'Delete'; return; }
+            if (!x.ok) { say(x.body.error || 'Could not delete (error ' + x.status + ').', true); d.disabled = false; d.textContent = 'Delete'; d.removeAttribute('data-armed'); return; }
+            app.innerHTML = '';
+            api('/kundali').then(function (r2) {
+              var left = (r2.ok && r2.body.kundalis) || [];
+              if (!left.length) { wrap.remove(); } else { renderSaved('Deleted. You can now generate a new kundali.'); }
+              status('Deleted. You can now generate a new kundali.');
+              var ph = document.getElementById('kundali-placeholder'); if (ph) ph.hidden = false;
+            });
           });
         }
       };
