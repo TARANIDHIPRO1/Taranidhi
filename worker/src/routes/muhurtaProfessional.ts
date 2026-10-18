@@ -45,6 +45,11 @@ import {
   type PersonalParams,
   scoreProfessionalMuhurta,
 } from "../lib/professionalMuhurta";
+import {
+  type DeepavaliLabel,
+  applyDeepavaliBonus,
+  getAmritKaal,
+} from "../lib/deepavaliMuhurta";
 import { debitWallet, InsufficientBalanceError, type Env as WalletEnv } from "../lib/wallet";
 import { json, errorJson } from "../lib/response";
 
@@ -141,6 +146,7 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
   const lonParam = url.searchParams.get("lon");
   const categoryParam = url.searchParams.get("category");
   const kundaliIdParam = url.searchParams.get("kundali_id");
+  const deepavaliLabelParam = url.searchParams.get("deepavali_label");
 
   const lat = latParam !== null ? Number(latParam) : NaN;
   const lon = lonParam !== null ? Number(lonParam) : NaN;
@@ -336,6 +342,27 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
     lon,
   });
 
+  // ── Deepavali Bonus (if deepavali_label provided) ──
+  let deepavaliResult = null;
+  if (deepavaliLabelParam && ["vehicle-purchase", "gold-purchase", "property-purchase", "business-startup", "family-events", "education", "legal", "health"].includes(deepavaliLabelParam)) {
+    const deepavaliLabel = deepavaliLabelParam as DeepavaliLabel;
+    const amritKaal = deepavaliLabel === "health" ? getAmritKaal(sunrise) : undefined;
+    deepavaliResult = applyDeepavaliBonus(
+      deepavaliLabel,
+      result.finalScore,
+      {
+        activeHora: activeHora?.lord ?? null,
+        currentNakIndex: currentNakIdx,
+        currentTithi,
+        sunrise,
+        dow,
+      },
+      amritKaal
+    );
+    // Update final score with Deepavali bonuses
+    result.finalScore = Math.min(deepavaliResult.scoreCapped ? 60 : 100, deepavaliResult.totalBonusPoints + result.finalScore);
+  }
+
   // ── Query Log ──
   await env.DB.prepare(
     `INSERT INTO query_logs (user_id, kundali_id, query_type, muhurta_pct, points_charged)
@@ -417,5 +444,27 @@ export async function handleMuhurtaProfessional(request: Request, env: Env): Pro
             antar_lord: antardashLord,
           }
         : null,
+
+    // Deepavali context (if deepavali_label provided)
+    deepavali: deepavaliResult
+      ? {
+          label: deepavaliResult.deepavaliLabel,
+          display_name: deepavaliResult.context.displayName,
+          icon: deepavaliResult.context.icon,
+          house: deepavaliResult.context.house,
+          special_rules: deepavaliResult.context.specialRules,
+          personalizations: deepavaliResult.context.personalizations,
+          bonuses_applied: deepavaliResult.bonusesApplied.map(b => ({
+            rule: b.rule,
+            bonus_points: b.bonusPoints,
+            reason: b.reason,
+          })),
+          total_bonus_points: deepavaliResult.totalBonusPoints,
+          score_capped: deepavaliResult.scoreCapped,
+          cap_reason: deepavaliResult.capReason,
+          deepavali_message: deepavaliResult.deepavaliMessage,
+          deepavali_recommendation: deepavaliResult.deepavaliRecommendation,
+        }
+      : null,
   });
 }
