@@ -50,8 +50,8 @@
     return !!(d && t);
   }
   ['dob-text', 'tob-text', 'tob-ampm'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.addEventListener('input', syncDateTime); el.addEventListener('change', syncDateTime); } });
-  (function () { var tt = document.getElementById('tob-text'); if (tt) tt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = tt.value.replace(/[^\d:.]/g, ''); if (!del && /^\d{2}$/.test(v)) v += ':'; tt.value = v; syncDateTime(); }); })();
-  (function () { var dt = document.getElementById('dob-text'); if (dt) dt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = dt.value.replace(/[^\d\/\-. ]/g, ''); if (!del && (/^\d{2}$/.test(v) || /^\d{2}[\/\-. ]\d{2}$/.test(v))) v += '/'; dt.value = v; syncDateTime(); }); })();
+  (function () { var tt = document.getElementById('tob-text'); if (tt) tt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = tt.value.replace(/[^\d:.]/g, '').replace(/([:.])[:.]+/g, '$1'); if (!del && /^\d{2}$/.test(v)) v += ':'; tt.value = v; syncDateTime(); }); })();
+  (function () { var dt = document.getElementById('dob-text'); if (dt) dt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = dt.value.replace(/[^\d\/\-. ]/g, '').replace(/([\/\-. ])[\/\-. ]+/g, '$1'); if (!del && (/^\d{2}$/.test(v) || /^\d{2}[\/\-. ]\d{2}$/.test(v))) v += '/'; dt.value = v; syncDateTime(); }); })();
 
   function status(msg, kind) {
     var box = form.querySelector('.result-box');
