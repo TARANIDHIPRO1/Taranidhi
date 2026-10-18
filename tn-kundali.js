@@ -130,15 +130,74 @@
   function fmtDate(iso) { try { return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) { return iso; } }
   function deg(x) { var d = Math.floor(x), m = Math.round((x - d) * 60); if (m === 60) { d++; m = 0; } return d + '°' + ('0' + m).slice(-2) + '′'; }
 
-  function southChart(chart) {
-    var bySign = {}; for (var i = 0; i < 12; i++) bySign[i] = [];
-    bySign[chart.ascendant.rashi].push('<b>Asc</b>');
-    chart.planets.forEach(function (p) { bySign[p.rashi].push(esc(ABBR[p.planet] || p.planet)); });
-    var cells = GRID.map(function (s) {
-      if (s === null) return '<div style="border:0"></div>';
-      return '<div style="border:1px solid var(--tn-border,#b89b55);min-height:64px;padding:4px;font-size:11px;line-height:1.35"><div style="opacity:.7;font-size:9px">' + SIGNS[s].slice(0, 3) + '</div>' + bySign[s].join(' ') + '</div>';
+  var BORDER = 'var(--tn-border,#b89b55)';
+  var GRAHA = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+
+  /* bySign: {0..11: [html labels]}; lagna: sign index of house 1 */
+  function southSvg(bySign, lagna, label) {
+    var cells = GRID.map(function (sg) {
+      if (sg === null) return '<div style="border:0"></div>';
+      var asc = sg === lagna ? '<span style="position:absolute;right:3px;top:2px;font-size:9px;opacity:.8">Asc</span>' : '';
+      return '<div style="position:relative;border:1px solid ' + BORDER + ';min-height:64px;padding:4px;font-size:12px;line-height:1.4' + (sg === lagna ? ';background:rgba(184,155,85,.12)' : '') + '"><div style="opacity:.65;font-size:9px">' + SIGNS[sg].slice(0, 3) + '</div>' + asc + bySign[sg].join(' ') + '</div>';
     }).join('');
-    return '<div role="img" aria-label="South Indian style birth chart" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:420px;margin:8px auto">' + cells + '</div>';
+    return '<div role="img" aria-label="' + esc(label) + '" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:380px;margin:8px auto">' + cells + '</div>';
+  }
+
+  /* North Indian diamond: house 1 is always the top centre diamond, houses run anticlockwise.
+     House h carries sign (lagna + h - 1) % 12. */
+  var NPOS = { 1: [200, 100], 2: [100, 48], 3: [48, 100], 4: [96, 200], 5: [48, 300], 6: [100, 352], 7: [200, 300], 8: [300, 352], 9: [352, 300], 10: [304, 200], 11: [352, 100], 12: [300, 48] };
+  function northSvg(bySign, lagna, label) {
+    var out = '<rect x="2" y="2" width="396" height="396" fill="none" stroke="' + BORDER + '" stroke-width="1.5"/>' +
+      '<path d="M2 2L398 398M398 2L2 398M200 2L2 200L200 398L398 200Z" fill="none" stroke="' + BORDER + '" stroke-width="1.2"/>';
+    for (var h = 1; h <= 12; h++) {
+      var sg = (lagna + h - 1) % 12, pos = NPOS[h], items = bySign[sg];
+      out += '<text x="' + pos[0] + '" y="' + (pos[1] - 16 - (items.length > 3 ? 6 : 0)) + '" text-anchor="middle" font-size="11" fill="currentColor" opacity=".6">' + (sg + 1) + '</text>';
+      // wrap planets, 3 per line
+      for (var i = 0; i < items.length; i += 3) {
+        out += '<text x="' + pos[0] + '" y="' + (pos[1] + (i / 3) * 16 - (items.length > 3 ? 6 : 0)) + '" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">' + items.slice(i, i + 3).join(' ') + '</text>';
+      }
+    }
+    return '<svg viewBox="0 0 400 400" role="img" aria-label="' + esc(label) + '" style="width:100%;max-width:380px;display:block;margin:8px auto;color:inherit">' + out + '</svg>';
+  }
+
+  function bySignFrom(list, lagnaSign) {
+    var by = {}; for (var i = 0; i < 12; i++) by[i] = [];
+    by[lagnaSign].push('<tspan>Asc</tspan>');
+    list.forEach(function (p) { by[p.sign].push(esc(ABBR[p.planet] || p.planet)); });
+    return by;
+  }
+  function bothCharts(list, lagnaSign, title) {
+    var north = northSvg(bySignFrom(list, lagnaSign), lagnaSign, 'North Indian ' + title);
+    var south = southSvg((function () { var by = bySignFrom(list, lagnaSign); by[lagnaSign] = []; return by; })(), lagnaSign, 'South Indian ' + title);
+    return '<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center">' +
+      '<div style="flex:1 1 300px;min-width:0"><p class="card-subtitle" style="text-align:center;margin:0">NORTH INDIAN</p>' + north + '</div>' +
+      '<div style="flex:1 1 300px;min-width:0"><p class="card-subtitle" style="text-align:center;margin:0">SOUTH INDIAN</p>' + south + '</div></div>';
+  }
+
+  /* Gochar: transit signs for the current moment from /muhurta/now (planets_by_house of the live muhurta lagna).
+     Sign precision only - the API returns houses, not transit degrees. */
+  function loadGochar(k, c, moonSign) {
+    var slot = document.getElementById('gochar-slot'); if (!slot) return;
+    var lat = k.latitude, lon = k.longitude;
+    api('/muhurta/now?lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon)).then(function (r) {
+      if (!r.ok || !r.body || !r.body.muhurta_validation) { slot.innerHTML = '<p class="card-subtitle">' + esc((r.body && r.body.error) || 'Gochar could not be loaded right now.') + '</p>'; return; }
+      var mv = r.body.muhurta_validation, tl = mv.stage5_sav.lagna_sign, ph = mv.stage4_lagna_shudhi.planets_by_house, tr = [];
+      Object.keys(ph).forEach(function (h) { (ph[h] || []).forEach(function (pl) { tr.push({ planet: pl, sign: (tl + (+h) - 1) % 12 }); }); });
+      tr.sort(function (a, b) { return GRAHA.indexOf(a.planet) - GRAHA.indexOf(b.planet); });
+      var natalLagna = c.ascendant.rashi;
+      var th = 'style="text-align:left;padding:5px 6px;border-bottom:1px solid ' + BORDER + '"';
+      var rows = tr.map(function (t) {
+        var hl = (t.sign - natalLagna + 12) % 12 + 1, hm = (t.sign - moonSign + 12) % 12 + 1;
+        return '<tr><td>' + esc(t.planet) + '</td><td>' + SIGNS[t.sign] + '</td><td>' + hl + '</td><td>' + hm + '</td></tr>';
+      }).join('');
+      var sat = tr.filter(function (t) { return t.planet === 'Saturn'; })[0], ss = '';
+      if (sat) { var d = (sat.sign - moonSign + 12) % 12; ss = d === 11 ? 'Sade Sati — first phase (Saturn in the 12th from Moon).' : d === 0 ? 'Sade Sati — peak phase (Saturn over natal Moon sign).' : d === 1 ? 'Sade Sati — last phase (Saturn in the 2nd from Moon).' : 'Sade Sati is not running (Saturn is in the ' + (d + 1) + 'th from natal Moon).'; }
+      var now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      slot.innerHTML = bothCharts(tr, natalLagna, 'Gochar chart (transit planets over natal Lagna)') +
+        '<div style="overflow-x:auto;margin-top:10px"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th ' + th + '>Transit planet</th><th ' + th + '>Now in</th><th ' + th + '>House from Lagna</th><th ' + th + '>House from Moon</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        (ss ? '<p class="card-subtitle"><b>' + esc(ss) + '</b></p>' : '') +
+        '<p class="card-subtitle">As of ' + esc(now) + '. Signs only (Lahiri); houses are counted from your natal Lagna. Planet degrees for transit are not provided by the API.</p>';
+    });
   }
 
   function renderChart(data) {
@@ -159,9 +218,11 @@
       '<div class="card"><h3 class="card-title">Dasha now</h3><p class="card-subtitle">' + esc(c.dasha.maha.lord) + ' – ' + esc(c.dasha.antar.lord) + '<br>until ' + esc(fmtDate(c.dasha.antar.end)) + '</p></div>' +
       '<div class="card"><h3 class="card-title">Tara today</h3><p class="card-subtitle">' + esc(c.tara.number) + ' · ' + esc(c.tara.name) + ' (' + esc(c.tara.beneficence) + ')</p></div>' +
       '</div></section>' +
-      '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">▦</span><h2>RASHI CHART</h2></div></div>' + southChart(c) + '</section>' +
+      '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">▦</span><h2>RASHI CHART (JANMA KUNDALI)</h2></div></div>' + bothCharts(c.planets.map(function (p) { return { planet: p.planet, sign: p.rashi }; }), c.ascendant.rashi, 'birth chart') + '</section>' +
+      '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">☽</span><h2>GOCHAR (TRANSIT NOW)</h2></div></div><div id="gochar-slot"><p class="card-subtitle">Loading current planetary positions …</p></div></section>' +
       '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">☉</span><h2>PLANETS</h2></div></div><div style="overflow-x:auto"><table ' + tbl + '><thead><tr><th ' + th + '>Planet</th><th ' + th + '>Sign</th><th ' + th + '>Nakshatra</th><th ' + th + '>House</th><th ' + th + '>KP sub</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">⌂</span><h2>HOUSE CUSPS (KP)</h2></div></div><div style="overflow-x:auto"><table ' + tbl + '><thead><tr><th ' + th + '>House</th><th ' + th + '>Sign</th><th ' + th + '>Nakshatra</th><th ' + th + '>Sub-lord</th></tr></thead><tbody>' + cusps + '</tbody></table></div><p class="card-subtitle">Calculated by ' + esc(data.meta.engine) + '.</p></section>';
+    loadGochar(k, c, moon.rashi);
     var ph = document.getElementById('kundali-placeholder'); if (ph) ph.hidden = true;
     app.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
