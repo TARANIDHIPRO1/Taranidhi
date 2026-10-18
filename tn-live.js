@@ -59,10 +59,32 @@
       .then(function (j) { var b = (j.results || [])[0]; return b ? { lat: b.latitude, lon: b.longitude, label: [b.name, b.admin1, b.country].filter(Boolean).join(', ') } : null; })
       .catch(function () { return null; });
   }
+  function reverseLabel(lat, lon) {
+    return fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en&latitude=' + lat + '&longitude=' + lon)
+      .then(function (r) { return r.json(); })
+      .then(function (j) { var s = [j.city || j.locality, j.principalSubdivision, j.countryName].filter(Boolean).join(', '); return s ? s + ' (GPS)' : 'My GPS location'; })
+      .catch(function () { return 'My GPS location'; });
+  }
+  /* GPS fix -> save place (not manual) -> redraw -> recalc. say(text) shows progress in the place bar. */
+  function gpsFix(say, opts) {
+    opts = opts || {};
+    if (!navigator.geolocation) { say('GPS is not available in this browser. Type a city instead.'); return Promise.resolve(false); }
+    say('Detecting your GPS location …');
+    return new Promise(function (resolve) {
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var lat = pos.coords.latitude, lon = pos.coords.longitude;
+        reverseLabel(lat, lon).then(function (label) { setPlace({ lat: lat, lon: lon, label: label, manual: false, ts: Date.now() }); drawPlace(); run(); resolve(true); });
+      }, function (err) {
+        var denied = err && err.code === 1;
+        say(denied ? 'GPS is blocked for this site. Click the lock icon next to the address bar, set Location to Allow, then press USE MY GPS LOCATION. Until then, type a city.' : 'GPS could not get a fix (' + ((err && err.message) || 'unknown') + '). Try again or type a city.');
+        resolve(false);
+      }, { enableHighAccuracy: true, timeout: opts.timeout || 20000, maximumAge: opts.maxAge == null ? 120000 : opts.maxAge });
+    });
+  }
   function drawPlace() {
     var p = getPlace();
     placeBox.innerHTML = '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">📍</span><h2>YOUR LOCATION</h2></div><button type="button" class="pill" id="tn-refresh" style="cursor:pointer">REFRESH ↻</button></div>' +
-      '<p class="card-subtitle" id="tn-place-label">' + (p ? esc(p.label) + ' · ' + p.lat.toFixed(4) + ', ' + p.lon.toFixed(4) : 'Location not set. Use GPS or type a city.') + '</p>' +
+      '<p class="card-subtitle" id="tn-place-label">' + (p ? esc(p.label) + ' · ' + p.lat.toFixed(4) + ', ' + p.lon.toFixed(4) : 'Location not set. Detecting GPS … or type a city.') + '</p>' +
       '<div class="form-row"><div class="form-group"><label for="tn-city">City</label><input id="tn-city" placeholder="e.g. Bhopal, India"></div></div>' +
       '<button type="button" class="submit-btn" id="tn-setcity" style="margin-bottom:10px">SET CITY</button>' +
       '<button type="button" class="submit-btn" id="tn-gps" style="background:linear-gradient(140deg,rgba(67,240,162,.8),rgba(43,240,162,.6));margin-bottom:6px">📍 USE MY GPS LOCATION</button>' +
@@ -71,15 +93,9 @@
     $('tn-setcity').addEventListener('click', function () {
       var q = $('tn-city').value.trim(); if (!q) { say('Type a city name.'); return; }
       say('Finding ' + q + ' …');
-      geocode(q).then(function (pl) { if (!pl) { say('Could not find "' + q + '".'); return; } setPlace(pl); drawPlace(); run(); });
+      geocode(q).then(function (pl) { if (!pl) { say('Could not find "' + q + '".'); return; } pl.manual = true; setPlace(pl); drawPlace(); run(); });
     });
-    $('tn-gps').addEventListener('click', function () {
-      if (!navigator.geolocation) { say('GPS is not supported here. Type a city instead.'); return; }
-      say('Getting GPS …');
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        setPlace({ lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'My GPS location' }); drawPlace(); run();
-      }, function () { say('GPS permission was not given. Type a city instead.'); }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
-    });
+    $('tn-gps').addEventListener('click', function () { gpsFix(say, { maxAge: 0 }); });
     $('tn-refresh').addEventListener('click', function () { run(); });
   }
 
@@ -541,8 +557,12 @@
   var NEEDS_PLACE = PAGE !== 'query' && PAGE !== 'cosmos';
   if (NEEDS_PLACE) drawPlace();
   var p0 = getPlace();
-  if (NEEDS_PLACE && !p0 && navigator.geolocation) {
-    // first visit: ask GPS once (viewer's own location is the right basis for Panchang/Hora)
-    navigator.geolocation.getCurrentPosition(function (pos) { setPlace({ lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'My GPS location' }); drawPlace(); run(); }, function () { run(); }, { timeout: 12000, maximumAge: 600000 });
+  function bootMsg(t) { var m = $('tn-place-msg'); if (m) { m.textContent = t; m.classList.toggle('show', !!t); } }
+  if (NEEDS_PLACE) {
+    // GPS is the default on every visit; a city the user typed by hand is respected (press USE MY GPS to switch back).
+    var useGps = !p0 || !p0.manual;
+    if (p0) run();            // show data for the last known place immediately
+    if (useGps) { gpsFix(bootMsg, { maxAge: 120000 }).then(function (ok) { if (!ok && !p0) run(); }); }
+    else if (!p0) { run(); }
   } else { run(); }
 })();
