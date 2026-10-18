@@ -20,6 +20,39 @@
   function f(name) { return form.elements[name]; }
   function val(name) { var el = f(name); return el ? String(el.value || '').trim() : ''; }
 
+  /* ---------- date / time entry: explicit DD/MM/YYYY and 12-hour time (native pickers read the browser locale and swap day/month) ---------- */
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function p2(n) { return ('0' + n).slice(-2); }
+  function parseDob(t) {
+    var m = String(t).trim().match(/^(\d{1,2})[\/\-. ](\d{1,2})[\/\-. ](\d{4})$/); if (!m) return null;
+    var d = +m[1], mo = +m[2], y = +m[3], dt = new Date(Date.UTC(y, mo - 1, d));
+    if (y < 1800 || y > 2100 || dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+    return { iso: y + '-' + p2(mo) + '-' + p2(d), text: d + ' ' + MONTHS[mo - 1] + ' ' + y + ', ' + DAYS[dt.getUTCDay()] };
+  }
+  function parseTob(t, ap) {
+    var m = String(t).trim().match(/^(\d{1,2})[:.](\d{2})$/); if (!m) return null;
+    var h = +m[1], mi = +m[2]; if (mi > 59 || h > 23) return null;
+    if (h > 12) { ap = h >= 12 ? 'PM' : 'AM'; } // 24-hour entry
+    else if (!ap) return null;
+    var h24 = h > 12 ? h : (ap === 'AM' ? (h === 12 ? 0 : h) : (h === 12 ? 12 : h + 12));
+    var h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+    return { hhmm: p2(h24) + ':' + p2(mi), text: h12 + ':' + p2(mi) + ' ' + (h24 < 12 ? 'AM' : 'PM') };
+  }
+  function syncDateTime() {
+    var dt = document.getElementById('dob-text'), tt = document.getElementById('tob-text'), ap = document.getElementById('tob-ampm');
+    var de = document.getElementById('dob-echo'), te = document.getElementById('tob-echo');
+    if (!dt || !tt || !ap || !form) return false;
+    var d = parseDob(dt.value), t = parseTob(tt.value, ap.value);
+    f('dob').value = d ? d.iso : ''; f('tob').value = t ? t.hhmm : '';
+    if (de) { de.textContent = dt.value.trim() ? (d ? '✓ ' + d.text : '✗ Enter as DD/MM/YYYY (day first), e.g. 08/04/1973') : ''; de.style.color = d ? '' : '#ff9b9b'; }
+    if (te) { te.textContent = tt.value.trim() ? (t ? '✓ ' + t.text : (/^\d{1,2}[:.]\d{2}$/.test(tt.value.trim()) && !ap.value ? '✗ Choose AM or PM' : '✗ Enter as hh:mm, e.g. 11:45')) : ''; te.style.color = t ? '' : '#ff9b9b'; }
+    return !!(d && t);
+  }
+  ['dob-text', 'tob-text', 'tob-ampm'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.addEventListener('input', syncDateTime); el.addEventListener('change', syncDateTime); } });
+  (function () { var tt = document.getElementById('tob-text'); if (tt) tt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = tt.value.replace(/[^\d:.]/g, ''); if (!del && /^\d{2}$/.test(v)) v += ':'; tt.value = v; syncDateTime(); }); })();
+  (function () { var dt = document.getElementById('dob-text'); if (dt) dt.addEventListener('input', function (ev) { var del = ev && ev.inputType && ev.inputType.indexOf('delete') === 0; var v = dt.value.replace(/[^\d\/\-. ]/g, ''); if (!del && (/^\d{2}$/.test(v) || /^\d{2}[\/\-. ]\d{2}$/.test(v))) v += '/'; dt.value = v; syncDateTime(); }); })();
+
   function status(msg, kind) {
     var box = form.querySelector('.result-box');
     if (!box) return;
@@ -200,6 +233,7 @@
     });
   }
 
+  function humanBirth(iso, tz) { try { return new Date(iso).toLocaleString('en-IN', { timeZone: tz || 'Asia/Kolkata', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); } catch (e) { return iso; } }
   function renderChart(data) {
     var k = data.kundali, c = data.chart, moon = c.planets.filter(function (p) { return p.planet === 'Moon'; })[0];
     var rows = c.planets.map(function (p) {
@@ -210,7 +244,7 @@
     var tbl = 'style="width:100%;border-collapse:collapse;font-size:12px"';
     app.innerHTML =
       '<section class="panel"><div class="panel-title"><div class="title-left"><span class="round-icon">📊</span><h2>' + esc(k.label || 'KUNDALI') + '</h2></div><span class="pill">' + esc(c.ayanamsa) + ' ayanamsha</span></div>' +
-      '<p class="card-subtitle">Born ' + esc(k.birth_date) + ' · ' + esc(k.latitude) + ', ' + esc(k.longitude) + ' · ' + esc(k.timezone) + '</p>' +
+      '<p class="card-subtitle">Born ' + esc(humanBirth(k.birth_date, k.timezone)) + ' · ' + esc(k.latitude) + ', ' + esc(k.longitude) + ' · ' + esc(k.timezone) + '</p>' +
       '<div class="card-grid">' +
       '<div class="card"><h3 class="card-title">Lagna</h3><p class="card-subtitle">' + esc(c.ascendant.rashiName) + ' ' + deg(c.ascendant.degInRashi) + '</p></div>' +
       '<div class="card"><h3 class="card-title">Moon</h3><p class="card-subtitle">' + esc(moon.rashiName) + '</p></div>' +
@@ -272,6 +306,7 @@
     e.preventDefault();
     if (busy) return;
     if (!form.reportValidity()) return;
+    if (!syncDateTime()) { status('Check date of birth (DD/MM/YYYY) and time of birth (hh:mm + AM/PM).', 'error'); return; }
     if (!validPhone(val('mobile'))) { status('Enter a valid 10-digit Indian mobile number.', 'error'); f('mobile').focus(); return; }
     busy = true;
     var btn = form.querySelector('button.submit-btn:not([type="button"])'); if (btn) btn.disabled = true;
