@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TaraNidhi</title>
+<style>
+html,body{margin:0;height:100%;background:#03051a}body{display:flex;justify-content:center;align-items:center}
+#tn-dev{box-sizing:content-box;max-width:calc(100vw - 20px);border:10px solid #14183f;border-radius:30px;box-shadow:0 0 0 1px rgba(214,181,102,.6),0 20px 60px rgba(0,0,0,.6);overflow:hidden;background:#000}
+#tn-dev iframe{width:100%;height:100%;border:0;display:block}
+#tn-vsw{position:fixed;left:12px;bottom:12px;z-index:10;display:flex;gap:2px;padding:3px;border:1px solid rgba(214,181,102,.7);border-radius:999px;background:rgba(8,12,38,.92);font:600 12px/1 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+#tn-vsw button{all:unset;cursor:pointer;padding:8px 11px;border-radius:999px;color:#e8dcae;white-space:nowrap}
+#tn-vsw button[aria-pressed="true"]{background:linear-gradient(140deg,#d6b566,#b8893a);color:#1a1405}
+#tn-vsw button:focus-visible{outline:2px solid #fff;outline-offset:1px}
+</style></head><body>
+<div id="tn-dev"><iframe id="tn-fr" title="TaraNidhi" allow="geolocation"></iframe></div>
+<div id="tn-vsw" role="group" aria-label="Screen view">
+<button type="button" data-v="laptop" aria-pressed="false">💻 Laptop</button>
+<button type="button" data-v="tablet" aria-pressed="false">📟 Tablet</button>
+<button type="button" data-v="mobile" aria-pressed="false">📱 Mobile</button></div>
+<script>
+(function () {
+  var KEY = 'tn_view', W = { tablet: 820, mobile: 412 };
+  function get() { try { var v = localStorage.getItem(KEY); return W[v] ? v : 'laptop'; } catch (e) { return 'laptop'; } }
+  function set(v) { try { localStorage.setItem(KEY, v); } catch (e) { } }
+  var p = new URLSearchParams(location.search).get('p') || '/';
+  if (!/^\/(?![\/\\])/.test(p)) p = '/';          // same-origin paths only
+  var mode = get(), fr = document.getElementById('tn-fr'), dev = document.getElementById('tn-dev');
+  if (mode === 'laptop') { location.replace(p); return; }
+  dev.style.width = W[mode] + 'px'; dev.style.height = 'min(calc(100vh - 28px),' + (mode === 'mobile' ? 900 : 1100) + 'px)';
+  fr.src = p;
+  document.querySelectorAll('#tn-vsw button').forEach(function (b) {
+    b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === mode));
+    b.addEventListener('click', function () {
+      var v = b.getAttribute('data-v'), inner = p;
+      try { var l = fr.contentWindow.location; inner = l.pathname + l.search + l.hash; } catch (e) { }
+      set(v);
+      if (v === 'laptop') location.href = inner; else location.replace('/tn-frame.html?p=' + encodeURIComponent(inner));
+    });
+  });
+  fr.addEventListener('load', function () { try { document.title = fr.contentDocument.title || 'TaraNidhi'; } catch (e) { } });
+})();
+</script></body></html>
