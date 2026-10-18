@@ -791,7 +791,7 @@ body[data-theme="cream-maroon"] input,body[data-theme="cream-maroon"] select,bod
 <div class="brand-bullets"><div class="brand-bullet"><strong>Business AstroNumerology</strong>Business name review, numerical analysis and alignment consultation.</div><div class="brand-bullet"><strong>Vastu Consulting</strong>Business-space review and practical recommendations within the agreed scope.</div><div class="brand-bullet"><strong>Entrepreneur Focus</strong>Support for startups, manufacturing, trading and established businesses.</div></div>
 <div class="brand-signature"><strong>Naveen K Rai</strong><br>AstroNumerologist · Vastu Consultant<br>Professional Business Astrologer<br><br><em>OCCULTVIISION™ — Where Businesses Become Powerful Brands</em></div>
 <a class="brand-cta" href="advertisement.html">Explore Services →</a> <a class="brand-cta" href="offer.html">View Consultation Offer →</a>
-</section><p class="disclaimer">Profile content is based on the service and positioning details provided. Add verified contact details, booking link and any required professional disclosures before publishing.</p></div><footer class="footer">TaraNidhi™ · OCCULTVIISION™ · UI prototype</footer></main>
+</section><p class="disclaimer">Profile content is based on the service and positioning details provided. Add verified contact details, booking link and any required professional disclosures before publishing.</p></div><footer class="footer">TaraNidhi™ · OCCULTVIISION™</footer></main>
 <nav class="bottom-nav" aria-label="Quick navigation"><div class="nav-inner"><a class="nav-item" href="index.html"><span class="nav-icon">✧</span><span>NOW</span></a><a class="nav-item" href="kundali.html"><span class="nav-icon">▦</span><span>Kundali</span></a><a class="nav-item" href="panchang.html"><span class="nav-icon">▤</span><span>Panchang</span></a><a class="nav-item" href="hora-lagna.html"><span class="nav-icon">◷</span><span>Hora & Lagna</span></a><a class="nav-item" href="query.html"><span class="nav-icon">?</span><span>Query</span></a></div></nav></div><script>
 (function(){
  const themes=[
@@ -803,7 +803,7 @@ body[data-theme="cream-maroon"] input,body[data-theme="cream-maroon"] select,bod
  ];
  const root=document.documentElement;
  function applyTheme(id){if(!themes.some(t=>t.id===id))id='cosmic-blue';root.dataset.theme=id;document.body.dataset.theme=id;try{localStorage.setItem('taranidhi-public-theme',id)}catch(e){};document.querySelectorAll('.theme-choice').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===id)));}
- function build(){const host=document.createElement('div');host.className='theme-picker';host.setAttribute('aria-label','Choose app colour theme');host.innerHTML='<span class="theme-picker-label">App Theme</span>'+themes.map(t=>'<button type="button" class="theme-choice" data-theme-choice="'+t.id+'" aria-pressed="false"><span class="theme-dot" style="background:'+t.dot+'"></span>'+t.label+'</button>').join('');
+ function build(){const host=document.createElement('div');host.className='theme-picker';host.setAttribute('aria-label','Choose app colour theme');host.innerHTML='<span class="theme-picker-label">Color Theme</span>'+themes.map(t=>'<button type="button" class="theme-choice" data-theme-choice="'+t.id+'" aria-pressed="false"><span class="theme-dot" style="background:'+t.dot+'"></span>'+t.label+'</button>').join('');
  host.addEventListener('click',e=>{const b=e.target.closest('[data-theme-choice]');if(b)applyTheme(b.dataset.themeChoice)});
  const header=document.querySelector('.header');if(header)header.insertAdjacentElement('afterend',host);else{const main=document.querySelector('.main-content');if(main)main.prepend(host);}
  let saved='cosmic-blue';try{saved=localStorage.getItem('taranidhi-public-theme')||saved}catch(e){}applyTheme(saved);
@@ -817,9 +817,9 @@ body[data-theme="cream-maroon"] input,body[data-theme="cream-maroon"] select,bod
  function setup(){
   const picker=document.querySelector('.theme-picker');
   if(picker&&!picker.querySelector('.theme-toggle')){
-   const toggle=document.createElement('button');toggle.type='button';toggle.className='theme-toggle';toggle.setAttribute('aria-expanded','false');toggle.innerHTML='<span aria-hidden="true">◉</span><span>Theme: <b class="tn-current-theme">Cosmic Blue</b></span><span aria-hidden="true">⌄</span>';
+   const toggle=document.createElement('button');toggle.type='button';toggle.className='theme-toggle';toggle.setAttribute('aria-expanded','false');toggle.innerHTML='<span aria-hidden="true">◉</span><span class="tn-theme-tab">Color Theme</span><span aria-hidden="true">⌄</span>';
    picker.insertBefore(toggle,picker.firstChild);
-   const current=()=>{const active=picker.querySelector('.theme-choice[aria-pressed="true"]');const label=active?active.textContent.trim():'Cosmic Blue';const b=toggle.querySelector('.tn-current-theme');if(b)b.textContent=label};
+   const current=()=>{const active=picker.querySelector('.theme-choice[aria-pressed="true"]');const label=active?active.textContent.trim():'Cosmic Blue';toggle.setAttribute('aria-label','Color Theme, current: '+label)};
    toggle.addEventListener('click',()=>{const open=picker.classList.toggle('theme-open');toggle.setAttribute('aria-expanded',String(open));current()});
    picker.addEventListener('click',e=>{if(e.target.closest('.theme-choice'))setTimeout(current,0)});current();
   }
