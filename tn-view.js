@@ -31,13 +31,8 @@
     });
   }
 
-  if (mode === 'laptop') {
-    document.addEventListener('DOMContentLoaded', function () {
-      var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
-      var w = document.createElement('div'); w.innerHTML = bar(); document.body.appendChild(w.firstChild); wire(document);
-    });
-    return;
-  }
+  window.tnSetView = function (v) { if (!MODES.hasOwnProperty(v)) return; set(v); if (v === 'laptop') { location.reload(); } else { location.replace('/tn-frame.html?p=' + encodeURIComponent(location.pathname + location.search + location.hash)); } };
+  if (mode === 'laptop') return;
 
   // Tablet / Mobile: open the framed wrapper page with this page inside it.
   var here = location.pathname + location.search + location.hash;
