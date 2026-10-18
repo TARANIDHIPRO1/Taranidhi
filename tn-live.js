@@ -275,19 +275,40 @@
         '<p class="card-subtitle">' + (ah && ah.quality.recommended_for_purpose ? '✅ Recommended for this purpose.' : '⚠ Not specifically recommended for this purpose.') + '</p>');
       var lag = panel('🌅', 'LAGNA (NOW)', infoBox('Rising sign right now', lagnaSign || '—', d.muhurta_validation && d.muhurta_validation.stage4_lagna_shudhi ? d.muhurta_validation.stage4_lagna_shudhi.note : '') +
         '<p class="card-subtitle">Sky ascendant at this moment and place. For a birth ascendant use the Kundali page.</p>');
-      // Full day: each hora expands into its 7 uphoras (same rule as the engine: sub-lords follow the Chaldean sequence from the hora lord)
-      var rows = (d.all_horas || []).map(function (h, idx) {
-        var hs = Date.parse(h.start), he = Date.parse(h.end), cur2 = nowMs >= hs && nowMs < he, dur = (he - hs) / 7, base = CHRONO.indexOf(h.lord), subs = '';
-        for (var k = 0; k < 7; k++) {
-          var a = hs + k * dur, b = hs + (k + 1) * dur, on = nowMs >= a && nowMs < b;
-          subs += '<tr' + (on ? ' style="background:#ffd76a22;font-weight:700"' : '') + '><td ' + td + '>' + (k + 1) + '</td><td ' + td + '>' + esc(CHRONO[(base + k) % 7]) + (on ? ' ◀ now' : '') + '</td><td ' + td + '>' + esc(new Date(a).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toUpperCase() + ' – ' + new Date(b).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toUpperCase()) + '</td></tr>';
-        }
-        return '<details' + (cur2 ? ' open' : '') + ' style="border-bottom:1px solid #ffffff1a;padding:6px 0"><summary style="cursor:pointer;font-size:13px;' + (cur2 ? 'font-weight:700;color:#ffd76a' : '') + '">' + h.hora_number + ' · ' + esc(h.lord) + ' · ' + esc(span(h.start, h.end)) + ' · ' + esc(h.nature) + (h.is_daytime ? ' · day' : ' · night') + (cur2 ? ' ◀ now' : '') + '</summary>' +
-          '<table ' + tbl + '><thead><tr><th ' + th + '>Uphora</th><th ' + th + '>Sub-lord</th><th ' + th + '>Time</th></tr></thead><tbody>' + subs + '</tbody></table></details>';
-      }).join('');
+      // Full day, two aligned tables (day / night). Each hora row opens to its 7 uphoras
+      // (same rule as the engine: sub-lords follow the Chaldean sequence from the hora lord).
+      var tm = function (ms, sec) { return new Date(ms).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: sec ? '2-digit' : undefined, hour12: true }).toUpperCase(); };
+      var cg = '<colgroup><col style="width:12%"><col style="width:26%"><col style="width:20%"><col style="width:20%"><col style="width:22%"></colgroup>';
+      var cgs = '<colgroup><col style="width:8%"><col style="width:22%"><col style="width:30%"><col style="width:30%"><col style="width:10%"></colgroup>';
+      var thc = 'style="text-align:left;padding:7px 5px;border-bottom:1px solid #d8b86a99;font-size:11px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap"';
+      var tdc = 'style="padding:8px 5px;border-bottom:1px solid #ffffff1a;white-space:nowrap"';
+      function badge(n) {
+        var m = { benefic: ['#2fbf84', '▲ Benefic'], malefic: ['#e06a6a', '▼ Malefic'], neutral: ['#a9b0d6', '● Neutral'] }[String(n).toLowerCase()] || ['#a9b0d6', esc(n)];
+        return '<span style="color:' + m[0] + ';font-weight:600">' + m[1] + '</span>';
+      }
+      function horaTbl(list) {
+        var out = '';
+        list.forEach(function (h) {
+          var hs = Date.parse(h.start), he = Date.parse(h.end), isNow = nowMs >= hs && nowMs < he, dur = (he - hs) / 7, base = CHRONO.indexOf(h.lord), subs = '';
+          for (var k = 0; k < 7; k++) {
+            var s0 = hs + k * dur, s1 = hs + (k + 1) * dur, on = nowMs >= s0 && nowMs < s1;
+            subs += '<tr' + (on ? ' style="background:#ffd76a26;font-weight:700"' : '') + '><td ' + tdc + '>' + (k + 1) + '</td><td ' + tdc + '>' + esc(CHRONO[(base + k) % 7]) + '</td><td ' + tdc + '>' + tm(s0, true) + '</td><td ' + tdc + '>' + tm(s1, true) + '</td><td ' + tdc + '>' + (on ? '◀ NOW' : '') + '</td></tr>';
+          }
+          out += '<tr data-hr="1" tabindex="0" role="button" aria-expanded="' + isNow + '" style="cursor:pointer;' + (isNow ? 'background:#ffd76a26;font-weight:700' : '') + '"><td ' + tdc + '><span class="tn-car">' + (isNow ? '▾' : '▸') + '</span> ' + h.hora_number + '</td><td ' + tdc + '>' + esc(h.lord) + (isNow ? ' <span style="font-size:9px;background:#ffd76a;color:#1a1405;border-radius:8px;padding:1px 5px;vertical-align:middle">NOW</span>' : '') + '</td><td ' + tdc + '>' + tm(hs) + '</td><td ' + tdc + '>' + tm(he) + '</td><td ' + tdc + '>' + badge(h.nature) + '</td></tr>' +
+            '<tr class="tn-sub"' + (isNow ? '' : ' hidden') + '><td colspan="5" style="padding:0 0 8px 0;border-bottom:1px solid #d8b86a55"><div style="margin:4px 0 0 10px;padding-left:8px;border-left:2px solid #d8b86a88"><table style="width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed">' + cgs +
+            '<thead><tr><th ' + thc + '>#</th><th ' + thc + '>Sub-lord</th><th ' + thc + '>From</th><th ' + thc + '>To</th><th ' + thc + '></th></tr></thead><tbody>' + subs + '</tbody></table></div></td></tr>';
+        });
+        return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed;min-width:340px">' + cg +
+          '<thead><tr><th ' + thc + '>No.</th><th ' + thc + '>Hora lord</th><th ' + thc + '>From</th><th ' + thc + '>To</th><th ' + thc + '>Nature</th></tr></thead><tbody>' + out + '</tbody></table></div>';
+      }
+      var all = d.all_horas || [];
+      var dayH = all.filter(function (h) { return h.is_daytime; }), nightH = all.filter(function (h) { return !h.is_daytime; });
+      var rows = '<p class="card-subtitle" style="margin:0 0 8px">Tap any hora to open its 7 uphoras.</p>' +
+        '<h3 class="card-title" style="text-align:left;margin:6px 0">☀ DAY HORAS (1–12) · Sunrise ' + esc(T(d.sunrise)) + ' → Sunset ' + esc(T(d.sunset)) + '</h3>' + horaTbl(dayH) +
+        '<h3 class="card-title" style="text-align:left;margin:16px 0 6px">☾ NIGHT HORAS (13–24) · Sunset ' + esc(T(d.sunset)) + ' → next Sunrise</h3>' + horaTbl(nightH);
       var bird = panel('🕊', 'PANCHA PAKSHI', infoBox('Bird now', pp.bird || '—', pp.cycle_start ? 'Yama ' + pp.yama_number + ' · ' + span(pp.cycle_start, pp.cycle_end) : '') + '<p class="card-subtitle">' + esc(pp.note) + '</p>');
       return ctl + '<div class="grid-three">' + lag + cur + str + '</div>' + bird +
-        panel('📋', 'HORA & UPHORA — FULL DAY', '<p class="card-subtitle">Tap an hora to see its 7 uphoras. Sunrise ' + esc(T(d.sunrise)) + ' · Sunset ' + esc(T(d.sunset)) + '.</p>' + rows) + updated(d);
+        panel('📋', 'HORA & UPHORA — FULL DAY', rows) + updated(d);
     },
 
     today: function (d) {
@@ -553,6 +574,10 @@
       var hp = $('h-purpose'); if (hp) hp.addEventListener('change', function () { horaPurpose = hp.value; run(true); });
     });
   }
+
+  function toggleHr(tr) { var sub = tr.nextElementSibling; if (!sub || !sub.classList.contains('tn-sub')) return; var open = sub.hidden; sub.hidden = !open; tr.setAttribute('aria-expanded', String(open)); var c = tr.querySelector('.tn-car'); if (c) c.textContent = open ? '▾' : '▸'; }
+  body.addEventListener('click', function (e) { var tr = e.target.closest && e.target.closest('tr[data-hr]'); if (tr) toggleHr(tr); });
+  body.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-hr]')) { e.preventDefault(); toggleHr(e.target); } });
 
   var NEEDS_PLACE = PAGE !== 'query' && PAGE !== 'cosmos';
   if (NEEDS_PLACE) drawPlace();
