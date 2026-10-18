@@ -201,22 +201,8 @@
     });
   }
 
-  /* ---------- find BIRTH-PLACE coordinates (not device GPS) ---------- */
-  var findBtn = document.getElementById('get-location-btn');
-  if (findBtn) findBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-    if (!val('city')) { status('Enter the birth city first.', 'error'); return; }
-    findBtn.disabled = true; status('Finding ' + val('city') + ' …');
-    geocode(val('city'), val('state'), val('country')).then(function (pl) {
-      findBtn.disabled = false;
-      if (!pl) { status('Could not find "' + val('city') + '". Check the spelling.', 'error'); return; }
-      f('lat').value = pl.lat; f('lon').value = pl.lon; f('lat').dataset.auto = '1';
-      status('Found: ' + pl.label + ' (' + pl.lat + ', ' + pl.lon + ', ' + pl.tz + '). Birth place is used, not your current location.');
-    });
-  });
-
   ['city', 'state', 'country'].forEach(function (n) {
-    f(n).addEventListener('input', function () { if (f('lat').dataset.auto) { f('lat').value = ''; f('lon').value = ''; delete f('lat').dataset.auto; } });
+    f(n).addEventListener('input', function () { var fb = document.getElementById('coord-fallback'); if (fb && fb.hidden) { f('lat').value = ''; f('lon').value = ''; } });
   });
 
   /* ---------- submit ---------- */
@@ -236,7 +222,7 @@
     place = hasGps ? tzForCoords(lat, lon).then(function (tz) { return tz ? { lat: lat, lon: lon, tz: tz, label: val('city') } : null; })
       : geocode(val('city'), val('state'), val('country'));
     place.catch(function () { return null; }).then(function (pl) {
-      if (!pl) { status(hasGps ? 'Could not determine the time zone for these coordinates.' : 'Could not find "' + val('city') + '" automatically. Check the spelling or the internet connection and try again. Coordinates are optional; use them only if the city is not found.', 'error'); done(); return null; }
+      if (!pl) { var fb = document.getElementById('coord-fallback'); if (fb) fb.hidden = false; status(hasGps ? 'Could not determine the time zone for these coordinates.' : 'Could not find "' + val('city') + '" automatically. Check the spelling, or enter the birth-place coordinates below.', 'error'); done(); return null; }
       var iso;
       try { iso = isoWithOffset(val('dob'), val('tob'), pl.tz); } catch (err) { status('Date or time of birth is not valid.', 'error'); done(); return null; }
       return ensureLogin(val('mobile')).then(function (ok) {

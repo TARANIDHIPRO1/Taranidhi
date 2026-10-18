@@ -118,17 +118,19 @@
 
   /* ---------- fetch ---------- */
   var cache = null;
+  var horaPurpose = 'general';
   function fetchNow(force) {
     var p = getPlace();
     if (!p) { body.innerHTML = msgPanel('SET YOUR LOCATION', '<p class="card-subtitle">Press "Use my GPS location" or type a city above.</p>'); return Promise.resolve(null); }
     if (!load(TOKEN_KEY)) { loginPanel(); return Promise.resolve(null); }
-    if (!force && cache && cache.key === p.lat + ',' + p.lon && Date.now() - cache.at < 30000) return Promise.resolve(cache.data);
+    var ckey = p.lat + ',' + p.lon + ',' + horaPurpose;
+    if (!force && cache && cache.key === ckey && Date.now() - cache.at < 30000) return Promise.resolve(cache.data);
     loading('Calculating the live sky for ' + p.label + ' …');
-    return api('/muhurta/now?lat=' + encodeURIComponent(p.lat) + '&lon=' + encodeURIComponent(p.lon)).then(function (r) {
+    return api('/muhurta/now?lat=' + encodeURIComponent(p.lat) + '&lon=' + encodeURIComponent(p.lon) + (PAGE === 'hora' ? '&purpose=' + encodeURIComponent(horaPurpose) : '')).then(function (r) {
       if (r.status === 401) { store(TOKEN_KEY, null); loginPanel(); return null; }
       if (r.status === 402) { body.innerHTML = msgPanel('POINTS NEEDED', '<p class="card-subtitle">Your points balance is 0, so a live lookup cannot run. Recharge points or upgrade your plan, then press REFRESH.</p>'); return null; }
       if (!r.ok) { body.innerHTML = msgPanel('COULD NOT LOAD', '<p class="card-subtitle">' + esc(r.body.error || 'Server error') + ' Press REFRESH to try again.</p>'); return null; }
-      cache = { key: p.lat + ',' + p.lon, at: Date.now(), data: r.body };
+      cache = { key: ckey, at: Date.now(), data: r.body };
       return r.body;
     });
   }
@@ -173,6 +175,25 @@
   function updated(d) { return '<p class="card-subtitle">Calculated ' + esc(new Date(d.as_of).toLocaleString('en-IN')) + ' by the OCCULTVIISION engine for the location above.</p>'; }
 
   /* ---------- pages ---------- */
+
+  var TOOLS = [
+    ['✧', 'NOW', 'index.html', 'Live moment: best window, panchang, star time'],
+    ['▦', 'Today', 'today.html', 'Today at a glance with daily guidance'],
+    ['📊', 'Kundali', 'kundali.html', 'Birth chart from birth place, time and date'],
+    ['📋', 'Panchang', 'panchang.html', 'Tithi, nakshatra, yoga, karana, vara, kaal'],
+    ['◷', 'Hora & Uphora', 'hora-lagna.html', 'Planetary hours and sub-hours, lagna now'],
+    ['⭐', 'Star Time', 'star-time.html', 'Planetary timeline for the day'],
+    ['✦', 'Moment', 'moment.html', 'Best time for a purpose on a chosen day'],
+    ['🗓', 'Muhurta Finder', 'muhurta.html', 'Auspicious windows by activity, with classical rules'],
+    ['🔮', 'Astrological Query', 'query.html', 'KP + Parashari answer from your kundali'],
+    ['♙', 'My Cosmos', 'my-cosmos.html', 'Lagna, dasha, nakshatra and tara of your chart']
+  ];
+  function toolsPanel() {
+    return panel('🧭', 'ALL TOOLS', '<div class="card-grid">' + TOOLS.map(function (t) {
+      return '<a class="card" href="' + t[2] + '" style="text-decoration:none;color:inherit"><div class="card-icon">' + t[0] + '</div><h3 class="card-title">' + esc(t[1]) + '</h3><p class="card-subtitle">' + esc(t[3]) + '</p></a>';
+    }).join('') + '</div>');
+  }
+
   var views = {
     now: function (d) {
       var best = d.active_hora && d.active_hora.quality && d.active_hora.quality.recommended_for_purpose ? d.active_hora : null;
@@ -196,7 +217,7 @@
         card('🌈', 'Choghadiya', d.choghadiya ? d.choghadiya.current.type : '—', d.choghadiya ? d.choghadiya.current.start_ist + '–' + d.choghadiya.current.end_ist + ' IST' : '') +
         card('⛔', 'Rahu Kaal', d.rahu_kaal && d.rahu_kaal.active_now ? 'ACTIVE NOW' : 'Not active', d.rahu_kaal ? span(d.rahu_kaal.start, d.rahu_kaal.end) : '') +
         card('✨', 'Abhijit', d.abhijit_muhurta && d.abhijit_muhurta.active_now ? 'ACTIVE NOW' : 'Not active', d.abhijit_muhurta ? span(d.abhijit_muhurta.start, d.abhijit_muhurta.end) : '') + '</div>' + updated(d));
-      return hero + '<div class="grid-two">' + snap + star + '</div>' + warn;
+      return hero + '<div class="grid-two">' + snap + star + '</div>' + warn + toolsPanel();
     },
 
     panchang: function (d) {
@@ -225,20 +246,33 @@
     },
 
     hora: function (d) {
-      var ah = d.active_hora, up = d.active_uphora, pp = d.pancha_pakshi || {};
+      var ah = d.active_hora, up = d.active_uphora, pp = d.pancha_pakshi || {}, nowMs = Date.now();
       var lagnaSign = d.muhurta_validation && d.muhurta_validation.stage5_sav ? SIGNS[d.muhurta_validation.stage5_sav.lagna_sign] : null;
+      var CHRONO = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'];
+      var purposeOpts = ['general', 'business', 'travel', 'marriage', 'finance', 'property', 'medical', 'education', 'legal', 'spiritual'].map(function (p) { return '<option value="' + p + '"' + (p === horaPurpose ? ' selected' : '') + '>' + p.charAt(0).toUpperCase() + p.slice(1) + '</option>'; }).join('');
+      var ctl = panel('🎯', 'HORA FOR YOUR PURPOSE', '<div class="form-group"><label for="h-purpose">Purpose</label><select id="h-purpose">' + purposeOpts + '</select></div>' +
+        (d.next_good_hora ? '<p class="card-subtitle">Next hora good for <b>' + esc(horaPurpose) + '</b>: <b>' + esc(d.next_good_hora.lord) + '</b> · ' + esc(span(d.next_good_hora.starts_at, d.next_good_hora.ends_at)) + '</p>' : '<p class="card-subtitle">No good hora left in the current window for this purpose.</p>'));
+      var cur = panel('◷', 'CURRENT HORA', infoBox('Planetary hour', ah ? ah.lord + ' hora' : '—', ah ? span(ah.start, ah.end) + ' · #' + ah.hora_number + (ah.is_daytime ? ' (day)' : ' (night)') : '') +
+        (up ? infoBox('Current Uphora (sub-hour)', up.sub, span(up.start, up.end)) : '') +
+        (d.next_hora ? '<p class="card-subtitle">Next hora: <b>' + esc(d.next_hora.lord) + '</b> at ' + esc(T(d.next_hora.starts_at)) + '</p>' : ''));
+      var str = panel('⚖', 'HORA STRENGTH', infoBox('Nature for ' + horaPurpose, ah ? ah.quality.nature : '—', ah ? ah.quality.note : '') +
+        '<p class="card-subtitle">' + (ah && ah.quality.recommended_for_purpose ? '✅ Recommended for this purpose.' : '⚠ Not specifically recommended for this purpose.') + '</p>');
       var lag = panel('🌅', 'LAGNA (NOW)', infoBox('Rising sign right now', lagnaSign || '—', d.muhurta_validation && d.muhurta_validation.stage4_lagna_shudhi ? d.muhurta_validation.stage4_lagna_shudhi.note : '') +
-        '<p class="card-subtitle">This is the sky\'s ascendant at this moment and place. For a birth ascendant, open the Kundali page.</p>');
-      var cur = panel('◷', 'CURRENT HORA', infoBox('Planetary hour', ah ? ah.lord + ' hora' : '—', ah ? span(ah.start, ah.end) : '') +
-        (up ? infoBox('Uphora (sub-hour)', up.sub, span(up.start, up.end)) : '') +
-        (d.next_hora ? '<p class="card-subtitle">Next: ' + esc(d.next_hora.lord) + ' at ' + esc(T(d.next_hora.starts_at)) + '</p>' : ''));
-      var str = panel('⚖', 'HORA STRENGTH', infoBox('Nature', ah ? ah.quality.nature : '—', ah ? ah.quality.note : '') +
-        (d.next_good_hora ? '<p class="card-subtitle">Next good hora: <b>' + esc(d.next_good_hora.lord) + '</b> ' + esc(span(d.next_good_hora.starts_at, d.next_good_hora.ends_at)) + '</p>' : ''));
+        '<p class="card-subtitle">Sky ascendant at this moment and place. For a birth ascendant use the Kundali page.</p>');
+      // Full day: each hora expands into its 7 uphoras (same rule as the engine: sub-lords follow the Chaldean sequence from the hora lord)
+      var rows = (d.all_horas || []).map(function (h, idx) {
+        var hs = Date.parse(h.start), he = Date.parse(h.end), cur2 = nowMs >= hs && nowMs < he, dur = (he - hs) / 7, base = CHRONO.indexOf(h.lord), subs = '';
+        for (var k = 0; k < 7; k++) {
+          var a = hs + k * dur, b = hs + (k + 1) * dur, on = nowMs >= a && nowMs < b;
+          subs += '<tr' + (on ? ' style="background:#ffd76a22;font-weight:700"' : '') + '><td ' + td + '>' + (k + 1) + '</td><td ' + td + '>' + esc(CHRONO[(base + k) % 7]) + (on ? ' ◀ now' : '') + '</td><td ' + td + '>' + esc(new Date(a).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toUpperCase() + ' – ' + new Date(b).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).toUpperCase()) + '</td></tr>';
+        }
+        return '<details' + (cur2 ? ' open' : '') + ' style="border-bottom:1px solid #ffffff1a;padding:6px 0"><summary style="cursor:pointer;font-size:13px;' + (cur2 ? 'font-weight:700;color:#ffd76a' : '') + '">' + h.hora_number + ' · ' + esc(h.lord) + ' · ' + esc(span(h.start, h.end)) + ' · ' + esc(h.nature) + (h.is_daytime ? ' · day' : ' · night') + (cur2 ? ' ◀ now' : '') + '</summary>' +
+          '<table ' + tbl + '><thead><tr><th ' + th + '>Uphora</th><th ' + th + '>Sub-lord</th><th ' + th + '>Time</th></tr></thead><tbody>' + subs + '</tbody></table></details>';
+      }).join('');
       var bird = panel('🕊', 'PANCHA PAKSHI', infoBox('Bird now', pp.bird || '—', pp.cycle_start ? 'Yama ' + pp.yama_number + ' · ' + span(pp.cycle_start, pp.cycle_end) : '') + '<p class="card-subtitle">' + esc(pp.note) + '</p>');
-      return '<div class="grid-three">' + lag + cur + str + '</div>' + bird +
-        panel('📋', 'ALL HORAS TODAY', horaTable(d) + '<p class="card-subtitle">Sunrise ' + esc(T(d.sunrise)) + ' · Sunset ' + esc(T(d.sunset)) + '</p>') + updated(d);
+      return ctl + '<div class="grid-three">' + lag + cur + str + '</div>' + bird +
+        panel('📋', 'HORA & UPHORA — FULL DAY', '<p class="card-subtitle">Tap an hora to see its 7 uphoras. Sunrise ' + esc(T(d.sunrise)) + ' · Sunset ' + esc(T(d.sunset)) + '.</p>' + rows) + updated(d);
     },
-
 
     today: function (d) {
       var v = d.vara || {}, t = d.tithi || {};
@@ -497,7 +531,11 @@
 
   function run(force) {
     if (custom[PAGE]) { custom[PAGE](); return; }
-    fetchNow(force).then(function (d) { if (d) body.innerHTML = views[PAGE](d); });
+    fetchNow(force).then(function (d) {
+      if (!d) return;
+      body.innerHTML = views[PAGE](d);
+      var hp = $('h-purpose'); if (hp) hp.addEventListener('change', function () { horaPurpose = hp.value; run(true); });
+    });
   }
 
   var NEEDS_PLACE = PAGE !== 'query' && PAGE !== 'cosmos';
