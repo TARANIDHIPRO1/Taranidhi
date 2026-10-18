@@ -51,15 +51,21 @@
   }
 
   /* ---------- place + timezone (Open-Meteo, free, no key) ---------- */
-  function geocode(city, state, country) {
-    var url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name=' + encodeURIComponent(city);
+  function geocodeOnce(q, state, country) {
+    var url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name=' + encodeURIComponent(q);
     return fetch(url).then(function (r) { return r.json(); }).then(function (j) {
       var list = j.results || [];
       if (!list.length) return null;
-      function m(a, b) { return a && b && String(a).toLowerCase().indexOf(String(b).toLowerCase()) !== -1; }
-      var best = list.filter(function (x) { return (!country || m(x.country, country) || m(x.country_code, country)) && (!state || m(x.admin1, state)); })[0]
-        || list.filter(function (x) { return !country || m(x.country, country) || m(x.country_code, country); })[0] || list[0];
+      function n(a) { return String(a || '').toLowerCase().replace(/[^a-z]/g, ''); }
+      function m(a, b) { return n(a) && n(b) && n(a).indexOf(n(b)) !== -1; }
+      var inCountry = list.filter(function (x) { return !country || m(x.country, country) || m(x.country_code, country); });
+      var best = inCountry.filter(function (x) { return !state || m(x.admin1, state) || m(x.admin2, state); })[0] || inCountry[0] || list[0];
       return { lat: best.latitude, lon: best.longitude, tz: best.timezone, label: [best.name, best.admin1, best.country].filter(Boolean).join(', ') };
+    });
+  }
+  function geocode(city, state, country) {
+    return geocodeOnce(city, state, country).catch(function () { return null; }).then(function (r) {
+      return r || geocodeOnce(String(city).split(',')[0].trim(), '', country).catch(function () { return null; });
     });
   }
   function tzForCoords(lat, lon) {
@@ -195,6 +201,24 @@
     });
   }
 
+  /* ---------- find BIRTH-PLACE coordinates (not device GPS) ---------- */
+  var findBtn = document.getElementById('get-location-btn');
+  if (findBtn) findBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (!val('city')) { status('Enter the birth city first.', 'error'); return; }
+    findBtn.disabled = true; status('Finding ' + val('city') + ' …');
+    geocode(val('city'), val('state'), val('country')).then(function (pl) {
+      findBtn.disabled = false;
+      if (!pl) { status('Could not find "' + val('city') + '". Check the spelling.', 'error'); return; }
+      f('lat').value = pl.lat; f('lon').value = pl.lon; f('lat').dataset.auto = '1';
+      status('Found: ' + pl.label + ' (' + pl.lat + ', ' + pl.lon + ', ' + pl.tz + '). Birth place is used, not your current location.');
+    });
+  });
+
+  ['city', 'state', 'country'].forEach(function (n) {
+    f(n).addEventListener('input', function () { if (f('lat').dataset.auto) { f('lat').value = ''; f('lon').value = ''; delete f('lat').dataset.auto; } });
+  });
+
   /* ---------- submit ---------- */
   var busy = false;
   form.addEventListener('submit', function (e) {
@@ -212,7 +236,7 @@
     place = hasGps ? tzForCoords(lat, lon).then(function (tz) { return tz ? { lat: lat, lon: lon, tz: tz, label: val('city') } : null; })
       : geocode(val('city'), val('state'), val('country'));
     place.catch(function () { return null; }).then(function (pl) {
-      if (!pl) { status(hasGps ? 'Could not determine the time zone for these coordinates.' : 'Could not find "' + val('city') + '". Check the spelling or press GET MY LOCATION / enter latitude and longitude.', 'error'); done(); return null; }
+      if (!pl) { status(hasGps ? 'Could not determine the time zone for these coordinates.' : 'Could not find "' + val('city') + '" automatically. Check the spelling or the internet connection and try again. Coordinates are optional; use them only if the city is not found.', 'error'); done(); return null; }
       var iso;
       try { iso = isoWithOffset(val('dob'), val('tob'), pl.tz); } catch (err) { status('Date or time of birth is not valid.', 'error'); done(); return null; }
       return ensureLogin(val('mobile')).then(function (ok) {
