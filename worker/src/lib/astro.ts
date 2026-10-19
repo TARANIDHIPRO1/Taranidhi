@@ -42,32 +42,44 @@ const VALID_AYANAMSAS: AyanamsaType[] = ["lahiri", "fagan", "deluce"];
 const VALID_HOUSE_SYSTEMS: HouseSystem[] = ["placidus", "equal", "whole-sign"];
 const VALID_DASHA_SYSTEMS: DashaSystem[] = ["vimshottari", "ashtottari"];
 
-export const AYANAMSA_TYPE: AyanamsaType = (
-  process.env.AYANAMSA_TYPE ?? "lahiri"
-) as AyanamsaType;
-export const HOUSE_SYSTEM: HouseSystem = (
-  process.env.HOUSE_SYSTEM ?? "placidus"
-) as HouseSystem;
-export const DASHA_SYSTEM: DashaSystem = (
-  process.env.DASHA_SYSTEM ?? "vimshottari"
-) as DashaSystem;
+// Get astrological config from Cloudflare environment (not Node.js process.env)
+// This function must be called at runtime with the 'env' parameter from the fetch handler
+// DO NOT access process.env here — Cloudflare Workers don't have it
+export function getAstroConfig(env: any) {
+  const ayanamsaType: AyanamsaType = (
+    (env?.AYANAMSA_TYPE as string) ?? "lahiri"
+  ) as AyanamsaType;
+  const houseSystem: HouseSystem = (
+    (env?.HOUSE_SYSTEM as string) ?? "placidus"
+  ) as HouseSystem;
+  const dashaSystem: DashaSystem = (
+    (env?.DASHA_SYSTEM as string) ?? "vimshottari"
+  ) as DashaSystem;
 
-// Validate configuration at startup
-if (!VALID_AYANAMSAS.includes(AYANAMSA_TYPE)) {
-  throw new Error(
-    `Invalid AYANAMSA_TYPE: "${AYANAMSA_TYPE}". Must be one of: ${VALID_AYANAMSAS.join(", ")}`
-  );
+  // Validate configuration
+  if (!VALID_AYANAMSAS.includes(ayanamsaType)) {
+    throw new Error(
+      `Invalid AYANAMSA_TYPE: "${ayanamsaType}". Must be one of: ${VALID_AYANAMSAS.join(", ")}`
+    );
+  }
+  if (!VALID_HOUSE_SYSTEMS.includes(houseSystem)) {
+    throw new Error(
+      `Invalid HOUSE_SYSTEM: "${houseSystem}". Must be one of: ${VALID_HOUSE_SYSTEMS.join(", ")}`
+    );
+  }
+  if (!VALID_DASHA_SYSTEMS.includes(dashaSystem)) {
+    throw new Error(
+      `Invalid DASHA_SYSTEM: "${dashaSystem}". Must be one of: ${VALID_DASHA_SYSTEMS.join(", ")}`
+    );
+  }
+
+  return { ayanamsaType, houseSystem, dashaSystem };
 }
-if (!VALID_HOUSE_SYSTEMS.includes(HOUSE_SYSTEM)) {
-  throw new Error(
-    `Invalid HOUSE_SYSTEM: "${HOUSE_SYSTEM}". Must be one of: ${VALID_HOUSE_SYSTEMS.join(", ")}`
-  );
-}
-if (!VALID_DASHA_SYSTEMS.includes(DASHA_SYSTEM)) {
-  throw new Error(
-    `Invalid DASHA_SYSTEM: "${DASHA_SYSTEM}". Must be one of: ${VALID_DASHA_SYSTEMS.join(", ")}`
-  );
-}
+
+// Defaults for when no env is available
+export const AYANAMSA_TYPE: AyanamsaType = "lahiri";
+export const HOUSE_SYSTEM: HouseSystem = "placidus";
+export const DASHA_SYSTEM: DashaSystem = "vimshottari";
 
 export function julianDayFromUtc(date: Date): number {
   return date.getTime() / 86400000 + 2440587.5;
