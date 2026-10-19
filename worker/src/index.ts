@@ -64,6 +64,7 @@ import { type Env as WalletEnv } from "./lib/wallet";
 import { type Env as OrdersEnv } from "./lib/orders";
 import { type Env as ReferralEnv } from "./lib/referral";
 import { errorJson, corsPreflight, type Env as ResponseEnv } from "./lib/response";
+import { INLINE_HTML } from "./lib/inline-html";
 
 export interface Env
   extends AuthEnv,
@@ -74,9 +75,6 @@ export interface Env
     SessionEnv,
     KnowledgeEnv {
   DB: D1Database;
-  ASSETS: {
-    fetch(request: Request | string): Promise<Response>;
-  };
 }
 
 export default {
@@ -319,16 +317,10 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
-    // Fallback: Serve static assets or index.html for client-side SPA routing
-    try {
-      return await env.ASSETS.fetch(request);
-    } catch (error) {
-      // Fallback: Serve basic HTML for testing
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>OccultViision</title></head><body><h1>TaraNidhi Loading...</h1><p>API Health: <span id="health">checking...</span></p><script>fetch('/health').then(r=>r.text()).then(t=>{document.getElementById('health').textContent=t})</script></body></html>`;
-      return new Response(html, {
-        headers: { "content-type": "text/html; charset=utf-8" },
-        status: 200
-      });
-    }
+    // Fallback: Serve inlined frontend for all non-API routes (SPA)
+    return new Response(INLINE_HTML, {
+      headers: { "content-type": "text/html; charset=utf-8" },
+      status: 200
+    });
   },
 };
