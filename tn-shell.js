@@ -9,7 +9,7 @@
     ['index.html', '✧', 'NOW'], ['today.html', '▦', 'Today'], ['calendar.html', '🗓', 'Utsav Calendar'], ['kundali.html', '▦', 'Kundali'],
     ['panchang.html', '▤', 'Panchang'], ['hora-lagna.html', '◷', 'Hora & Uphora'], ['star-time.html', '◉', 'Star Time'], ['moment.html', '◌', 'Moment'],
     ['muhurta.html', '✦', 'Muhurta Finder'], ['query.html', '?', 'Astrological Query'], ['my-cosmos.html', '♙', 'My Cosmos'],
-    ['astrologer.html', '☸', 'Astrologer & Enquiry'], ['advertisement.html', '▣', 'Advertisement'], ['offer.html', '✧', 'Offers'],
+    ['astrologer.html', '☸', 'Astrologer & Enquiry'], ['vehicle.html', '🚗', 'Vehicle Number & Colour'], ['advertisement.html', '▣', 'Advertisement'], ['offer.html', '✧', 'Offers'],
     ['offers.html', '✧', 'Special Offers'], ['personal-branding.html', '♙', 'My Brand'], ['about.html', 'ℹ', 'About']
   ];
   var DEVICES = [['laptop', '💻', 'Laptop'], ['tablet', '📟', 'Tablet'], ['mobile', '📱', 'Mobile']];
