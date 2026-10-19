@@ -46,3 +46,8 @@ FRONTEND_ORIGIN = "*"
 # Anyone on the beta URL can log in with OTP code 000000.
 # FLIP TO "false" AND SET ENVIRONMENT="production" BEFORE COMMERCIAL LAUNCH.
 DEV_OTP_BYPASS = "true"
+
+# ── Route binding (CRITICAL: enables the worker to respond to HTTP requests) ──
+[[routes]]
+pattern = "taranidhi-pro1.occultviision.workers.dev/*"
+custom_domain = true
