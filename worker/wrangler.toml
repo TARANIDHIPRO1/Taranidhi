@@ -47,7 +47,3 @@ FRONTEND_ORIGIN = "*"
 # FLIP TO "false" AND SET ENVIRONMENT="production" BEFORE COMMERCIAL LAUNCH.
 DEV_OTP_BYPASS = "true"
 
-# ── Auto-routed on workers.dev subdomain ──
-# For .workers.dev domains, Cloudflare automatically routes all requests.
-# No explicit route binding needed — the worker responds to:
-# https://taranidhi-pro1.occultviision.workers.dev/
