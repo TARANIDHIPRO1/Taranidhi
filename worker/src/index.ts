@@ -64,7 +64,6 @@ import { type Env as WalletEnv } from "./lib/wallet";
 import { type Env as OrdersEnv } from "./lib/orders";
 import { type Env as ReferralEnv } from "./lib/referral";
 import { errorJson, corsPreflight, type Env as ResponseEnv } from "./lib/response";
-import { INLINE_HTML } from "./lib/inline-html";
 
 export interface Env
   extends AuthEnv,
@@ -317,8 +316,8 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
-    // Fallback: Serve inlined frontend for all non-API routes (SPA)
-    return new Response(INLINE_HTML, {
+    // Fallback: Serve test response to verify worker is working
+    return new Response("<!DOCTYPE html><html><head><title>TaraNidhi - Test</title></head><body><h1>✅ Worker is ALIVE</h1><p>Path: " + pathname + "</p><p>All APIs online</p></body></html>", {
       headers: { "content-type": "text/html; charset=utf-8" },
       status: 200
     });
