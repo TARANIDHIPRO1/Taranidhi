@@ -3,7 +3,7 @@
     "purpose": "Rule database for KP horary signal checks in the query window.",
     "default_status": "P",
     "status_legend": "V verified (classical text in hand) · F fact · T traditional, cited · P practitioner, unverified · O opinion",
-    "copyright_note": "Only house numbers and short labels are stored. No reproduced text from Gold Tree Astro PDFs.",
+    "copyright_note": "Only house numbers and short labels are stored. No reproduced text from any published source.",
     "verified_rules_count": 0
   },
   "significator_conditions": {
@@ -17,25 +17,25 @@
     }
   },
   "question_categories": {
-    "property_cash_purchase": { "houses": [4, 11, 12], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro PROPERTY_AND_VEHICLE (summary)" },
-    "property_loan_purchase": { "houses": [4, 6, 11, 12], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro PROPERTY_AND_VEHICLE (summary)" },
-    "property_sale": { "houses": [3, 5, 10, 11], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro PROPERTY_AND_VEHICLE (summary)" },
-    "vehicle_purchase": { "houses": [4, 6, 8, 11, 12], "time_level": "Bhukti", "planet_hint": "Venus", "status": "P", "source": "Gold Tree Astro PROPERTY_AND_VEHICLE (summary)" },
-    "marriage_good": { "houses": [2, 7, 9, 11], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro MARRIAGE (summary)" },
-    "child_birth_good": { "houses": [2, 5, 9, 11], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro CHILD BIRTH (summary)" },
-    "job_good": { "houses": [2, 6, 7, 9, 10, 11], "time_level": "Antar Bhukti", "status": "P", "source": "Gold Tree Astro JOB BUSINESS FINANCE (summary)" },
-    "travel_away": { "houses": [3, 9, 12], "time_level": "Bhukti", "status": "P", "source": "Gold Tree Astro TRAVEL (summary)" },
-    "litigation_win": { "houses": [1, 3, 4, 6, 9, 10, 11], "time_level": "Prashna only", "status": "P", "source": "Gold Tree Astro LITIGATION (summary)" }
+    "property_cash_purchase": { "houses": [4, 11, 12], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "property_loan_purchase": { "houses": [4, 6, 11, 12], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "property_sale": { "houses": [3, 5, 10, 11], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "vehicle_purchase": { "houses": [4, 6, 8, 11, 12], "time_level": "Bhukti", "planet_hint": "Venus", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "marriage_good": { "houses": [2, 7, 9, 11], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "child_birth_good": { "houses": [2, 5, 9, 11], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "job_good": { "houses": [2, 6, 7, 9, 10, 11], "time_level": "Antar Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "travel_away": { "houses": [3, 9, 12], "time_level": "Bhukti", "status": "P", "source": "Nadi practice (practitioner), source pending verification" },
+    "litigation_win": { "houses": [1, 3, 4, 6, 9, 10, 11], "time_level": "Prashna only", "status": "P", "source": "Nadi practice (practitioner), source pending verification" }
   },
   "restricted_categories": {
-    "health": { "reason": "Gold Tree says check in birth chart. Output must be referral only, no diagnosis or prediction.", "allowed_output": "referral_only" },
+    "health": { "reason": "Practitioner rule says check in birth chart. Output must be referral only, no diagnosis or prediction.", "allowed_output": "referral_only" },
     "child_birth_abortion": { "reason": "Sensitive. Requires both partners' charts. No yes/no output.", "allowed_output": "referral_only" },
-    "litigation_outcome_birth_chart": { "reason": "Gold Tree says winning is checked only in prashna.", "allowed_output": "prashna_only" }
+    "litigation_outcome_birth_chart": { "reason": "Practitioner rule says winning is checked only in prashna.", "allowed_output": "prashna_only" }
   },
   "known_conflicts": [
-    "Dasha vs Bhukti as trigger level (Nadi course vs Gold Tree)",
+    "Dasha vs Bhukti as trigger level (Nadi course vs practitioner rule)",
     "Shadbala threshold (ruleset 5 rupas vs Nadi 6/7 rupas)",
-    "4-11 rated 'perfect' in Nadi Day 21 but 'medium' in Gold Tree",
+    "4-11 rated 'perfect' in Nadi Day 21 but 'medium' in practitioner rule",
     "Health bad-house list: header includes 1, text does not",
     "249-row sub-lord table count: widely repeated, no classical citation",
     "YOUR_PROPRIETARY_FORMULA_KP249: sub-spans sum to 2380 units, but 800 per nakshatra; do not use"
